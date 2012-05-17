@@ -27,25 +27,22 @@ class DebugNodes  extends DisplayObject
 	
 	public function debugNodes(e : Event)
 	{
-		trace("debugNodes");
 		debugNode(Lib.document.body);
 	}
 	
 	public function debugNode(node : HtmlDom)
 	{
-		trace("debugNode("+node+")");
 		for (cCount in 0...node.childNodes.length)
 		{
-			if (cast(node.childNodes[cCount]).className != null)
+			if (cast(node.childNodes[cCount], HtmlDom).className != null)
 			{
-				trace("CLASSNAME FOUND");
 				var tagName = untyped node.childNodes[cCount].nodeName;
 				trace("tag " + tagName +
-				" with class=" + cast(node.childNodes[cCount]).className +
-				" has associated components : "+SLPlayer.getAssociatedComponents(cast(node.childNodes[cCount])));
+				" with class=" + cast(node.childNodes[cCount], HtmlDom).className +
+				" has associated components : "+SLPlayer.getAssociatedComponents(cast(node.childNodes[cCount], HtmlDom)));
 			}
 			if (node.childNodes[cCount].hasChildNodes())
-				debugNode(cast(node.childNodes[cCount]));
+				debugNode(cast(node.childNodes[cCount], HtmlDom));
 		}
 	}
 }
