@@ -4,7 +4,18 @@ import sys.FileSystem;
 import haxe.macro.Expr;
 
 /**
- * ...
+ * 
+	  une macro split la page html en deux : body et head
+
+		. prend le contenu de <body> comme une chaine de caractère et génère 
+		js.Lib.document.body.innerHTML = "... la chaine ..."; 
+
+		. parse puis interprete le contenu de <head> comme la config de l'appli SLPlayer (par exemple taille de l'appli dans la balise meta viewport)
+
+		. interprete <script src="classes/Galery.js" /> comme ceci :
+		génère un "import classes.Galery;" (le dev doit avoir ajouté le bon class path pour qu on le trouve)
+		génère un "new Galery();" pour qu il soit executé dès le lancement de l appli
+	 
  * @author Thomas Fétiveau
  */
 
@@ -47,6 +58,11 @@ class AppBuilder
 						{
 							case "script":
 								var cmpClassName = headElt.get("src");
+								
+								//FIXME
+								if (cmpClassName == "SLPlayer.js")
+									continue;
+								
 								if (cmpClassName != null && StringTools.endsWith(cmpClassName.toLowerCase(), ".js"))
 								{
 									cmpClassName = cmpClassName.substr(0, cmpClassName.length - 3);

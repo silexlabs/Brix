@@ -15,20 +15,10 @@ import DebugNodes;
  */
 @:build(slplayer.macro.AppBuilder.buildFromHtml('gallery.html')) class SLPlayer 
 {
-	//static var _htmlBody:String = "toto";
-	/*
-	 * une macro split la page html en deux : body et head
-
-		. prend le contenu de <body> comme une chaine de caractère et génère 
-		js.Lib.document.body.innerHTML = "... la chaine ..."; 
-
-		. parse puis interprete le contenu de <head> comme la config de l'appli SLPlayer (par exemple taille de l'appli dans la balise meta viewport)
-
-		. interprete <script src="classes/Galery.js" /> comme ceci :
-		génère un "import classes.Galery;" (le dev doit avoir ajouté le bon class path pour qu on le trouve)
-		génère un "new Galery();" pour qu il soit executé dès le lancement de l appli
-	 */
-
+	static private var nodeToCmpInstances = new Hash<List<DisplayObject>>();
+	
+	static private var SLPID_ATTR_NAME = "slpid";
+	
 	public function new() 
 	{
 		//Set the body HTML content if not js
@@ -79,8 +69,38 @@ trace("taggedNodes = "+taggedNodes.length);
 		}
 	}
 	
+	public static function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void
+	{
+		trace("addAssociatedComponent("+node+", "+cmp+")");
+		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
+		
+		var associatedCmps : List<DisplayObject>;
+		
+		if (nodeId != null)
+		{
+			associatedCmps = nodeToCmpInstances.get(nodeId);
+		}
+		else
+		{
+			//there may be a better way to get a unique id...
+			nodeId = haxe.Md5.encode(Std.string(Math.random()) + Date.now().toString());
+			node.setAttribute("data-" + SLPID_ATTR_NAME, nodeId);
+			associatedCmps = new List();
+		}
+		
+		associatedCmps.add(cmp);
+		
+		nodeToCmpInstances.set( nodeId, associatedCmps );
+	}
+	
 	public static function getAssociatedComponents(node : HtmlDom) : Null<List<DisplayObject>>
 	{
-		return cast Reflect.field(node, "slPlayerCmps");
+		//return cast Reflect.field(node, "slPlayerCmps");
+		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
+		
+		if (nodeId != null)
+			return nodeToCmpInstances.get(nodeId);
+		
+		return null;
 	}
 }

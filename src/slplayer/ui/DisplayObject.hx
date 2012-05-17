@@ -1,5 +1,7 @@
 package slplayer.ui;
 
+import slplayer.core.SLPlayer;
+
 import js.Lib;
 import js.Dom;
 
@@ -22,15 +24,16 @@ class DisplayObject
 	{
 		this.rootElement = rootElement;
 		
+		SLPlayer.addAssociatedComponent(rootElement, this);
 		//Keep a reference within the node object to each DisplayObject instance linked to this node
-		var slPlayerCmps : List<DisplayObject> = cast Reflect.field(rootElement, "slPlayerCmps");
-		
-		if (slPlayerCmps == null)
-			slPlayerCmps = new List();
-		
-		slPlayerCmps.add(this);
-		
-		Reflect.setField(rootElement, "slPlayerCmps", slPlayerCmps);
+		//var slPlayerCmps : List<DisplayObject> = cast Reflect.field(rootElement, "slPlayerCmps");
+		//
+		//if (slPlayerCmps == null)
+			//slPlayerCmps = new List();
+		//
+		//slPlayerCmps.add(this);
+		//
+		//Reflect.setField(rootElement, "slPlayerCmps", slPlayerCmps);
 	}
 	
 	// --- CUSTOMIZABLE API ---
