@@ -1,0 +1,4 @@
+-js Gallery.js
+-cp .
+-cp ../../src/
+-main slplayer.core.SLPlayer

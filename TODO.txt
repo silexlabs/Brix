@@ -1,0 +1,5 @@
+- make a set of components :
+
+  * form set: inputs, buttons, checkboxes...
+  * gallery
+  * dataProvider
