@@ -27,8 +27,10 @@ class DisplayObject
 		
 		if (slPlayerCmps == null)
 			slPlayerCmps = new List();
-
+		
 		slPlayerCmps.add(this);
+		
+		Reflect.setField(rootElement, "slPlayerCmps", slPlayerCmps);
 	}
 	
 	// --- CUSTOMIZABLE API ---

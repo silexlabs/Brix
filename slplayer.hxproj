@@ -15,7 +15,7 @@
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
-    <class path="demo\helloworld" />
+    <class path="demo\gallery" />
     <class path="src" />
     <class path="..\haxe_libs\cocktail\src" />
     <class path="..\haxe_libs\cocktail\lib" />

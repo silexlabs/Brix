@@ -5,7 +5,9 @@ import js.Dom;
 
 import slplayer.ui.DisplayObject;
 
+//TODO generates these imports in macro
 import Gallery;
+import DebugNodes;
 
 /**
  * ...
@@ -31,8 +33,8 @@ import Gallery;
 	{
 		//Set the body HTML content if not js
 		#if !js
-		trace("body set");
-		Lib.document.body.innerHTML = _htmlBody;
+			trace("body set");
+			Lib.document.body.innerHTML = _htmlBody;
 		#end
 	}
 
@@ -49,7 +51,7 @@ import Gallery;
 	private function initDisplayObjects(e : Event) { }
 	
 	/**
-	 * TODO determine if it wouldn't be better to pass directly the Class. I've tried before but I don't get the generic <> thing...
+	 * TODO determine if it wouldn't be better to pass directly the Class. We would however loose the benefit of resolving it. but we could try catch the exceptions...
 	 * TODO Also, need to ask the mailing list if I have to use Reflect to access a Class static field.
 	 * @param	displayObjectClassName
 	 */
@@ -75,5 +77,10 @@ trace("taggedNodes = "+taggedNodes.length);
 				}
 			}
 		}
+	}
+	
+	public static function getAssociatedComponents(node : HtmlDom) : Null<List<DisplayObject>>
+	{
+		return cast Reflect.field(node, "slPlayerCmps");
 	}
 }

@@ -16,22 +16,6 @@ class Gallery extends DisplayObject
 	
 	var currentIndex:Int;
 	
-	//var ulElt : HtmlDom;
-	
-	//static override public function initAll():Void
-	//{
-		//var ulElts = Lib.document.getElementsByTagName("ul");
-	//
-		//for (ulCnt in 0...ulElts.length)
-		//{	
-			//if (ulElts[ulCnt].id == className)
-			//{
-				//var newGallery = Gallery.create(ulElts[ulCnt]);
-				//newGallery.init();
-			//}
-		//}
-	//}
-	
 	override public function init(e:Event):Void 
 	{
 		trace("Gallery component initialized");
@@ -82,13 +66,4 @@ class Gallery extends DisplayObject
 			currentIndex--;
 		updateView();
 	}
-	
-	//public static function main():Void
-	//{
-		//#if js
-			//Lib.window.onload = callback(init);
-		//#else
-			//init(null);
-		//#end
-	//}
 }
