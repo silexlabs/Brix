@@ -55,39 +55,23 @@ import Gallery;
 	 */
 	private function initDisplayObjectsOfType(displayObjectClassName : String)
 	{
-		//FIXME need cocktail implementation of getElementByClassName()
-		//var nodes = Lib.document.getElementsByClassName(className);
-		//
-		//for (node in nodes)
-		//{
-			//var displayObject = new DisplayObject(node);
-			//displayObject.init();
-		//}
-		trace("initDisplayObjectsOfType called with displayObjectClassName="+displayObjectClassName);
+trace("initDisplayObjectsOfType called with displayObjectClassName="+displayObjectClassName);
 		
 		var displayObjectClass = Type.resolveClass(displayObjectClassName);
 		
 		if (displayObjectClass != null)
 		{
-			trace(displayObjectClassName+" class resolved.");
-			var ulElts = Lib.document.body.getElementsByTagName("ul");
-			//var ulElts = Lib.document.getElementsByClassName("gallery");
-			trace("ulElts = "+ulElts.length);
-			for (ulCnt in 0...ulElts.length)
+			var tagClassName = Reflect.field(displayObjectClass, "className");
+trace(displayObjectClassName+" class resolved and its tag classname is "+tagClassName);
+			
+			if (tagClassName != null)
 			{
-				trace(ulElts[ulCnt].id+" == "+Reflect.field(displayObjectClass,"className"));
-				//if (ulElts[ulCnt].id == displayObjectClass.className)
-				if (ulElts[ulCnt].id == Reflect.field(displayObjectClass,"className"))
+				var taggedNodes : Array<HtmlDom> = untyped Lib.document.getElementsByClassName(tagClassName);
+trace("taggedNodes = "+taggedNodes.length);
+				for (nodeCnt in 0...taggedNodes.length)
 				{
-					var newDisplayObject = Type.createInstance( displayObjectClass, [ulElts[ulCnt]] ); trace(displayObjectClassName+" instance created");
-					//newDisplayObject.init();
-					//#if js
-						//Lib.window.onload = callback(newDisplayObject.init);
-						//Lib.window.onload = Reflect.callMethod(newDisplayObject, Reflect.field(newDisplayObject, "init"), []);
-						//Lib.window.onload = callback(Reflect.field(newDisplayObject,"init"));
-					//#else
-						newDisplayObject.init(null);
-					//#end
+					var newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] ); trace(displayObjectClassName+" instance created");
+					newDisplayObject.init(null);
 				}
 			}
 		}

@@ -735,19 +735,19 @@ slplayer.core.SLPlayer.prototype = {
 		this.initDisplayObjectsOfType("Gallery");
 	}
 	,initDisplayObjectsOfType: function(displayObjectClassName) {
-		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 66, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 58, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 		var displayObjectClass = Type.resolveClass(displayObjectClassName);
 		if(displayObjectClass != null) {
-			haxe.Log.trace(displayObjectClassName + " class resolved.",{ fileName : "SLPlayer.hx", lineNumber : 72, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-			var ulElts = js.Lib.document.body.getElementsByTagName("ul");
-			haxe.Log.trace("ulElts = " + ulElts.length,{ fileName : "SLPlayer.hx", lineNumber : 75, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-			var _g1 = 0, _g = ulElts.length;
-			while(_g1 < _g) {
-				var ulCnt = _g1++;
-				haxe.Log.trace(ulElts[ulCnt].id + " == " + Reflect.field(displayObjectClass,"className"),{ fileName : "SLPlayer.hx", lineNumber : 78, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-				if(ulElts[ulCnt].id == Reflect.field(displayObjectClass,"className")) {
-					var newDisplayObject = Type.createInstance(displayObjectClass,[ulElts[ulCnt]]);
-					haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 82, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+			var tagClassName = Reflect.field(displayObjectClass,"className");
+			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 65, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+			if(tagClassName != null) {
+				var taggedNodes = js.Lib.document.getElementsByClassName(tagClassName);
+				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 70, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+				var _g1 = 0, _g = taggedNodes.length;
+				while(_g1 < _g) {
+					var nodeCnt = _g1++;
+					var newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
+					haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 73, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 					newDisplayObject.init(null);
 				}
 			}
@@ -799,5 +799,5 @@ js.Boot.__init();
 slplayer.ui.DisplayObject.className = "DisplayObject";
 Gallery.className = "gallery";
 js.Lib.onerror = null;
-slplayer.core.SLPlayer._htmlBody = "<div><div>Hi ! This gallery is developped in Haxe/js:</div><br/><ul id=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div>This one is just another instance of the same gallery component:</div><br/><ul id=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div>";
+slplayer.core.SLPlayer._htmlBody = "<div><div>Hi ! This gallery is developped in Haxe/js:</div><br/><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div>This one is just another instance of the same gallery component:</div><br/><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div>";
 slplayer.core.SLPlayer.main()
