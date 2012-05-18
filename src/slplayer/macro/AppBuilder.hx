@@ -51,7 +51,7 @@ class AppBuilder
 			switch(elt.nodeName.toLowerCase())
 			{
 				case "head":
-					//trace("head content: "+elt.toString());
+//trace("head content: "+elt.toString());
 					for (headElt in elt.elements())
 					{
 						switch(headElt.nodeName.toLowerCase())
@@ -66,11 +66,12 @@ class AppBuilder
 								if (cmpClassName != null && StringTools.endsWith(cmpClassName.toLowerCase(), ".js"))
 								{
 									cmpClassName = cmpClassName.substr(0, cmpClassName.length - 3);
-									trace("found cmpClassName="+cmpClassName);
-									//add a new cmpClassName() in SLPlayer constructor
+									cmpClassName = StringTools.replace( cmpClassName, "/", "." );
+trace("found cmpClassName="+cmpClassName);
+									
 									for (fc in 0...fields.length)
 									{
-										//trace("\n"+fields[f]+"\n");
+//trace("\n"+fields[fc]+"\n");
 										switch (fields[fc].kind)
 										{
 											case FFun(f) :
@@ -78,22 +79,24 @@ class AppBuilder
 												{
 													continue;
 												}
-												//trace(fields[fc]);
-																								
+//trace(fields[fc]);
+												
 												switch (f.expr.expr)
 												{
 													case EBlock(exprs):
 														pos = haxe.macro.Context.currentPos();
-														//var newCmpExpr = { expr : ENew( { name : cmpClassName, pack : [], params : [], sub : null }, []) , pos : pos };
+														//exprs.push({ expr : ENew( { name : cmpClassName, pack : [], params : [], sub : null }, []) , pos : pos });
 														//trace("added new "+cmpClassName+"() call");
 
-														//var newCmpExpr = { expr : ECall( { expr : EField( { expr : EConst(CType(cmpClassName)), pos : pos }, "initAll"), pos : pos }, [] ) , pos : pos };
+														//exprs.push({ expr : ECall( { expr : EField( { expr : EConst(CType(cmpClassName)), pos : pos }, "initAll"), pos : pos }, [] ) , pos : pos });
 														//trace("added call to "+cmpClassName+".main()");
-
-														var newCmpExpr = { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [{ expr : EConst(CString(cmpClassName)), pos : pos}] ) , pos : pos };
-														trace("added call to initDisplayObjectsOfType("+cmpClassName+")");
 														
-														exprs.push(newCmpExpr);
+														//generate import
+														exprs.push(generateImport(cmpClassName));
+														
+														//generate call to
+														exprs.push({ expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [{ expr : EConst(CString(cmpClassName)), pos : pos}] ) , pos : pos });
+//trace("added call to initDisplayObjectsOfType("+cmpClassName+")");
 														break;
 													
 													default :
@@ -105,11 +108,6 @@ class AppBuilder
 												trace("field "+fields[fc].name+" ignored.");
 										}
 									}
-									
-									//add import cmpClassName in SLPlayer class
-									//TODO
-									
-									
 								}
 								
 							//case "meta":
@@ -132,5 +130,32 @@ class AppBuilder
 			}
 		}
 		return fields;
+	}
+	
+	/*
+	{ expr => EType({ expr => EConst(CIdent(debug)), pos  : pos },DebugNodes), pos  : pos }
+	{ expr => EType({ expr => EField({ expr => EConst(CIdent(silexlabs)), pos : pos },slplayer), pos : pos },DebugNodes), pos : pos }
+	*/
+	static function generateImport(classname : String) : Expr
+	{
+		var splitedClassName = classname.split(".");
+		var realClassName = splitedClassName.pop();
+		
+		if (splitedClassName.length > 0)
+		{
+			return { expr : EType( generateImportPackagePath(splitedClassName) , realClassName), pos : haxe.macro.Context.currentPos() };
+		}
+		
+		return { expr : EConst(CType(classname)), pos : haxe.macro.Context.currentPos() };
+	}
+	
+	static function generateImportPackagePath(path : Array<String>) : Expr
+	{
+		if (path.length > 1)
+		{
+			var lastPathElt = path.pop();
+			return { expr : EField( generateImportPackagePath(path), lastPathElt), pos : haxe.macro.Context.currentPos() };
+		}
+		return { expr : EConst(CIdent(path[0])), pos : haxe.macro.Context.currentPos() };
 	}
 }

@@ -17,39 +17,6 @@ slplayer.ui.DisplayObject.prototype = {
 	}
 	,__class__: slplayer.ui.DisplayObject
 }
-var DebugNodes = $hxClasses["DebugNodes"] = function(rootElement) {
-	slplayer.ui.DisplayObject.call(this,rootElement);
-};
-DebugNodes.__name__ = ["DebugNodes"];
-DebugNodes.__super__ = slplayer.ui.DisplayObject;
-DebugNodes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
-	init: function(e) {
-		haxe.Log.trace("DebugNodes component initialized",{ fileName : "DebugNodes.hx", lineNumber : 20, className : "DebugNodes", methodName : "init"});
-		var debugButton = js.Lib.document.createElement("img");
-		debugButton.setAttribute("src","assets/debug.png");
-		debugButton.onclick = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(this.debugNodes.$bind(this));
-		this.rootElement.appendChild(debugButton);
-	}
-	,debugNodes: function(e) {
-		this.debugNode(js.Lib.document.body);
-	}
-	,debugNode: function(node) {
-		var _g1 = 0, _g = node.childNodes.length;
-		while(_g1 < _g) {
-			var cCount = _g1++;
-			if(node.childNodes[cCount].className != null) {
-				var tagName = node.childNodes[cCount].nodeName;
-				haxe.Log.trace("tag " + tagName + " with class=" + node.childNodes[cCount].className + " has associated components : " + slplayer.core.SLPlayer.getAssociatedComponents(node.childNodes[cCount]),{ fileName : "DebugNodes.hx", lineNumber : 40, className : "DebugNodes", methodName : "debugNode"});
-			}
-			if(node.childNodes[cCount].hasChildNodes()) this.debugNode(node.childNodes[cCount]);
-		}
-	}
-	,__class__: DebugNodes
-});
 var Gallery = $hxClasses["Gallery"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
 };
@@ -966,6 +933,42 @@ js.Lib.setErrorHandler = function(f) {
 js.Lib.prototype = {
 	__class__: js.Lib
 }
+var silexlabs = silexlabs || {}
+if(!silexlabs.slplayer) silexlabs.slplayer = {}
+silexlabs.slplayer.DebugNodes = $hxClasses["silexlabs.slplayer.DebugNodes"] = function(rootElement) {
+	slplayer.ui.DisplayObject.call(this,rootElement);
+};
+silexlabs.slplayer.DebugNodes.__name__ = ["silexlabs","slplayer","DebugNodes"];
+silexlabs.slplayer.DebugNodes.__super__ = slplayer.ui.DisplayObject;
+silexlabs.slplayer.DebugNodes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	init: function(e) {
+		haxe.Log.trace("DebugNodes component initialized",{ fileName : "DebugNodes.hx", lineNumber : 20, className : "silexlabs.slplayer.DebugNodes", methodName : "init"});
+		var debugButton = js.Lib.document.createElement("img");
+		debugButton.setAttribute("src","assets/debug.png");
+		debugButton.onclick = (function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(this.debugNodes.$bind(this));
+		this.rootElement.appendChild(debugButton);
+	}
+	,debugNodes: function(e) {
+		this.debugNode(js.Lib.document.body);
+	}
+	,debugNode: function(node) {
+		var _g1 = 0, _g = node.childNodes.length;
+		while(_g1 < _g) {
+			var cCount = _g1++;
+			var elt = node.childNodes[cCount];
+			if(elt.className != null) {
+				var tagName = elt.nodeName;
+				haxe.Log.trace("tag " + tagName + " with class=" + elt.className + " has associated components : " + slplayer.core.SLPlayer.getAssociatedComponents(elt),{ fileName : "DebugNodes.hx", lineNumber : 41, className : "silexlabs.slplayer.DebugNodes", methodName : "debugNode"});
+			}
+			if(node.childNodes[cCount].hasChildNodes()) this.debugNode(elt);
+		}
+	}
+	,__class__: silexlabs.slplayer.DebugNodes
+});
 if(!slplayer.core) slplayer.core = {}
 slplayer.core.SLPlayer = $hxClasses["slplayer.core.SLPlayer"] = function() {
 };
@@ -979,7 +982,7 @@ slplayer.core.SLPlayer.main = function() {
 	})(mySLPlayerApp.initDisplayObjects.$bind(mySLPlayerApp));
 }
 slplayer.core.SLPlayer.addAssociatedComponent = function(node,cmp) {
-	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 74, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
+	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 70, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
 	var nodeId = node.getAttribute("data-" + slplayer.core.SLPlayer.SLPID_ATTR_NAME);
 	var associatedCmps;
 	if(nodeId != null) associatedCmps = slplayer.core.SLPlayer.nodeToCmpInstances.get(nodeId); else {
@@ -997,23 +1000,27 @@ slplayer.core.SLPlayer.getAssociatedComponents = function(node) {
 }
 slplayer.core.SLPlayer.prototype = {
 	initDisplayObjects: function(e) {
+		Gallery;
+		silexlabs.slplayer.DebugNodes;
+		Gallery;
 		this.initDisplayObjectsOfType("Gallery");
-		this.initDisplayObjectsOfType("DebugNodes");
+		silexlabs.slplayer.DebugNodes;
+		this.initDisplayObjectsOfType("silexlabs.slplayer.DebugNodes");
 	}
 	,initDisplayObjectsOfType: function(displayObjectClassName) {
-		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 50, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 46, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 		var displayObjectClass = Type.resolveClass(displayObjectClassName);
 		if(displayObjectClass != null) {
 			var tagClassName = Reflect.field(displayObjectClass,"className");
-			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 57, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 53, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 			if(tagClassName != null) {
 				var taggedNodes = js.Lib.document.getElementsByClassName(tagClassName);
-				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 62, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 58, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 				var _g1 = 0, _g = taggedNodes.length;
 				while(_g1 < _g) {
 					var nodeCnt = _g1++;
 					var newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
-					haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 65, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+					haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 61, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 					newDisplayObject.init(null);
 				}
 			}
@@ -1107,9 +1114,9 @@ js.Boot.__init();
 	}
 }
 slplayer.ui.DisplayObject.className = "DisplayObject";
-DebugNodes.className = "debugnode";
 Gallery.className = "gallery";
 js.Lib.onerror = null;
+silexlabs.slplayer.DebugNodes.className = "debugnode";
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
 slplayer.core.SLPlayer._htmlBody = "<div><div>Hi ! This gallery is developped in Haxe/js:</div><br/><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div>This one is just another instance of the same gallery component:</div><br/><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div class=\"debugnode\"/></div>";

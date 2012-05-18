@@ -5,10 +5,6 @@ import js.Dom;
 
 import slplayer.ui.DisplayObject;
 
-//TODO generates these imports in macro
-import Gallery;
-import DebugNodes;
-
 /**
  * ...
  * @author Thomas Fétiveau
@@ -38,7 +34,7 @@ import DebugNodes;
 		#end
 	}
 
-	private function initDisplayObjects(e : Event) { }
+	private function initDisplayObjects(e : Event) { Gallery;  silexlabs.slplayer.DebugNodes; }
 	
 	/**
 	 * TODO determine if it wouldn't be better to pass directly the Class. We would however loose the benefit of resolving it. but we could try catch the exceptions...
