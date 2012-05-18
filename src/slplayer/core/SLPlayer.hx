@@ -34,7 +34,7 @@ import slplayer.ui.DisplayObject;
 		#end
 	}
 
-	private function initDisplayObjects(e : Event) { Gallery;  silexlabs.slplayer.DebugNodes; }
+	private function initDisplayObjects(e : Event) { }
 	
 	/**
 	 * TODO determine if it wouldn't be better to pass directly the Class. We would however loose the benefit of resolving it. but we could try catch the exceptions...

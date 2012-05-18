@@ -16,6 +16,8 @@ class Gallery extends DisplayObject
 	
 	var currentIndex:Int;
 	
+	//var data(null,null):Array<String>;
+	
 	override public function init(e:Event):Void 
 	{
 		trace("Gallery component initialized");
@@ -40,6 +42,13 @@ class Gallery extends DisplayObject
 		buttonContainer.appendChild(rightButton);
 		
 		rootElement.appendChild(buttonContainer);
+		
+		untyped rootElement.addEventListener("data", onData , false);
+		
+		var onNewDataConsumerEvent = untyped Lib.document.createEvent("CustomEvent");
+		onNewDataConsumerEvent.initCustomEvent("newDataConsumer", false, false, me);
+		
+		untyped this.rootElement.dispatchEvent(onNewDataConsumerEvent);
 	}
 	
 	function updateView():Void
@@ -65,5 +74,27 @@ class Gallery extends DisplayObject
 		if ( currentIndex > 0 )
 			currentIndex--;
 		updateView();
+	}
+	
+	function onData(e:Dynamic):Void
+	{
+trace("onData " + e.detail);
+		if (untyped e.detail != null)
+		{
+			var data : Array<Dynamic> = cast e.detail;
+
+			for (d in data)
+			{
+				if (d.media_thumbnail.url != null)
+				{
+					var newLi = Lib.document.createElement("li");
+					var newImg = Lib.document.createElement("img");
+					newLi.appendChild(newImg);
+					newImg.setAttribute("src", d.media_thumbnail.url);
+					rootElement.appendChild(newLi);
+				}
+			}
+			updateView();
+		}
 	}
 }

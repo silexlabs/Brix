@@ -6,7 +6,7 @@ import js.Lib;
 import js.Dom;
 
 /**
- * ...
+ * TODO rename DisplayObject in something more explicit ?
  * @author Thomas Fétiveau
  */
 class DisplayObject 
@@ -25,15 +25,6 @@ class DisplayObject
 		this.rootElement = rootElement;
 		
 		SLPlayer.addAssociatedComponent(rootElement, this);
-		//Keep a reference within the node object to each DisplayObject instance linked to this node
-		//var slPlayerCmps : List<DisplayObject> = cast Reflect.field(rootElement, "slPlayerCmps");
-		//
-		//if (slPlayerCmps == null)
-			//slPlayerCmps = new List();
-		//
-		//slPlayerCmps.add(this);
-		//
-		//Reflect.setField(rootElement, "slPlayerCmps", slPlayerCmps);
 	}
 	
 	// --- CUSTOMIZABLE API ---

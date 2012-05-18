@@ -4,6 +4,58 @@ function $extend(from, fields) {
 	for (var name in fields) proto[name] = fields[name];
 	return proto;
 }
+var EReg = $hxClasses["EReg"] = function(r,opt) {
+	opt = opt.split("u").join("");
+	this.r = new RegExp(r,opt);
+};
+EReg.__name__ = ["EReg"];
+EReg.prototype = {
+	r: null
+	,match: function(s) {
+		this.r.m = this.r.exec(s);
+		this.r.s = s;
+		return this.r.m != null;
+	}
+	,matched: function(n) {
+		return this.r.m != null && n >= 0 && n < this.r.m.length?this.r.m[n]:(function($this) {
+			var $r;
+			throw "EReg::matched";
+			return $r;
+		}(this));
+	}
+	,matchedLeft: function() {
+		if(this.r.m == null) throw "No string matched";
+		return this.r.s.substr(0,this.r.m.index);
+	}
+	,matchedRight: function() {
+		if(this.r.m == null) throw "No string matched";
+		var sz = this.r.m.index + this.r.m[0].length;
+		return this.r.s.substr(sz,this.r.s.length - sz);
+	}
+	,matchedPos: function() {
+		if(this.r.m == null) throw "No string matched";
+		return { pos : this.r.m.index, len : this.r.m[0].length};
+	}
+	,split: function(s) {
+		var d = "#__delim__#";
+		return s.replace(this.r,d).split(d);
+	}
+	,replace: function(s,by) {
+		return s.replace(this.r,by);
+	}
+	,customReplace: function(s,f) {
+		var buf = new StringBuf();
+		while(true) {
+			if(!this.match(s)) break;
+			buf.add(this.matchedLeft());
+			buf.add(f(this));
+			s = this.matchedRight();
+		}
+		buf.b[buf.b.length] = s == null?"null":s;
+		return buf.b.join("");
+	}
+	,__class__: EReg
+}
 var slplayer = slplayer || {}
 if(!slplayer.ui) slplayer.ui = {}
 slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
@@ -25,7 +77,7 @@ Gallery.__super__ = slplayer.ui.DisplayObject;
 Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	currentIndex: null
 	,init: function(e) {
-		haxe.Log.trace("Gallery component initialized",{ fileName : "Gallery.hx", lineNumber : 21, className : "Gallery", methodName : "init"});
+		haxe.Log.trace("Gallery component initialized",{ fileName : "Gallery.hx", lineNumber : 23, className : "Gallery", methodName : "init"});
 		var liChilds = this.rootElement.getElementsByTagName("li");
 		this.currentIndex = 0;
 		this.updateView();
@@ -48,6 +100,10 @@ Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		buttonContainer.appendChild(leftButton);
 		buttonContainer.appendChild(rightButton);
 		this.rootElement.appendChild(buttonContainer);
+		this.rootElement.addEventListener("data",this.onData.$bind(this),false);
+		var onNewDataConsumerEvent = js.Lib.document.createEvent("CustomEvent");
+		onNewDataConsumerEvent.initCustomEvent("newDataConsumer",false,false,me);
+		this.rootElement.dispatchEvent(onNewDataConsumerEvent);
 	}
 	,updateView: function() {
 		var liChilds = this.rootElement.getElementsByTagName("li");
@@ -65,6 +121,25 @@ Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	,previousPicture: function(e) {
 		if(this.currentIndex > 0) this.currentIndex--;
 		this.updateView();
+	}
+	,onData: function(e) {
+		haxe.Log.trace("onData " + e.detail,{ fileName : "Gallery.hx", lineNumber : 81, className : "Gallery", methodName : "onData"});
+		if(e.detail != null) {
+			var data = e.detail;
+			var _g = 0;
+			while(_g < data.length) {
+				var d = data[_g];
+				++_g;
+				if(d.media_thumbnail.url != null) {
+					var newLi = js.Lib.document.createElement("li");
+					var newImg = js.Lib.document.createElement("img");
+					newLi.appendChild(newImg);
+					newImg.setAttribute("src",d.media_thumbnail.url);
+					this.rootElement.appendChild(newLi);
+				}
+			}
+			this.updateView();
+		}
 	}
 	,__class__: Gallery
 });
@@ -372,6 +447,95 @@ StringBuf.prototype = {
 	,b: null
 	,__class__: StringBuf
 }
+var StringTools = $hxClasses["StringTools"] = function() { }
+StringTools.__name__ = ["StringTools"];
+StringTools.urlEncode = function(s) {
+	return encodeURIComponent(s);
+}
+StringTools.urlDecode = function(s) {
+	return decodeURIComponent(s.split("+").join(" "));
+}
+StringTools.htmlEscape = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+}
+StringTools.htmlUnescape = function(s) {
+	return s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
+}
+StringTools.startsWith = function(s,start) {
+	return s.length >= start.length && s.substr(0,start.length) == start;
+}
+StringTools.endsWith = function(s,end) {
+	var elen = end.length;
+	var slen = s.length;
+	return slen >= elen && s.substr(slen - elen,elen) == end;
+}
+StringTools.isSpace = function(s,pos) {
+	var c = s.charCodeAt(pos);
+	return c >= 9 && c <= 13 || c == 32;
+}
+StringTools.ltrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,r)) r++;
+	if(r > 0) return s.substr(r,l - r); else return s;
+}
+StringTools.rtrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,l - r - 1)) r++;
+	if(r > 0) return s.substr(0,l - r); else return s;
+}
+StringTools.trim = function(s) {
+	return StringTools.ltrim(StringTools.rtrim(s));
+}
+StringTools.rpad = function(s,c,l) {
+	var sl = s.length;
+	var cl = c.length;
+	while(sl < l) if(l - sl < cl) {
+		s += c.substr(0,l - sl);
+		sl = l;
+	} else {
+		s += c;
+		sl += cl;
+	}
+	return s;
+}
+StringTools.lpad = function(s,c,l) {
+	var ns = "";
+	var sl = s.length;
+	if(sl >= l) return s;
+	var cl = c.length;
+	while(sl < l) if(l - sl < cl) {
+		ns += c.substr(0,l - sl);
+		sl = l;
+	} else {
+		ns += c;
+		sl += cl;
+	}
+	return ns + s;
+}
+StringTools.replace = function(s,sub,by) {
+	return s.split(sub).join(by);
+}
+StringTools.hex = function(n,digits) {
+	var s = "";
+	var hexChars = "0123456789ABCDEF";
+	do {
+		s = hexChars.charAt(n & 15) + s;
+		n >>>= 4;
+	} while(n > 0);
+	if(digits != null) while(s.length < digits) s = "0" + s;
+	return s;
+}
+StringTools.fastCodeAt = function(s,index) {
+	return s.cca(index);
+}
+StringTools.isEOF = function(c) {
+	return c != c;
+}
+StringTools.prototype = {
+	__class__: StringTools
+}
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
 ValueType.TNull = ["TNull",0];
 ValueType.TNull.toString = $estr;
@@ -557,7 +721,536 @@ Type.allEnums = function(e) {
 Type.prototype = {
 	__class__: Type
 }
+var Xml = $hxClasses["Xml"] = function() {
+};
+Xml.__name__ = ["Xml"];
+Xml.Element = null;
+Xml.PCData = null;
+Xml.CData = null;
+Xml.Comment = null;
+Xml.DocType = null;
+Xml.Prolog = null;
+Xml.Document = null;
+Xml.parse = function(str) {
+	var rules = [Xml.enode,Xml.epcdata,Xml.eend,Xml.ecdata,Xml.edoctype,Xml.ecomment,Xml.eprolog];
+	var nrules = rules.length;
+	var current = Xml.createDocument();
+	var stack = new List();
+	while(str.length > 0) {
+		var i = 0;
+		try {
+			while(i < nrules) {
+				var r = rules[i];
+				if(r.match(str)) {
+					switch(i) {
+					case 0:
+						var x = Xml.createElement(r.matched(1));
+						current.addChild(x);
+						str = r.matchedRight();
+						while(Xml.eattribute.match(str)) {
+							x.set(Xml.eattribute.matched(1),Xml.eattribute.matched(3));
+							str = Xml.eattribute.matchedRight();
+						}
+						if(!Xml.eclose.match(str)) {
+							i = nrules;
+							throw "__break__";
+						}
+						if(Xml.eclose.matched(1) == ">") {
+							stack.push(current);
+							current = x;
+						}
+						str = Xml.eclose.matchedRight();
+						break;
+					case 1:
+						var x = Xml.createPCData(r.matched(0));
+						current.addChild(x);
+						str = r.matchedRight();
+						break;
+					case 2:
+						if(current._children != null && current._children.length == 0) {
+							var e = Xml.createPCData("");
+							current.addChild(e);
+						}
+						if(r.matched(1) != current._nodeName || stack.isEmpty()) {
+							i = nrules;
+							throw "__break__";
+						}
+						current = stack.pop();
+						str = r.matchedRight();
+						break;
+					case 3:
+						str = r.matchedRight();
+						if(!Xml.ecdata_end.match(str)) throw "End of CDATA section not found";
+						var x = Xml.createCData(Xml.ecdata_end.matchedLeft());
+						current.addChild(x);
+						str = Xml.ecdata_end.matchedRight();
+						break;
+					case 4:
+						var pos = 0;
+						var count = 0;
+						var old = str;
+						try {
+							while(true) {
+								if(!Xml.edoctype_elt.match(str)) throw "End of DOCTYPE section not found";
+								var p = Xml.edoctype_elt.matchedPos();
+								pos += p.pos + p.len;
+								str = Xml.edoctype_elt.matchedRight();
+								switch(Xml.edoctype_elt.matched(0)) {
+								case "[":
+									count++;
+									break;
+								case "]":
+									count--;
+									if(count < 0) throw "Invalid ] found in DOCTYPE declaration";
+									break;
+								default:
+									if(count == 0) throw "__break__";
+								}
+							}
+						} catch( e ) { if( e != "__break__" ) throw e; }
+						var x = Xml.createDocType(old.substr(10,pos - 11));
+						current.addChild(x);
+						break;
+					case 5:
+						if(!Xml.ecomment_end.match(str)) throw "Unclosed Comment";
+						var p = Xml.ecomment_end.matchedPos();
+						var x = Xml.createComment(str.substr(4,p.pos + p.len - 7));
+						current.addChild(x);
+						str = Xml.ecomment_end.matchedRight();
+						break;
+					case 6:
+						var prolog = r.matched(0);
+						var x = Xml.createProlog(prolog.substr(2,prolog.length - 4));
+						current.addChild(x);
+						str = r.matchedRight();
+						break;
+					}
+					throw "__break__";
+				}
+				i += 1;
+			}
+		} catch( e ) { if( e != "__break__" ) throw e; }
+		if(i == nrules) {
+			if(str.length > 10) throw "Xml parse error : Unexpected " + str.substr(0,10) + "..."; else throw "Xml parse error : Unexpected " + str;
+		}
+	}
+	if(!stack.isEmpty()) throw "Xml parse error : Unclosed " + stack.last().getNodeName();
+	return current;
+}
+Xml.createElement = function(name) {
+	var r = new Xml();
+	r.nodeType = Xml.Element;
+	r._children = new Array();
+	r._attributes = new Hash();
+	r.setNodeName(name);
+	return r;
+}
+Xml.createPCData = function(data) {
+	var r = new Xml();
+	r.nodeType = Xml.PCData;
+	r.setNodeValue(data);
+	return r;
+}
+Xml.createCData = function(data) {
+	var r = new Xml();
+	r.nodeType = Xml.CData;
+	r.setNodeValue(data);
+	return r;
+}
+Xml.createComment = function(data) {
+	var r = new Xml();
+	r.nodeType = Xml.Comment;
+	r.setNodeValue(data);
+	return r;
+}
+Xml.createDocType = function(data) {
+	var r = new Xml();
+	r.nodeType = Xml.DocType;
+	r.setNodeValue(data);
+	return r;
+}
+Xml.createProlog = function(data) {
+	var r = new Xml();
+	r.nodeType = Xml.Prolog;
+	r.setNodeValue(data);
+	return r;
+}
+Xml.createDocument = function() {
+	var r = new Xml();
+	r.nodeType = Xml.Document;
+	r._children = new Array();
+	return r;
+}
+Xml.prototype = {
+	nodeType: null
+	,nodeName: null
+	,nodeValue: null
+	,parent: null
+	,_nodeName: null
+	,_nodeValue: null
+	,_attributes: null
+	,_children: null
+	,_parent: null
+	,getNodeName: function() {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._nodeName;
+	}
+	,setNodeName: function(n) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._nodeName = n;
+	}
+	,getNodeValue: function() {
+		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
+		return this._nodeValue;
+	}
+	,setNodeValue: function(v) {
+		if(this.nodeType == Xml.Element || this.nodeType == Xml.Document) throw "bad nodeType";
+		return this._nodeValue = v;
+	}
+	,getParent: function() {
+		return this._parent;
+	}
+	,get: function(att) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._attributes.get(att);
+	}
+	,set: function(att,value) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		this._attributes.set(att,value);
+	}
+	,remove: function(att) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		this._attributes.remove(att);
+	}
+	,exists: function(att) {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._attributes.exists(att);
+	}
+	,attributes: function() {
+		if(this.nodeType != Xml.Element) throw "bad nodeType";
+		return this._attributes.keys();
+	}
+	,iterator: function() {
+		if(this._children == null) throw "bad nodetype";
+		return { cur : 0, x : this._children, hasNext : function() {
+			return this.cur < this.x.length;
+		}, next : function() {
+			return this.x[this.cur++];
+		}};
+	}
+	,elements: function() {
+		if(this._children == null) throw "bad nodetype";
+		return { cur : 0, x : this._children, hasNext : function() {
+			var k = this.cur;
+			var l = this.x.length;
+			while(k < l) {
+				if(this.x[k].nodeType == Xml.Element) break;
+				k += 1;
+			}
+			this.cur = k;
+			return k < l;
+		}, next : function() {
+			var k = this.cur;
+			var l = this.x.length;
+			while(k < l) {
+				var n = this.x[k];
+				k += 1;
+				if(n.nodeType == Xml.Element) {
+					this.cur = k;
+					return n;
+				}
+			}
+			return null;
+		}};
+	}
+	,elementsNamed: function(name) {
+		if(this._children == null) throw "bad nodetype";
+		return { cur : 0, x : this._children, hasNext : function() {
+			var k = this.cur;
+			var l = this.x.length;
+			while(k < l) {
+				var n = this.x[k];
+				if(n.nodeType == Xml.Element && n._nodeName == name) break;
+				k++;
+			}
+			this.cur = k;
+			return k < l;
+		}, next : function() {
+			var k = this.cur;
+			var l = this.x.length;
+			while(k < l) {
+				var n = this.x[k];
+				k++;
+				if(n.nodeType == Xml.Element && n._nodeName == name) {
+					this.cur = k;
+					return n;
+				}
+			}
+			return null;
+		}};
+	}
+	,firstChild: function() {
+		if(this._children == null) throw "bad nodetype";
+		return this._children[0];
+	}
+	,firstElement: function() {
+		if(this._children == null) throw "bad nodetype";
+		var cur = 0;
+		var l = this._children.length;
+		while(cur < l) {
+			var n = this._children[cur];
+			if(n.nodeType == Xml.Element) return n;
+			cur++;
+		}
+		return null;
+	}
+	,addChild: function(x) {
+		if(this._children == null) throw "bad nodetype";
+		if(x._parent != null) x._parent._children.remove(x);
+		x._parent = this;
+		this._children.push(x);
+	}
+	,removeChild: function(x) {
+		if(this._children == null) throw "bad nodetype";
+		var b = this._children.remove(x);
+		if(b) x._parent = null;
+		return b;
+	}
+	,insertChild: function(x,pos) {
+		if(this._children == null) throw "bad nodetype";
+		if(x._parent != null) x._parent._children.remove(x);
+		x._parent = this;
+		this._children.insert(pos,x);
+	}
+	,toString: function() {
+		if(this.nodeType == Xml.PCData) return this._nodeValue;
+		if(this.nodeType == Xml.CData) return "<![CDATA[" + this._nodeValue + "]]>";
+		if(this.nodeType == Xml.Comment) return "<!--" + this._nodeValue + "-->";
+		if(this.nodeType == Xml.DocType) return "<!DOCTYPE " + this._nodeValue + ">";
+		if(this.nodeType == Xml.Prolog) return "<?" + this._nodeValue + "?>";
+		var s = new StringBuf();
+		if(this.nodeType == Xml.Element) {
+			s.b[s.b.length] = "<";
+			s.add(this._nodeName);
+			var $it0 = this._attributes.keys();
+			while( $it0.hasNext() ) {
+				var k = $it0.next();
+				s.b[s.b.length] = " ";
+				s.b[s.b.length] = k == null?"null":k;
+				s.b[s.b.length] = "=\"";
+				s.add(this._attributes.get(k));
+				s.b[s.b.length] = "\"";
+			}
+			if(this._children.length == 0) {
+				s.b[s.b.length] = "/>";
+				return s.b.join("");
+			}
+			s.b[s.b.length] = ">";
+		}
+		var $it1 = this.iterator();
+		while( $it1.hasNext() ) {
+			var x = $it1.next();
+			s.add(x.toString());
+		}
+		if(this.nodeType == Xml.Element) {
+			s.b[s.b.length] = "</";
+			s.add(this._nodeName);
+			s.b[s.b.length] = ">";
+		}
+		return s.b.join("");
+	}
+	,__class__: Xml
+	,__properties__: {get_parent:"getParent",set_nodeValue:"setNodeValue",get_nodeValue:"getNodeValue",set_nodeName:"setNodeName",get_nodeName:"getNodeName"}
+}
+var custom = custom || {}
+if(!custom.component) custom.component = {}
+custom.component.RssConnector = $hxClasses["custom.component.RssConnector"] = function(rootElement) {
+	slplayer.ui.DisplayObject.call(this,rootElement);
+};
+custom.component.RssConnector.__name__ = ["custom","component","RssConnector"];
+custom.component.RssConnector.__super__ = slplayer.ui.DisplayObject;
+custom.component.RssConnector.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	src: null
+	,init: function(e) {
+		this.setSrc(this.rootElement.getAttribute("data-" + custom.component.RssConnector.SRC_TAG));
+		if(this.src == null) haxe.Log.trace("INFO " + custom.component.RssConnector.SRC_TAG + " attribute not set on html element",{ fileName : "RssConnector.hx", lineNumber : 29, className : "custom.component.RssConnector", methodName : "init"});
+		var me = this;
+		this.rootElement.addEventListener("newDataConsumer",(function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(me.getData.$bind(me)),false);
+	}
+	,setSrc: function(newSrc) {
+		if(newSrc == this.src) return this.src;
+		this.src = newSrc;
+		this.getData(null);
+		return this.src;
+	}
+	,getData: function(e) {
+		if(this.src == null) {
+			haxe.Log.trace("INFO src not set.",{ fileName : "RssConnector.hx", lineNumber : 51, className : "custom.component.RssConnector", methodName : "getData"});
+			return;
+		}
+		var r = new haxe.Http("custom/component/RssProxy.php");
+		r.setParameter("url",this.src);
+		var me = this;
+		r.onData = (function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(me.onData.$bind(me));
+		r.onError = (function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(me.onError.$bind(me));
+		r.request(true);
+	}
+	,onData: function(data) {
+		var xml;
+		try {
+			xml = Xml.parse(data);
+		} catch( e ) {
+			haxe.Log.trace("ERROR cannot parse rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 71, className : "custom.component.RssConnector", methodName : "onData"});
+			return;
+		}
+		var items = xml.firstElement().firstElement().elementsNamed("item");
+		var data1 = new Array();
+		while(items.hasNext()) data1.push(this.generateDataObject(items.next()));
+		var onDataEvent = js.Lib.document.createEvent("CustomEvent");
+		onDataEvent.initCustomEvent("data",false,false,data1);
+		this.rootElement.dispatchEvent(onDataEvent);
+	}
+	,generateDataObject: function(elt) {
+		var data = { };
+		var xmlChilds = elt.elements();
+		while(xmlChilds.hasNext()) {
+			var xmlChild = xmlChilds.next();
+			var nodeName = StringTools.replace(xmlChild.getNodeName(),":","_");
+			data[nodeName] = { };
+			var atts = xmlChild.attributes();
+			while(atts.hasNext()) {
+				var at = atts.next();
+				Reflect.field(data,nodeName)[at] = xmlChild.get(at);
+			}
+			var innerChilds = xmlChild.elements();
+			if(innerChilds.hasNext()) while(innerChilds.hasNext()) {
+				var innerChild = innerChilds.next();
+				Reflect.field(data,nodeName)[innerChild.getNodeName()] = this.generateDataObject(innerChild);
+			} else if(xmlChild.firstChild() != null) data[nodeName] = xmlChild.firstChild();
+		}
+		return data;
+	}
+	,onError: function(msg) {
+		haxe.Log.trace("ERROR cannot access to rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 128, className : "custom.component.RssConnector", methodName : "onError"});
+	}
+	,__class__: custom.component.RssConnector
+	,__properties__: {set_src:"setSrc"}
+});
 var haxe = haxe || {}
+haxe.Http = $hxClasses["haxe.Http"] = function(url) {
+	this.url = url;
+	this.headers = new Hash();
+	this.params = new Hash();
+	this.async = true;
+};
+haxe.Http.__name__ = ["haxe","Http"];
+haxe.Http.requestUrl = function(url) {
+	var h = new haxe.Http(url);
+	h.async = false;
+	var r = null;
+	h.onData = function(d) {
+		r = d;
+	};
+	h.onError = function(e) {
+		throw e;
+	};
+	h.request(false);
+	return r;
+}
+haxe.Http.prototype = {
+	url: null
+	,async: null
+	,postData: null
+	,headers: null
+	,params: null
+	,setHeader: function(header,value) {
+		this.headers.set(header,value);
+	}
+	,setParameter: function(param,value) {
+		this.params.set(param,value);
+	}
+	,setPostData: function(data) {
+		this.postData = data;
+	}
+	,request: function(post) {
+		var me = this;
+		var r = new js.XMLHttpRequest();
+		var onreadystatechange = function() {
+			if(r.readyState != 4) return;
+			var s = (function($this) {
+				var $r;
+				try {
+					$r = r.status;
+				} catch( e ) {
+					$r = null;
+				}
+				return $r;
+			}(this));
+			if(s == undefined) s = null;
+			if(s != null) me.onStatus(s);
+			if(s != null && s >= 200 && s < 400) me.onData(r.responseText); else switch(s) {
+			case null: case undefined:
+				me.onError("Failed to connect or resolve host");
+				break;
+			case 12029:
+				me.onError("Failed to connect to host");
+				break;
+			case 12007:
+				me.onError("Unknown host");
+				break;
+			default:
+				me.onError("Http Error #" + r.status);
+			}
+		};
+		if(this.async) r.onreadystatechange = onreadystatechange;
+		var uri = this.postData;
+		if(uri != null) post = true; else {
+			var $it0 = this.params.keys();
+			while( $it0.hasNext() ) {
+				var p = $it0.next();
+				if(uri == null) uri = ""; else uri += "&";
+				uri += StringTools.urlEncode(p) + "=" + StringTools.urlEncode(this.params.get(p));
+			}
+		}
+		try {
+			if(post) r.open("POST",this.url,this.async); else if(uri != null) {
+				var question = this.url.split("?").length <= 1;
+				r.open("GET",this.url + (question?"?":"&") + uri,this.async);
+				uri = null;
+			} else r.open("GET",this.url,this.async);
+		} catch( e ) {
+			this.onError(e.toString());
+			return;
+		}
+		if(this.headers.get("Content-Type") == null && post && this.postData == null) r.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+		var $it1 = this.headers.keys();
+		while( $it1.hasNext() ) {
+			var h = $it1.next();
+			r.setRequestHeader(h,this.headers.get(h));
+		}
+		r.send(uri);
+		if(!this.async) onreadystatechange();
+	}
+	,onData: function(data) {
+	}
+	,onError: function(msg) {
+	}
+	,onStatus: function(status) {
+	}
+	,__class__: haxe.Http
+}
 haxe.Log = $hxClasses["haxe.Log"] = function() { }
 haxe.Log.__name__ = ["haxe","Log"];
 haxe.Log.trace = function(v,infos) {
@@ -1001,11 +1694,11 @@ slplayer.core.SLPlayer.getAssociatedComponents = function(node) {
 slplayer.core.SLPlayer.prototype = {
 	initDisplayObjects: function(e) {
 		Gallery;
-		silexlabs.slplayer.DebugNodes;
-		Gallery;
 		this.initDisplayObjectsOfType("Gallery");
 		silexlabs.slplayer.DebugNodes;
 		this.initDisplayObjectsOfType("silexlabs.slplayer.DebugNodes");
+		custom.component.RssConnector;
+		this.initDisplayObjectsOfType("custom.component.RssConnector");
 	}
 	,initDisplayObjectsOfType: function(displayObjectClassName) {
 		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 46, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
@@ -1103,6 +1796,15 @@ js.Boot.__init();
 	var Void = $hxClasses["Void"] = { __ename__ : ["Void"]};
 }
 {
+	Xml.Element = "element";
+	Xml.PCData = "pcdata";
+	Xml.CData = "cdata";
+	Xml.Comment = "comment";
+	Xml.DocType = "doctype";
+	Xml.Prolog = "prolog";
+	Xml.Document = "document";
+}
+{
 	if(typeof document != "undefined") js.Lib.document = document;
 	if(typeof window != "undefined") {
 		js.Lib.window = window;
@@ -1113,11 +1815,40 @@ js.Boot.__init();
 		};
 	}
 }
+js["XMLHttpRequest"] = window.XMLHttpRequest?XMLHttpRequest:window.ActiveXObject?function() {
+	try {
+		return new ActiveXObject("Msxml2.XMLHTTP");
+	} catch( e ) {
+		try {
+			return new ActiveXObject("Microsoft.XMLHTTP");
+		} catch( e1 ) {
+			throw "Unable to create XMLHttpRequest object.";
+		}
+	}
+}:(function($this) {
+	var $r;
+	throw "Unable to create XMLHttpRequest object.";
+	return $r;
+}(this));
 slplayer.ui.DisplayObject.className = "DisplayObject";
 Gallery.className = "gallery";
+Xml.enode = new EReg("^<([a-zA-Z0-9:._-]+)","");
+Xml.ecdata = new EReg("^<!\\[CDATA\\[","i");
+Xml.edoctype = new EReg("^<!DOCTYPE ","i");
+Xml.eend = new EReg("^</([a-zA-Z0-9:._-]+)>","");
+Xml.epcdata = new EReg("^[^<]+","");
+Xml.ecomment = new EReg("^<!--","");
+Xml.eprolog = new EReg("^<\\?[^\\?]+\\?>","");
+Xml.eattribute = new EReg("^\\s*([a-zA-Z0-9:_-]+)\\s*=\\s*([\"'])([^\\2]*?)\\2","");
+Xml.eclose = new EReg("^[ \r\n\t]*(>|(/>))","");
+Xml.ecdata_end = new EReg("\\]\\]>","");
+Xml.edoctype_elt = new EReg("[\\[|\\]>]","");
+Xml.ecomment_end = new EReg("-->","");
+custom.component.RssConnector.className = "rssconnector";
+custom.component.RssConnector.SRC_TAG = "src-rss";
 js.Lib.onerror = null;
 silexlabs.slplayer.DebugNodes.className = "debugnode";
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<div><div>Hi ! This gallery is developped in Haxe/js:</div><br/><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div>This one is just another instance of the same gallery component:</div><br/><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div class=\"debugnode\"/></div>";
+slplayer.core.SLPlayer._htmlBody = "<div><div>Hi ! This gallery is developped in Haxe/js:</div><br/><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div>This one is just another instance of the same gallery component which is combined with a rss feed reader component:</div><br/><ul class=\"gallery rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div class=\"debugnode\"/></div>";
 slplayer.core.SLPlayer.main()

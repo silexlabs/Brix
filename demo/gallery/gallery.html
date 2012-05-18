@@ -5,6 +5,7 @@
 	<script src="SLPlayer.js"></script>
 	<script src="Gallery.js"></script>
 	<script src="silexlabs/slplayer/DebugNodes.js"></script>
+	<script src="custom/component/RssConnector.js"></script>
 </head>
 <body>
 	<div>
@@ -16,8 +17,8 @@
 			<li><img src="assets/3.png" /></li>
 		</ul>
 
-		<div>This one is just another instance of the same gallery component:</div><br />
-		<ul class="gallery">
+		<div>This one is just another instance of the same gallery component which is combined with a rss feed reader component:</div><br />
+		<ul class="gallery rssconnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
 			<li><img src="./assets/4.jpg" /></li>
 			<li><img src="assets/1.png" /></li>
 			<li><img src="assets/2.png" /></li>
