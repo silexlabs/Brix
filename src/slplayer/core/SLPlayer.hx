@@ -56,10 +56,13 @@ trace(displayObjectClassName+" class resolved and its tag classname is "+tagClas
 			{
 				var taggedNodes : Array<HtmlDom> = untyped Lib.document.getElementsByClassName(tagClassName);
 trace("taggedNodes = "+taggedNodes.length);
-				for (nodeCnt in 0...taggedNodes.length)
+				//for (nodeCntnodeCnt in 0...taggedNodes.length)
+				var nodeCnt = 0;
+				while (nodeCnt < taggedNodes.length)
 				{
 					var newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] ); trace(displayObjectClassName+" instance created");
 					newDisplayObject.init(null);
+					nodeCnt++;
 				}
 			}
 		}

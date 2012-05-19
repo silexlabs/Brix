@@ -3,3 +3,8 @@
   * form set: inputs, buttons, checkboxes...
   * gallery
   * dataProvider
+  
+ 
+- The connectors could have just one instance for the all document ( or could be static classes) ?
+
+- 

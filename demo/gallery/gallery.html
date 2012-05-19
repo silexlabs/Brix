@@ -9,21 +9,26 @@
 </head>
 <body>
 	<div>
-		<div>Hi ! This gallery is developped in Haxe/js:</div><br />
+		<div>A basic gallery component:</div><br />
+		<div>
 		<ul class="gallery">
 			<li><img src="./assets/4.jpg" /></li>
 			<li><img src="assets/1.png" /></li>
 			<li><img src="assets/2.png" /></li>
 			<li><img src="assets/3.png" /></li>
 		</ul>
+		</div>
 
-		<div>This one is just another instance of the same gallery component which is combined with a rss feed reader component:</div><br />
-		<ul class="gallery rssconnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
-			<li><img src="./assets/4.jpg" /></li>
+		<div>The same gallery component combined with a rss feed reader component:</div><br />
+		<div>
+			<ul class="gallery rssconnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
+			<li><img src="assets/4.jpg" /></li>
+			::foreach data:: <li><img src="::media_thumbnail.url::" /></li> ::end::
 			<li><img src="assets/1.png" /></li>
 			<li><img src="assets/2.png" /></li>
 			<li><img src="assets/3.png" /></li>
 		</ul>
+		</div>
 		<div class="debugnode"></div>
 	</div>
 </body>

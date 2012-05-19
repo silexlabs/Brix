@@ -9,6 +9,8 @@ import js.Lib;
 
 /**
  * TODO determine if it wouldn't be useful to create a DataProvider and a DataConsumer interface or base class
+ * TODO allow multiple adresses in src
+ * TODO cleanup to allow different rss formats
  * @author Thomas Fétiveau
  */
 
@@ -79,7 +81,7 @@ class RssConnector extends DisplayObject
 		}
 //trace("data="+data);
 		var onDataEvent = untyped Lib.document.createEvent("CustomEvent");
-		untyped onDataEvent.initCustomEvent("data", false, false, data);
+		untyped onDataEvent.initCustomEvent("data", false, false, { src : src , data : data }); // FIXME this has to be a formalized typedef for all dataProviders/consummers
 
 		untyped this.rootElement.dispatchEvent(onDataEvent);
 	}

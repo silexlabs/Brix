@@ -4,6 +4,8 @@ using haxe.Log;
 import js.Lib;
 import js.Dom;
 
+import haxe.Template;
+
 import slplayer.ui.DisplayObject;
 
 /**
@@ -16,14 +18,17 @@ class Gallery extends DisplayObject
 	
 	var currentIndex:Int;
 	
-	//var data(null,null):Array<String>;
+	var tpl : Template;
+	
+	var dataProviders(default,null) : Hash<Array<Dynamic>>;
 	
 	override public function init(e:Event):Void 
 	{
-		trace("Gallery component initialized");
-		//hide all li childs but the first one.
-		var liChilds = rootElement.getElementsByTagName("li");
-		//trace("li childs length= "+liChilds.length);
+		dataProviders = new Hash();
+		
+		tpl = untyped new Template(rootElement.innerHTML);
+		rootElement.innerHTML = "";
+		
 		currentIndex = 0;
 		updateView();
 		
@@ -41,7 +46,7 @@ class Gallery extends DisplayObject
 		buttonContainer.appendChild(leftButton);
 		buttonContainer.appendChild(rightButton);
 		
-		rootElement.appendChild(buttonContainer);
+		rootElement.parentNode.appendChild(buttonContainer);
 		
 		untyped rootElement.addEventListener("data", onData , false);
 		
@@ -51,9 +56,20 @@ class Gallery extends DisplayObject
 		untyped this.rootElement.dispatchEvent(onNewDataConsumerEvent);
 	}
 	
+	/**
+	 * The redraw function of the component.
+	 */
 	function updateView():Void
 	{
-		//trace("[updateView] currentIndex= "+currentIndex);
+		//consolidate providers data
+		var providersData : Array<Dynamic> = new Array();
+		for (pvdData in dataProviders)
+		{
+			providersData = providersData.concat(pvdData);
+		}
+		//execute template
+		rootElement.innerHTML = tpl.execute({data:providersData});
+		//hide all but the selected item
 		var liChilds = rootElement.getElementsByTagName("li");
 		for ( liCnt in 0...liChilds.length)
 		{
@@ -78,22 +94,9 @@ class Gallery extends DisplayObject
 	
 	function onData(e:Dynamic):Void
 	{
-trace("onData " + e.detail);
 		if (untyped e.detail != null)
 		{
-			var data : Array<Dynamic> = cast e.detail;
-
-			for (d in data)
-			{
-				if (d.media_thumbnail.url != null)
-				{
-					var newLi = Lib.document.createElement("li");
-					var newImg = Lib.document.createElement("img");
-					newLi.appendChild(newImg);
-					newImg.setAttribute("src", d.media_thumbnail.url);
-					rootElement.appendChild(newLi);
-				}
-			}
+			dataProviders.set(e.detail.src,e.detail.data);
 			updateView();
 		}
 	}

@@ -76,9 +76,12 @@ Gallery.__name__ = ["Gallery"];
 Gallery.__super__ = slplayer.ui.DisplayObject;
 Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	currentIndex: null
+	,tpl: null
+	,dataProviders: null
 	,init: function(e) {
-		haxe.Log.trace("Gallery component initialized",{ fileName : "Gallery.hx", lineNumber : 23, className : "Gallery", methodName : "init"});
-		var liChilds = this.rootElement.getElementsByTagName("li");
+		this.dataProviders = new Hash();
+		this.tpl = new haxe.Template(this.rootElement.innerHTML);
+		this.rootElement.innerHTML = "";
 		this.currentIndex = 0;
 		this.updateView();
 		var leftButton = js.Lib.document.createElement("img");
@@ -99,13 +102,20 @@ Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		var buttonContainer = js.Lib.document.createElement("div");
 		buttonContainer.appendChild(leftButton);
 		buttonContainer.appendChild(rightButton);
-		this.rootElement.appendChild(buttonContainer);
+		this.rootElement.parentNode.appendChild(buttonContainer);
 		this.rootElement.addEventListener("data",this.onData.$bind(this),false);
 		var onNewDataConsumerEvent = js.Lib.document.createEvent("CustomEvent");
 		onNewDataConsumerEvent.initCustomEvent("newDataConsumer",false,false,me);
 		this.rootElement.dispatchEvent(onNewDataConsumerEvent);
 	}
 	,updateView: function() {
+		var providersData = new Array();
+		var $it0 = this.dataProviders.iterator();
+		while( $it0.hasNext() ) {
+			var pvdData = $it0.next();
+			providersData = providersData.concat(pvdData);
+		}
+		this.rootElement.innerHTML = this.tpl.execute({ data : providersData});
 		var liChilds = this.rootElement.getElementsByTagName("li");
 		var _g1 = 0, _g = liChilds.length;
 		while(_g1 < _g) {
@@ -123,21 +133,8 @@ Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		this.updateView();
 	}
 	,onData: function(e) {
-		haxe.Log.trace("onData " + e.detail,{ fileName : "Gallery.hx", lineNumber : 81, className : "Gallery", methodName : "onData"});
 		if(e.detail != null) {
-			var data = e.detail;
-			var _g = 0;
-			while(_g < data.length) {
-				var d = data[_g];
-				++_g;
-				if(d.media_thumbnail.url != null) {
-					var newLi = js.Lib.document.createElement("li");
-					var newImg = js.Lib.document.createElement("img");
-					newLi.appendChild(newImg);
-					newImg.setAttribute("src",d.media_thumbnail.url);
-					this.rootElement.appendChild(newLi);
-				}
-			}
+			this.dataProviders.set(e.detail.src,e.detail.data);
 			this.updateView();
 		}
 	}
@@ -1073,7 +1070,7 @@ custom.component.RssConnector.prototype = $extend(slplayer.ui.DisplayObject.prot
 	src: null
 	,init: function(e) {
 		this.setSrc(this.rootElement.getAttribute("data-" + custom.component.RssConnector.SRC_TAG));
-		if(this.src == null) haxe.Log.trace("INFO " + custom.component.RssConnector.SRC_TAG + " attribute not set on html element",{ fileName : "RssConnector.hx", lineNumber : 29, className : "custom.component.RssConnector", methodName : "init"});
+		if(this.src == null) haxe.Log.trace("INFO " + custom.component.RssConnector.SRC_TAG + " attribute not set on html element",{ fileName : "RssConnector.hx", lineNumber : 31, className : "custom.component.RssConnector", methodName : "init"});
 		var me = this;
 		this.rootElement.addEventListener("newDataConsumer",(function(f) {
 			return function(a1) {
@@ -1089,7 +1086,7 @@ custom.component.RssConnector.prototype = $extend(slplayer.ui.DisplayObject.prot
 	}
 	,getData: function(e) {
 		if(this.src == null) {
-			haxe.Log.trace("INFO src not set.",{ fileName : "RssConnector.hx", lineNumber : 51, className : "custom.component.RssConnector", methodName : "getData"});
+			haxe.Log.trace("INFO src not set.",{ fileName : "RssConnector.hx", lineNumber : 53, className : "custom.component.RssConnector", methodName : "getData"});
 			return;
 		}
 		var r = new haxe.Http("custom/component/RssProxy.php");
@@ -1112,14 +1109,14 @@ custom.component.RssConnector.prototype = $extend(slplayer.ui.DisplayObject.prot
 		try {
 			xml = Xml.parse(data);
 		} catch( e ) {
-			haxe.Log.trace("ERROR cannot parse rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 71, className : "custom.component.RssConnector", methodName : "onData"});
+			haxe.Log.trace("ERROR cannot parse rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 73, className : "custom.component.RssConnector", methodName : "onData"});
 			return;
 		}
 		var items = xml.firstElement().firstElement().elementsNamed("item");
 		var data1 = new Array();
 		while(items.hasNext()) data1.push(this.generateDataObject(items.next()));
 		var onDataEvent = js.Lib.document.createEvent("CustomEvent");
-		onDataEvent.initCustomEvent("data",false,false,data1);
+		onDataEvent.initCustomEvent("data",false,false,{ src : this.src, data : data1});
 		this.rootElement.dispatchEvent(onDataEvent);
 	}
 	,generateDataObject: function(elt) {
@@ -1143,7 +1140,7 @@ custom.component.RssConnector.prototype = $extend(slplayer.ui.DisplayObject.prot
 		return data;
 	}
 	,onError: function(msg) {
-		haxe.Log.trace("ERROR cannot access to rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 128, className : "custom.component.RssConnector", methodName : "onError"});
+		haxe.Log.trace("ERROR cannot access to rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 130, className : "custom.component.RssConnector", methodName : "onError"});
 	}
 	,__class__: custom.component.RssConnector
 	,__properties__: {set_src:"setSrc"}
@@ -1427,6 +1424,391 @@ haxe.Md5.prototype = {
 	}
 	,__class__: haxe.Md5
 }
+if(!haxe._Template) haxe._Template = {}
+haxe._Template.TemplateExpr = $hxClasses["haxe._Template.TemplateExpr"] = { __ename__ : ["haxe","_Template","TemplateExpr"], __constructs__ : ["OpVar","OpExpr","OpIf","OpStr","OpBlock","OpForeach","OpMacro"] }
+haxe._Template.TemplateExpr.OpVar = function(v) { var $x = ["OpVar",0,v]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
+haxe._Template.TemplateExpr.OpExpr = function(expr) { var $x = ["OpExpr",1,expr]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
+haxe._Template.TemplateExpr.OpIf = function(expr,eif,eelse) { var $x = ["OpIf",2,expr,eif,eelse]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
+haxe._Template.TemplateExpr.OpStr = function(str) { var $x = ["OpStr",3,str]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
+haxe._Template.TemplateExpr.OpBlock = function(l) { var $x = ["OpBlock",4,l]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
+haxe._Template.TemplateExpr.OpForeach = function(expr,loop) { var $x = ["OpForeach",5,expr,loop]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
+haxe._Template.TemplateExpr.OpMacro = function(name,params) { var $x = ["OpMacro",6,name,params]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
+haxe.Template = $hxClasses["haxe.Template"] = function(str) {
+	var tokens = this.parseTokens(str);
+	this.expr = this.parseBlock(tokens);
+	if(!tokens.isEmpty()) throw "Unexpected '" + tokens.first().s + "'";
+};
+haxe.Template.__name__ = ["haxe","Template"];
+haxe.Template.prototype = {
+	expr: null
+	,context: null
+	,macros: null
+	,stack: null
+	,buf: null
+	,execute: function(context,macros) {
+		this.macros = macros == null?{ }:macros;
+		this.context = context;
+		this.stack = new List();
+		this.buf = new StringBuf();
+		this.run(this.expr);
+		return this.buf.b.join("");
+	}
+	,resolve: function(v) {
+		if(Reflect.hasField(this.context,v)) return Reflect.field(this.context,v);
+		var $it0 = this.stack.iterator();
+		while( $it0.hasNext() ) {
+			var ctx = $it0.next();
+			if(Reflect.hasField(ctx,v)) return Reflect.field(ctx,v);
+		}
+		if(v == "__current__") return this.context;
+		return Reflect.field(haxe.Template.globals,v);
+	}
+	,parseTokens: function(data) {
+		var tokens = new List();
+		while(haxe.Template.splitter.match(data)) {
+			var p = haxe.Template.splitter.matchedPos();
+			if(p.pos > 0) tokens.add({ p : data.substr(0,p.pos), s : true, l : null});
+			if(data.charCodeAt(p.pos) == 58) {
+				tokens.add({ p : data.substr(p.pos + 2,p.len - 4), s : false, l : null});
+				data = haxe.Template.splitter.matchedRight();
+				continue;
+			}
+			var parp = p.pos + p.len;
+			var npar = 1;
+			while(npar > 0) {
+				var c = data.charCodeAt(parp);
+				if(c == 40) npar++; else if(c == 41) npar--; else if(c == null) throw "Unclosed macro parenthesis";
+				parp++;
+			}
+			var params = data.substr(p.pos + p.len,parp - (p.pos + p.len) - 1).split(",");
+			tokens.add({ p : haxe.Template.splitter.matched(2), s : false, l : params});
+			data = data.substr(parp,data.length - parp);
+		}
+		if(data.length > 0) tokens.add({ p : data, s : true, l : null});
+		return tokens;
+	}
+	,parseBlock: function(tokens) {
+		var l = new List();
+		while(true) {
+			var t = tokens.first();
+			if(t == null) break;
+			if(!t.s && (t.p == "end" || t.p == "else" || t.p.substr(0,7) == "elseif ")) break;
+			l.add(this.parse(tokens));
+		}
+		if(l.length == 1) return l.first();
+		return haxe._Template.TemplateExpr.OpBlock(l);
+	}
+	,parse: function(tokens) {
+		var t = tokens.pop();
+		var p = t.p;
+		if(t.s) return haxe._Template.TemplateExpr.OpStr(p);
+		if(t.l != null) {
+			var pe = new List();
+			var _g = 0, _g1 = t.l;
+			while(_g < _g1.length) {
+				var p1 = _g1[_g];
+				++_g;
+				pe.add(this.parseBlock(this.parseTokens(p1)));
+			}
+			return haxe._Template.TemplateExpr.OpMacro(p,pe);
+		}
+		if(p.substr(0,3) == "if ") {
+			p = p.substr(3,p.length - 3);
+			var e = this.parseExpr(p);
+			var eif = this.parseBlock(tokens);
+			var t1 = tokens.first();
+			var eelse;
+			if(t1 == null) throw "Unclosed 'if'";
+			if(t1.p == "end") {
+				tokens.pop();
+				eelse = null;
+			} else if(t1.p == "else") {
+				tokens.pop();
+				eelse = this.parseBlock(tokens);
+				t1 = tokens.pop();
+				if(t1 == null || t1.p != "end") throw "Unclosed 'else'";
+			} else {
+				t1.p = t1.p.substr(4,t1.p.length - 4);
+				eelse = this.parse(tokens);
+			}
+			return haxe._Template.TemplateExpr.OpIf(e,eif,eelse);
+		}
+		if(p.substr(0,8) == "foreach ") {
+			p = p.substr(8,p.length - 8);
+			var e = this.parseExpr(p);
+			var efor = this.parseBlock(tokens);
+			var t1 = tokens.pop();
+			if(t1 == null || t1.p != "end") throw "Unclosed 'foreach'";
+			return haxe._Template.TemplateExpr.OpForeach(e,efor);
+		}
+		if(haxe.Template.expr_splitter.match(p)) return haxe._Template.TemplateExpr.OpExpr(this.parseExpr(p));
+		return haxe._Template.TemplateExpr.OpVar(p);
+	}
+	,parseExpr: function(data) {
+		var l = new List();
+		var expr = data;
+		while(haxe.Template.expr_splitter.match(data)) {
+			var p = haxe.Template.expr_splitter.matchedPos();
+			var k = p.pos + p.len;
+			if(p.pos != 0) l.add({ p : data.substr(0,p.pos), s : true});
+			var p1 = haxe.Template.expr_splitter.matched(0);
+			l.add({ p : p1, s : p1.indexOf("\"") >= 0});
+			data = haxe.Template.expr_splitter.matchedRight();
+		}
+		if(data.length != 0) l.add({ p : data, s : true});
+		var e;
+		try {
+			e = this.makeExpr(l);
+			if(!l.isEmpty()) throw l.first().p;
+		} catch( s ) {
+			if( js.Boot.__instanceof(s,String) ) {
+				throw "Unexpected '" + s + "' in " + expr;
+			} else throw(s);
+		}
+		return function() {
+			try {
+				return e();
+			} catch( exc ) {
+				throw "Error : " + Std.string(exc) + " in " + expr;
+			}
+		};
+	}
+	,makeConst: function(v) {
+		haxe.Template.expr_trim.match(v);
+		v = haxe.Template.expr_trim.matched(1);
+		if(v.charCodeAt(0) == 34) {
+			var str = v.substr(1,v.length - 2);
+			return function() {
+				return str;
+			};
+		}
+		if(haxe.Template.expr_int.match(v)) {
+			var i = Std.parseInt(v);
+			return function() {
+				return i;
+			};
+		}
+		if(haxe.Template.expr_float.match(v)) {
+			var f = Std.parseFloat(v);
+			return function() {
+				return f;
+			};
+		}
+		var me = this;
+		return function() {
+			return me.resolve(v);
+		};
+	}
+	,makePath: function(e,l) {
+		var p = l.first();
+		if(p == null || p.p != ".") return e;
+		l.pop();
+		var field = l.pop();
+		if(field == null || !field.s) throw field.p;
+		var f = field.p;
+		haxe.Template.expr_trim.match(f);
+		f = haxe.Template.expr_trim.matched(1);
+		return this.makePath(function() {
+			return Reflect.field(e(),f);
+		},l);
+	}
+	,makeExpr: function(l) {
+		return this.makePath(this.makeExpr2(l),l);
+	}
+	,makeExpr2: function(l) {
+		var p = l.pop();
+		if(p == null) throw "<eof>";
+		if(p.s) return this.makeConst(p.p);
+		switch(p.p) {
+		case "(":
+			var e1 = this.makeExpr(l);
+			var p1 = l.pop();
+			if(p1 == null || p1.s) throw p1.p;
+			if(p1.p == ")") return e1;
+			var e2 = this.makeExpr(l);
+			var p2 = l.pop();
+			if(p2 == null || p2.p != ")") throw p2.p;
+			return (function($this) {
+				var $r;
+				switch(p1.p) {
+				case "+":
+					$r = function() {
+						return e1() + e2();
+					};
+					break;
+				case "-":
+					$r = function() {
+						return e1() - e2();
+					};
+					break;
+				case "*":
+					$r = function() {
+						return e1() * e2();
+					};
+					break;
+				case "/":
+					$r = function() {
+						return e1() / e2();
+					};
+					break;
+				case ">":
+					$r = function() {
+						return e1() > e2();
+					};
+					break;
+				case "<":
+					$r = function() {
+						return e1() < e2();
+					};
+					break;
+				case ">=":
+					$r = function() {
+						return e1() >= e2();
+					};
+					break;
+				case "<=":
+					$r = function() {
+						return e1() <= e2();
+					};
+					break;
+				case "==":
+					$r = function() {
+						return e1() == e2();
+					};
+					break;
+				case "!=":
+					$r = function() {
+						return e1() != e2();
+					};
+					break;
+				case "&&":
+					$r = function() {
+						return e1() && e2();
+					};
+					break;
+				case "||":
+					$r = function() {
+						return e1() || e2();
+					};
+					break;
+				default:
+					$r = (function($this) {
+						var $r;
+						throw "Unknown operation " + p1.p;
+						return $r;
+					}($this));
+				}
+				return $r;
+			}(this));
+		case "!":
+			var e = this.makeExpr(l);
+			return function() {
+				var v = e();
+				return v == null || v == false;
+			};
+		case "-":
+			var e = this.makeExpr(l);
+			return function() {
+				return -e();
+			};
+		}
+		throw p.p;
+	}
+	,run: function(e) {
+		var $e = (e);
+		switch( $e[1] ) {
+		case 0:
+			var v = $e[2];
+			this.buf.add(Std.string(this.resolve(v)));
+			break;
+		case 1:
+			var e1 = $e[2];
+			this.buf.add(Std.string(e1()));
+			break;
+		case 2:
+			var eelse = $e[4], eif = $e[3], e1 = $e[2];
+			var v = e1();
+			if(v == null || v == false) {
+				if(eelse != null) this.run(eelse);
+			} else this.run(eif);
+			break;
+		case 3:
+			var str = $e[2];
+			this.buf.add(str);
+			break;
+		case 4:
+			var l = $e[2];
+			var $it0 = l.iterator();
+			while( $it0.hasNext() ) {
+				var e1 = $it0.next();
+				this.run(e1);
+			}
+			break;
+		case 5:
+			var loop = $e[3], e1 = $e[2];
+			var v = e1();
+			try {
+				var x = v.iterator();
+				if(x.hasNext == null) throw null;
+				v = x;
+			} catch( e2 ) {
+				try {
+					if(v.hasNext == null) throw null;
+				} catch( e3 ) {
+					throw "Cannot iter on " + v;
+				}
+			}
+			this.stack.push(this.context);
+			var v1 = v;
+			while( v1.hasNext() ) {
+				var ctx = v1.next();
+				this.context = ctx;
+				this.run(loop);
+			}
+			this.context = this.stack.pop();
+			break;
+		case 6:
+			var params = $e[3], m = $e[2];
+			var v = Reflect.field(this.macros,m);
+			var pl = new Array();
+			var old = this.buf;
+			pl.push(this.resolve.$bind(this));
+			var $it1 = params.iterator();
+			while( $it1.hasNext() ) {
+				var p = $it1.next();
+				var $e = (p);
+				switch( $e[1] ) {
+				case 0:
+					var v1 = $e[2];
+					pl.push(this.resolve(v1));
+					break;
+				default:
+					this.buf = new StringBuf();
+					this.run(p);
+					pl.push(this.buf.b.join(""));
+				}
+			}
+			this.buf = old;
+			try {
+				this.buf.add(Std.string(v.apply(this.macros,pl)));
+			} catch( e1 ) {
+				var plstr = (function($this) {
+					var $r;
+					try {
+						$r = pl.join(",");
+					} catch( e2 ) {
+						$r = "???";
+					}
+					return $r;
+				}(this));
+				var msg = "Macro call " + m + "(" + plstr + ") failed (" + Std.string(e1) + ")";
+				throw msg;
+			}
+			break;
+		}
+	}
+	,__class__: haxe.Template
+}
 var js = js || {}
 js.Boot = $hxClasses["js.Boot"] = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -1675,7 +2057,7 @@ slplayer.core.SLPlayer.main = function() {
 	})(mySLPlayerApp.initDisplayObjects.$bind(mySLPlayerApp));
 }
 slplayer.core.SLPlayer.addAssociatedComponent = function(node,cmp) {
-	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 70, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
+	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 73, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
 	var nodeId = node.getAttribute("data-" + slplayer.core.SLPlayer.SLPID_ATTR_NAME);
 	var associatedCmps;
 	if(nodeId != null) associatedCmps = slplayer.core.SLPlayer.nodeToCmpInstances.get(nodeId); else {
@@ -1709,12 +2091,12 @@ slplayer.core.SLPlayer.prototype = {
 			if(tagClassName != null) {
 				var taggedNodes = js.Lib.document.getElementsByClassName(tagClassName);
 				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 58, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-				var _g1 = 0, _g = taggedNodes.length;
-				while(_g1 < _g) {
-					var nodeCnt = _g1++;
+				var nodeCnt = 0;
+				while(nodeCnt < taggedNodes.length) {
 					var newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
-					haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 61, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+					haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 63, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 					newDisplayObject.init(null);
+					nodeCnt++;
 				}
 			}
 		}
@@ -1846,9 +2228,15 @@ Xml.edoctype_elt = new EReg("[\\[|\\]>]","");
 Xml.ecomment_end = new EReg("-->","");
 custom.component.RssConnector.className = "rssconnector";
 custom.component.RssConnector.SRC_TAG = "src-rss";
+haxe.Template.splitter = new EReg("(::[A-Za-z0-9_ ()&|!+=/><*.\"-]+::|\\$\\$([A-Za-z0-9_-]+)\\()","");
+haxe.Template.expr_splitter = new EReg("(\\(|\\)|[ \r\n\t]*\"[^\"]*\"[ \r\n\t]*|[!+=/><*.&|-]+)","");
+haxe.Template.expr_trim = new EReg("^[ ]*([^ ]+)[ ]*$","");
+haxe.Template.expr_int = new EReg("^[0-9]+$","");
+haxe.Template.expr_float = new EReg("^([+-]?)(?=\\d|,\\d)\\d*(,\\d*)?([Ee]([+-]?\\d+))?$","");
+haxe.Template.globals = { };
 js.Lib.onerror = null;
 silexlabs.slplayer.DebugNodes.className = "debugnode";
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<div><div>Hi ! This gallery is developped in Haxe/js:</div><br/><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div>This one is just another instance of the same gallery component which is combined with a rss feed reader component:</div><br/><ul class=\"gallery rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div class=\"debugnode\"/></div>";
+slplayer.core.SLPlayer._htmlBody = "<div><div>Hi ! This gallery is developped in Haxe/js:</div><br/><div><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>This one is just another instance of the same gallery component which is combined with a rss feed reader component:</div><br/><div><ul class=\"gallery rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t::foreach data:: <li><img src=\"::media_thumbnail.url::\"/></li> ::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div class=\"debugnode\"/></div>";
 slplayer.core.SLPlayer.main()
