@@ -1,33 +1,33 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<title>Hello world !</title>
+	<title>Proto SLPlayer Demo</title>
 	<script src="SLPlayer.js"></script>
-	<script src="Gallery.js"></script>
-	<script src="silexlabs/slplayer/DebugNodes.js"></script>
-	<script src="custom/component/RssConnector.js"></script>
+	<script src="slplayer/prototype/player/Gallery.js"></script>
+	<script src="slplayer/prototype/debug/DebugNodes.js"></script>
+	<script src="slplayer/prototype/data/RssConnector.js"></script>
 </head>
 <body>
 	<div>
 		<div>A basic gallery component:</div><br />
 		<div>
-		<ul class="gallery">
-			<li><img src="./assets/4.jpg" /></li>
-			<li><img src="assets/1.png" /></li>
-			<li><img src="assets/2.png" /></li>
-			<li><img src="assets/3.png" /></li>
-		</ul>
+			<ul class="gallery">
+				<li><img src="assets/4.jpg" /></li>
+				<li><img src="assets/1.png" /></li>
+				<li><img src="assets/2.png" /></li>
+				<li><img src="assets/3.png" /></li>
+			</ul>
 		</div>
 
 		<div>The same gallery component combined with a rss feed reader component:</div><br />
 		<div>
-			<ul class="gallery rssconnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
-			<li><img src="assets/4.jpg" /></li>
-			::foreach data:: <li><img src="::media_thumbnail.url::" /></li> ::end::
-			<li><img src="assets/1.png" /></li>
-			<li><img src="assets/2.png" /></li>
-			<li><img src="assets/3.png" /></li>
-		</ul>
+			<ul class="gallery rssconnector playbar" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
+				<li><img src="assets/4.jpg" /></li>
+				::foreach data:: <li><img width="155" height="155" title="::media_title::" alt="::media_title::" src="::media_thumbnail.url::" /></li> ::end::
+				<li><img src="assets/1.png" /></li>
+				<li><img src="assets/2.png" /></li>
+				<li><img src="assets/3.png" /></li>
+			</ul>
 		</div>
 		<div class="debugnode"></div>
 	</div>

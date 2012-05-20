@@ -1,4 +1,4 @@
 -js SLPlayer.js
--cp .
+-cp ./src/
 -cp ../../src/
 -main slplayer.core.SLPlayer

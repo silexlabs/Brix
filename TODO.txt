@@ -7,4 +7,20 @@
  
 - The connectors could have just one instance for the all document ( or could be static classes) ?
 
-- 
+- norm the data consumer / data provider components ?
+
+  for both consumers and providers : a typedef defining the detail parameter of the CustomEvent
+  
+  for providers :
+	  a dispatch data method
+
+- make a timer and a playbar component
+
+- with the use of macro, force having a static override var className when extending DisplayObject ?
+
+
+
+
+Things to discuss :
+	
+	- this heritage system is not perfect : if we want a component which will be both data provider, data consumer, ... it's not possible => propose a composition system ? or a metadata / macro based system ? or simulate multi inheritance with "using" ?

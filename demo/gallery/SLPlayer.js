@@ -56,90 +56,6 @@ EReg.prototype = {
 	}
 	,__class__: EReg
 }
-var slplayer = slplayer || {}
-if(!slplayer.ui) slplayer.ui = {}
-slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
-	this.rootElement = rootElement;
-	slplayer.core.SLPlayer.addAssociatedComponent(rootElement,this);
-};
-slplayer.ui.DisplayObject.__name__ = ["slplayer","ui","DisplayObject"];
-slplayer.ui.DisplayObject.prototype = {
-	rootElement: null
-	,init: function(e) {
-	}
-	,__class__: slplayer.ui.DisplayObject
-}
-var Gallery = $hxClasses["Gallery"] = function(rootElement) {
-	slplayer.ui.DisplayObject.call(this,rootElement);
-};
-Gallery.__name__ = ["Gallery"];
-Gallery.__super__ = slplayer.ui.DisplayObject;
-Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
-	currentIndex: null
-	,tpl: null
-	,dataProviders: null
-	,init: function(e) {
-		this.dataProviders = new Hash();
-		this.tpl = new haxe.Template(this.rootElement.innerHTML);
-		this.rootElement.innerHTML = "";
-		this.currentIndex = 0;
-		this.updateView();
-		var leftButton = js.Lib.document.createElement("img");
-		leftButton.setAttribute("src","assets/prev.png");
-		var me = this;
-		leftButton.onclick = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(me.previousPicture.$bind(me));
-		var rightButton = js.Lib.document.createElement("img");
-		rightButton.setAttribute("src","assets/next.png");
-		rightButton.onclick = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(me.nextPicture.$bind(me));
-		var buttonContainer = js.Lib.document.createElement("div");
-		buttonContainer.appendChild(leftButton);
-		buttonContainer.appendChild(rightButton);
-		this.rootElement.parentNode.appendChild(buttonContainer);
-		this.rootElement.addEventListener("data",this.onData.$bind(this),false);
-		var onNewDataConsumerEvent = js.Lib.document.createEvent("CustomEvent");
-		onNewDataConsumerEvent.initCustomEvent("newDataConsumer",false,false,me);
-		this.rootElement.dispatchEvent(onNewDataConsumerEvent);
-	}
-	,updateView: function() {
-		var providersData = new Array();
-		var $it0 = this.dataProviders.iterator();
-		while( $it0.hasNext() ) {
-			var pvdData = $it0.next();
-			providersData = providersData.concat(pvdData);
-		}
-		this.rootElement.innerHTML = this.tpl.execute({ data : providersData});
-		var liChilds = this.rootElement.getElementsByTagName("li");
-		var _g1 = 0, _g = liChilds.length;
-		while(_g1 < _g) {
-			var liCnt = _g1++;
-			liChilds[liCnt].style.display = "none";
-		}
-		liChilds[this.currentIndex].style.display = "block";
-	}
-	,nextPicture: function(e) {
-		if(this.currentIndex < this.rootElement.getElementsByTagName("li").length - 1) this.currentIndex++;
-		this.updateView();
-	}
-	,previousPicture: function(e) {
-		if(this.currentIndex > 0) this.currentIndex--;
-		this.updateView();
-	}
-	,onData: function(e) {
-		if(e.detail != null) {
-			this.dataProviders.set(e.detail.src,e.detail.data);
-			this.updateView();
-		}
-	}
-	,__class__: Gallery
-});
 var Hash = $hxClasses["Hash"] = function() {
 	this.h = { };
 };
@@ -1059,92 +975,6 @@ Xml.prototype = {
 	,__class__: Xml
 	,__properties__: {get_parent:"getParent",set_nodeValue:"setNodeValue",get_nodeValue:"getNodeValue",set_nodeName:"setNodeName",get_nodeName:"getNodeName"}
 }
-var custom = custom || {}
-if(!custom.component) custom.component = {}
-custom.component.RssConnector = $hxClasses["custom.component.RssConnector"] = function(rootElement) {
-	slplayer.ui.DisplayObject.call(this,rootElement);
-};
-custom.component.RssConnector.__name__ = ["custom","component","RssConnector"];
-custom.component.RssConnector.__super__ = slplayer.ui.DisplayObject;
-custom.component.RssConnector.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
-	src: null
-	,init: function(e) {
-		this.setSrc(this.rootElement.getAttribute("data-" + custom.component.RssConnector.SRC_TAG));
-		if(this.src == null) haxe.Log.trace("INFO " + custom.component.RssConnector.SRC_TAG + " attribute not set on html element",{ fileName : "RssConnector.hx", lineNumber : 31, className : "custom.component.RssConnector", methodName : "init"});
-		var me = this;
-		this.rootElement.addEventListener("newDataConsumer",(function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(me.getData.$bind(me)),false);
-	}
-	,setSrc: function(newSrc) {
-		if(newSrc == this.src) return this.src;
-		this.src = newSrc;
-		this.getData(null);
-		return this.src;
-	}
-	,getData: function(e) {
-		if(this.src == null) {
-			haxe.Log.trace("INFO src not set.",{ fileName : "RssConnector.hx", lineNumber : 53, className : "custom.component.RssConnector", methodName : "getData"});
-			return;
-		}
-		var r = new haxe.Http("custom/component/RssProxy.php");
-		r.setParameter("url",this.src);
-		var me = this;
-		r.onData = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(me.onData.$bind(me));
-		r.onError = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(me.onError.$bind(me));
-		r.request(true);
-	}
-	,onData: function(data) {
-		var xml;
-		try {
-			xml = Xml.parse(data);
-		} catch( e ) {
-			haxe.Log.trace("ERROR cannot parse rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 73, className : "custom.component.RssConnector", methodName : "onData"});
-			return;
-		}
-		var items = xml.firstElement().firstElement().elementsNamed("item");
-		var data1 = new Array();
-		while(items.hasNext()) data1.push(this.generateDataObject(items.next()));
-		var onDataEvent = js.Lib.document.createEvent("CustomEvent");
-		onDataEvent.initCustomEvent("data",false,false,{ src : this.src, data : data1});
-		this.rootElement.dispatchEvent(onDataEvent);
-	}
-	,generateDataObject: function(elt) {
-		var data = { };
-		var xmlChilds = elt.elements();
-		while(xmlChilds.hasNext()) {
-			var xmlChild = xmlChilds.next();
-			var nodeName = StringTools.replace(xmlChild.getNodeName(),":","_");
-			data[nodeName] = { };
-			var atts = xmlChild.attributes();
-			while(atts.hasNext()) {
-				var at = atts.next();
-				Reflect.field(data,nodeName)[at] = xmlChild.get(at);
-			}
-			var innerChilds = xmlChild.elements();
-			if(innerChilds.hasNext()) while(innerChilds.hasNext()) {
-				var innerChild = innerChilds.next();
-				Reflect.field(data,nodeName)[innerChild.getNodeName()] = this.generateDataObject(innerChild);
-			} else if(xmlChild.firstChild() != null) data[nodeName] = xmlChild.firstChild();
-		}
-		return data;
-	}
-	,onError: function(msg) {
-		haxe.Log.trace("ERROR cannot access to rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 130, className : "custom.component.RssConnector", methodName : "onError"});
-	}
-	,__class__: custom.component.RssConnector
-	,__properties__: {set_src:"setSrc"}
-});
 var haxe = haxe || {}
 haxe.Http = $hxClasses["haxe.Http"] = function(url) {
 	this.url = url;
@@ -2008,42 +1838,7 @@ js.Lib.setErrorHandler = function(f) {
 js.Lib.prototype = {
 	__class__: js.Lib
 }
-var silexlabs = silexlabs || {}
-if(!silexlabs.slplayer) silexlabs.slplayer = {}
-silexlabs.slplayer.DebugNodes = $hxClasses["silexlabs.slplayer.DebugNodes"] = function(rootElement) {
-	slplayer.ui.DisplayObject.call(this,rootElement);
-};
-silexlabs.slplayer.DebugNodes.__name__ = ["silexlabs","slplayer","DebugNodes"];
-silexlabs.slplayer.DebugNodes.__super__ = slplayer.ui.DisplayObject;
-silexlabs.slplayer.DebugNodes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
-	init: function(e) {
-		haxe.Log.trace("DebugNodes component initialized",{ fileName : "DebugNodes.hx", lineNumber : 20, className : "silexlabs.slplayer.DebugNodes", methodName : "init"});
-		var debugButton = js.Lib.document.createElement("img");
-		debugButton.setAttribute("src","assets/debug.png");
-		debugButton.onclick = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(this.debugNodes.$bind(this));
-		this.rootElement.appendChild(debugButton);
-	}
-	,debugNodes: function(e) {
-		this.debugNode(js.Lib.document.body);
-	}
-	,debugNode: function(node) {
-		var _g1 = 0, _g = node.childNodes.length;
-		while(_g1 < _g) {
-			var cCount = _g1++;
-			var elt = node.childNodes[cCount];
-			if(elt.className != null) {
-				var tagName = elt.nodeName;
-				haxe.Log.trace("tag " + tagName + " with class=" + elt.className + " has associated components : " + slplayer.core.SLPlayer.getAssociatedComponents(elt),{ fileName : "DebugNodes.hx", lineNumber : 41, className : "silexlabs.slplayer.DebugNodes", methodName : "debugNode"});
-			}
-			if(node.childNodes[cCount].hasChildNodes()) this.debugNode(elt);
-		}
-	}
-	,__class__: silexlabs.slplayer.DebugNodes
-});
+var slplayer = slplayer || {}
 if(!slplayer.core) slplayer.core = {}
 slplayer.core.SLPlayer = $hxClasses["slplayer.core.SLPlayer"] = function() {
 };
@@ -2075,12 +1870,12 @@ slplayer.core.SLPlayer.getAssociatedComponents = function(node) {
 }
 slplayer.core.SLPlayer.prototype = {
 	initDisplayObjects: function(e) {
-		Gallery;
-		this.initDisplayObjectsOfType("Gallery");
-		silexlabs.slplayer.DebugNodes;
-		this.initDisplayObjectsOfType("silexlabs.slplayer.DebugNodes");
-		custom.component.RssConnector;
-		this.initDisplayObjectsOfType("custom.component.RssConnector");
+		slplayer.prototype.player.Gallery;
+		this.initDisplayObjectsOfType("slplayer.prototype.player.Gallery");
+		slplayer.prototype.debug.DebugNodes;
+		this.initDisplayObjectsOfType("slplayer.prototype.debug.DebugNodes");
+		slplayer.prototype.data.RssConnector;
+		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector");
 	}
 	,initDisplayObjectsOfType: function(displayObjectClassName) {
 		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 46, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
@@ -2103,6 +1898,250 @@ slplayer.core.SLPlayer.prototype = {
 	}
 	,__class__: slplayer.core.SLPlayer
 }
+if(!slplayer.data) slplayer.data = {}
+slplayer.data.Common = $hxClasses["slplayer.data.Common"] = function() { }
+slplayer.data.Common.__name__ = ["slplayer","data","Common"];
+slplayer.data.Common.prototype = {
+	__class__: slplayer.data.Common
+}
+slplayer.data.DataConsumer = $hxClasses["slplayer.data.DataConsumer"] = function() { }
+slplayer.data.DataConsumer.__name__ = ["slplayer","data","DataConsumer"];
+slplayer.data.DataConsumer.startConsuming = function(consumer,from) {
+	from.addEventListener(slplayer.data.Common.ON_DATA_EVENT_TYPE,consumer.onData.$bind(consumer),false);
+	var onNewConsumerEvent = js.Lib.document.createEvent("CustomEvent");
+	onNewConsumerEvent.initCustomEvent(slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE,false,false,consumer);
+	from.dispatchEvent(onNewConsumerEvent);
+}
+slplayer.data.DataConsumer.prototype = {
+	__class__: slplayer.data.DataConsumer
+}
+slplayer.data.IDataConsumer = $hxClasses["slplayer.data.IDataConsumer"] = function() { }
+slplayer.data.IDataConsumer.__name__ = ["slplayer","data","IDataConsumer"];
+slplayer.data.IDataConsumer.prototype = {
+	onData: null
+	,__class__: slplayer.data.IDataConsumer
+}
+slplayer.data.DataProvider = $hxClasses["slplayer.data.DataProvider"] = function() { }
+slplayer.data.DataProvider.__name__ = ["slplayer","data","DataProvider"];
+slplayer.data.DataProvider.startProviding = function(provider,target) {
+	target.addEventListener(slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE,(function(f) {
+		return function(a1) {
+			return f(a1);
+		};
+	})(provider.getData.$bind(provider)),false);
+}
+slplayer.data.DataProvider.dispatchData = function(target,data) {
+	var onDataEvent = js.Lib.document.createEvent("CustomEvent");
+	onDataEvent.initCustomEvent(slplayer.data.Common.ON_DATA_EVENT_TYPE,false,false,data);
+	target.dispatchEvent(onDataEvent);
+}
+slplayer.data.DataProvider.prototype = {
+	__class__: slplayer.data.DataProvider
+}
+slplayer.data.IDataProvider = $hxClasses["slplayer.data.IDataProvider"] = function() { }
+slplayer.data.IDataProvider.__name__ = ["slplayer","data","IDataProvider"];
+slplayer.data.IDataProvider.prototype = {
+	getData: null
+	,__class__: slplayer.data.IDataProvider
+}
+if(!slplayer.ui) slplayer.ui = {}
+slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
+	this.rootElement = rootElement;
+	slplayer.core.SLPlayer.addAssociatedComponent(rootElement,this);
+};
+slplayer.ui.DisplayObject.__name__ = ["slplayer","ui","DisplayObject"];
+slplayer.ui.DisplayObject.prototype = {
+	rootElement: null
+	,init: function(e) {
+	}
+	,__class__: slplayer.ui.DisplayObject
+}
+if(!slplayer.prototype) slplayer.prototype = {}
+if(!slplayer.prototype.data) slplayer.prototype.data = {}
+slplayer.prototype.data.RssConnector = $hxClasses["slplayer.prototype.data.RssConnector"] = function(rootElement) {
+	slplayer.ui.DisplayObject.call(this,rootElement);
+};
+slplayer.prototype.data.RssConnector.__name__ = ["slplayer","prototype","data","RssConnector"];
+slplayer.prototype.data.RssConnector.__interfaces__ = [slplayer.data.IDataProvider];
+slplayer.prototype.data.RssConnector.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.data.RssConnector.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	src: null
+	,setSrc: function(newSrc) {
+		if(newSrc == this.src || newSrc == null) return this.src;
+		this.src = newSrc;
+		this.getData(null);
+		return this.src;
+	}
+	,init: function(e) {
+		this.setSrc(this.rootElement.getAttribute("data-" + slplayer.prototype.data.RssConnector.SRC_TAG));
+		if(this.src == null) haxe.Log.trace("INFO " + slplayer.prototype.data.RssConnector.SRC_TAG + " attribute not set on html element",{ fileName : "RssConnector.hx", lineNumber : 46, className : "slplayer.prototype.data.RssConnector", methodName : "init"});
+		var me = this;
+		slplayer.data.DataProvider.startProviding(this,this.rootElement);
+	}
+	,getData: function(e) {
+		if(this.src == null) {
+			haxe.Log.trace("INFO src not set.",{ fileName : "RssConnector.hx", lineNumber : 58, className : "slplayer.prototype.data.RssConnector", methodName : "getData"});
+			return;
+		}
+		var r = new haxe.Http("XMLProxy.php");
+		r.setParameter("url",this.src);
+		var me = this;
+		r.onData = (function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(me.onData.$bind(me));
+		r.onError = (function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(me.onError.$bind(me));
+		r.request(true);
+	}
+	,onData: function(data) {
+		var dataXml;
+		try {
+			dataXml = Xml.parse(data);
+		} catch( e ) {
+			haxe.Log.trace("ERROR cannot parse rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 78, className : "slplayer.prototype.data.RssConnector", methodName : "onData"});
+			return;
+		}
+		var items = dataXml.firstElement().firstElement().elementsNamed("item");
+		var itemsData = new Array();
+		while(items.hasNext()) itemsData.push(this.generateDataObject(items.next()));
+		slplayer.data.DataProvider.dispatchData(this.rootElement,{ src : this.src, srcTitle : null, data : itemsData});
+	}
+	,generateDataObject: function(elt) {
+		var data = { };
+		var xmlChilds = elt.elements();
+		while(xmlChilds.hasNext()) {
+			var xmlChild = xmlChilds.next();
+			var nodeName = StringTools.replace(xmlChild.getNodeName(),":","_");
+			data[nodeName] = { };
+			var atts = xmlChild.attributes();
+			while(atts.hasNext()) {
+				var at = atts.next();
+				Reflect.field(data,nodeName)[at] = xmlChild.get(at);
+			}
+			var innerChilds = xmlChild.elements();
+			if(innerChilds.hasNext()) while(innerChilds.hasNext()) {
+				var innerChild = innerChilds.next();
+				Reflect.field(data,nodeName)[innerChild.getNodeName()] = this.generateDataObject(innerChild);
+			} else if(xmlChild.firstChild() != null) data[nodeName] = xmlChild.firstChild();
+		}
+		return data;
+	}
+	,onError: function(msg) {
+		haxe.Log.trace("ERROR cannot access to rss feed " + this.src,{ fileName : "RssConnector.hx", lineNumber : 137, className : "slplayer.prototype.data.RssConnector", methodName : "onError"});
+	}
+	,__class__: slplayer.prototype.data.RssConnector
+	,__properties__: {set_src:"setSrc"}
+});
+if(!slplayer.prototype.debug) slplayer.prototype.debug = {}
+slplayer.prototype.debug.DebugNodes = $hxClasses["slplayer.prototype.debug.DebugNodes"] = function(rootElement) {
+	slplayer.ui.DisplayObject.call(this,rootElement);
+};
+slplayer.prototype.debug.DebugNodes.__name__ = ["slplayer","prototype","debug","DebugNodes"];
+slplayer.prototype.debug.DebugNodes.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.debug.DebugNodes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	init: function(e) {
+		haxe.Log.trace("DebugNodes component initialized",{ fileName : "DebugNodes.hx", lineNumber : 20, className : "slplayer.prototype.debug.DebugNodes", methodName : "init"});
+		var debugButton = js.Lib.document.createElement("img");
+		debugButton.setAttribute("src","assets/debug.png");
+		debugButton.onclick = (function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(this.debugNodes.$bind(this));
+		this.rootElement.appendChild(debugButton);
+	}
+	,debugNodes: function(e) {
+		this.debugNode(js.Lib.document.body);
+	}
+	,debugNode: function(node) {
+		var _g1 = 0, _g = node.childNodes.length;
+		while(_g1 < _g) {
+			var cCount = _g1++;
+			var elt = node.childNodes[cCount];
+			if(elt.className != null) {
+				var tagName = elt.nodeName;
+				haxe.Log.trace("tag " + tagName + " with class=" + elt.className + " has associated components : " + slplayer.core.SLPlayer.getAssociatedComponents(elt),{ fileName : "DebugNodes.hx", lineNumber : 41, className : "slplayer.prototype.debug.DebugNodes", methodName : "debugNode"});
+			}
+			if(node.childNodes[cCount].hasChildNodes()) this.debugNode(elt);
+		}
+	}
+	,__class__: slplayer.prototype.debug.DebugNodes
+});
+if(!slplayer.prototype.player) slplayer.prototype.player = {}
+slplayer.prototype.player.Gallery = $hxClasses["slplayer.prototype.player.Gallery"] = function(rootElement) {
+	slplayer.ui.DisplayObject.call(this,rootElement);
+};
+slplayer.prototype.player.Gallery.__name__ = ["slplayer","prototype","player","Gallery"];
+slplayer.prototype.player.Gallery.__interfaces__ = [slplayer.data.IDataConsumer];
+slplayer.prototype.player.Gallery.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	currentIndex: null
+	,tpl: null
+	,dataProviders: null
+	,init: function(e) {
+		this.dataProviders = new Hash();
+		this.tpl = new haxe.Template(this.rootElement.innerHTML);
+		this.rootElement.innerHTML = "";
+		this.currentIndex = 0;
+		this.updateView();
+		var leftButton = js.Lib.document.createElement("img");
+		leftButton.setAttribute("src","assets/prev.png");
+		var me = this;
+		leftButton.onclick = (function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(me.previousPicture.$bind(me));
+		var rightButton = js.Lib.document.createElement("img");
+		rightButton.setAttribute("src","assets/next.png");
+		rightButton.onclick = (function(f) {
+			return function(a1) {
+				return f(a1);
+			};
+		})(me.nextPicture.$bind(me));
+		var buttonContainer = js.Lib.document.createElement("div");
+		buttonContainer.appendChild(leftButton);
+		buttonContainer.appendChild(rightButton);
+		this.rootElement.parentNode.appendChild(buttonContainer);
+		slplayer.data.DataConsumer.startConsuming(this,this.rootElement);
+	}
+	,updateView: function() {
+		var providersData = new Array();
+		var $it0 = this.dataProviders.iterator();
+		while( $it0.hasNext() ) {
+			var pvdData = $it0.next();
+			providersData = providersData.concat(pvdData);
+		}
+		this.rootElement.innerHTML = this.tpl.execute({ data : providersData});
+		var liChilds = this.rootElement.getElementsByTagName("li");
+		var _g1 = 0, _g = liChilds.length;
+		while(_g1 < _g) {
+			var liCnt = _g1++;
+			liChilds[liCnt].style.display = "none";
+		}
+		liChilds[this.currentIndex].style.display = "block";
+	}
+	,nextPicture: function(e) {
+		if(this.currentIndex < this.rootElement.getElementsByTagName("li").length - 1) this.currentIndex++;
+		this.updateView();
+	}
+	,previousPicture: function(e) {
+		if(this.currentIndex > 0) this.currentIndex--;
+		this.updateView();
+	}
+	,onData: function(e) {
+		if(e.detail != null) {
+			this.dataProviders.set(e.detail.src,e.detail.data);
+			this.updateView();
+		}
+	}
+	,__class__: slplayer.prototype.player.Gallery
+});
 js.Boot.__res = {}
 js.Boot.__init();
 {
@@ -2212,8 +2251,6 @@ js["XMLHttpRequest"] = window.XMLHttpRequest?XMLHttpRequest:window.ActiveXObject
 	throw "Unable to create XMLHttpRequest object.";
 	return $r;
 }(this));
-slplayer.ui.DisplayObject.className = "DisplayObject";
-Gallery.className = "gallery";
 Xml.enode = new EReg("^<([a-zA-Z0-9:._-]+)","");
 Xml.ecdata = new EReg("^<!\\[CDATA\\[","i");
 Xml.edoctype = new EReg("^<!DOCTYPE ","i");
@@ -2226,8 +2263,6 @@ Xml.eclose = new EReg("^[ \r\n\t]*(>|(/>))","");
 Xml.ecdata_end = new EReg("\\]\\]>","");
 Xml.edoctype_elt = new EReg("[\\[|\\]>]","");
 Xml.ecomment_end = new EReg("-->","");
-custom.component.RssConnector.className = "rssconnector";
-custom.component.RssConnector.SRC_TAG = "src-rss";
 haxe.Template.splitter = new EReg("(::[A-Za-z0-9_ ()&|!+=/><*.\"-]+::|\\$\\$([A-Za-z0-9_-]+)\\()","");
 haxe.Template.expr_splitter = new EReg("(\\(|\\)|[ \r\n\t]*\"[^\"]*\"[ \r\n\t]*|[!+=/><*.&|-]+)","");
 haxe.Template.expr_trim = new EReg("^[ ]*([^ ]+)[ ]*$","");
@@ -2235,8 +2270,14 @@ haxe.Template.expr_int = new EReg("^[0-9]+$","");
 haxe.Template.expr_float = new EReg("^([+-]?)(?=\\d|,\\d)\\d*(,\\d*)?([Ee]([+-]?\\d+))?$","");
 haxe.Template.globals = { };
 js.Lib.onerror = null;
-silexlabs.slplayer.DebugNodes.className = "debugnode";
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<div><div>Hi ! This gallery is developped in Haxe/js:</div><br/><div><ul class=\"gallery\"><li><img src=\"./assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>This one is just another instance of the same gallery component which is combined with a rss feed reader component:</div><br/><div><ul class=\"gallery rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t::foreach data:: <li><img src=\"::media_thumbnail.url::\"/></li> ::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div class=\"debugnode\"/></div>";
+slplayer.core.SLPlayer._htmlBody = "<div><div>A basic gallery component:</div><br/><div><ul class=\"gallery\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>The same gallery component combined with a rss feed reader component:</div><br/><div><ul class=\"gallery rssconnector playbar\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t::foreach data:: <li><img width=\"155\" alt=\"::media_title::\" src=\"::media_thumbnail.url::\" height=\"155\" title=\"::media_title::\"/></li> ::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div class=\"debugnode\"/></div>";
+slplayer.data.Common.ON_DATA_EVENT_TYPE = "data";
+slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
+slplayer.ui.DisplayObject.className = "DisplayObject";
+slplayer.prototype.data.RssConnector.className = "rssconnector";
+slplayer.prototype.data.RssConnector.SRC_TAG = "src-rss";
+slplayer.prototype.debug.DebugNodes.className = "debugnode";
+slplayer.prototype.player.Gallery.className = "gallery";
 slplayer.core.SLPlayer.main()

@@ -1,6 +1,7 @@
-package;
+package slplayer.prototype.player;
 
 using haxe.Log;
+
 import js.Lib;
 import js.Dom;
 
@@ -8,13 +9,17 @@ import haxe.Template;
 
 import slplayer.ui.DisplayObject;
 
+//these two lines below are mandatory to be a standard data consumer
+import slplayer.data.DataConsumer;
+using slplayer.data.DataConsumer;
+
 /**
  * Gallery component for SLPlayer applications.
  * @author Thomas Fétiveau
  */
-class Gallery extends DisplayObject
+class Gallery extends DisplayObject, implements IDataConsumer
 {
-	static override var className = "gallery";
+	static var className = "gallery";
 	
 	var currentIndex:Int;
 	
@@ -48,12 +53,7 @@ class Gallery extends DisplayObject
 		
 		rootElement.parentNode.appendChild(buttonContainer);
 		
-		untyped rootElement.addEventListener("data", onData , false);
-		
-		var onNewDataConsumerEvent = untyped Lib.document.createEvent("CustomEvent");
-		onNewDataConsumerEvent.initCustomEvent("newDataConsumer", false, false, me);
-		
-		untyped this.rootElement.dispatchEvent(onNewDataConsumerEvent);
+		startConsuming(rootElement);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ class Gallery extends DisplayObject
 		updateView();
 	}
 	
-	function onData(e:Dynamic):Void
+	private function onData(e:Dynamic):Void
 	{
 		if (untyped e.detail != null)
 		{
