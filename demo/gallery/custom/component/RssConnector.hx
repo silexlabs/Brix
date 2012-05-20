@@ -80,7 +80,7 @@ class RssConnector extends DisplayObject
 			data.push( generateDataObject(items.next()) );
 		}
 //trace("data="+data);
-		var onDataEvent = untyped Lib.document.createEvent("CustomEvent");
+		var onDataEvent:Event = untyped Lib.document.createEvent("CustomEvent");
 		untyped onDataEvent.initCustomEvent("data", false, false, { src : src , data : data }); // FIXME this has to be a formalized typedef for all dataProviders/consummers
 
 		untyped this.rootElement.dispatchEvent(onDataEvent);

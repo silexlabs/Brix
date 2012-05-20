@@ -50,8 +50,8 @@ class Gallery extends DisplayObject
 		
 		untyped rootElement.addEventListener("data", onData , false);
 		
-		var onNewDataConsumerEvent = untyped Lib.document.createEvent("CustomEvent");
-		onNewDataConsumerEvent.initCustomEvent("newDataConsumer", false, false, me);
+		var onNewDataConsumerEvent:Event = untyped Lib.document.createEvent("CustomEvent");
+		untyped onNewDataConsumerEvent.initCustomEvent("newDataConsumer", false, false, me);
 		
 		untyped this.rootElement.dispatchEvent(onNewDataConsumerEvent);
 	}
@@ -94,9 +94,15 @@ class Gallery extends DisplayObject
 	
 	function onData(e:Dynamic):Void
 	{
-		if (untyped e.detail != null)
+		#if flash9
+		var evt:cocktail.core.event.CustomEvent = cast(e);
+		#else
+		var evt = e;
+		#end
+		
+		if (evt.detail != null)
 		{
-			dataProviders.set(e.detail.src,e.detail.data);
+			dataProviders.set(evt.detail.src,evt.detail.data);
 			updateView();
 		}
 	}
