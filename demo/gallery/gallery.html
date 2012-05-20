@@ -5,14 +5,15 @@
 	<script src="SLPlayer.js"></script>
 	<script src="slplayer/prototype/player/Gallery.js"></script>
 	<script src="slplayer/prototype/player/BasicPlayerControl.js"></script>
+	<script src="slplayer/prototype/player/AutoPlayer.js"></script>
 	<!--  <script src="slplayer/prototype/debug/DebugNodes.js"></script> -->
 	<script src="slplayer/prototype/data/RssConnector.js"></script>
 </head>
 <body>
 	<div>
-		<div>A basic gallery component:</div><br />
+		<div>Here is a basic Gallery component combined with a AutoPlayer component : </div><br />
 		<div>
-			<ul class="gallery">
+			<ul class="gallery autoplayer" data-autoplay-interval="1500">
 				<li><img src="assets/4.jpg" /></li>
 				<li><img src="assets/1.png" /></li>
 				<li><img src="assets/2.png" /></li>
@@ -20,7 +21,7 @@
 			</ul>
 		</div>
 
-		<div>The same gallery component combined with a rss feed reader component:</div><br />
+		<div>The same gallery component combined with a rss feed reader component and a control bar component :</div><br />
 		<div style="width:160px;">
 			<ul class="gallery rssconnector controlbar" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
 				<li><img src="assets/4.jpg" /></li>

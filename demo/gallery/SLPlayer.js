@@ -1639,6 +1639,41 @@ haxe.Template.prototype = {
 	}
 	,__class__: haxe.Template
 }
+haxe.Timer = $hxClasses["haxe.Timer"] = function(time_ms) {
+	var me = this;
+	this.id = window.setInterval(function() {
+		me.run();
+	},time_ms);
+};
+haxe.Timer.__name__ = ["haxe","Timer"];
+haxe.Timer.delay = function(f,time_ms) {
+	var t = new haxe.Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	};
+	return t;
+}
+haxe.Timer.measure = function(f,pos) {
+	var t0 = haxe.Timer.stamp();
+	var r = f();
+	haxe.Log.trace(haxe.Timer.stamp() - t0 + "s",pos);
+	return r;
+}
+haxe.Timer.stamp = function() {
+	return Date.now().getTime() / 1000;
+}
+haxe.Timer.prototype = {
+	id: null
+	,stop: function() {
+		if(this.id == null) return;
+		window.clearInterval(this.id);
+		this.id = null;
+	}
+	,run: function() {
+	}
+	,__class__: haxe.Timer
+}
 var js = js || {}
 js.Boot = $hxClasses["js.Boot"] = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -1874,6 +1909,8 @@ slplayer.core.SLPlayer.prototype = {
 		this.initDisplayObjectsOfType("slplayer.prototype.player.Gallery");
 		slplayer.prototype.player.BasicPlayerControl;
 		this.initDisplayObjectsOfType("slplayer.prototype.player.BasicPlayerControl");
+		slplayer.prototype.player.AutoPlayer;
+		this.initDisplayObjectsOfType("slplayer.prototype.player.AutoPlayer");
 		slplayer.prototype.data.RssConnector;
 		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector");
 	}
@@ -2047,6 +2084,39 @@ slplayer.ui.player.IPlayerControl.prototype = {
 	,__class__: slplayer.ui.player.IPlayerControl
 }
 if(!slplayer.prototype.player) slplayer.prototype.player = {}
+slplayer.prototype.player.AutoPlayer = $hxClasses["slplayer.prototype.player.AutoPlayer"] = function(rootElement) {
+	slplayer.ui.DisplayObject.call(this,rootElement);
+};
+slplayer.prototype.player.AutoPlayer.__name__ = ["slplayer","prototype","player","AutoPlayer"];
+slplayer.prototype.player.AutoPlayer.__interfaces__ = [slplayer.ui.player.IPlayerControl];
+slplayer.prototype.player.AutoPlayer.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.player.AutoPlayer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	timer: null
+	,interval: null
+	,init: function(e) {
+		this.interval = Std.parseInt(this.rootElement.getAttribute("data-" + slplayer.prototype.player.AutoPlayer.AUTOPLAY_INTERVAL_TAG));
+		slplayer.ui.player.PlayerControl.startPlayerControl(this,this.rootElement);
+		this.timer = new haxe.Timer(this.interval);
+		var me = this;
+		this.timer.run = (function(f,a1) {
+			return function() {
+				return f(a1);
+			};
+		})((function(_e) {
+			return function(target) {
+				return slplayer.ui.player.PlayerControl.next(_e,target);
+			};
+		})(me),this.rootElement);
+	}
+	,onPlayableFirst: function(e) {
+	}
+	,onPlayableLast: function(e) {
+		slplayer.ui.player.PlayerControl.first(this,this.rootElement);
+	}
+	,onPlayableChange: function(e) {
+	}
+	,__class__: slplayer.prototype.player.AutoPlayer
+});
 slplayer.prototype.player.BasicPlayerControl = $hxClasses["slplayer.prototype.player.BasicPlayerControl"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
 };
@@ -2384,12 +2454,14 @@ haxe.Template.globals = { };
 js.Lib.onerror = null;
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<div><div>A basic gallery component:</div><br/><div><ul class=\"gallery\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>The same gallery component combined with a rss feed reader component:</div><br/><div style=\"width:160px;\"><ul class=\"gallery rssconnector controlbar\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t::foreach data:: <li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li> ::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div>";
+slplayer.core.SLPlayer._htmlBody = "<div><div>Here is a basic Gallery component combined with a AutoPlayer component : </div><br/><div><ul class=\"gallery autoplayer\" data-autoplay-interval=\"1500\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>The same gallery component combined with a rss feed reader component and a control bar component :</div><br/><div style=\"width:160px;\"><ul class=\"gallery rssconnector controlbar\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t::foreach data:: <li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li> ::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div>";
 slplayer.data.Common.ON_DATA_EVENT_TYPE = "data";
 slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
 slplayer.ui.DisplayObject.className = "DisplayObject";
 slplayer.prototype.data.RssConnector.className = "rssconnector";
 slplayer.prototype.data.RssConnector.SRC_TAG = "src-rss";
+slplayer.prototype.player.AutoPlayer.className = "autoplayer";
+slplayer.prototype.player.AutoPlayer.AUTOPLAY_INTERVAL_TAG = "autoplay-interval";
 slplayer.prototype.player.BasicPlayerControl.className = "controlbar";
 slplayer.prototype.player.Gallery.className = "gallery";
 slplayer.ui.player.Playable.START_PLAYABLE = "start_playable";
