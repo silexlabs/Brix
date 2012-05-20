@@ -1872,8 +1872,8 @@ slplayer.core.SLPlayer.prototype = {
 	initDisplayObjects: function(e) {
 		slplayer.prototype.player.Gallery;
 		this.initDisplayObjectsOfType("slplayer.prototype.player.Gallery");
-		slplayer.prototype.debug.DebugNodes;
-		this.initDisplayObjectsOfType("slplayer.prototype.debug.DebugNodes");
+		slplayer.prototype.player.BasicPlayerControl;
+		this.initDisplayObjectsOfType("slplayer.prototype.player.BasicPlayerControl");
 		slplayer.prototype.data.RssConnector;
 		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector");
 	}
@@ -2037,47 +2037,101 @@ slplayer.prototype.data.RssConnector.prototype = $extend(slplayer.ui.DisplayObje
 	,__class__: slplayer.prototype.data.RssConnector
 	,__properties__: {set_src:"setSrc"}
 });
-if(!slplayer.prototype.debug) slplayer.prototype.debug = {}
-slplayer.prototype.debug.DebugNodes = $hxClasses["slplayer.prototype.debug.DebugNodes"] = function(rootElement) {
+if(!slplayer.ui.player) slplayer.ui.player = {}
+slplayer.ui.player.IPlayerControl = $hxClasses["slplayer.ui.player.IPlayerControl"] = function() { }
+slplayer.ui.player.IPlayerControl.__name__ = ["slplayer","ui","player","IPlayerControl"];
+slplayer.ui.player.IPlayerControl.prototype = {
+	onPlayableFirst: null
+	,onPlayableLast: null
+	,onPlayableChange: null
+	,__class__: slplayer.ui.player.IPlayerControl
+}
+if(!slplayer.prototype.player) slplayer.prototype.player = {}
+slplayer.prototype.player.BasicPlayerControl = $hxClasses["slplayer.prototype.player.BasicPlayerControl"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
 };
-slplayer.prototype.debug.DebugNodes.__name__ = ["slplayer","prototype","debug","DebugNodes"];
-slplayer.prototype.debug.DebugNodes.__super__ = slplayer.ui.DisplayObject;
-slplayer.prototype.debug.DebugNodes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
-	init: function(e) {
-		haxe.Log.trace("DebugNodes component initialized",{ fileName : "DebugNodes.hx", lineNumber : 20, className : "slplayer.prototype.debug.DebugNodes", methodName : "init"});
-		var debugButton = js.Lib.document.createElement("img");
-		debugButton.setAttribute("src","assets/debug.png");
-		debugButton.onclick = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(this.debugNodes.$bind(this));
-		this.rootElement.appendChild(debugButton);
+slplayer.prototype.player.BasicPlayerControl.__name__ = ["slplayer","prototype","player","BasicPlayerControl"];
+slplayer.prototype.player.BasicPlayerControl.__interfaces__ = [slplayer.ui.player.IPlayerControl];
+slplayer.prototype.player.BasicPlayerControl.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.player.BasicPlayerControl.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	firstButton: null
+	,previousButton: null
+	,nextButton: null
+	,lastButton: null
+	,init: function(e) {
+		var me = this;
+		this.buildUI();
+		slplayer.ui.player.PlayerControl.startPlayerControl(this,this.rootElement);
+		var me1 = this;
+		this.firstButton.onclick = function(e1) {
+			slplayer.ui.player.PlayerControl.first(me1,me.rootElement);
+		};
+		this.previousButton.onclick = function(e1) {
+			slplayer.ui.player.PlayerControl.previous(me1,me.rootElement);
+		};
+		this.nextButton.onclick = function(e1) {
+			slplayer.ui.player.PlayerControl.next(me1,me.rootElement);
+		};
+		this.lastButton.onclick = function(e1) {
+			slplayer.ui.player.PlayerControl.last(me1,me.rootElement);
+		};
 	}
-	,debugNodes: function(e) {
-		this.debugNode(js.Lib.document.body);
+	,buildUI: function() {
+		var divFirst = js.Lib.document.createElement("div");
+		var divPrev = js.Lib.document.createElement("div");
+		var divNext = js.Lib.document.createElement("div");
+		var divLast = js.Lib.document.createElement("div");
+		divFirst.style.cssFloat = divPrev.style.cssFloat = divNext.style.cssFloat = divLast.style.cssFloat = "left";
+		divFirst.style.width = divPrev.style.width = divNext.style.width = divLast.style.width = "40px";
+		divFirst.style.height = divPrev.style.height = divNext.style.height = divLast.style.height = "30px";
+		this.firstButton = js.Lib.document.createElement("img");
+		this.firstButton.setAttribute("src","assets/first.png");
+		divFirst.appendChild(this.firstButton);
+		this.previousButton = js.Lib.document.createElement("img");
+		this.previousButton.setAttribute("src","assets/prev.png");
+		divPrev.appendChild(this.previousButton);
+		this.nextButton = js.Lib.document.createElement("img");
+		this.nextButton.setAttribute("src","assets/next.png");
+		divNext.appendChild(this.nextButton);
+		this.lastButton = js.Lib.document.createElement("img");
+		this.lastButton.setAttribute("src","assets/last.png");
+		divLast.appendChild(this.lastButton);
+		var buttonContainer = js.Lib.document.createElement("div");
+		buttonContainer.style.width = "160px";
+		buttonContainer.appendChild(divFirst);
+		buttonContainer.appendChild(divPrev);
+		buttonContainer.appendChild(divNext);
+		buttonContainer.appendChild(divLast);
+		this.rootElement.parentNode.style.textAlign = "center";
+		this.rootElement.parentNode.appendChild(buttonContainer);
 	}
-	,debugNode: function(node) {
-		var _g1 = 0, _g = node.childNodes.length;
-		while(_g1 < _g) {
-			var cCount = _g1++;
-			var elt = node.childNodes[cCount];
-			if(elt.className != null) {
-				var tagName = elt.nodeName;
-				haxe.Log.trace("tag " + tagName + " with class=" + elt.className + " has associated components : " + slplayer.core.SLPlayer.getAssociatedComponents(elt),{ fileName : "DebugNodes.hx", lineNumber : 41, className : "slplayer.prototype.debug.DebugNodes", methodName : "debugNode"});
-			}
-			if(node.childNodes[cCount].hasChildNodes()) this.debugNode(elt);
-		}
+	,onPlayableFirst: function(e) {
+		this.firstButton.style.display = "none";
+		this.previousButton.style.display = "none";
 	}
-	,__class__: slplayer.prototype.debug.DebugNodes
+	,onPlayableLast: function(e) {
+		this.nextButton.style.display = "none";
+		this.lastButton.style.display = "none";
+	}
+	,onPlayableChange: function(e) {
+		this.firstButton.style.display = this.previousButton.style.display = this.nextButton.style.display = this.lastButton.style.display = "block";
+	}
+	,__class__: slplayer.prototype.player.BasicPlayerControl
 });
-if(!slplayer.prototype.player) slplayer.prototype.player = {}
+slplayer.ui.player.IPlayable = $hxClasses["slplayer.ui.player.IPlayable"] = function() { }
+slplayer.ui.player.IPlayable.__name__ = ["slplayer","ui","player","IPlayable"];
+slplayer.ui.player.IPlayable.prototype = {
+	next: null
+	,previous: null
+	,first: null
+	,last: null
+	,__class__: slplayer.ui.player.IPlayable
+}
 slplayer.prototype.player.Gallery = $hxClasses["slplayer.prototype.player.Gallery"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
 };
 slplayer.prototype.player.Gallery.__name__ = ["slplayer","prototype","player","Gallery"];
-slplayer.prototype.player.Gallery.__interfaces__ = [slplayer.data.IDataConsumer];
+slplayer.prototype.player.Gallery.__interfaces__ = [slplayer.ui.player.IPlayable,slplayer.data.IDataConsumer];
 slplayer.prototype.player.Gallery.__super__ = slplayer.ui.DisplayObject;
 slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	currentIndex: null
@@ -2085,30 +2139,19 @@ slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.
 	,dataProviders: null
 	,init: function(e) {
 		this.dataProviders = new Hash();
+		this.initUI();
 		this.tpl = new haxe.Template(this.rootElement.innerHTML);
 		this.rootElement.innerHTML = "";
 		this.currentIndex = 0;
 		this.updateView();
-		var leftButton = js.Lib.document.createElement("img");
-		leftButton.setAttribute("src","assets/prev.png");
-		var me = this;
-		leftButton.onclick = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(me.previousPicture.$bind(me));
-		var rightButton = js.Lib.document.createElement("img");
-		rightButton.setAttribute("src","assets/next.png");
-		rightButton.onclick = (function(f) {
-			return function(a1) {
-				return f(a1);
-			};
-		})(me.nextPicture.$bind(me));
-		var buttonContainer = js.Lib.document.createElement("div");
-		buttonContainer.appendChild(leftButton);
-		buttonContainer.appendChild(rightButton);
-		this.rootElement.parentNode.appendChild(buttonContainer);
 		slplayer.data.DataConsumer.startConsuming(this,this.rootElement);
+		slplayer.ui.player.Playable.startPlayable(this,this.rootElement);
+	}
+	,initUI: function() {
+		this.rootElement.style.listStyleType = "none";
+		this.rootElement.style.listStylePosition = "inside";
+		this.rootElement.style.margin = "0";
+		this.rootElement.style.padding = "0";
 	}
 	,updateView: function() {
 		var providersData = new Array();
@@ -2119,6 +2162,8 @@ slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.
 		}
 		this.rootElement.innerHTML = this.tpl.execute({ data : providersData});
 		var liChilds = this.rootElement.getElementsByTagName("li");
+		slplayer.ui.player.Playable.dispatchOnChange(this,this.rootElement);
+		if(this.currentIndex <= 0) slplayer.ui.player.Playable.dispatchOnFirst(this,this.rootElement); else if(this.currentIndex >= liChilds.length - 1) slplayer.ui.player.Playable.dispatchOnLast(this,this.rootElement);
 		var _g1 = 0, _g = liChilds.length;
 		while(_g1 < _g) {
 			var liCnt = _g1++;
@@ -2126,12 +2171,20 @@ slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.
 		}
 		liChilds[this.currentIndex].style.display = "block";
 	}
-	,nextPicture: function(e) {
+	,next: function(e) {
 		if(this.currentIndex < this.rootElement.getElementsByTagName("li").length - 1) this.currentIndex++;
 		this.updateView();
 	}
-	,previousPicture: function(e) {
+	,previous: function(e) {
 		if(this.currentIndex > 0) this.currentIndex--;
+		this.updateView();
+	}
+	,first: function(e) {
+		this.currentIndex = 0;
+		this.updateView();
+	}
+	,last: function(e) {
+		this.currentIndex = this.rootElement.getElementsByTagName("li").length - 1;
 		this.updateView();
 	}
 	,onData: function(e) {
@@ -2142,6 +2195,65 @@ slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.
 	}
 	,__class__: slplayer.prototype.player.Gallery
 });
+slplayer.ui.player.Playable = $hxClasses["slplayer.ui.player.Playable"] = function() { }
+slplayer.ui.player.Playable.__name__ = ["slplayer","ui","player","Playable"];
+slplayer.ui.player.Playable.startPlayable = function(playable,target) {
+	target.addEventListener(slplayer.ui.player.PlayerControl.FIRST,playable.first.$bind(playable),false);
+	target.addEventListener(slplayer.ui.player.PlayerControl.LAST,playable.last.$bind(playable),false);
+	target.addEventListener(slplayer.ui.player.PlayerControl.NEXT,playable.next.$bind(playable),false);
+	target.addEventListener(slplayer.ui.player.PlayerControl.PREVIOUS,playable.previous.$bind(playable),false);
+	var onStartPlayableEvent = js.Lib.document.createEvent("CustomEvent");
+	onStartPlayableEvent.initCustomEvent(slplayer.ui.player.Playable.START_PLAYABLE,false,false,playable);
+	target.dispatchEvent(onStartPlayableEvent);
+}
+slplayer.ui.player.Playable.dispatchOnLast = function(playable,target) {
+	var onLastEvent = js.Lib.document.createEvent("CustomEvent");
+	onLastEvent.initCustomEvent(slplayer.ui.player.Playable.ON_LAST,false,false,playable);
+	target.dispatchEvent(onLastEvent);
+}
+slplayer.ui.player.Playable.dispatchOnFirst = function(playable,target) {
+	var onFirstEvent = js.Lib.document.createEvent("CustomEvent");
+	onFirstEvent.initCustomEvent(slplayer.ui.player.Playable.ON_FIRST,false,false,playable);
+	target.dispatchEvent(onFirstEvent);
+}
+slplayer.ui.player.Playable.dispatchOnChange = function(playable,target) {
+	var onChangeEvent = js.Lib.document.createEvent("CustomEvent");
+	onChangeEvent.initCustomEvent(slplayer.ui.player.Playable.ON_CHANGE,false,false,playable);
+	target.dispatchEvent(onChangeEvent);
+}
+slplayer.ui.player.Playable.prototype = {
+	__class__: slplayer.ui.player.Playable
+}
+slplayer.ui.player.PlayerControl = $hxClasses["slplayer.ui.player.PlayerControl"] = function() { }
+slplayer.ui.player.PlayerControl.__name__ = ["slplayer","ui","player","PlayerControl"];
+slplayer.ui.player.PlayerControl.startPlayerControl = function(playerControl,target) {
+	target.addEventListener(slplayer.ui.player.Playable.ON_LAST,playerControl.onPlayableLast.$bind(playerControl),false);
+	target.addEventListener(slplayer.ui.player.Playable.ON_FIRST,playerControl.onPlayableFirst.$bind(playerControl),false);
+	target.addEventListener(slplayer.ui.player.Playable.ON_CHANGE,playerControl.onPlayableChange.$bind(playerControl),false);
+}
+slplayer.ui.player.PlayerControl.next = function(playerControl,target) {
+	var nextEvent = js.Lib.document.createEvent("Event");
+	nextEvent.initEvent(slplayer.ui.player.PlayerControl.NEXT,false,false);
+	target.dispatchEvent(nextEvent);
+}
+slplayer.ui.player.PlayerControl.previous = function(playerControl,target) {
+	var previousEvent = js.Lib.document.createEvent("Event");
+	previousEvent.initEvent(slplayer.ui.player.PlayerControl.PREVIOUS,false,false);
+	target.dispatchEvent(previousEvent);
+}
+slplayer.ui.player.PlayerControl.first = function(playerControl,target) {
+	var firstEvent = js.Lib.document.createEvent("Event");
+	firstEvent.initEvent(slplayer.ui.player.PlayerControl.FIRST,false,false);
+	target.dispatchEvent(firstEvent);
+}
+slplayer.ui.player.PlayerControl.last = function(playerControl,target) {
+	var lastEvent = js.Lib.document.createEvent("Event");
+	lastEvent.initEvent(slplayer.ui.player.PlayerControl.LAST,false,false);
+	target.dispatchEvent(lastEvent);
+}
+slplayer.ui.player.PlayerControl.prototype = {
+	__class__: slplayer.ui.player.PlayerControl
+}
 js.Boot.__res = {}
 js.Boot.__init();
 {
@@ -2272,12 +2384,20 @@ haxe.Template.globals = { };
 js.Lib.onerror = null;
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<div><div>A basic gallery component:</div><br/><div><ul class=\"gallery\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>The same gallery component combined with a rss feed reader component:</div><br/><div><ul class=\"gallery rssconnector playbar\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t::foreach data:: <li><img width=\"155\" alt=\"::media_title::\" src=\"::media_thumbnail.url::\" height=\"155\" title=\"::media_title::\"/></li> ::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div class=\"debugnode\"/></div>";
+slplayer.core.SLPlayer._htmlBody = "<div><div>A basic gallery component:</div><br/><div><ul class=\"gallery\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>The same gallery component combined with a rss feed reader component:</div><br/><div style=\"width:160px;\"><ul class=\"gallery rssconnector controlbar\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t::foreach data:: <li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li> ::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div>";
 slplayer.data.Common.ON_DATA_EVENT_TYPE = "data";
 slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
 slplayer.ui.DisplayObject.className = "DisplayObject";
 slplayer.prototype.data.RssConnector.className = "rssconnector";
 slplayer.prototype.data.RssConnector.SRC_TAG = "src-rss";
-slplayer.prototype.debug.DebugNodes.className = "debugnode";
+slplayer.prototype.player.BasicPlayerControl.className = "controlbar";
 slplayer.prototype.player.Gallery.className = "gallery";
+slplayer.ui.player.Playable.START_PLAYABLE = "start_playable";
+slplayer.ui.player.Playable.ON_LAST = "on_last";
+slplayer.ui.player.Playable.ON_FIRST = "on_first";
+slplayer.ui.player.Playable.ON_CHANGE = "on_change";
+slplayer.ui.player.PlayerControl.FIRST = "first";
+slplayer.ui.player.PlayerControl.LAST = "last";
+slplayer.ui.player.PlayerControl.NEXT = "next";
+slplayer.ui.player.PlayerControl.PREVIOUS = "previous";
 slplayer.core.SLPlayer.main()

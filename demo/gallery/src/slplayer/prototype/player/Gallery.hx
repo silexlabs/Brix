@@ -13,11 +13,14 @@ import slplayer.ui.DisplayObject;
 import slplayer.data.DataConsumer;
 using slplayer.data.DataConsumer;
 
+import slplayer.ui.player.Playable;
+using slplayer.ui.player.Playable;
+
 /**
  * Gallery component for SLPlayer applications.
  * @author Thomas Fétiveau
  */
-class Gallery extends DisplayObject, implements IDataConsumer
+class Gallery extends DisplayObject, implements IDataConsumer, implements IPlayable
 {
 	static var className = "gallery";
 	
@@ -31,46 +34,53 @@ class Gallery extends DisplayObject, implements IDataConsumer
 	{
 		dataProviders = new Hash();
 		
+		initUI();
+		
 		tpl = untyped new Template(rootElement.innerHTML);
 		rootElement.innerHTML = "";
 		
 		currentIndex = 0;
 		updateView();
 		
-		//add left and right buttons
-		var leftButton = Lib.document.createElement("img");
-		leftButton.setAttribute("src", "assets/prev.png");
-		var me = this;
-		leftButton.onclick = callback(me.previousPicture);
-		
-		var rightButton = Lib.document.createElement("img");
-		rightButton.setAttribute("src", "assets/next.png");
-		rightButton.onclick = callback(me.nextPicture);
-		
-		var buttonContainer = Lib.document.createElement("div");
-		buttonContainer.appendChild(leftButton);
-		buttonContainer.appendChild(rightButton);
-		
-		rootElement.parentNode.appendChild(buttonContainer);
-		
 		startConsuming(rootElement);
+		
+		startPlayable(rootElement);
+	}
+	
+	function initUI():Void
+	{
+		rootElement.style.listStyleType = "none";
+		rootElement.style.listStylePosition = "inside";
+		rootElement.style.margin = "0";
+		rootElement.style.padding = "0";
 	}
 	
 	/**
 	 * The redraw function of the component.
 	 */
 	function updateView():Void
-	{
+	{		
 		//consolidate providers data
 		var providersData : Array<Dynamic> = new Array();
 		for (pvdData in dataProviders)
 		{
 			providersData = providersData.concat(pvdData);
 		}
+		
 		//execute template
 		rootElement.innerHTML = tpl.execute({data:providersData});
-		//hide all but the selected item
+		
 		var liChilds = rootElement.getElementsByTagName("li");
+		
+		dispatchOnChange(rootElement);
+		
+		if (currentIndex <= 0)
+			dispatchOnFirst(rootElement);
+		else if (currentIndex >= liChilds.length-1)
+			dispatchOnLast(rootElement);
+			
+		
+		//hide all but the selected item
 		for ( liCnt in 0...liChilds.length)
 		{
 			liChilds[liCnt].style.display = "none";
@@ -78,17 +88,29 @@ class Gallery extends DisplayObject, implements IDataConsumer
 		liChilds[currentIndex].style.display = "block";
 	}
 	
-	function nextPicture(e:Event):Void
+	function next(e:Event):Void
 	{
 		if ( currentIndex < rootElement.getElementsByTagName("li").length - 1 )
 			currentIndex++;
 		updateView();
 	}
 	
-	function previousPicture(e:Event):Void
+	function previous(e:Event):Void
 	{
 		if ( currentIndex > 0 )
 			currentIndex--;
+		updateView();
+	}
+	
+	private function first(e:Event):Void
+	{
+		currentIndex = 0;
+		updateView();
+	}
+	
+	private function last(e:Event):Void
+	{
+		currentIndex = rootElement.getElementsByTagName("li").length - 1;
 		updateView();
 	}
 	
