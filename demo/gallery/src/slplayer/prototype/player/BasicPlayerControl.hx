@@ -45,7 +45,7 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 		var divNext = Lib.document.createElement("div");
 		var divLast = Lib.document.createElement("div");
 		
-		divFirst.style.cssFloat = divPrev.style.cssFloat = divNext.style.cssFloat = divLast.style.cssFloat = "left";
+		divFirst.style.display = divPrev.style.display = divNext.style.display = divLast.style.display = "inline-block";
 		divFirst.style.width = divPrev.style.width = divNext.style.width = divLast.style.width = "40px";
 		divFirst.style.height = divPrev.style.height = divNext.style.height = divLast.style.height = "30px";
 		
@@ -72,7 +72,8 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 		buttonContainer.appendChild(divNext);
 		buttonContainer.appendChild(divLast);
 		
-		rootElement.parentNode.style.textAlign = "center";
+		var parent:HtmlDom = cast(rootElement.parentNode);
+		parent.style.textAlign = "center";
 		rootElement.parentNode.appendChild(buttonContainer);
 	}
 	
