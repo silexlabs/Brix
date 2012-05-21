@@ -49,10 +49,10 @@ class Gallery extends DisplayObject, implements IDataConsumer, implements IPlaya
 	
 	function initUI():Void
 	{
-		rootElement.style.listStyleType = "none";
-		rootElement.style.listStylePosition = "inside";
-		rootElement.style.margin = "0";
-		rootElement.style.padding = "0";
+		//rootElement.style.listStyleType = "none";
+		//rootElement.style.listStylePosition = "inside";
+		//rootElement.style.margin = "0";
+		//rootElement.style.padding = "0";
 	}
 	
 	/**
@@ -116,9 +116,15 @@ class Gallery extends DisplayObject, implements IDataConsumer, implements IPlaya
 	
 	private function onData(e:Dynamic):Void
 	{
-		if (untyped e.detail != null)
+		#if flash9
+		var evt:cocktail.core.event.CustomEvent = cast(e);
+		#else
+		var evt = e;
+		#end
+		
+		if (untyped evt.detail != null)
 		{
-			dataProviders.set(e.detail.src,e.detail.data);
+			dataProviders.set(evt.detail.src,evt.detail.data);
 			updateView();
 		}
 	}
