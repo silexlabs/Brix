@@ -1,4 +1,4 @@
-package custom.component;
+package slplayer.prototype.data;
 
 import slplayer.ui.DisplayObject;
 
@@ -7,20 +7,35 @@ import haxe.Http;
 import js.Dom;
 import js.Lib;
 
+//need this to be a standard compliant data provider
+import slplayer.data.DataProvider;
+using slplayer.data.DataProvider;
+
 /**
- * TODO determine if it wouldn't be useful to create a DataProvider and a DataConsumer interface or base class
+ * 
  * TODO allow multiple adresses in src
  * TODO cleanup to allow different rss formats
  * @author Thomas Fétiveau
  */
-
-class RssConnector extends DisplayObject
+class RssConnector extends DisplayObject, implements IDataProvider
 {
-	static override var className = "rssconnector";
+	static var className = "rssconnector";
 	
 	static var SRC_TAG = "src-rss";
 	
+	
 	public var src(default, setSrc) : String;
+
+	public function setSrc(newSrc : String) : String
+	{
+		if (newSrc == src || newSrc == null)
+			return src;
+		
+		src = newSrc;
+		getData(null);
+		
+		return src;
+	}
 	
 	override public function init(e:Event):Void 
 	{
@@ -31,18 +46,8 @@ class RssConnector extends DisplayObject
 			trace("INFO " + SRC_TAG + " attribute not set on html element");
 		
 		var me = this;
-		untyped this.rootElement.addEventListener("newDataConsumer", callback(me.getData) , false);
-	}
-
-	public function setSrc(newSrc : String) : String
-	{
-		if (newSrc == src)
-			return src;
 		
-		src = newSrc;
-		getData(null);
-		
-		return src;
+		startProviding(rootElement);
 	}
 	
 	public function getData(e:Event = null)
@@ -54,7 +59,7 @@ class RssConnector extends DisplayObject
 			return;
 		}
 		
-		var r = new Http("custom/component/RssProxy.php");
+		var r = new Http("XMLProxy.php");
 		r.setParameter( "url" , src);
 		var me = this;
 		r.onData = callback(me.onData);
@@ -62,30 +67,33 @@ class RssConnector extends DisplayObject
 		r.request(true);
 	}
 	
-	public function onData(data : String)
+	private function onData(data : String):Void
 	{
 //trace("data received");
-		var xml :  Xml;
+		var dataXml :  Xml;
 		try
 		{
-			xml = Xml.parse(data);
+			dataXml = Xml.parse(data);
 		}
 		catch (e : Dynamic ) { trace("ERROR cannot parse rss feed "+src); return; }
-
-		var items = xml.firstElement().firstElement().elementsNamed("item");
-
-		var data : Array<Dynamic> = new Array();
+		
+		var items = dataXml.firstElement().firstElement().elementsNamed("item");
+		
+		var itemsData : Array<Dynamic> = new Array();
+		
 		while( items.hasNext() )
 		{
-			data.push( generateDataObject(items.next()) );
+			itemsData.push( generateDataObject(items.next()) );
 		}
-//trace("data="+data);
-		var onDataEvent:Event = untyped Lib.document.createEvent("CustomEvent");
-		untyped onDataEvent.initCustomEvent("data", false, false, { src : src , data : data }); // FIXME this has to be a formalized typedef for all dataProviders/consummers
-
-		untyped this.rootElement.dispatchEvent(onDataEvent);
+		
+		rootElement.dispatchData( { src : src, srcTitle : null, data : itemsData } );
 	}
 	
+	/**
+	 * Generates the data dynamic object for each item or sub elements of items.
+	 * @param	elt
+	 * @return a dynamic object having the same scheme as the data tree from the rss feed.
+	 */
 	function generateDataObject(elt : Xml) : Dynamic
 	{
 		var data : Dynamic<Dynamic>  = cast {};
@@ -105,8 +113,7 @@ class RssConnector extends DisplayObject
 				var at = atts.next();
 				Reflect.setField( Reflect.field(data, nodeName), at, xmlChild.get(at) );
 			}
-			
-			
+
 			var innerChilds = xmlChild.elements();
 			if (innerChilds.hasNext())
 			{

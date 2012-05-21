@@ -1,4 +1,4 @@
-package silexlabs.slplayer;
+package slplayer.prototype.debug;
 
 import slplayer.ui.DisplayObject;
 import slplayer.core.SLPlayer;
