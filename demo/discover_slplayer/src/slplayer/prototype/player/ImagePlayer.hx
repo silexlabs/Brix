@@ -8,6 +8,7 @@ import haxe.Template;
 import slplayer.ui.DisplayObject;
 
 //these two lines below are mandatory to be a standard data consumer
+import slplayer.data.Common;
 import slplayer.data.DataConsumer;
 using slplayer.data.DataConsumer;
 
@@ -18,14 +19,24 @@ using slplayer.ui.player.Playable;
  * Gallery component for SLPlayer applications.
  * @author Thomas Fétiveau
  */
-class ImageViewer extends DisplayObject, implements IDataConsumer, implements IPlayable
+class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IPlayable
 {
-	static var className = "imageviewer";
+	/**
+	 * The class name associated with this component
+	 */
+	static var className = "imageplayer";
+	/**
+	 * A list of allowed tag names for the root element.
+	 */
+	static var rootElementNameFilter : List<String> = Lambda.list(["ul"]);
 	
 	var currentIndex:Int;
 	
 	var tpl : Template;
 	
+	/**
+	 * This variable may contain data from different sources and/or DataProviders.
+	 */
 	var dataProviders(default,null) : Hash<Array<Dynamic>>;
 	
 	override public function init(e:Event):Void 
@@ -69,17 +80,12 @@ class ImageViewer extends DisplayObject, implements IDataConsumer, implements IP
 		//execute template
 		rootElement.innerHTML = tpl.execute({data:providersData});
 		
-		var liChilds = rootElement.getElementsByTagName("li");
-		
 		dispatchOnChange(rootElement);
 		
-		if (currentIndex <= 0)
-			dispatchOnFirst(rootElement);
-		else if (currentIndex >= liChilds.length-1)
-			dispatchOnLast(rootElement);
-			
+		dispatchIndex();
 		
 		//hide all but the selected item
+		var liChilds = rootElement.getElementsByTagName("li");
 		for ( liCnt in 0...liChilds.length)
 		{
 			liChilds[liCnt].style.display = "none";
@@ -87,43 +93,51 @@ class ImageViewer extends DisplayObject, implements IDataConsumer, implements IP
 		liChilds[currentIndex].style.display = "block";
 	}
 	
-	function next(e:Event):Void
+	function dispatchIndex()
+	{
+		var liChilds = rootElement.getElementsByTagName("li");
+		if (currentIndex <= 0)
+			dispatchOnFirst(rootElement);
+		else if (currentIndex >= liChilds.length-1)
+			dispatchOnLast(rootElement);
+	}
+	
+	function next():Void
 	{
 		if ( currentIndex < rootElement.getElementsByTagName("li").length - 1 )
 			currentIndex++;
 		updateView();
 	}
 	
-	function previous(e:Event):Void
+	function previous():Void
 	{
 		if ( currentIndex > 0 )
 			currentIndex--;
 		updateView();
 	}
 	
-	private function first(e:Event):Void
+	private function first():Void
 	{
 		currentIndex = 0;
 		updateView();
 	}
 	
-	private function last(e:Event):Void
+	private function last():Void
 	{
 		currentIndex = rootElement.getElementsByTagName("li").length - 1;
 		updateView();
 	}
 	
-	private function onData(e:Dynamic):Void
+	private function onNewPlayerControl():Void
 	{
-		#if flash9
-		var evt:cocktail.core.event.CustomEvent = cast(e);
-		#else
-		var evt = e;
-		#end
-		
-		if (untyped evt.detail != null)
+		dispatchIndex();
+	}
+	
+	private function onData(dataObj:DataObject):Void
+	{
+		if (dataObj != null)
 		{
-			dataProviders.set(evt.detail.src,evt.detail.data);
+			dataProviders.set(dataObj.src,dataObj.data);
 			updateView();
 		}
 	}

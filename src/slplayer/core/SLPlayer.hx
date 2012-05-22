@@ -9,7 +9,7 @@ import slplayer.ui.DisplayObject;
  * ...
  * @author Thomas Fétiveau
  */
-@:build(slplayer.macro.AppBuilder.buildFromHtml('gallery.html')) class SLPlayer 
+@:build(slplayer.macro.AppBuilder.buildFromHtml('index.html')) class SLPlayer 
 {
 	static private var nodeToCmpInstances = new Hash<List<DisplayObject>>();
 	
@@ -19,7 +19,6 @@ import slplayer.ui.DisplayObject;
 	{
 		//Set the body HTML content if not js
 		#if !js
-			trace("body set");
 			Lib.document.body.innerHTML = _htmlBody;
 		#end
 	}
@@ -27,6 +26,7 @@ import slplayer.ui.DisplayObject;
 	public static function main()
 	{
 		var mySLPlayerApp = new SLPlayer();
+		
 		#if js
 			Lib.window.onload = callback(mySLPlayerApp.initDisplayObjects);
 		#else
@@ -34,22 +34,28 @@ import slplayer.ui.DisplayObject;
 		#end
 	}
 
-	private function initDisplayObjects(e : Event) { }
+	/**
+	 * This function is filled in by the macro.
+	 * @param	e
+	 */
+	private function initDisplayObjects(e : Event) { var args:Hash<String> = new Hash(); args.set("toto", "titi"); args.set("tutu", "tyty"); initDisplayObjectsOfType("slplayer.prototype.config.JsonConfiguration", args); }
 	
 	/**
 	 * TODO determine if it wouldn't be better to pass directly the Class. We would however loose the benefit of resolving it. but we could try catch the exceptions...
 	 * TODO Also, need to ask the mailing list if I have to use Reflect to access a Class static field.
 	 * @param	displayObjectClassName
 	 */
-	private function initDisplayObjectsOfType(displayObjectClassName : String)
+	private function initDisplayObjectsOfType(displayObjectClassName : String , ?args:Hash<String>)
 	{
 trace("initDisplayObjectsOfType called with displayObjectClassName="+displayObjectClassName);
 		
 		var displayObjectClass = Type.resolveClass(displayObjectClassName);
 		
-		if (displayObjectClass != null)
+		if (displayObjectClass != null) // case DisplayObject component
 		{
 			var tagClassName = Reflect.field(displayObjectClass, "className");
+			var tagFilter:List<String> = Reflect.field(displayObjectClass, "rootElementNameFilter");
+			
 trace(displayObjectClassName+" class resolved and its tag classname is "+tagClassName);
 			
 			if (tagClassName != null)
@@ -60,17 +66,42 @@ trace("taggedNodes = "+taggedNodes.length);
 				var nodeCnt = 0;
 				while (nodeCnt < taggedNodes.length)
 				{
-					var newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] ); trace(displayObjectClassName+" instance created");
-					newDisplayObject.init(null);
+					if ( tagFilter == null || Lambda.exists( tagFilter , function(s:String) { return taggedNodes[nodeCnt].nodeName.toLowerCase() == s.toLowerCase(); } ) )
+					{
+						var newDisplayObject;
+						
+						if (args != null)
+							newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt], args] );
+						else
+							newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] );
+						
+trace(displayObjectClassName+" instance created");
+						newDisplayObject.init(null);
+					}
+					else
+					{
+						trace("ERROR: cannot instanciate "+displayObjectClassName+" on a "+taggedNodes[nodeCnt].nodeName+" tag.");
+					}
 					nodeCnt++;
 				}
+			}
+			else // case non-visual component
+			{
+				try
+				{
+					if (args != null)
+						Type.createInstance( displayObjectClass, [args] );
+					else
+						Type.createInstance( displayObjectClass, [] );
+				}
+				catch(unknown : Dynamic ) { trace(Std.string(unknown));}
 			}
 		}
 	}
 	
 	public static function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void
 	{
-		trace("addAssociatedComponent("+node+", "+cmp+")");
+trace("addAssociatedComponent("+node+", "+cmp+")");
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
 		var associatedCmps : List<DisplayObject>;

@@ -12,7 +12,6 @@ using slplayer.ui.player.PlayerControl;
  * ...
  * @author Thomas Fétiveau
  */
-
 class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 {
 	static var className = "controlbar";
@@ -77,19 +76,19 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 		rootElement.parentNode.appendChild(buttonContainer);
 	}
 	
-	private function onPlayableFirst(e:Event):Void
+	private function onPlayableFirst():Void
 	{
 		firstButton.style.display = "none";
 		previousButton.style.display = "none";
 	}
 	
-	private function onPlayableLast(e:Event):Void
+	private function onPlayableLast():Void
 	{
 		nextButton.style.display = "none";
 		lastButton.style.display = "none";
 	}
 	
-	private function onPlayableChange(e:Event):Void
+	private function onPlayableChange():Void
 	{
 		firstButton.style.display = previousButton.style.display = nextButton.style.display = lastButton.style.display = "block";
 	}

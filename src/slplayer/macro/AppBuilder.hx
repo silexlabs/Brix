@@ -67,7 +67,9 @@ class AppBuilder
 								{
 									cmpClassName = cmpClassName.substr(0, cmpClassName.length - 3);
 									cmpClassName = StringTools.replace( cmpClassName, "/", "." );
-trace("found cmpClassName="+cmpClassName);
+trace("found cmpClassName=" + cmpClassName);
+									
+									var initArgsElts = headElt.attributes();
 									
 									for (fc in 0...fields.length)
 									{
@@ -80,7 +82,6 @@ trace("found cmpClassName="+cmpClassName);
 													continue;
 												}
 //trace(fields[fc]);
-												
 												switch (f.expr.expr)
 												{
 													case EBlock(exprs):
@@ -94,15 +95,30 @@ trace("found cmpClassName="+cmpClassName);
 														//generate import
 														exprs.push(generateImport(cmpClassName));
 														
-														//generate call to
-														exprs.push({ expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [{ expr : EConst(CString(cmpClassName)), pos : pos}] ) , pos : pos });
+														if (initArgsElts.hasNext()) //case the component initialization takes arguments
+														{
+															//FIXME we may encode cmpClassName+"Args" in MD5 for more security (conflicts)
+															var shortCmpClassName = cmpClassName.split('.').pop();
+															exprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : shortCmpClassName + "Args", type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
+															
+															for (initArgElt in initArgsElts)
+															{
+																exprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
+															}
+															//generate call to initDisplayObjectsOfType with additionnal arguments
+															exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
+														}
+														else
+														{
+															//generate call to initDisplayObjectsOfType with no additionnal arguments
+															exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
+														}
 //trace("added call to initDisplayObjectsOfType("+cmpClassName+")");
 														break;
 													
 													default :
 														trace("expr type ignored for field initDisplayObjects.");
 												}
-												
 											
 											default :
 												trace("field "+fields[fc].name+" ignored.");
@@ -117,14 +133,21 @@ trace("found cmpClassName="+cmpClassName);
 								trace("Application configuration node "+headElt.nodeName+" ignored.");
 						}
 					}
-
+					
 				case "body":
 					//Add the _htmlBody static var to the SLPlayer class
 					pos = haxe.macro.Context.currentPos();
+					
 					var htmlBodyFieldType = TPath( { pack : [], name : "String", params : [], sub : null } );
+					
+					var bodyInnerHtml = "";
+					if (elt.firstChild() != null)
+						bodyInnerHtml = elt.firstChild().toString();
+					
 					var htmlBodyFieldValue = { expr : EConst(CString(elt.firstChild().toString())) , pos : pos };
+					
 					fields.push({ name : "_htmlBody", doc : null, meta : [], access : [AStatic], kind : FVar(htmlBodyFieldType, htmlBodyFieldValue), pos : pos });
-
+					
 				default:
 					trace("Main application node "+elt.nodeName+" ignored.");
 			}

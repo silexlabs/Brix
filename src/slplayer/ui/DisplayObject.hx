@@ -14,7 +14,13 @@ class DisplayObject
 	/**
 	 * The class name associated with this component
 	 */
-	public static var className : String = "DisplayObject";
+	static var className : String = "DisplayObject";
+	/**
+	 * A list of allowed tag names for the root element.
+	 * If this parameter isn't defined or if the list is empty, it means there is no filtering (all tag names are allowed).
+	 */
+	static var rootElementNameFilter : List<String> = Lambda.list([]);
+	
 	/**
 	 * The dom node associated with the instance of this component
 	 */

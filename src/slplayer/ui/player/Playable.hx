@@ -23,13 +23,15 @@ class Playable
 	 */
 	static public function startPlayable(playable : IPlayable, target : Dynamic):Void
 	{
-		untyped target.addEventListener(PlayerControl.FIRST, playable.first , false);
+		untyped target.addEventListener(PlayerControl.FIRST, function(e:Event) { playable.first();} , false);
 		
-		untyped target.addEventListener(PlayerControl.LAST, playable.last , false);
+		untyped target.addEventListener(PlayerControl.LAST, function(e:Event) { playable.last();} , false);
 		
-		untyped target.addEventListener(PlayerControl.NEXT, playable.next , false);
+		untyped target.addEventListener(PlayerControl.NEXT, function(e:Event) { playable.next();} , false);
 		
-		untyped target.addEventListener(PlayerControl.PREVIOUS, playable.previous , false);
+		untyped target.addEventListener(PlayerControl.PREVIOUS, function(e:Event) { playable.previous();} , false);
+		
+		untyped target.addEventListener(PlayerControl.NEW_PLAYER_CONTROL, function(e:Event) { playable.onNewPlayerControl();} , false);
 		
 		var onStartPlayableEvent = untyped Lib.document.createEvent("CustomEvent");
 		
@@ -71,12 +73,14 @@ class Playable
  */
 interface IPlayable 
 {
-	private function next(e:Event):Void;
+	private function next():Void;
 	
-	private function previous(e:Event):Void;
+	private function previous():Void;
 	
-	private function first(e:Event):Void;
+	private function first():Void;
 	
-	private function last(e:Event):Void;
+	private function last():Void;
+	
+	private function onNewPlayerControl():Void;
 	
 }

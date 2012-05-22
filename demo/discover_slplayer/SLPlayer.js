@@ -124,6 +124,148 @@ IntIter.prototype = {
 	}
 	,__class__: IntIter
 }
+var Lambda = $hxClasses["Lambda"] = function() { }
+Lambda.__name__ = ["Lambda"];
+Lambda.array = function(it) {
+	var a = new Array();
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var i = $it0.next();
+		a.push(i);
+	}
+	return a;
+}
+Lambda.list = function(it) {
+	var l = new List();
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var i = $it0.next();
+		l.add(i);
+	}
+	return l;
+}
+Lambda.map = function(it,f) {
+	var l = new List();
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var x = $it0.next();
+		l.add(f(x));
+	}
+	return l;
+}
+Lambda.mapi = function(it,f) {
+	var l = new List();
+	var i = 0;
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var x = $it0.next();
+		l.add(f(i++,x));
+	}
+	return l;
+}
+Lambda.has = function(it,elt,cmp) {
+	if(cmp == null) {
+		var $it0 = it.iterator();
+		while( $it0.hasNext() ) {
+			var x = $it0.next();
+			if(x == elt) return true;
+		}
+	} else {
+		var $it1 = it.iterator();
+		while( $it1.hasNext() ) {
+			var x = $it1.next();
+			if(cmp(x,elt)) return true;
+		}
+	}
+	return false;
+}
+Lambda.exists = function(it,f) {
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var x = $it0.next();
+		if(f(x)) return true;
+	}
+	return false;
+}
+Lambda.foreach = function(it,f) {
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var x = $it0.next();
+		if(!f(x)) return false;
+	}
+	return true;
+}
+Lambda.iter = function(it,f) {
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var x = $it0.next();
+		f(x);
+	}
+}
+Lambda.filter = function(it,f) {
+	var l = new List();
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var x = $it0.next();
+		if(f(x)) l.add(x);
+	}
+	return l;
+}
+Lambda.fold = function(it,f,first) {
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var x = $it0.next();
+		first = f(x,first);
+	}
+	return first;
+}
+Lambda.count = function(it,pred) {
+	var n = 0;
+	if(pred == null) {
+		var $it0 = it.iterator();
+		while( $it0.hasNext() ) {
+			var _ = $it0.next();
+			n++;
+		}
+	} else {
+		var $it1 = it.iterator();
+		while( $it1.hasNext() ) {
+			var x = $it1.next();
+			if(pred(x)) n++;
+		}
+	}
+	return n;
+}
+Lambda.empty = function(it) {
+	return !it.iterator().hasNext();
+}
+Lambda.indexOf = function(it,v) {
+	var i = 0;
+	var $it0 = it.iterator();
+	while( $it0.hasNext() ) {
+		var v2 = $it0.next();
+		if(v == v2) return i;
+		i++;
+	}
+	return -1;
+}
+Lambda.concat = function(a,b) {
+	var l = new List();
+	var $it0 = a.iterator();
+	while( $it0.hasNext() ) {
+		var x = $it0.next();
+		l.add(x);
+	}
+	var $it1 = b.iterator();
+	while( $it1.hasNext() ) {
+		var x = $it1.next();
+		l.add(x);
+	}
+	return l;
+}
+Lambda.prototype = {
+	__class__: Lambda
+}
 var List = $hxClasses["List"] = function() {
 	this.length = 0;
 };
@@ -1887,7 +2029,7 @@ slplayer.core.SLPlayer.main = function() {
 	})(mySLPlayerApp.initDisplayObjects.$bind(mySLPlayerApp));
 }
 slplayer.core.SLPlayer.addAssociatedComponent = function(node,cmp) {
-	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 73, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
+	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 104, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
 	var nodeId = node.getAttribute("data-" + slplayer.core.SLPlayer.SLPID_ATTR_NAME);
 	var associatedCmps;
 	if(nodeId != null) associatedCmps = slplayer.core.SLPlayer.nodeToCmpInstances.get(nodeId); else {
@@ -1905,33 +2047,62 @@ slplayer.core.SLPlayer.getAssociatedComponents = function(node) {
 }
 slplayer.core.SLPlayer.prototype = {
 	initDisplayObjects: function(e) {
+		var args = new Hash();
+		args.set("toto","titi");
+		args.set("tutu","tyty");
+		this.initDisplayObjectsOfType("slplayer.prototype.config.JsonConfiguration",args);
 		slplayer.prototype.data.RssConnector;
-		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector");
-		slplayer.prototype.player.ImageViewer;
-		this.initDisplayObjectsOfType("slplayer.prototype.player.ImageViewer");
+		var RssConnectorArgs = new Hash();
+		RssConnectorArgs.set("src","slplayer/prototype/data/RssConnector.js");
+		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector",RssConnectorArgs);
+		slplayer.prototype.player.ImagePlayer;
+		var ImagePlayerArgs = new Hash();
+		ImagePlayerArgs.set("src","slplayer/prototype/player/ImagePlayer.js");
+		this.initDisplayObjectsOfType("slplayer.prototype.player.ImagePlayer",ImagePlayerArgs);
+		slplayer.prototype.ui.TemplateRenderer;
+		var TemplateRendererArgs = new Hash();
+		TemplateRendererArgs.set("src","slplayer/prototype/ui/TemplateRenderer.js");
+		this.initDisplayObjectsOfType("slplayer.prototype.ui.TemplateRenderer",TemplateRendererArgs);
 		slplayer.prototype.player.BasicPlayerControl;
-		this.initDisplayObjectsOfType("slplayer.prototype.player.BasicPlayerControl");
+		var BasicPlayerControlArgs = new Hash();
+		BasicPlayerControlArgs.set("src","slplayer/prototype/player/BasicPlayerControl.js");
+		this.initDisplayObjectsOfType("slplayer.prototype.player.BasicPlayerControl",BasicPlayerControlArgs);
 		slplayer.prototype.player.AutoPlayer;
-		this.initDisplayObjectsOfType("slplayer.prototype.player.AutoPlayer");
-		slplayer.prototype.data.RssConnector;
-		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector");
+		var AutoPlayerArgs = new Hash();
+		AutoPlayerArgs.set("src","slplayer/prototype/player/AutoPlayer.js");
+		this.initDisplayObjectsOfType("slplayer.prototype.player.AutoPlayer",AutoPlayerArgs);
+		slplayer.prototype.config.JsonConfiguration;
+		var JsonConfigurationArgs = new Hash();
+		JsonConfigurationArgs.set("src","slplayer/prototype/config/JsonConfiguration.js");
+		JsonConfigurationArgs.set("data-json-src","conf.json");
+		this.initDisplayObjectsOfType("slplayer.prototype.config.JsonConfiguration",JsonConfigurationArgs);
 	}
-	,initDisplayObjectsOfType: function(displayObjectClassName) {
-		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 46, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+	,initDisplayObjectsOfType: function(displayObjectClassName,args) {
+		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 50, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 		var displayObjectClass = Type.resolveClass(displayObjectClassName);
 		if(displayObjectClass != null) {
 			var tagClassName = Reflect.field(displayObjectClass,"className");
-			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 53, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+			var tagFilter = Reflect.field(displayObjectClass,"rootElementNameFilter");
+			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 59, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 			if(tagClassName != null) {
 				var taggedNodes = js.Lib.document.getElementsByClassName(tagClassName);
-				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 58, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 64, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 				var nodeCnt = 0;
 				while(nodeCnt < taggedNodes.length) {
-					var newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
-					haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 63, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-					newDisplayObject.init(null);
+					if(tagFilter == null || Lambda.exists(tagFilter,function(s) {
+						return taggedNodes[nodeCnt].nodeName.toLowerCase() == s.toLowerCase();
+					})) {
+						var newDisplayObject;
+						if(args != null) newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt],args]); else newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
+						haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 78, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+						newDisplayObject.init(null);
+					} else haxe.Log.trace("ERROR: cannot instanciate " + displayObjectClassName + " on a " + taggedNodes[nodeCnt].nodeName + " tag.",{ fileName : "SLPlayer.hx", lineNumber : 83, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 					nodeCnt++;
 				}
+			} else try {
+				if(args != null) Type.createInstance(displayObjectClass,[args]); else Type.createInstance(displayObjectClass,[]);
+			} catch( unknown ) {
+				haxe.Log.trace(Std.string(unknown),{ fileName : "SLPlayer.hx", lineNumber : 97, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 			}
 		}
 	}
@@ -1946,7 +2117,10 @@ slplayer.data.Common.prototype = {
 slplayer.data.DataConsumer = $hxClasses["slplayer.data.DataConsumer"] = function() { }
 slplayer.data.DataConsumer.__name__ = ["slplayer","data","DataConsumer"];
 slplayer.data.DataConsumer.startConsuming = function(consumer,from) {
-	from.addEventListener(slplayer.data.Common.ON_DATA_EVENT_TYPE,consumer.onData.$bind(consumer),false);
+	from.addEventListener(slplayer.data.Common.ON_DATA_EVENT_TYPE,function(e) {
+		var evt = e;
+		consumer.onData(e.detail);
+	},false);
 	var onNewConsumerEvent = js.Lib.document.createEvent("CustomEvent");
 	onNewConsumerEvent.initCustomEvent(slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE,false,false,consumer);
 	from.dispatchEvent(onNewConsumerEvent);
@@ -1963,11 +2137,9 @@ slplayer.data.IDataConsumer.prototype = {
 slplayer.data.DataProvider = $hxClasses["slplayer.data.DataProvider"] = function() { }
 slplayer.data.DataProvider.__name__ = ["slplayer","data","DataProvider"];
 slplayer.data.DataProvider.startProviding = function(provider,target) {
-	target.addEventListener(slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE,(function(f) {
-		return function(a1) {
-			return f(a1);
-		};
-	})(provider.getData.$bind(provider)),false);
+	target.addEventListener(slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE,function(e) {
+		provider.getData();
+	},false);
 }
 slplayer.data.DataProvider.dispatchData = function(target,data) {
 	var onDataEvent = js.Lib.document.createEvent("CustomEvent");
@@ -1983,6 +2155,30 @@ slplayer.data.IDataProvider.prototype = {
 	getData: null
 	,__class__: slplayer.data.IDataProvider
 }
+if(!slplayer.prototype) slplayer.prototype = {}
+if(!slplayer.prototype.config) slplayer.prototype.config = {}
+slplayer.prototype.config.JsonConfiguration = $hxClasses["slplayer.prototype.config.JsonConfiguration"] = function(args) {
+	if(slplayer.prototype.config.JsonConfiguration.instance != null) throw "ERROR: Cannot instanciate more than one JsonConfiguration !";
+	this.src = args.get("data-" + slplayer.prototype.config.JsonConfiguration.TAG_SRC);
+	if(this.src == null) throw "ERROR: tag data-" + slplayer.prototype.config.JsonConfiguration.TAG_SRC + " not set on JsonConfiguration component !";
+	this.consumers = slplayer.prototype.util.DomTools.getElementsByAttribute(js.Lib.document,"data-" + slplayer.prototype.config.JsonConfiguration.TAG_LISTENERS,"*");
+	var _g1 = 0, _g = this.consumers.length;
+	while(_g1 < _g) {
+		var consCnt = _g1++;
+		slplayer.data.DataProvider.startProviding(this,this.consumers[consCnt]);
+	}
+	slplayer.prototype.config.JsonConfiguration.instance = this;
+};
+slplayer.prototype.config.JsonConfiguration.__name__ = ["slplayer","prototype","config","JsonConfiguration"];
+slplayer.prototype.config.JsonConfiguration.__interfaces__ = [slplayer.data.IDataProvider];
+slplayer.prototype.config.JsonConfiguration.instance = null;
+slplayer.prototype.config.JsonConfiguration.prototype = {
+	src: null
+	,consumers: null
+	,getData: function() {
+	}
+	,__class__: slplayer.prototype.config.JsonConfiguration
+}
 if(!slplayer.ui) slplayer.ui = {}
 slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
 	this.rootElement = rootElement;
@@ -1995,7 +2191,6 @@ slplayer.ui.DisplayObject.prototype = {
 	}
 	,__class__: slplayer.ui.DisplayObject
 }
-if(!slplayer.prototype) slplayer.prototype = {}
 if(!slplayer.prototype.data) slplayer.prototype.data = {}
 slplayer.prototype.data.RssConnector = $hxClasses["slplayer.prototype.data.RssConnector"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
@@ -2008,7 +2203,6 @@ slplayer.prototype.data.RssConnector.prototype = $extend(slplayer.ui.DisplayObje
 	,setSrc: function(newSrc) {
 		if(newSrc == this.src || newSrc == null) return this.src;
 		this.src = newSrc;
-		this.getData(null);
 		return this.src;
 	}
 	,init: function(e) {
@@ -2017,7 +2211,7 @@ slplayer.prototype.data.RssConnector.prototype = $extend(slplayer.ui.DisplayObje
 		var me = this;
 		slplayer.data.DataProvider.startProviding(this,this.rootElement);
 	}
-	,getData: function(e) {
+	,getData: function() {
 		if(this.src == null) {
 			haxe.Log.trace("INFO src not set.",{ fileName : "RssConnector.hx", lineNumber : 58, className : "slplayer.prototype.data.RssConnector", methodName : "getData"});
 			return;
@@ -2110,7 +2304,7 @@ slplayer.prototype.player.AutoPlayer.prototype = $extend(slplayer.ui.DisplayObje
 			};
 		})(me),this.rootElement);
 	}
-	,onPlayableFirst: function(e) {
+	,onPlayableFirst: function() {
 		var me = this;
 		this.timer.run = (function(f,a1) {
 			return function() {
@@ -2122,7 +2316,7 @@ slplayer.prototype.player.AutoPlayer.prototype = $extend(slplayer.ui.DisplayObje
 			};
 		})(me),this.rootElement);
 	}
-	,onPlayableLast: function(e) {
+	,onPlayableLast: function() {
 		var me = this;
 		this.timer.run = (function(f,a1) {
 			return function() {
@@ -2134,7 +2328,7 @@ slplayer.prototype.player.AutoPlayer.prototype = $extend(slplayer.ui.DisplayObje
 			};
 		})(me),this.rootElement);
 	}
-	,onPlayableChange: function(e) {
+	,onPlayableChange: function() {
 	}
 	,__class__: slplayer.prototype.player.AutoPlayer
 });
@@ -2197,15 +2391,15 @@ slplayer.prototype.player.BasicPlayerControl.prototype = $extend(slplayer.ui.Dis
 		parent.style.textAlign = "center";
 		this.rootElement.parentNode.appendChild(buttonContainer);
 	}
-	,onPlayableFirst: function(e) {
+	,onPlayableFirst: function() {
 		this.firstButton.style.display = "none";
 		this.previousButton.style.display = "none";
 	}
-	,onPlayableLast: function(e) {
+	,onPlayableLast: function() {
 		this.nextButton.style.display = "none";
 		this.lastButton.style.display = "none";
 	}
-	,onPlayableChange: function(e) {
+	,onPlayableChange: function() {
 		this.firstButton.style.display = this.previousButton.style.display = this.nextButton.style.display = this.lastButton.style.display = "block";
 	}
 	,__class__: slplayer.prototype.player.BasicPlayerControl
@@ -2217,15 +2411,16 @@ slplayer.ui.player.IPlayable.prototype = {
 	,previous: null
 	,first: null
 	,last: null
+	,onNewPlayerControl: null
 	,__class__: slplayer.ui.player.IPlayable
 }
-slplayer.prototype.player.ImageViewer = $hxClasses["slplayer.prototype.player.ImageViewer"] = function(rootElement) {
+slplayer.prototype.player.ImagePlayer = $hxClasses["slplayer.prototype.player.ImagePlayer"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
 };
-slplayer.prototype.player.ImageViewer.__name__ = ["slplayer","prototype","player","ImageViewer"];
-slplayer.prototype.player.ImageViewer.__interfaces__ = [slplayer.ui.player.IPlayable,slplayer.data.IDataConsumer];
-slplayer.prototype.player.ImageViewer.__super__ = slplayer.ui.DisplayObject;
-slplayer.prototype.player.ImageViewer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+slplayer.prototype.player.ImagePlayer.__name__ = ["slplayer","prototype","player","ImagePlayer"];
+slplayer.prototype.player.ImagePlayer.__interfaces__ = [slplayer.ui.player.IPlayable,slplayer.data.IDataConsumer];
+slplayer.prototype.player.ImagePlayer.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.player.ImagePlayer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	currentIndex: null
 	,tpl: null
 	,dataProviders: null
@@ -2250,9 +2445,9 @@ slplayer.prototype.player.ImageViewer.prototype = $extend(slplayer.ui.DisplayObj
 			providersData = providersData.concat(pvdData);
 		}
 		this.rootElement.innerHTML = this.tpl.execute({ data : providersData});
-		var liChilds = this.rootElement.getElementsByTagName("li");
 		slplayer.ui.player.Playable.dispatchOnChange(this,this.rootElement);
-		if(this.currentIndex <= 0) slplayer.ui.player.Playable.dispatchOnFirst(this,this.rootElement); else if(this.currentIndex >= liChilds.length - 1) slplayer.ui.player.Playable.dispatchOnLast(this,this.rootElement);
+		this.dispatchIndex();
+		var liChilds = this.rootElement.getElementsByTagName("li");
 		var _g1 = 0, _g = liChilds.length;
 		while(_g1 < _g) {
 			var liCnt = _g1++;
@@ -2260,38 +2455,105 @@ slplayer.prototype.player.ImageViewer.prototype = $extend(slplayer.ui.DisplayObj
 		}
 		liChilds[this.currentIndex].style.display = "block";
 	}
-	,next: function(e) {
+	,dispatchIndex: function() {
+		var liChilds = this.rootElement.getElementsByTagName("li");
+		if(this.currentIndex <= 0) slplayer.ui.player.Playable.dispatchOnFirst(this,this.rootElement); else if(this.currentIndex >= liChilds.length - 1) slplayer.ui.player.Playable.dispatchOnLast(this,this.rootElement);
+	}
+	,next: function() {
 		if(this.currentIndex < this.rootElement.getElementsByTagName("li").length - 1) this.currentIndex++;
 		this.updateView();
 	}
-	,previous: function(e) {
+	,previous: function() {
 		if(this.currentIndex > 0) this.currentIndex--;
 		this.updateView();
 	}
-	,first: function(e) {
+	,first: function() {
 		this.currentIndex = 0;
 		this.updateView();
 	}
-	,last: function(e) {
+	,last: function() {
 		this.currentIndex = this.rootElement.getElementsByTagName("li").length - 1;
 		this.updateView();
 	}
-	,onData: function(e) {
-		var evt = e;
-		if(evt.detail != null) {
-			this.dataProviders.set(evt.detail.src,evt.detail.data);
+	,onNewPlayerControl: function() {
+		this.dispatchIndex();
+	}
+	,onData: function(dataObj) {
+		if(dataObj != null) {
+			this.dataProviders.set(dataObj.src,dataObj.data);
 			this.updateView();
 		}
 	}
-	,__class__: slplayer.prototype.player.ImageViewer
+	,__class__: slplayer.prototype.player.ImagePlayer
 });
+if(!slplayer.prototype.ui) slplayer.prototype.ui = {}
+slplayer.prototype.ui.TemplateRenderer = $hxClasses["slplayer.prototype.ui.TemplateRenderer"] = function(rootElement) {
+	slplayer.ui.DisplayObject.call(this,rootElement);
+};
+slplayer.prototype.ui.TemplateRenderer.__name__ = ["slplayer","prototype","ui","TemplateRenderer"];
+slplayer.prototype.ui.TemplateRenderer.__interfaces__ = [slplayer.data.IDataConsumer];
+slplayer.prototype.ui.TemplateRenderer.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.ui.TemplateRenderer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	tpl: null
+	,dataProviders: null
+	,init: function(e) {
+		this.dataProviders = new Hash();
+		this.tpl = new haxe.Template(this.rootElement.innerHTML);
+		this.rootElement.innerHTML = "";
+		this.updateView();
+		slplayer.data.DataConsumer.startConsuming(this,this.rootElement);
+	}
+	,updateView: function() {
+		var providersData = new Array();
+		var $it0 = this.dataProviders.iterator();
+		while( $it0.hasNext() ) {
+			var pvdData = $it0.next();
+			providersData = providersData.concat(pvdData);
+		}
+		this.rootElement.innerHTML = this.tpl.execute({ data : providersData});
+	}
+	,onData: function(dataObj) {
+		if(dataObj != null) {
+			this.dataProviders.set(dataObj.src,dataObj.data);
+			this.updateView();
+		}
+	}
+	,__class__: slplayer.prototype.ui.TemplateRenderer
+});
+if(!slplayer.prototype.util) slplayer.prototype.util = {}
+slplayer.prototype.util.DomTools = $hxClasses["slplayer.prototype.util.DomTools"] = function() { }
+slplayer.prototype.util.DomTools.__name__ = ["slplayer","prototype","util","DomTools"];
+slplayer.prototype.util.DomTools.getElementsByAttribute = function(elt,attr,value) {
+	var childElts = elt.getElementsByTagName("*");
+	var filteredChildElts = new Array();
+	var _g1 = 0, _g = childElts.length;
+	while(_g1 < _g) {
+		var cCount = _g1++;
+		if(childElts[cCount].getAttribute(attr) != null && (value == "*" || childElts[cCount].getAttribute(attr) == value)) filteredChildElts.push(childElts[cCount]);
+	}
+	return filteredChildElts;
+}
+slplayer.prototype.util.DomTools.prototype = {
+	__class__: slplayer.prototype.util.DomTools
+}
 slplayer.ui.player.Playable = $hxClasses["slplayer.ui.player.Playable"] = function() { }
 slplayer.ui.player.Playable.__name__ = ["slplayer","ui","player","Playable"];
 slplayer.ui.player.Playable.startPlayable = function(playable,target) {
-	target.addEventListener(slplayer.ui.player.PlayerControl.FIRST,playable.first.$bind(playable),false);
-	target.addEventListener(slplayer.ui.player.PlayerControl.LAST,playable.last.$bind(playable),false);
-	target.addEventListener(slplayer.ui.player.PlayerControl.NEXT,playable.next.$bind(playable),false);
-	target.addEventListener(slplayer.ui.player.PlayerControl.PREVIOUS,playable.previous.$bind(playable),false);
+	target.addEventListener(slplayer.ui.player.PlayerControl.FIRST,function(e) {
+		playable.first();
+	},false);
+	target.addEventListener(slplayer.ui.player.PlayerControl.LAST,function(e) {
+		playable.last();
+	},false);
+	target.addEventListener(slplayer.ui.player.PlayerControl.NEXT,function(e) {
+		playable.next();
+	},false);
+	target.addEventListener(slplayer.ui.player.PlayerControl.PREVIOUS,function(e) {
+		playable.previous();
+	},false);
+	target.addEventListener(slplayer.ui.player.PlayerControl.NEW_PLAYER_CONTROL,function(e) {
+		playable.onNewPlayerControl();
+	},false);
 	var onStartPlayableEvent = js.Lib.document.createEvent("CustomEvent");
 	onStartPlayableEvent.initCustomEvent(slplayer.ui.player.Playable.START_PLAYABLE,false,false,playable);
 	target.dispatchEvent(onStartPlayableEvent);
@@ -2317,9 +2579,18 @@ slplayer.ui.player.Playable.prototype = {
 slplayer.ui.player.PlayerControl = $hxClasses["slplayer.ui.player.PlayerControl"] = function() { }
 slplayer.ui.player.PlayerControl.__name__ = ["slplayer","ui","player","PlayerControl"];
 slplayer.ui.player.PlayerControl.startPlayerControl = function(playerControl,target) {
-	target.addEventListener(slplayer.ui.player.Playable.ON_LAST,playerControl.onPlayableLast.$bind(playerControl),false);
-	target.addEventListener(slplayer.ui.player.Playable.ON_FIRST,playerControl.onPlayableFirst.$bind(playerControl),false);
-	target.addEventListener(slplayer.ui.player.Playable.ON_CHANGE,playerControl.onPlayableChange.$bind(playerControl),false);
+	target.addEventListener(slplayer.ui.player.Playable.ON_LAST,function(e) {
+		playerControl.onPlayableLast();
+	},false);
+	target.addEventListener(slplayer.ui.player.Playable.ON_FIRST,function(e) {
+		playerControl.onPlayableFirst();
+	},false);
+	target.addEventListener(slplayer.ui.player.Playable.ON_CHANGE,function(e) {
+		playerControl.onPlayableChange();
+	},false);
+	var newPlayerControlEvent = js.Lib.document.createEvent("CustomEvent");
+	newPlayerControlEvent.initEvent(slplayer.ui.player.PlayerControl.NEW_PLAYER_CONTROL,false,false,playerControl);
+	target.dispatchEvent(newPlayerControlEvent);
 }
 slplayer.ui.player.PlayerControl.next = function(playerControl,target) {
 	var nextEvent = js.Lib.document.createEvent("Event");
@@ -2474,16 +2745,21 @@ haxe.Template.globals = { };
 js.Lib.onerror = null;
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<div><div>Here is an image viewer component combined with a AutoPlayer component : </div><div><ul class=\"imageviewer autoplayer\" data-autoplay-interval=\"1500\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>The same image viewer component combined with a rss feed reader component and a control bar component :</div><div style=\"width:160px;\"><ul class=\"imageviewer controlbar rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t::foreach data::<li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li>::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div>";
+slplayer.core.SLPlayer._htmlBody = "<a href=\"#\">try JS version</a>";
 slplayer.data.Common.ON_DATA_EVENT_TYPE = "data";
 slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
+slplayer.prototype.config.JsonConfiguration.TAG_SRC = "json-src";
+slplayer.prototype.config.JsonConfiguration.TAG_LISTENERS = "json-conf-listen";
 slplayer.ui.DisplayObject.className = "DisplayObject";
+slplayer.ui.DisplayObject.rootElementNameFilter = Lambda.list([]);
 slplayer.prototype.data.RssConnector.className = "rssconnector";
 slplayer.prototype.data.RssConnector.SRC_TAG = "src-rss";
 slplayer.prototype.player.AutoPlayer.className = "autoplayer";
 slplayer.prototype.player.AutoPlayer.AUTOPLAY_INTERVAL_TAG = "autoplay-interval";
 slplayer.prototype.player.BasicPlayerControl.className = "controlbar";
-slplayer.prototype.player.ImageViewer.className = "imageviewer";
+slplayer.prototype.player.ImagePlayer.className = "imageplayer";
+slplayer.prototype.player.ImagePlayer.rootElementNameFilter = Lambda.list(["ul"]);
+slplayer.prototype.ui.TemplateRenderer.className = "template";
 slplayer.ui.player.Playable.START_PLAYABLE = "start_playable";
 slplayer.ui.player.Playable.ON_LAST = "on_last";
 slplayer.ui.player.Playable.ON_FIRST = "on_first";
@@ -2492,4 +2768,5 @@ slplayer.ui.player.PlayerControl.FIRST = "first";
 slplayer.ui.player.PlayerControl.LAST = "last";
 slplayer.ui.player.PlayerControl.NEXT = "next";
 slplayer.ui.player.PlayerControl.PREVIOUS = "previous";
+slplayer.ui.player.PlayerControl.NEW_PLAYER_CONTROL = "onNewPlayerControl";
 slplayer.core.SLPlayer.main()

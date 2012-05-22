@@ -37,18 +37,18 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl
 		timer.run = callback(me.next, rootElement);
 	}
 	
-	private function onPlayableFirst(e:Event):Void
+	private function onPlayableFirst():Void
 	{
 		var me = this;
 		timer.run = callback(me.next, rootElement);
 	}
 	
-	private function onPlayableLast(e:Event):Void
+	private function onPlayableLast():Void
 	{
 		var me = this;
 		timer.run = callback(me.first, rootElement);
 	}
 	
-	private function onPlayableChange(e:Event):Void { }
+	private function onPlayableChange():Void { }
 	
 }

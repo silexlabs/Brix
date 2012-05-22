@@ -9,21 +9,40 @@ import js.Lib;
  */
 class PlayerControl 
 {
+	/**
+	 * This event is to notify the associated Playable(s) that the user triggered a "FIRST" command.
+	 */
 	static public var FIRST = "first";
-	
+	/**
+	 * This event is to notify the associated Playable(s) that the user triggered a "LAST" command.
+	 */
 	static public var LAST = "last";
-	
+	/**
+	 * This event is to notify the associated Playable(s) that the user triggered a "NEXT" command.
+	 */
 	static public var NEXT = "next";
-	
+	/**
+	 * This event is to notify the associated Playable(s) that the user triggered a "PREVIOUS" command.
+	 */
 	static public var PREVIOUS = "previous";
+	/**
+	 * This event is to notify any Playable that a new PlayerControl just initialized for them.
+	 */
+	static public var NEW_PLAYER_CONTROL = "onNewPlayerControl";
 	
 	static public function startPlayerControl(playerControl : IPlayerControl, target : Dynamic):Void
 	{
-		untyped target.addEventListener(Playable.ON_LAST, playerControl.onPlayableLast , false);
+		untyped target.addEventListener(Playable.ON_LAST, function(e:Event) { playerControl.onPlayableLast();} , false);
 		
-		untyped target.addEventListener(Playable.ON_FIRST, playerControl.onPlayableFirst , false);
+		untyped target.addEventListener(Playable.ON_FIRST, function(e:Event) { playerControl.onPlayableFirst();} , false);
 		
-		untyped target.addEventListener(Playable.ON_CHANGE, playerControl.onPlayableChange , false);
+		untyped target.addEventListener(Playable.ON_CHANGE, function(e:Event) { playerControl.onPlayableChange();} , false);
+		
+		var newPlayerControlEvent = untyped Lib.document.createEvent("CustomEvent");
+		
+		untyped newPlayerControlEvent.initEvent(NEW_PLAYER_CONTROL, false, false, playerControl);
+		
+		untyped target.dispatchEvent(newPlayerControlEvent);
 	}
 	
 	static public function next(playerControl : IPlayerControl, target : Dynamic):Void
@@ -65,9 +84,9 @@ class PlayerControl
 
 interface IPlayerControl
 {
-	private function onPlayableFirst(e:Event):Void;
+	private function onPlayableFirst():Void;
 	
-	private function onPlayableLast(e:Event):Void;
+	private function onPlayableLast():Void;
 	
-	private function onPlayableChange(e:Event):Void;
+	private function onPlayableChange():Void;
 }

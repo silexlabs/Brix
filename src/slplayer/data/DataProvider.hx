@@ -16,7 +16,8 @@ class DataProvider
 {
 	static public function startProviding(provider : IDataProvider, target : Dynamic)
 	{
-		untyped target.addEventListener(Common.ON_DATA_CONSUMER_EVENT_TYPE, callback(provider.getData), false);
+		//FIXME we should possibly not call directly getData here but another function onNewDataConsumer
+		untyped target.addEventListener(Common.ON_DATA_CONSUMER_EVENT_TYPE, function(e:Event) { provider.getData(); }, false);
 	}
 	
 	static public function dispatchData(target : Dynamic, data : DataObject)
@@ -35,5 +36,5 @@ interface IDataProvider
 	 * Common callback to all data provider to retreive data.
 	 * @param	e
 	 */
-	public function getData(e:Event = null):Void;
+	public function getData():Void;
 }

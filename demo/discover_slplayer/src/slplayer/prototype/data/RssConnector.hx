@@ -32,7 +32,7 @@ class RssConnector extends DisplayObject, implements IDataProvider
 			return src;
 		
 		src = newSrc;
-		getData(null);
+		//getData(null);
 		
 		return src;
 	}
@@ -50,7 +50,7 @@ class RssConnector extends DisplayObject, implements IDataProvider
 		startProviding(rootElement);
 	}
 	
-	public function getData(e:Event = null)
+	public function getData()
 	{
 //trace("getting data...");
 		if (src == null)

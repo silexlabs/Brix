@@ -15,7 +15,14 @@ class DataConsumer
 {
 	static public function startConsuming(consumer : IDataConsumer, from : Dynamic)
 	{
-		untyped from.addEventListener(Common.ON_DATA_EVENT_TYPE, consumer.onData , false);
+		untyped from.addEventListener(Common.ON_DATA_EVENT_TYPE, function(e:Event) {
+																						#if flash9
+																							var evt:cocktail.core.event.CustomEvent = cast(e);
+																						#else
+																							var evt = e;
+																						#end
+																						consumer.onData(e.detail); 
+																					} , false);
 		
 		var onNewConsumerEvent = untyped Lib.document.createEvent("CustomEvent");
 		
@@ -31,5 +38,5 @@ interface IDataConsumer
 	 * Common callback to all data consumers to receive data.
 	 * @param	e
 	 */
-	private function onData(e:Dynamic):Void;
+	private function onData(dataObj : DataObject):Void;
 }
