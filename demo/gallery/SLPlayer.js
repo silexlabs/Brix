@@ -2111,9 +2111,28 @@ slplayer.prototype.player.AutoPlayer.prototype = $extend(slplayer.ui.DisplayObje
 		})(me),this.rootElement);
 	}
 	,onPlayableFirst: function(e) {
+		var me = this;
+		this.timer.run = (function(f,a1) {
+			return function() {
+				return f(a1);
+			};
+		})((function(_e) {
+			return function(target) {
+				return slplayer.ui.player.PlayerControl.next(_e,target);
+			};
+		})(me),this.rootElement);
 	}
 	,onPlayableLast: function(e) {
-		slplayer.ui.player.PlayerControl.first(this,this.rootElement);
+		var me = this;
+		this.timer.run = (function(f,a1) {
+			return function() {
+				return f(a1);
+			};
+		})((function(_e) {
+			return function(target) {
+				return slplayer.ui.player.PlayerControl.first(_e,target);
+			};
+		})(me),this.rootElement);
 	}
 	,onPlayableChange: function(e) {
 	}
