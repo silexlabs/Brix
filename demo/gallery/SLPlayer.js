@@ -1905,8 +1905,10 @@ slplayer.core.SLPlayer.getAssociatedComponents = function(node) {
 }
 slplayer.core.SLPlayer.prototype = {
 	initDisplayObjects: function(e) {
-		slplayer.prototype.player.Gallery;
-		this.initDisplayObjectsOfType("slplayer.prototype.player.Gallery");
+		slplayer.prototype.data.RssConnector;
+		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector");
+		slplayer.prototype.player.ImageViewer;
+		this.initDisplayObjectsOfType("slplayer.prototype.player.ImageViewer");
 		slplayer.prototype.player.BasicPlayerControl;
 		this.initDisplayObjectsOfType("slplayer.prototype.player.BasicPlayerControl");
 		slplayer.prototype.player.AutoPlayer;
@@ -2151,7 +2153,7 @@ slplayer.prototype.player.BasicPlayerControl.prototype = $extend(slplayer.ui.Dis
 		var divPrev = js.Lib.document.createElement("div");
 		var divNext = js.Lib.document.createElement("div");
 		var divLast = js.Lib.document.createElement("div");
-		divFirst.style.cssFloat = divPrev.style.cssFloat = divNext.style.cssFloat = divLast.style.cssFloat = "left";
+		divFirst.style.display = divPrev.style.display = divNext.style.display = divLast.style.display = "inline-block";
 		divFirst.style.width = divPrev.style.width = divNext.style.width = divLast.style.width = "40px";
 		divFirst.style.height = divPrev.style.height = divNext.style.height = divLast.style.height = "30px";
 		this.firstButton = js.Lib.document.createElement("img");
@@ -2172,7 +2174,8 @@ slplayer.prototype.player.BasicPlayerControl.prototype = $extend(slplayer.ui.Dis
 		buttonContainer.appendChild(divPrev);
 		buttonContainer.appendChild(divNext);
 		buttonContainer.appendChild(divLast);
-		this.rootElement.parentNode.style.textAlign = "center";
+		var parent = this.rootElement.parentNode;
+		parent.style.textAlign = "center";
 		this.rootElement.parentNode.appendChild(buttonContainer);
 	}
 	,onPlayableFirst: function(e) {
@@ -2197,13 +2200,13 @@ slplayer.ui.player.IPlayable.prototype = {
 	,last: null
 	,__class__: slplayer.ui.player.IPlayable
 }
-slplayer.prototype.player.Gallery = $hxClasses["slplayer.prototype.player.Gallery"] = function(rootElement) {
+slplayer.prototype.player.ImageViewer = $hxClasses["slplayer.prototype.player.ImageViewer"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
 };
-slplayer.prototype.player.Gallery.__name__ = ["slplayer","prototype","player","Gallery"];
-slplayer.prototype.player.Gallery.__interfaces__ = [slplayer.ui.player.IPlayable,slplayer.data.IDataConsumer];
-slplayer.prototype.player.Gallery.__super__ = slplayer.ui.DisplayObject;
-slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+slplayer.prototype.player.ImageViewer.__name__ = ["slplayer","prototype","player","ImageViewer"];
+slplayer.prototype.player.ImageViewer.__interfaces__ = [slplayer.ui.player.IPlayable,slplayer.data.IDataConsumer];
+slplayer.prototype.player.ImageViewer.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.player.ImageViewer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	currentIndex: null
 	,tpl: null
 	,dataProviders: null
@@ -2218,10 +2221,7 @@ slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.
 		slplayer.ui.player.Playable.startPlayable(this,this.rootElement);
 	}
 	,initUI: function() {
-		this.rootElement.style.listStyleType = "none";
-		this.rootElement.style.listStylePosition = "inside";
-		this.rootElement.style.margin = "0";
-		this.rootElement.style.padding = "0";
+		this.rootElement.style.paddingLeft = "0";
 	}
 	,updateView: function() {
 		var providersData = new Array();
@@ -2258,12 +2258,13 @@ slplayer.prototype.player.Gallery.prototype = $extend(slplayer.ui.DisplayObject.
 		this.updateView();
 	}
 	,onData: function(e) {
-		if(e.detail != null) {
-			this.dataProviders.set(e.detail.src,e.detail.data);
+		var evt = e;
+		if(evt.detail != null) {
+			this.dataProviders.set(evt.detail.src,evt.detail.data);
 			this.updateView();
 		}
 	}
-	,__class__: slplayer.prototype.player.Gallery
+	,__class__: slplayer.prototype.player.ImageViewer
 });
 slplayer.ui.player.Playable = $hxClasses["slplayer.ui.player.Playable"] = function() { }
 slplayer.ui.player.Playable.__name__ = ["slplayer","ui","player","Playable"];
@@ -2454,7 +2455,7 @@ haxe.Template.globals = { };
 js.Lib.onerror = null;
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<div><div>Here is a basic Gallery component combined with a AutoPlayer component : </div><br/><div><ul class=\"gallery autoplayer\" data-autoplay-interval=\"1500\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>The same gallery component combined with a rss feed reader component and a control bar component :</div><br/><div style=\"width:160px;\"><ul class=\"gallery rssconnector controlbar\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t::foreach data:: <li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li> ::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div>";
+slplayer.core.SLPlayer._htmlBody = "<div><div>Here is an image viewer component combined with a AutoPlayer component : </div><div><ul class=\"imageviewer autoplayer\" data-autoplay-interval=\"1500\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div><div>The same image viewer component combined with a rss feed reader component and a control bar component :</div><div style=\"width:160px;\"><ul class=\"imageviewer controlbar rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t::foreach data::<li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li>::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div>";
 slplayer.data.Common.ON_DATA_EVENT_TYPE = "data";
 slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
 slplayer.ui.DisplayObject.className = "DisplayObject";
@@ -2463,7 +2464,7 @@ slplayer.prototype.data.RssConnector.SRC_TAG = "src-rss";
 slplayer.prototype.player.AutoPlayer.className = "autoplayer";
 slplayer.prototype.player.AutoPlayer.AUTOPLAY_INTERVAL_TAG = "autoplay-interval";
 slplayer.prototype.player.BasicPlayerControl.className = "controlbar";
-slplayer.prototype.player.Gallery.className = "gallery";
+slplayer.prototype.player.ImageViewer.className = "imageviewer";
 slplayer.ui.player.Playable.START_PLAYABLE = "start_playable";
 slplayer.ui.player.Playable.ON_LAST = "on_last";
 slplayer.ui.player.Playable.ON_FIRST = "on_first";

@@ -1,5 +1,6 @@
 -swf gallery.swf
 -cp .
+-cp ./src/
 -cp ../../src/
 -cp ../../../haxe_libs/cocktail/src/
 -cp ../../../haxe_libs/cocktail/lib/

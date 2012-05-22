@@ -12,7 +12,7 @@ import slplayer.data.Common;
  * @author Thomas Fétiveau
  */
 class DataConsumer 
-{	
+{
 	static public function startConsuming(consumer : IDataConsumer, from : Dynamic)
 	{
 		untyped from.addEventListener(Common.ON_DATA_EVENT_TYPE, consumer.onData , false);

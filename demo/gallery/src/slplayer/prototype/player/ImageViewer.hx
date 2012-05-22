@@ -1,7 +1,5 @@
 package slplayer.prototype.player;
 
-using haxe.Log;
-
 import js.Lib;
 import js.Dom;
 
@@ -20,9 +18,9 @@ using slplayer.ui.player.Playable;
  * Gallery component for SLPlayer applications.
  * @author Thomas Fétiveau
  */
-class Gallery extends DisplayObject, implements IDataConsumer, implements IPlayable
+class ImageViewer extends DisplayObject, implements IDataConsumer, implements IPlayable
 {
-	static var className = "gallery";
+	static var className = "imageviewer";
 	
 	var currentIndex:Int;
 	
@@ -52,6 +50,7 @@ class Gallery extends DisplayObject, implements IDataConsumer, implements IPlaya
 		//rootElement.style.listStyleType = "none";
 		//rootElement.style.listStylePosition = "inside";
 		//rootElement.style.margin = "0";
+		rootElement.style.paddingLeft = "0";
 		//rootElement.style.padding = "0";
 	}
 	
