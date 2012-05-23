@@ -39,7 +39,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	 */
 	var dataProviders(default,null) : Hash<Array<Dynamic>>;
 	
-	override public function init(e:Event):Void 
+	override public function init():Void 
 	{
 		dataProviders = new Hash();
 		

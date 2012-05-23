@@ -24,6 +24,8 @@ TODOS
 
 - parse the metadata and extract the viewport (!!!)
 
+- add a way to ignore some <script> headers (for non components libraries) : fe with a data-ignore tag (!!!)
+
 - a la complation, vérifier que les children attendus sont présents (les boutons de la galerie par exemple)
 - with the use of macro, force having a static override var className when extending DisplayObject ?
 

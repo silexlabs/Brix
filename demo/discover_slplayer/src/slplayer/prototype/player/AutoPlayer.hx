@@ -25,7 +25,7 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl
 	
 	var interval : Int;
 
-	override public function init(e:Event):Void
+	override public function init():Void
 	{
 		interval = Std.parseInt(rootElement.getAttribute("data-" + AUTOPLAY_INTERVAL_TAG));
 		

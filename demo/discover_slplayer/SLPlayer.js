@@ -2029,7 +2029,7 @@ slplayer.core.SLPlayer.main = function() {
 	})(mySLPlayerApp.initDisplayObjects.$bind(mySLPlayerApp));
 }
 slplayer.core.SLPlayer.addAssociatedComponent = function(node,cmp) {
-	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 104, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
+	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 146, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
 	var nodeId = node.getAttribute("data-" + slplayer.core.SLPlayer.SLPID_ATTR_NAME);
 	var associatedCmps;
 	if(nodeId != null) associatedCmps = slplayer.core.SLPlayer.nodeToCmpInstances.get(nodeId); else {
@@ -2061,33 +2061,62 @@ slplayer.core.SLPlayer.prototype = {
 		this.initDisplayObjectsOfType("slplayer.prototype.player.AutoPlayer");
 	}
 	,initDisplayObjectsOfType: function(displayObjectClassName,args) {
-		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 50, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 53, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 		var displayObjectClass = Type.resolveClass(displayObjectClassName);
 		if(displayObjectClass != null) {
 			var tagClassName = Reflect.field(displayObjectClass,"className");
 			var tagFilter = Reflect.field(displayObjectClass,"rootElementNameFilter");
-			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 59, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 62, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 			if(tagClassName != null) {
 				var taggedNodes = js.Lib.document.getElementsByClassName(tagClassName);
-				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 64, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-				var nodeCnt = 0;
-				while(nodeCnt < taggedNodes.length) {
-					if(tagFilter == null || Lambda.exists(tagFilter,function(s) {
-						return taggedNodes[nodeCnt].nodeName.toLowerCase() == s.toLowerCase();
-					})) {
+				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 67, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+				var _g1 = 0, _g = taggedNodes.length;
+				while(_g1 < _g) {
+					var nodeCnt = _g1++;
+					if(this.checkFilterOnElt(taggedNodes[nodeCnt],tagFilter)) {
 						var newDisplayObject;
-						if(args != null) newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt],args]); else newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
-						haxe.Log.trace(displayObjectClassName + " instance created",{ fileName : "SLPlayer.hx", lineNumber : 78, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-						newDisplayObject.init(null);
-					} else haxe.Log.trace("ERROR: cannot instanciate " + displayObjectClassName + " on a " + taggedNodes[nodeCnt].nodeName + " tag.",{ fileName : "SLPlayer.hx", lineNumber : 83, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-					nodeCnt++;
+						try {
+							if(args != null) newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt],args]); else newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
+							newDisplayObject.init();
+						} catch( unknown ) {
+							haxe.Log.trace(Std.string(unknown),{ fileName : "SLPlayer.hx", lineNumber : 83, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+						}
+					} else haxe.Log.trace("ERROR: cannot instanciate " + displayObjectClassName + " on a " + taggedNodes[nodeCnt].nodeName + " tag.",{ fileName : "SLPlayer.hx", lineNumber : 87, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 				}
 			} else try {
 				if(args != null) Type.createInstance(displayObjectClass,[args]); else Type.createInstance(displayObjectClass,[]);
 			} catch( unknown ) {
-				haxe.Log.trace(Std.string(unknown),{ fileName : "SLPlayer.hx", lineNumber : 97, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+				haxe.Log.trace(Std.string(unknown),{ fileName : "SLPlayer.hx", lineNumber : 100, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 			}
 		}
+	}
+	,checkFilterOnElt: function(elt,tagFilter) {
+		if(tagFilter == null || tagFilter.isEmpty()) return true;
+		if(Lambda.exists(tagFilter,function(s) {
+			return elt.nodeName.toLowerCase() == s.toLowerCase();
+		})) return true;
+		if(elt.nodeName.toLowerCase() == "div") return Lambda.exists(tagFilter,function(s) {
+			var childs = elt.childNodes;
+			var _g1 = 0, _g = childs.length;
+			while(_g1 < _g) {
+				var chCnt = [_g1++];
+				var classAtt = childs[chCnt[0]].getAttribute("class");
+				if(classAtt == null) continue;
+				if(Lambda.exists(classAtt.split(" "),(function() {
+					return function(s1) {
+						return s1 == "body";
+					};
+				})())) {
+					if(Lambda.exists(tagFilter,(function(chCnt) {
+						return function(s1) {
+							return childs[chCnt[0]].nodeName.toLowerCase() == s1.toLowerCase();
+						};
+					})(chCnt))) return true;
+				}
+			}
+			return false;
+		});
+		return false;
 	}
 	,__class__: slplayer.core.SLPlayer
 }
@@ -2146,7 +2175,7 @@ slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(r
 slplayer.ui.DisplayObject.__name__ = ["slplayer","ui","DisplayObject"];
 slplayer.ui.DisplayObject.prototype = {
 	rootElement: null
-	,init: function(e) {
+	,init: function() {
 	}
 	,__class__: slplayer.ui.DisplayObject
 }
@@ -2165,7 +2194,7 @@ slplayer.prototype.data.RssConnector.prototype = $extend(slplayer.ui.DisplayObje
 		this.src = newSrc;
 		return this.src;
 	}
-	,init: function(e) {
+	,init: function() {
 		this.setSrc(this.rootElement.getAttribute("data-" + slplayer.prototype.data.RssConnector.SRC_TAG));
 		if(this.src == null) haxe.Log.trace("INFO " + slplayer.prototype.data.RssConnector.SRC_TAG + " attribute not set on html element",{ fileName : "RssConnector.hx", lineNumber : 46, className : "slplayer.prototype.data.RssConnector", methodName : "init"});
 		var me = this;
@@ -2249,7 +2278,7 @@ slplayer.prototype.player.AutoPlayer.__super__ = slplayer.ui.DisplayObject;
 slplayer.prototype.player.AutoPlayer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	timer: null
 	,interval: null
-	,init: function(e) {
+	,init: function() {
 		this.interval = Std.parseInt(this.rootElement.getAttribute("data-" + slplayer.prototype.player.AutoPlayer.AUTOPLAY_INTERVAL_TAG));
 		slplayer.ui.player.PlayerControl.startPlayerControl(this,this.rootElement);
 		this.timer = new haxe.Timer(this.interval);
@@ -2303,21 +2332,21 @@ slplayer.prototype.player.BasicPlayerControl.prototype = $extend(slplayer.ui.Dis
 	,previousButton: null
 	,nextButton: null
 	,lastButton: null
-	,init: function(e) {
+	,init: function() {
 		var me = this;
 		this.buildUI();
 		slplayer.ui.player.PlayerControl.startPlayerControl(this,this.rootElement);
 		var me1 = this;
-		this.firstButton.onclick = function(e1) {
+		this.firstButton.onclick = function(e) {
 			slplayer.ui.player.PlayerControl.first(me1,me.rootElement);
 		};
-		this.previousButton.onclick = function(e1) {
+		this.previousButton.onclick = function(e) {
 			slplayer.ui.player.PlayerControl.previous(me1,me.rootElement);
 		};
-		this.nextButton.onclick = function(e1) {
+		this.nextButton.onclick = function(e) {
 			slplayer.ui.player.PlayerControl.next(me1,me.rootElement);
 		};
-		this.lastButton.onclick = function(e1) {
+		this.lastButton.onclick = function(e) {
 			slplayer.ui.player.PlayerControl.last(me1,me.rootElement);
 		};
 	}
@@ -2384,7 +2413,7 @@ slplayer.prototype.player.ImagePlayer.prototype = $extend(slplayer.ui.DisplayObj
 	currentIndex: null
 	,tpl: null
 	,dataProviders: null
-	,init: function(e) {
+	,init: function() {
 		this.dataProviders = new Hash();
 		this.initUI();
 		this.tpl = new haxe.Template(this.rootElement.innerHTML);
@@ -2453,7 +2482,7 @@ slplayer.prototype.ui.CodeViewer = $hxClasses["slplayer.prototype.ui.CodeViewer"
 slplayer.prototype.ui.CodeViewer.__name__ = ["slplayer","prototype","ui","CodeViewer"];
 slplayer.prototype.ui.CodeViewer.__super__ = slplayer.ui.DisplayObject;
 slplayer.prototype.ui.CodeViewer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
-	init: function(e) {
+	init: function() {
 		var container = js.Lib.document.getElementById(this.rootElement.getAttribute("data-" + slplayer.prototype.ui.CodeViewer.CODE_VIEW_ID_TAG));
 		if(container == null) container = this.rootElement;
 		this.rootElement.innerHTML = StringTools.replace(StringTools.replace(StringTools.htmlEscape(container.innerHTML),"\t","&nbsp;&nbsp;"),"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;","");
@@ -2469,7 +2498,7 @@ slplayer.prototype.ui.TemplateRenderer.__super__ = slplayer.ui.DisplayObject;
 slplayer.prototype.ui.TemplateRenderer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	tpl: null
 	,dataProviders: null
-	,init: function(e) {
+	,init: function() {
 		this.dataProviders = new Hash();
 		this.tpl = new haxe.Template(this.rootElement.innerHTML);
 		this.rootElement.innerHTML = "";
@@ -2705,7 +2734,7 @@ slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
 slplayer.core.SLPlayer._htmlBody = "<div style=\"font-family:Sans-serif;\"><div>TRY <a href=\"#\">JS VERSION</a> or <a href=\"index_as3.html\">AS3 VERSION</a></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a AutoPlayer component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example01\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example01\"><ul class=\"imageplayer autoplayer\" data-autoplay-interval=\"1500\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a ControlBar component and an RssConnector component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example02\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example02\" style=\"width:160px;\"><ul class=\"imageplayer controlbar rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t\t::foreach data::<li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li>::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">TemplateReader component combined with an RssConnector component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example03\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example03\" style=\"height:200px; overflow:hidden;\"><ul class=\"template rssconnector\" data-src-rss=\"http://feeds.bbci.co.uk/news/world/rss.xml\">\t\t\t\t\t::foreach data::<li><a href=\"::link::\">::title:: : ::description::</a></li>::end::</ul></div></div></div>";
 slplayer.data.Common.ON_DATA_EVENT_TYPE = "data";
 slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
-slplayer.ui.DisplayObject.className = "DisplayObject";
+slplayer.ui.DisplayObject.className = "displayobject";
 slplayer.ui.DisplayObject.rootElementNameFilter = Lambda.list([]);
 slplayer.prototype.data.RssConnector.className = "rssconnector";
 slplayer.prototype.data.RssConnector.SRC_TAG = "src-rss";

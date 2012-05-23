@@ -37,7 +37,7 @@ class RssConnector extends DisplayObject, implements IDataProvider
 		return src;
 	}
 	
-	override public function init(e:Event):Void 
+	override public function init():Void 
 	{
 //trace("initialization");
 		src = this.rootElement.getAttribute("data-" + SRC_TAG);

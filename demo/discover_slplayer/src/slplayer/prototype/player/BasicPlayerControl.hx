@@ -24,7 +24,7 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 	
 	var lastButton:HtmlDom;
 
-	override public function init(e:Event):Void
+	override public function init():Void
 	{
 		buildUI();
 		

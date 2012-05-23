@@ -24,12 +24,6 @@ class DisplayObject
 	 */
 	static var rootElementNameFilter : List<String> = Lambda.list([]);
 	
-	
-	/**
-	 * The Template object used to render the template syntax.
-	 */
-	var tpl : Template;
-	
 	/**
 	 * The dom node associated with the instance of this component
 	 */
@@ -44,5 +38,5 @@ class DisplayObject
 	
 	// --- CUSTOMIZABLE API ---
 
-	public dynamic function init(e:Event) : Void { }
+	public dynamic function init() : Void { }
 }
