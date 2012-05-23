@@ -25,7 +25,7 @@ class JsonConfiguration implements IDataProvider
 	var consumers:Array<HtmlDom>;
 
 	public function new(args:Hash<String>) 
-	{
+	{ trace("args = "+args);
 		if (instance!=null)
 		{
 			throw "ERROR: Cannot instanciate more than one JsonConfiguration !";

@@ -33,13 +33,13 @@ class AppBuilder
 	{
 		var fields = haxe.macro.Context.getBuildFields();
 		var pos;
-
+		
 		//First read the HTML file
 		if (!FileSystem.exists(fileName))
 			throw fileName + " not found !";
-
+		
 		var rowHtmlContent = neko.io.File.getContent(fileName);
-
+		
 		//ignore first line if <!DOCTYPE html>
 		//TODO
 		
@@ -69,7 +69,7 @@ class AppBuilder
 									cmpClassName = StringTools.replace( cmpClassName, "/", "." );
 trace("found cmpClassName=" + cmpClassName);
 									
-									var initArgsElts = headElt.attributes();
+									var initArgsElts:Iterable<String> = { iterator : headElt.attributes };
 									
 									for (fc in 0...fields.length)
 									{
@@ -95,7 +95,7 @@ trace("found cmpClassName=" + cmpClassName);
 														//generate import
 														exprs.push(generateImport(cmpClassName));
 														
-														if (initArgsElts.hasNext()) //case the component initialization takes arguments
+														if (Lambda.exists(initArgsElts, function(atName:String) { return StringTools.startsWith( atName , "data-" ); } )) //case the component initialization takes arguments (other than src or type)
 														{
 															//FIXME we may encode cmpClassName+"Args" in MD5 for more security (conflicts)
 															var shortCmpClassName = cmpClassName.split('.').pop();
@@ -103,7 +103,8 @@ trace("found cmpClassName=" + cmpClassName);
 															
 															for (initArgElt in initArgsElts)
 															{
-																exprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
+																if (StringTools.startsWith( initArgElt , "data-" ))
+																	exprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
 															}
 															//generate call to initDisplayObjectsOfType with additionnal arguments
 															exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );

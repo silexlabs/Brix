@@ -2047,33 +2047,18 @@ slplayer.core.SLPlayer.getAssociatedComponents = function(node) {
 }
 slplayer.core.SLPlayer.prototype = {
 	initDisplayObjects: function(e) {
-		var args = new Hash();
-		args.set("toto","titi");
-		args.set("tutu","tyty");
-		this.initDisplayObjectsOfType("slplayer.prototype.config.JsonConfiguration",args);
 		slplayer.prototype.data.RssConnector;
-		var RssConnectorArgs = new Hash();
-		RssConnectorArgs.set("src","slplayer/prototype/data/RssConnector.js");
-		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector",RssConnectorArgs);
+		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector");
 		slplayer.prototype.player.ImagePlayer;
-		var ImagePlayerArgs = new Hash();
-		ImagePlayerArgs.set("src","slplayer/prototype/player/ImagePlayer.js");
-		this.initDisplayObjectsOfType("slplayer.prototype.player.ImagePlayer",ImagePlayerArgs);
+		this.initDisplayObjectsOfType("slplayer.prototype.player.ImagePlayer");
 		slplayer.prototype.ui.TemplateRenderer;
-		var TemplateRendererArgs = new Hash();
-		TemplateRendererArgs.set("src","slplayer/prototype/ui/TemplateRenderer.js");
-		this.initDisplayObjectsOfType("slplayer.prototype.ui.TemplateRenderer",TemplateRendererArgs);
+		this.initDisplayObjectsOfType("slplayer.prototype.ui.TemplateRenderer");
 		slplayer.prototype.player.BasicPlayerControl;
-		var BasicPlayerControlArgs = new Hash();
-		BasicPlayerControlArgs.set("src","slplayer/prototype/player/BasicPlayerControl.js");
-		this.initDisplayObjectsOfType("slplayer.prototype.player.BasicPlayerControl",BasicPlayerControlArgs);
+		this.initDisplayObjectsOfType("slplayer.prototype.player.BasicPlayerControl");
 		slplayer.prototype.player.AutoPlayer;
-		var AutoPlayerArgs = new Hash();
-		AutoPlayerArgs.set("src","slplayer/prototype/player/AutoPlayer.js");
-		this.initDisplayObjectsOfType("slplayer.prototype.player.AutoPlayer",AutoPlayerArgs);
+		this.initDisplayObjectsOfType("slplayer.prototype.player.AutoPlayer");
 		slplayer.prototype.config.JsonConfiguration;
 		var JsonConfigurationArgs = new Hash();
-		JsonConfigurationArgs.set("src","slplayer/prototype/config/JsonConfiguration.js");
 		JsonConfigurationArgs.set("data-json-src","conf.json");
 		this.initDisplayObjectsOfType("slplayer.prototype.config.JsonConfiguration",JsonConfigurationArgs);
 	}
@@ -2158,6 +2143,7 @@ slplayer.data.IDataProvider.prototype = {
 if(!slplayer.prototype) slplayer.prototype = {}
 if(!slplayer.prototype.config) slplayer.prototype.config = {}
 slplayer.prototype.config.JsonConfiguration = $hxClasses["slplayer.prototype.config.JsonConfiguration"] = function(args) {
+	haxe.Log.trace("args = " + args,{ fileName : "JsonConfiguration.hx", lineNumber : 28, className : "slplayer.prototype.config.JsonConfiguration", methodName : "new"});
 	if(slplayer.prototype.config.JsonConfiguration.instance != null) throw "ERROR: Cannot instanciate more than one JsonConfiguration !";
 	this.src = args.get("data-" + slplayer.prototype.config.JsonConfiguration.TAG_SRC);
 	if(this.src == null) throw "ERROR: tag data-" + slplayer.prototype.config.JsonConfiguration.TAG_SRC + " not set on JsonConfiguration component !";

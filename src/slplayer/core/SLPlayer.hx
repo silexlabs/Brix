@@ -38,7 +38,7 @@ import slplayer.ui.DisplayObject;
 	 * This function is filled in by the macro.
 	 * @param	e
 	 */
-	private function initDisplayObjects(e : Event) { var args:Hash<String> = new Hash(); args.set("toto", "titi"); args.set("tutu", "tyty"); initDisplayObjectsOfType("slplayer.prototype.config.JsonConfiguration", args); }
+	private function initDisplayObjects(e : Event) { }
 	
 	/**
 	 * TODO determine if it wouldn't be better to pass directly the Class. We would however loose the benefit of resolving it. but we could try catch the exceptions...

@@ -22,6 +22,8 @@ TODOS
 
 - document everything (!!!)
 
+- parse the metadata and extract the viewport (!!!)
+
 - a la complation, vérifier que les children attendus sont présents (les boutons de la galerie par exemple)
 - with the use of macro, force having a static override var className when extending DisplayObject ?
 
