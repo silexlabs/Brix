@@ -4,13 +4,15 @@ TODOS
   * form set: inputs, buttons, checkboxes...
   * skinning system & examples
   
-  * templateRenderer	[WIP]	(!!!)
-- manage both syntaxes for components (with body and without)   (!!!)
+  * templateRenderer with reverse template syntax		(!!!)
+- manage both syntaxes for components (with body and without)   (!!!) *** create Templatable contract ?
 
 - MAKE A STATIC/SINGLETON CONFIGURATION COMPONENT   (!!!)
 - manage when no classname in the component (!!!)
 
-- produce documentation (!!!)
+- produce documentation (!!!) ***
+
+- get rid of the classnames static var ?
 
 - don't put the gallery.html file in SLPlayer.hx (reference it at least as a compiler argument (!!!)
 
@@ -22,7 +24,7 @@ TODOS
 
 - document everything (!!!)
 
-- parse the metadata and extract the viewport (!!!)
+- parse the metadata and extract the viewport (!!!) ***
 
 - add a way to ignore some <script> headers (for non components libraries) : fe with a data-ignore tag (!!!)
 

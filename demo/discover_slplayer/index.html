@@ -47,11 +47,44 @@
 		</div>
 		
 		<div style="margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;">
-			<div style="margin-bottom:10px;">TemplateReader component combined with an RssConnector component.</div>
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a ControlBar component. We've redefined the ControlBar buttons here.</div>
 			<div>Code:</div>
 			<pre class="codeviewer" data-code-viewer-id="example03" style='font-family:"Courier New"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;'></pre>
 			<div>Output:</div>
-			<div id="example03" style="height:200px; overflow:hidden;">
+			<div id="example03">
+				<div class="imageplayer controlbar" data-autoplay-interval="1500">
+					<div style="width:155px">
+						<div style="display:inline-block; height:50px; width:50px; margin-right:50px;">
+							<img style="width:100%; height:100%;" src="assets/first.jpg" data-controlbar-first="true" />
+						</div>
+						<div style="display:inline-block; height:50px; width:50px;">
+							<img style="width:100%; height:100%;" src="assets/last.jpg" data-controlbar-last="true" />
+						</div>
+					</div>
+					<ul data-body="imageplayer">
+						<li><img src="assets/4.jpg" /></li>
+						<li><img src="assets/1.png" /></li>
+						<li><img src="assets/2.png" /></li>
+						<li><img src="assets/3.png" /></li>
+					</ul>
+					<div style="width:155px">
+						<div style="display:inline-block; height:50px; width:50px; margin-right:50px;">
+							<img style="width:100%; height:100%;" src="assets/previous.jpg" data-controlbar-previous="true" />
+						</div>
+						<div style="display:inline-block; height:50px; width:50px;">
+							<img style="width:100%; height:100%;" src="assets/next.jpg" data-controlbar-next="true" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div style="margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;">
+			<div style="margin-bottom:10px;">TemplateReader component combined with an RssConnector component.</div>
+			<div>Code:</div>
+			<pre class="codeviewer" data-code-viewer-id="example04" style='font-family:"Courier New"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example04" style="height:200px; overflow:hidden;">
 				<ul class="template rssconnector" data-src-rss="http://feeds.bbci.co.uk/news/world/rss.xml">
 					::foreach data::<li><a href="::link::">::title:: : ::description::</a></li>::end::
 				</ul>

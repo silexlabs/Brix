@@ -2029,7 +2029,7 @@ slplayer.core.SLPlayer.main = function() {
 	})(mySLPlayerApp.initDisplayObjects.$bind(mySLPlayerApp));
 }
 slplayer.core.SLPlayer.addAssociatedComponent = function(node,cmp) {
-	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 146, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
+	haxe.Log.trace("addAssociatedComponent(" + node + ", " + cmp + ")",{ fileName : "SLPlayer.hx", lineNumber : 99, className : "slplayer.core.SLPlayer", methodName : "addAssociatedComponent"});
 	var nodeId = node.getAttribute("data-" + slplayer.core.SLPlayer.SLPID_ATTR_NAME);
 	var associatedCmps;
 	if(nodeId != null) associatedCmps = slplayer.core.SLPlayer.nodeToCmpInstances.get(nodeId); else {
@@ -2065,58 +2065,27 @@ slplayer.core.SLPlayer.prototype = {
 		var displayObjectClass = Type.resolveClass(displayObjectClassName);
 		if(displayObjectClass != null) {
 			var tagClassName = Reflect.field(displayObjectClass,"className");
-			var tagFilter = Reflect.field(displayObjectClass,"rootElementNameFilter");
-			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 62, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+			haxe.Log.trace(displayObjectClassName + " class resolved and its tag classname is " + tagClassName,{ fileName : "SLPlayer.hx", lineNumber : 61, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 			if(tagClassName != null) {
 				var taggedNodes = js.Lib.document.getElementsByClassName(tagClassName);
-				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 67, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+				haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "SLPlayer.hx", lineNumber : 66, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 				var _g1 = 0, _g = taggedNodes.length;
 				while(_g1 < _g) {
 					var nodeCnt = _g1++;
-					if(this.checkFilterOnElt(taggedNodes[nodeCnt],tagFilter)) {
-						var newDisplayObject;
-						try {
-							if(args != null) newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt],args]); else newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
-							newDisplayObject.init();
-						} catch( unknown ) {
-							haxe.Log.trace(Std.string(unknown),{ fileName : "SLPlayer.hx", lineNumber : 83, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
-						}
-					} else haxe.Log.trace("ERROR: cannot instanciate " + displayObjectClassName + " on a " + taggedNodes[nodeCnt].nodeName + " tag.",{ fileName : "SLPlayer.hx", lineNumber : 87, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+					var newDisplayObject;
+					try {
+						if(args != null) newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt],args]); else newDisplayObject = Type.createInstance(displayObjectClass,[taggedNodes[nodeCnt]]);
+						newDisplayObject.init();
+					} catch( unknown ) {
+						haxe.Log.trace(Std.string(unknown),{ fileName : "SLPlayer.hx", lineNumber : 80, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+					}
 				}
 			} else try {
 				if(args != null) Type.createInstance(displayObjectClass,[args]); else Type.createInstance(displayObjectClass,[]);
 			} catch( unknown ) {
-				haxe.Log.trace(Std.string(unknown),{ fileName : "SLPlayer.hx", lineNumber : 100, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
+				haxe.Log.trace(Std.string(unknown),{ fileName : "SLPlayer.hx", lineNumber : 92, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
 			}
 		}
-	}
-	,checkFilterOnElt: function(elt,tagFilter) {
-		if(tagFilter == null || tagFilter.isEmpty()) return true;
-		if(Lambda.exists(tagFilter,function(s) {
-			return elt.nodeName.toLowerCase() == s.toLowerCase();
-		})) return true;
-		if(elt.nodeName.toLowerCase() == "div") return Lambda.exists(tagFilter,function(s) {
-			var childs = elt.childNodes;
-			var _g1 = 0, _g = childs.length;
-			while(_g1 < _g) {
-				var chCnt = [_g1++];
-				var classAtt = childs[chCnt[0]].getAttribute("class");
-				if(classAtt == null) continue;
-				if(Lambda.exists(classAtt.split(" "),(function() {
-					return function(s1) {
-						return s1 == "body";
-					};
-				})())) {
-					if(Lambda.exists(tagFilter,(function(chCnt) {
-						return function(s1) {
-							return childs[chCnt[0]].nodeName.toLowerCase() == s1.toLowerCase();
-						};
-					})(chCnt))) return true;
-				}
-			}
-			return false;
-		});
-		return false;
 	}
 	,__class__: slplayer.core.SLPlayer
 }
@@ -2170,11 +2139,40 @@ slplayer.data.IDataProvider.prototype = {
 if(!slplayer.ui) slplayer.ui = {}
 slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
 	this.rootElement = rootElement;
+	this.bodyElement = this.determineBodyElement(rootElement);
+	if(!this.checkFilterOnElt(this.bodyElement)) throw "ERROR: cannot instantiate " + Reflect.field(Type.getClass(this),"className") + " on a " + this.bodyElement.nodeName + " element.";
 	slplayer.core.SLPlayer.addAssociatedComponent(rootElement,this);
 };
 slplayer.ui.DisplayObject.__name__ = ["slplayer","ui","DisplayObject"];
 slplayer.ui.DisplayObject.prototype = {
 	rootElement: null
+	,bodyElement: null
+	,determineBodyElement: function(rootElement) {
+		var me = this;
+		var childElts = rootElement.childNodes;
+		var _g1 = 0, _g = childElts.length;
+		while(_g1 < _g) {
+			var cnt = _g1++;
+			if(childElts[cnt].nodeType != js.Lib.document.body.nodeType) continue;
+			if(childElts[cnt].getAttribute("data-" + slplayer.ui.DisplayObject.BODY_TAG) != null) {
+				if(Lambda.exists(childElts[cnt].getAttribute("data-" + slplayer.ui.DisplayObject.BODY_TAG).split(" "),function(s) {
+					return s == Reflect.field(Type.getClass(me),"className");
+				})) {
+					if(this.checkFilterOnElt(childElts[cnt])) return childElts[cnt];
+				}
+			}
+		}
+		return rootElement;
+	}
+	,checkFilterOnElt: function(elt) {
+		if(elt.nodeType != js.Lib.document.body.nodeType) return false;
+		var tagFilter = Reflect.field(Type.getClass(this),"bodyElementNameFilter");
+		if(tagFilter == null || tagFilter.isEmpty()) return true;
+		if(Lambda.exists(tagFilter,function(s) {
+			return elt.nodeName.toLowerCase() == s.toLowerCase();
+		})) return true;
+		return false;
+	}
 	,init: function() {
 	}
 	,__class__: slplayer.ui.DisplayObject
@@ -2334,21 +2332,40 @@ slplayer.prototype.player.BasicPlayerControl.prototype = $extend(slplayer.ui.Dis
 	,lastButton: null
 	,init: function() {
 		var me = this;
-		this.buildUI();
+		this.firstButton = { eltAttrId : slplayer.prototype.player.BasicPlayerControl.FIRST_BUTTON_TAG, elt : null};
+		this.previousButton = { eltAttrId : slplayer.prototype.player.BasicPlayerControl.PREVIOUS_BUTTON_TAG, elt : null};
+		this.nextButton = { eltAttrId : slplayer.prototype.player.BasicPlayerControl.NEXT_BUTTON_TAG, elt : null};
+		this.lastButton = { eltAttrId : slplayer.prototype.player.BasicPlayerControl.LAST_BUTTON_TAG, elt : null};
+		if(!this.discoverUIElts()) this.buildUI();
+		haxe.Log.trace("firstButton=" + this.firstButton + "  previousButton=" + this.previousButton + "  nextButton=" + this.nextButton + "  lastButton=" + this.lastButton,{ fileName : "BasicPlayerControl.hx", lineNumber : 41, className : "slplayer.prototype.player.BasicPlayerControl", methodName : "init"});
 		slplayer.ui.player.PlayerControl.startPlayerControl(this,this.rootElement);
 		var me1 = this;
-		this.firstButton.onclick = function(e) {
+		if(this.firstButton.elt != null) this.firstButton.elt.onclick = function(e) {
 			slplayer.ui.player.PlayerControl.first(me1,me.rootElement);
 		};
-		this.previousButton.onclick = function(e) {
+		if(this.previousButton.elt != null) this.previousButton.elt.onclick = function(e) {
 			slplayer.ui.player.PlayerControl.previous(me1,me.rootElement);
 		};
-		this.nextButton.onclick = function(e) {
+		if(this.nextButton.elt != null) this.nextButton.elt.onclick = function(e) {
 			slplayer.ui.player.PlayerControl.next(me1,me.rootElement);
 		};
-		this.lastButton.onclick = function(e) {
+		if(this.lastButton.elt != null) this.lastButton.elt.onclick = function(e) {
 			slplayer.ui.player.PlayerControl.last(me1,me.rootElement);
 		};
+	}
+	,discoverUIElts: function() {
+		var discoverySucceed = false;
+		var _g = 0, _g1 = [this.firstButton,this.previousButton,this.nextButton,this.lastButton];
+		while(_g < _g1.length) {
+			var searchedPair = _g1[_g];
+			++_g;
+			var results = slplayer.prototype.util.DomTools.getElementsByAttribute(this.bodyElement,"data-" + searchedPair.eltAttrId,"*");
+			if(results.length > 0) {
+				searchedPair.elt = results[0];
+				discoverySucceed = true;
+			}
+		}
+		return discoverySucceed;
 	}
 	,buildUI: function() {
 		var divFirst = js.Lib.document.createElement("div");
@@ -2358,38 +2375,36 @@ slplayer.prototype.player.BasicPlayerControl.prototype = $extend(slplayer.ui.Dis
 		divFirst.style.display = divPrev.style.display = divNext.style.display = divLast.style.display = "inline-block";
 		divFirst.style.width = divPrev.style.width = divNext.style.width = divLast.style.width = "40px";
 		divFirst.style.height = divPrev.style.height = divNext.style.height = divLast.style.height = "30px";
-		this.firstButton = js.Lib.document.createElement("img");
-		this.firstButton.setAttribute("src","assets/first.png");
-		divFirst.appendChild(this.firstButton);
-		this.previousButton = js.Lib.document.createElement("img");
-		this.previousButton.setAttribute("src","assets/prev.png");
-		divPrev.appendChild(this.previousButton);
-		this.nextButton = js.Lib.document.createElement("img");
-		this.nextButton.setAttribute("src","assets/next.png");
-		divNext.appendChild(this.nextButton);
-		this.lastButton = js.Lib.document.createElement("img");
-		this.lastButton.setAttribute("src","assets/last.png");
-		divLast.appendChild(this.lastButton);
+		this.firstButton.elt = js.Lib.document.createElement("img");
+		this.firstButton.elt.setAttribute("src","assets/first.png");
+		divFirst.appendChild(this.firstButton.elt);
+		this.previousButton.elt = js.Lib.document.createElement("img");
+		this.previousButton.elt.setAttribute("src","assets/prev.png");
+		divPrev.appendChild(this.previousButton.elt);
+		this.nextButton.elt = js.Lib.document.createElement("img");
+		this.nextButton.elt.setAttribute("src","assets/next.png");
+		divNext.appendChild(this.nextButton.elt);
+		this.lastButton.elt = js.Lib.document.createElement("img");
+		this.lastButton.elt.setAttribute("src","assets/last.png");
+		divLast.appendChild(this.lastButton.elt);
 		var buttonContainer = js.Lib.document.createElement("div");
 		buttonContainer.style.width = "160px";
 		buttonContainer.appendChild(divFirst);
 		buttonContainer.appendChild(divPrev);
 		buttonContainer.appendChild(divNext);
 		buttonContainer.appendChild(divLast);
-		var parent = this.rootElement.parentNode;
-		parent.style.textAlign = "center";
-		this.rootElement.parentNode.appendChild(buttonContainer);
+		this.bodyElement.parentNode.appendChild(buttonContainer);
 	}
 	,onPlayableFirst: function() {
-		this.firstButton.style.display = "none";
-		this.previousButton.style.display = "none";
+		this.firstButton.elt.style.display = "none";
+		this.previousButton.elt.style.display = "none";
 	}
 	,onPlayableLast: function() {
-		this.nextButton.style.display = "none";
-		this.lastButton.style.display = "none";
+		this.nextButton.elt.style.display = "none";
+		this.lastButton.elt.style.display = "none";
 	}
 	,onPlayableChange: function() {
-		this.firstButton.style.display = this.previousButton.style.display = this.nextButton.style.display = this.lastButton.style.display = "block";
+		this.firstButton.elt.style.display = this.previousButton.elt.style.display = this.nextButton.elt.style.display = this.lastButton.elt.style.display = "block";
 	}
 	,__class__: slplayer.prototype.player.BasicPlayerControl
 });
@@ -2416,15 +2431,15 @@ slplayer.prototype.player.ImagePlayer.prototype = $extend(slplayer.ui.DisplayObj
 	,init: function() {
 		this.dataProviders = new Hash();
 		this.initUI();
-		this.tpl = new haxe.Template(this.rootElement.innerHTML);
-		this.rootElement.innerHTML = "";
+		this.tpl = new haxe.Template(this.bodyElement.innerHTML);
+		this.bodyElement.innerHTML = "";
 		this.currentIndex = 0;
 		this.updateView();
 		slplayer.data.DataConsumer.startConsuming(this,this.rootElement);
 		slplayer.ui.player.Playable.startPlayable(this,this.rootElement);
 	}
 	,initUI: function() {
-		this.rootElement.style.paddingLeft = "0";
+		this.bodyElement.style.paddingLeft = "0";
 	}
 	,updateView: function() {
 		var providersData = new Array();
@@ -2433,10 +2448,10 @@ slplayer.prototype.player.ImagePlayer.prototype = $extend(slplayer.ui.DisplayObj
 			var pvdData = $it0.next();
 			providersData = providersData.concat(pvdData);
 		}
-		this.rootElement.innerHTML = this.tpl.execute({ data : providersData});
+		this.bodyElement.innerHTML = this.tpl.execute({ data : providersData});
 		slplayer.ui.player.Playable.dispatchOnChange(this,this.rootElement);
 		this.dispatchIndex();
-		var liChilds = this.rootElement.getElementsByTagName("li");
+		var liChilds = this.bodyElement.getElementsByTagName("li");
 		var _g1 = 0, _g = liChilds.length;
 		while(_g1 < _g) {
 			var liCnt = _g1++;
@@ -2445,11 +2460,11 @@ slplayer.prototype.player.ImagePlayer.prototype = $extend(slplayer.ui.DisplayObj
 		liChilds[this.currentIndex].style.display = "block";
 	}
 	,dispatchIndex: function() {
-		var liChilds = this.rootElement.getElementsByTagName("li");
+		var liChilds = this.bodyElement.getElementsByTagName("li");
 		if(this.currentIndex <= 0) slplayer.ui.player.Playable.dispatchOnFirst(this,this.rootElement); else if(this.currentIndex >= liChilds.length - 1) slplayer.ui.player.Playable.dispatchOnLast(this,this.rootElement);
 	}
 	,next: function() {
-		if(this.currentIndex < this.rootElement.getElementsByTagName("li").length - 1) this.currentIndex++;
+		if(this.currentIndex < this.bodyElement.getElementsByTagName("li").length - 1) this.currentIndex++;
 		this.updateView();
 	}
 	,previous: function() {
@@ -2461,7 +2476,7 @@ slplayer.prototype.player.ImagePlayer.prototype = $extend(slplayer.ui.DisplayObj
 		this.updateView();
 	}
 	,last: function() {
-		this.currentIndex = this.rootElement.getElementsByTagName("li").length - 1;
+		this.currentIndex = this.bodyElement.getElementsByTagName("li").length - 1;
 		this.updateView();
 	}
 	,onNewPlayerControl: function() {
@@ -2522,6 +2537,22 @@ slplayer.prototype.ui.TemplateRenderer.prototype = $extend(slplayer.ui.DisplayOb
 	}
 	,__class__: slplayer.prototype.ui.TemplateRenderer
 });
+if(!slplayer.prototype.util) slplayer.prototype.util = {}
+slplayer.prototype.util.DomTools = $hxClasses["slplayer.prototype.util.DomTools"] = function() { }
+slplayer.prototype.util.DomTools.__name__ = ["slplayer","prototype","util","DomTools"];
+slplayer.prototype.util.DomTools.getElementsByAttribute = function(elt,attr,value) {
+	var childElts = elt.getElementsByTagName("*");
+	var filteredChildElts = new Array();
+	var _g1 = 0, _g = childElts.length;
+	while(_g1 < _g) {
+		var cCount = _g1++;
+		if(childElts[cCount].getAttribute(attr) != null && (value == "*" || childElts[cCount].getAttribute(attr) == value)) filteredChildElts.push(childElts[cCount]);
+	}
+	return filteredChildElts;
+}
+slplayer.prototype.util.DomTools.prototype = {
+	__class__: slplayer.prototype.util.DomTools
+}
 slplayer.ui.player.Playable = $hxClasses["slplayer.ui.player.Playable"] = function() { }
 slplayer.ui.player.Playable.__name__ = ["slplayer","ui","player","Playable"];
 slplayer.ui.player.Playable.startPlayable = function(playable,target) {
@@ -2575,7 +2606,7 @@ slplayer.ui.player.PlayerControl.startPlayerControl = function(playerControl,tar
 		playerControl.onPlayableChange();
 	},false);
 	var newPlayerControlEvent = js.Lib.document.createEvent("CustomEvent");
-	newPlayerControlEvent.initEvent(slplayer.ui.player.PlayerControl.NEW_PLAYER_CONTROL,false,false,playerControl);
+	newPlayerControlEvent.initCustomEvent(slplayer.ui.player.PlayerControl.NEW_PLAYER_CONTROL,false,false,playerControl);
 	target.dispatchEvent(newPlayerControlEvent);
 }
 slplayer.ui.player.PlayerControl.next = function(playerControl,target) {
@@ -2731,18 +2762,23 @@ haxe.Template.globals = { };
 js.Lib.onerror = null;
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<div style=\"font-family:Sans-serif;\"><div>TRY <a href=\"#\">JS VERSION</a> or <a href=\"index_as3.html\">AS3 VERSION</a></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a AutoPlayer component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example01\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example01\"><ul class=\"imageplayer autoplayer\" data-autoplay-interval=\"1500\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a ControlBar component and an RssConnector component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example02\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example02\" style=\"width:160px;\"><ul class=\"imageplayer controlbar rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t\t::foreach data::<li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li>::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">TemplateReader component combined with an RssConnector component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example03\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example03\" style=\"height:200px; overflow:hidden;\"><ul class=\"template rssconnector\" data-src-rss=\"http://feeds.bbci.co.uk/news/world/rss.xml\">\t\t\t\t\t::foreach data::<li><a href=\"::link::\">::title:: : ::description::</a></li>::end::</ul></div></div></div>";
+slplayer.core.SLPlayer._htmlBody = "<div style=\"font-family:Sans-serif;\"><div>TRY <a href=\"#\">JS VERSION</a> or <a href=\"index_as3.html\">AS3 VERSION</a></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a AutoPlayer component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example01\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example01\"><ul class=\"imageplayer autoplayer\" data-autoplay-interval=\"1500\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a ControlBar component and an RssConnector component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example02\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example02\" style=\"width:160px;\"><ul class=\"imageplayer controlbar rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t\t::foreach data::<li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li>::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a ControlBar component. We've redefined the ControlBar buttons here.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example03\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example03\"><div class=\"imageplayer controlbar\" data-autoplay-interval=\"1500\"><div style=\"width:155px\"><div style=\"display:inline-block; height:50px; width:50px; margin-right:50px;\"><img src=\"assets/first.jpg\" style=\"width:100%; height:100%;\" data-controlbar-first=\"true\"/></div><div style=\"display:inline-block; height:50px; width:50px;\"><img data-controlbar-last=\"true\" src=\"assets/last.jpg\" style=\"width:100%; height:100%;\"/></div></div><ul data-body=\"imageplayer\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul><div style=\"width:155px\"><div style=\"display:inline-block; height:50px; width:50px; margin-right:50px;\"><img src=\"assets/previous.jpg\" style=\"width:100%; height:100%;\" data-controlbar-previous=\"true\"/></div><div style=\"display:inline-block; height:50px; width:50px;\"><img data-controlbar-next=\"true\" src=\"assets/next.jpg\" style=\"width:100%; height:100%;\"/></div></div></div></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">TemplateReader component combined with an RssConnector component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example04\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example04\" style=\"height:200px; overflow:hidden;\"><ul class=\"template rssconnector\" data-src-rss=\"http://feeds.bbci.co.uk/news/world/rss.xml\">\t\t\t\t\t::foreach data::<li><a href=\"::link::\">::title:: : ::description::</a></li>::end::</ul></div></div></div>";
 slplayer.data.Common.ON_DATA_EVENT_TYPE = "data";
 slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
 slplayer.ui.DisplayObject.className = "displayobject";
-slplayer.ui.DisplayObject.rootElementNameFilter = Lambda.list([]);
+slplayer.ui.DisplayObject.bodyElementNameFilter = Lambda.list([]);
+slplayer.ui.DisplayObject.BODY_TAG = "body";
 slplayer.prototype.data.RssConnector.className = "rssconnector";
 slplayer.prototype.data.RssConnector.SRC_TAG = "src-rss";
 slplayer.prototype.player.AutoPlayer.className = "autoplayer";
 slplayer.prototype.player.AutoPlayer.AUTOPLAY_INTERVAL_TAG = "autoplay-interval";
 slplayer.prototype.player.BasicPlayerControl.className = "controlbar";
+slplayer.prototype.player.BasicPlayerControl.FIRST_BUTTON_TAG = "controlbar-first";
+slplayer.prototype.player.BasicPlayerControl.PREVIOUS_BUTTON_TAG = "controlbar-previous";
+slplayer.prototype.player.BasicPlayerControl.NEXT_BUTTON_TAG = "controlbar-next";
+slplayer.prototype.player.BasicPlayerControl.LAST_BUTTON_TAG = "controlbar-last";
 slplayer.prototype.player.ImagePlayer.className = "imageplayer";
-slplayer.prototype.player.ImagePlayer.rootElementNameFilter = Lambda.list(["ul"]);
+slplayer.prototype.player.ImagePlayer.bodyElementNameFilter = Lambda.list(["ul"]);
 slplayer.prototype.ui.CodeViewer.className = "codeviewer";
 slplayer.prototype.ui.CodeViewer.rootElementNameFilter = Lambda.list(["pre"]);
 slplayer.prototype.ui.CodeViewer.CODE_VIEW_ID_TAG = "code-viewer-id";

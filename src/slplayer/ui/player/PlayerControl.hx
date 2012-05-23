@@ -40,7 +40,7 @@ class PlayerControl
 		
 		var newPlayerControlEvent = untyped Lib.document.createEvent("CustomEvent");
 		
-		untyped newPlayerControlEvent.initEvent(NEW_PLAYER_CONTROL, false, false, playerControl);
+		untyped newPlayerControlEvent.initCustomEvent(NEW_PLAYER_CONTROL, false, false, playerControl);
 		
 		untyped target.dispatchEvent(newPlayerControlEvent);
 	}

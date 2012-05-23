@@ -26,7 +26,6 @@ class DomTools
 			if ( childElts[cCount].getAttribute(attr)!=null && ( value == "*" || childElts[cCount].getAttribute(attr) == value) )
                 filteredChildElts.push(childElts[cCount]);
 		}
-		
 		return filteredChildElts;
 	}
 	

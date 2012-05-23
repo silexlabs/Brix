@@ -57,7 +57,6 @@ trace("initDisplayObjectsOfType called with displayObjectClassName="+displayObje
 		if (displayObjectClass != null) // case DisplayObject component
 		{
 			var tagClassName = Reflect.field(displayObjectClass, "className");
-			var tagFilter:List<String> = Reflect.field(displayObjectClass, "rootElementNameFilter");
 			
 trace(displayObjectClassName+" class resolved and its tag classname is "+tagClassName);
 			
@@ -67,25 +66,18 @@ trace(displayObjectClassName+" class resolved and its tag classname is "+tagClas
 trace("taggedNodes = "+taggedNodes.length);
 				for (nodeCnt in 0...taggedNodes.length)
 				{
-					if ( checkFilterOnElt(taggedNodes[nodeCnt] , tagFilter) )
+					var newDisplayObject;
+					
+					try
 					{
-						var newDisplayObject;
-						
-						try
-						{
-							if (args != null)
-								newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt], args] );
-							else
-								newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] );
-						
-							newDisplayObject.init();
-						}
-						catch(unknown : Dynamic ) { trace(Std.string(unknown));}
+						if (args != null)
+							newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt], args] );
+						else
+							newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] );
+					
+						newDisplayObject.init();
 					}
-					else
-					{
-						trace("ERROR: cannot instanciate "+displayObjectClassName+" on a "+taggedNodes[nodeCnt].nodeName+" tag.");
-					}
+					catch(unknown : Dynamic ) { trace(Std.string(unknown));}
 				}
 			}
 			else //case of non-visual component: we just try to create an instance, no call on init()
@@ -100,45 +92,6 @@ trace("taggedNodes = "+taggedNodes.length);
 				catch(unknown : Dynamic ) { trace(Std.string(unknown));}
 			}
 		}
-	}
-	
-	/**
-	 * Checks if a given element is allowed against the filters of a component
-	 * @param	elt
-	 * @param	tagFilter
-	 * @return
-	 */
-	function checkFilterOnElt( elt:HtmlDom , tagFilter:List<String>) : Bool
-	{
-		if ( tagFilter == null || tagFilter.isEmpty() )
-			return true;
-		
-		if ( Lambda.exists( tagFilter , function(s:String) { return elt.nodeName.toLowerCase() == s.toLowerCase(); } ) )
-			return true;
-		
-		if ( elt.nodeName.toLowerCase() == "div" )
-		{
-			// here we determine if one of the direct childs has a class="body" on the expected tag name
-			return Lambda.exists( tagFilter , 
-				function(s:String)
-				{
-					var childs = elt.childNodes;
-					for ( chCnt in 0...childs.length ) 
-					{ 
-						var classAtt = childs[chCnt].getAttribute("class"); 
-						
-						if (classAtt == null) 
-							continue;
-						
-						if ( Lambda.exists(classAtt.split(" ") , function(s:String) { return s == "body"; } ) )
-							if ( Lambda.exists( tagFilter , function(s:String) { return childs[chCnt].nodeName.toLowerCase() == s.toLowerCase(); } ) )
-								return true;
-					}
-					return false; 
-				} );
-		}
-		
-		return false;
 	}
 	
 	public static function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void

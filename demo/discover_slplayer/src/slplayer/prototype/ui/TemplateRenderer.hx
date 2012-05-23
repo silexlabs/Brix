@@ -23,9 +23,10 @@ class TemplateRenderer extends DisplayObject, implements IDataConsumer
 	 */
 	static var className = "template";
 	
-	
+	/**
+	 * The Template object used to render the template syntax.
+	 */
 	var tpl : Template;
-	
 	/**
 	 * This variable may contain data from different sources and/or DataProviders.
 	 */
@@ -48,7 +49,7 @@ class TemplateRenderer extends DisplayObject, implements IDataConsumer
 	 */
 	function updateView():Void
 	{		
-		//consolidate providers data
+		//consolidate data from providers
 		var providersData : Array<Dynamic> = new Array();
 		for (pvdData in dataProviders)
 		{
