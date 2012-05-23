@@ -2047,6 +2047,8 @@ slplayer.core.SLPlayer.getAssociatedComponents = function(node) {
 }
 slplayer.core.SLPlayer.prototype = {
 	initDisplayObjects: function(e) {
+		slplayer.prototype.ui.CodeViewer;
+		this.initDisplayObjectsOfType("slplayer.prototype.ui.CodeViewer");
 		slplayer.prototype.data.RssConnector;
 		this.initDisplayObjectsOfType("slplayer.prototype.data.RssConnector");
 		slplayer.prototype.player.ImagePlayer;
@@ -2057,10 +2059,6 @@ slplayer.core.SLPlayer.prototype = {
 		this.initDisplayObjectsOfType("slplayer.prototype.player.BasicPlayerControl");
 		slplayer.prototype.player.AutoPlayer;
 		this.initDisplayObjectsOfType("slplayer.prototype.player.AutoPlayer");
-		slplayer.prototype.config.JsonConfiguration;
-		var JsonConfigurationArgs = new Hash();
-		JsonConfigurationArgs.set("data-json-src","conf.json");
-		this.initDisplayObjectsOfType("slplayer.prototype.config.JsonConfiguration",JsonConfigurationArgs);
 	}
 	,initDisplayObjectsOfType: function(displayObjectClassName,args) {
 		haxe.Log.trace("initDisplayObjectsOfType called with displayObjectClassName=" + displayObjectClassName,{ fileName : "SLPlayer.hx", lineNumber : 50, className : "slplayer.core.SLPlayer", methodName : "initDisplayObjectsOfType"});
@@ -2140,31 +2138,6 @@ slplayer.data.IDataProvider.prototype = {
 	getData: null
 	,__class__: slplayer.data.IDataProvider
 }
-if(!slplayer.prototype) slplayer.prototype = {}
-if(!slplayer.prototype.config) slplayer.prototype.config = {}
-slplayer.prototype.config.JsonConfiguration = $hxClasses["slplayer.prototype.config.JsonConfiguration"] = function(args) {
-	haxe.Log.trace("args = " + args,{ fileName : "JsonConfiguration.hx", lineNumber : 28, className : "slplayer.prototype.config.JsonConfiguration", methodName : "new"});
-	if(slplayer.prototype.config.JsonConfiguration.instance != null) throw "ERROR: Cannot instanciate more than one JsonConfiguration !";
-	this.src = args.get("data-" + slplayer.prototype.config.JsonConfiguration.TAG_SRC);
-	if(this.src == null) throw "ERROR: tag data-" + slplayer.prototype.config.JsonConfiguration.TAG_SRC + " not set on JsonConfiguration component !";
-	this.consumers = slplayer.prototype.util.DomTools.getElementsByAttribute(js.Lib.document,"data-" + slplayer.prototype.config.JsonConfiguration.TAG_LISTENERS,"*");
-	var _g1 = 0, _g = this.consumers.length;
-	while(_g1 < _g) {
-		var consCnt = _g1++;
-		slplayer.data.DataProvider.startProviding(this,this.consumers[consCnt]);
-	}
-	slplayer.prototype.config.JsonConfiguration.instance = this;
-};
-slplayer.prototype.config.JsonConfiguration.__name__ = ["slplayer","prototype","config","JsonConfiguration"];
-slplayer.prototype.config.JsonConfiguration.__interfaces__ = [slplayer.data.IDataProvider];
-slplayer.prototype.config.JsonConfiguration.instance = null;
-slplayer.prototype.config.JsonConfiguration.prototype = {
-	src: null
-	,consumers: null
-	,getData: function() {
-	}
-	,__class__: slplayer.prototype.config.JsonConfiguration
-}
 if(!slplayer.ui) slplayer.ui = {}
 slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
 	this.rootElement = rootElement;
@@ -2177,6 +2150,7 @@ slplayer.ui.DisplayObject.prototype = {
 	}
 	,__class__: slplayer.ui.DisplayObject
 }
+if(!slplayer.prototype) slplayer.prototype = {}
 if(!slplayer.prototype.data) slplayer.prototype.data = {}
 slplayer.prototype.data.RssConnector = $hxClasses["slplayer.prototype.data.RssConnector"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
@@ -2473,6 +2447,19 @@ slplayer.prototype.player.ImagePlayer.prototype = $extend(slplayer.ui.DisplayObj
 	,__class__: slplayer.prototype.player.ImagePlayer
 });
 if(!slplayer.prototype.ui) slplayer.prototype.ui = {}
+slplayer.prototype.ui.CodeViewer = $hxClasses["slplayer.prototype.ui.CodeViewer"] = function(rootElement) {
+	slplayer.ui.DisplayObject.call(this,rootElement);
+};
+slplayer.prototype.ui.CodeViewer.__name__ = ["slplayer","prototype","ui","CodeViewer"];
+slplayer.prototype.ui.CodeViewer.__super__ = slplayer.ui.DisplayObject;
+slplayer.prototype.ui.CodeViewer.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	init: function(e) {
+		var container = js.Lib.document.getElementById(this.rootElement.getAttribute("data-" + slplayer.prototype.ui.CodeViewer.CODE_VIEW_ID_TAG));
+		if(container == null) container = this.rootElement;
+		this.rootElement.innerHTML = StringTools.replace(StringTools.replace(StringTools.htmlEscape(container.innerHTML),"\t","&nbsp;&nbsp;"),"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;","");
+	}
+	,__class__: slplayer.prototype.ui.CodeViewer
+});
 slplayer.prototype.ui.TemplateRenderer = $hxClasses["slplayer.prototype.ui.TemplateRenderer"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
 };
@@ -2506,22 +2493,6 @@ slplayer.prototype.ui.TemplateRenderer.prototype = $extend(slplayer.ui.DisplayOb
 	}
 	,__class__: slplayer.prototype.ui.TemplateRenderer
 });
-if(!slplayer.prototype.util) slplayer.prototype.util = {}
-slplayer.prototype.util.DomTools = $hxClasses["slplayer.prototype.util.DomTools"] = function() { }
-slplayer.prototype.util.DomTools.__name__ = ["slplayer","prototype","util","DomTools"];
-slplayer.prototype.util.DomTools.getElementsByAttribute = function(elt,attr,value) {
-	var childElts = elt.getElementsByTagName("*");
-	var filteredChildElts = new Array();
-	var _g1 = 0, _g = childElts.length;
-	while(_g1 < _g) {
-		var cCount = _g1++;
-		if(childElts[cCount].getAttribute(attr) != null && (value == "*" || childElts[cCount].getAttribute(attr) == value)) filteredChildElts.push(childElts[cCount]);
-	}
-	return filteredChildElts;
-}
-slplayer.prototype.util.DomTools.prototype = {
-	__class__: slplayer.prototype.util.DomTools
-}
 slplayer.ui.player.Playable = $hxClasses["slplayer.ui.player.Playable"] = function() { }
 slplayer.ui.player.Playable.__name__ = ["slplayer","ui","player","Playable"];
 slplayer.ui.player.Playable.startPlayable = function(playable,target) {
@@ -2731,11 +2702,9 @@ haxe.Template.globals = { };
 js.Lib.onerror = null;
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
-slplayer.core.SLPlayer._htmlBody = "<a href=\"#\">try JS version</a>";
+slplayer.core.SLPlayer._htmlBody = "<div style=\"font-family:Sans-serif;\"><div>TRY <a href=\"#\">JS VERSION</a> or <a href=\"index_as3.html\">AS3 VERSION</a></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a AutoPlayer component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example01\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example01\"><ul class=\"imageplayer autoplayer\" data-autoplay-interval=\"1500\"><li><img src=\"assets/4.jpg\"/></li><li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">ImagePlayer component combined with a ControlBar component and an RssConnector component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example02\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example02\" style=\"width:160px;\"><ul class=\"imageplayer controlbar rssconnector\" data-src-rss=\"http://api.flickr.com/services/feeds/photos_public.gne?format=rss2\"><li><img src=\"assets/4.jpg\"/></li>\t\t\t\t\t::foreach data::<li><img alt=\"::media_title::\" src=\"::media_thumbnail.url::\" style=\"height:155px;\" title=\"::media_title::\"/></li>::end::<li><img src=\"assets/1.png\"/></li><li><img src=\"assets/2.png\"/></li><li><img src=\"assets/3.png\"/></li></ul></div></div><div style=\"margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;\"><div style=\"margin-bottom:10px;\">TemplateReader component combined with an RssConnector component.</div><div>Code:</div><pre class=\"codeviewer\" data-code-viewer-id=\"example03\" style=\"font-family:\"Courier New\"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;\"/><div>Output:</div><div id=\"example03\" style=\"height:200px; overflow:hidden;\"><ul class=\"template rssconnector\" data-src-rss=\"http://feeds.bbci.co.uk/news/world/rss.xml\">\t\t\t\t\t::foreach data::<li><a href=\"::link::\">::title:: : ::description::</a></li>::end::</ul></div></div></div>";
 slplayer.data.Common.ON_DATA_EVENT_TYPE = "data";
 slplayer.data.Common.ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
-slplayer.prototype.config.JsonConfiguration.TAG_SRC = "json-src";
-slplayer.prototype.config.JsonConfiguration.TAG_LISTENERS = "json-conf-listen";
 slplayer.ui.DisplayObject.className = "DisplayObject";
 slplayer.ui.DisplayObject.rootElementNameFilter = Lambda.list([]);
 slplayer.prototype.data.RssConnector.className = "rssconnector";
@@ -2745,6 +2714,9 @@ slplayer.prototype.player.AutoPlayer.AUTOPLAY_INTERVAL_TAG = "autoplay-interval"
 slplayer.prototype.player.BasicPlayerControl.className = "controlbar";
 slplayer.prototype.player.ImagePlayer.className = "imageplayer";
 slplayer.prototype.player.ImagePlayer.rootElementNameFilter = Lambda.list(["ul"]);
+slplayer.prototype.ui.CodeViewer.className = "codeviewer";
+slplayer.prototype.ui.CodeViewer.rootElementNameFilter = Lambda.list(["pre"]);
+slplayer.prototype.ui.CodeViewer.CODE_VIEW_ID_TAG = "code-viewer-id";
 slplayer.prototype.ui.TemplateRenderer.className = "template";
 slplayer.ui.player.Playable.START_PLAYABLE = "start_playable";
 slplayer.ui.player.Playable.ON_LAST = "on_last";

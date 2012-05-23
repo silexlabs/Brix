@@ -70,12 +70,15 @@ trace("taggedNodes = "+taggedNodes.length);
 					{
 						var newDisplayObject;
 						
-						if (args != null)
-							newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt], args] );
-						else
-							newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] );
+						try
+						{
+							if (args != null)
+								newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt], args] );
+							else
+								newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] );
+						}
+						catch(unknown : Dynamic ) { trace(Std.string(unknown));}
 						
-trace(displayObjectClassName+" instance created");
 						newDisplayObject.init(null);
 					}
 					else

@@ -3,42 +3,59 @@
 	<meta charset="utf-8" />
 	<title>Proto SLPlayer Demo</title>
 	<script src="SLPlayer.js"></script>
+	<script src="slplayer/prototype/ui/CodeViewer.js"></script>
 	<script src="slplayer/prototype/data/RssConnector.js"></script>
 	<script src="slplayer/prototype/player/ImagePlayer.js"></script>
 	<script src="slplayer/prototype/ui/TemplateRenderer.js"></script>
 	<script src="slplayer/prototype/player/BasicPlayerControl.js"></script>
 	<script src="slplayer/prototype/player/AutoPlayer.js"></script>
-	<script src="slplayer/prototype/config/JsonConfiguration.js" data-json-src="conf.json"></script>
+	<!-- <script src="slplayer/prototype/config/JsonConfiguration.js" data-json-src="conf.json"></script> -->
 </head>
 <body>
-	<a href="#">try JS version</a> or <a href="index_as3.html">AS3 version</a>
-	<div>
-		<div>Here is an image viewer component combined with a AutoPlayer component : </div>
-		<div>
-			<ul class="imageplayer autoplayer" data-autoplay-interval="1500" data-json-conf-listen="">
-				<li><img src="assets/4.jpg" /></li>
-				<li><img src="assets/1.png" /></li>
-				<li><img src="assets/2.png" /></li>
-				<li><img src="assets/3.png" /></li>
-			</ul>
-		</div>
-
-		<div>The same image viewer component combined with a rss feed reader component and a control bar component :</div>
-		<div style="width:160px;">
-			<ul class="imageplayer controlbar rssconnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
-				<li><img src="assets/4.jpg" /></li>
-				::foreach data::<li><img style="height:155px;" title="::media_title::" alt="::media_title::" src="::media_thumbnail.url::" /></li>::end::
-				<li><img src="assets/1.png" /></li>
-				<li><img src="assets/2.png" /></li>
-				<li><img src="assets/3.png" /></li>
-			</ul>
+	<div style="font-family:Sans-serif;">
+		<div>TRY <a href="#">JS VERSION</a> or <a href="index_as3.html">AS3 VERSION</a></div>
+		
+		<div style="margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;">
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a AutoPlayer component.</div>
+			<div>Code:</div>
+			<pre class="codeviewer" data-code-viewer-id="example01" style='font-family:"Courier New"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example01">
+				<ul class="imageplayer autoplayer" data-autoplay-interval="1500">
+					<li><img src="assets/4.jpg" /></li>
+					<li><img src="assets/1.png" /></li>
+					<li><img src="assets/2.png" /></li>
+					<li><img src="assets/3.png" /></li>
+				</ul>
+			</div>
 		</div>
 		
-		<div>Now a simple template renderer combined with a rss connector : </div>
-		<div style="height:200px; overflow:hidden;">
-			<ul class="template rssconnector" data-src-rss="http://feeds.bbci.co.uk/news/world/rss.xml">
-				::foreach data::<li><a href="::link::">::title:: : ::description::</a></li>::end::
-			</ul>
+		<div style="margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;">
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a ControlBar component and an RssConnector component.</div>
+			<div>Code:</div>
+			<pre class="codeviewer" data-code-viewer-id="example02" style='font-family:"Courier New"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example02" style="width:160px;">
+				<ul class="imageplayer controlbar rssconnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
+					<li><img src="assets/4.jpg" /></li>
+					::foreach data::<li><img style="height:155px;" title="::media_title::" alt="::media_title::" src="::media_thumbnail.url::" /></li>::end::
+					<li><img src="assets/1.png" /></li>
+					<li><img src="assets/2.png" /></li>
+					<li><img src="assets/3.png" /></li>
+				</ul>
+			</div>
+		</div>
+		
+		<div style="margin:20px; width:800px; padding:5px; border:1px solid black; font-size:14px;">
+			<div style="margin-bottom:10px;">TemplateReader component combined with an RssConnector component.</div>
+			<div>Code:</div>
+			<pre class="codeviewer" data-code-viewer-id="example03" style='font-family:"Courier New"; text-color:grey; font-size:14px; background-color:#d5d5d5; white-space:pre-wrap; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example03" style="height:200px; overflow:hidden;">
+				<ul class="template rssconnector" data-src-rss="http://feeds.bbci.co.uk/news/world/rss.xml">
+					::foreach data::<li><a href="::link::">::title:: : ::description::</a></li>::end::
+				</ul>
+			</div>
 		</div>
 	</div>
 </body>
