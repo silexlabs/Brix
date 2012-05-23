@@ -1,0 +1,9 @@
+-swf discover_slplayer.swf
+-cp .
+-cp ./src/
+-cp ../../src/
+-cp ../../../haxe_libs/cocktail/src/
+-cp ../../../haxe_libs/cocktail/lib/
+-main slplayer.core.SLPlayer
+--remap js:cocktail
+-swf-version 10.2

@@ -1,0 +1,59 @@
+TODOS
+- make a set of components :
+
+  * form set: inputs, buttons, checkboxes...
+  * skinning system & examples
+  
+  * templateRenderer with reverse template syntax		(!!!)
+- manage both syntaxes for components (with body and without)   (!!!) *** create Templatable contract ?
+
+- MAKE A STATIC/SINGLETON CONFIGURATION COMPONENT   (!!!)
+- manage when no classname in the component (!!!)
+
+- produce documentation (!!!) ***
+
+- get rid of the classnames static var ?
+
+- don't put the gallery.html file in SLPlayer.hx (reference it at least as a compiler argument (!!!)
+
+- check we don't initialize a component twice  (!!!)
+
+- skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
+
+- Make a demo showing both code and rendered content (!!!)
+
+- document everything (!!!)
+
+- parse the metadata and extract the viewport (!!!) ***
+
+- add a way to ignore some <script> headers (for non components libraries) : fe with a data-ignore tag (!!!)
+
+- a la complation, vérifier que les children attendus sont présents (les boutons de la galerie par exemple)
+- with the use of macro, force having a static override var className when extending DisplayObject ?
+
+REMARKS
+- there is a source HTML and a generated HTML
+- classes can extend DisplayObject so that they are linked to an html node
+- mixins: data consumer,
+
+QUESTIONS
+- dataProvider initialized with the content of the node "body/dataProvider"?
+- comment aller plus loin dans la compilation du html / erreurs de compilation
+- probleme: 2 data consumer sur le meme noeud
+- composition de composant: class du sous composant (control bar) sur le meme noeud que le composant (galerie)
+  
+
+- The connectors could have just one instance for the all document ( or could be static classes) ?
+
+
+
+
+
+
+Things to discuss :
+	
+	- this heritage system is not perfect : if we want a component which will be both data provider, data consumer, ... it's not possible => propose a composition system ? or a metadata / macro based system ? or simulate multi inheritance with "using" ?
+	
+	- the dynamically generated ids are not a good idea ? What if we want to add manually an id ? => change this with a two Hash objects !!!
+	
+	- Fait au runtime : exception au cas ou un composant n’est pas associé au bon type de noeud html. Faudrait-il le gérer à lq compilation ?
