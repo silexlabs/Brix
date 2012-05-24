@@ -40,7 +40,10 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl
 	 */
 	override public function init(?args:Hash<String>):Void
 	{
-		var rowInterval = args.get("data-" + AUTOPLAY_INTERVAL_TAG);
+		var rowInterval = null;
+		
+		if (args != null)
+			rowInterval = args.get("data-" + AUTOPLAY_INTERVAL_TAG);
 		
 		if (rowInterval == null)
 			interval = 2000;

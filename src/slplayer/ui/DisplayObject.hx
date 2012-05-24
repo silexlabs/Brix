@@ -78,11 +78,13 @@ class DisplayObject
 			if (childElts[cnt].nodeType != Lib.document.body.nodeType) //FIXME is there a cleaner way to get the value of the type element ?
 				continue;
 			
-			if (cast(childElts[cnt], HtmlDom).getAttribute("data-"+BODY_TAG) != null)
+			var childElt : HtmlDom = cast childElts[cnt];
+			
+			if (childElt.getAttribute("data-"+BODY_TAG) != null)
 			{
-				if (Lambda.exists( cast(childElts[cnt], HtmlDom).getAttribute("data-" + BODY_TAG).split(" ") , function (s:String) { return s == Reflect.field(Type.getClass(this), "className"); } ))
-					if (checkFilterOnElt( cast(childElts[cnt], HtmlDom) ))
-						return cast(childElts[cnt], HtmlDom);
+				if (Lambda.exists( childElt.getAttribute("data-" + BODY_TAG).split(" ") , function (s:String) { return s == Reflect.field(Type.getClass(this), "className"); } ))
+					if (checkFilterOnElt( childElt ))
+						return childElt;
 			}
 		}
 		return rootElement;

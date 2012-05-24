@@ -5,8 +5,10 @@ TODOS
   * skinning system & examples
   
   * templateRenderer with reverse template syntax	[WIP]	(!!!)
-- manage both syntaxes for components (with body and without)   [WIP]   (!!!) *** create Templatable contract ?
+- manage both syntaxes for components (with body and template and without)   [WIP]   (!!!) *** create Templatable contract ?
 - skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
+
+- make the <scripts> not trying to doznload anything if the corresponding component is in SLPlayer (!!!)
 
 - MAKE A STATIC/SINGLETON CONFIGURATION COMPONENT   (!!!)
 - manage when no classname in the component (!!!)
