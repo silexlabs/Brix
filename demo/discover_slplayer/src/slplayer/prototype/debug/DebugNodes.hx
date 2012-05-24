@@ -15,7 +15,7 @@ class DebugNodes  extends DisplayObject
 {
 	static override var className = "debugnode";
 	
-	override public function init():Void 
+	override public function init(?args:Hash<String>):Void 
 	{
 		trace("DebugNodes component initialized");
 		

@@ -4,8 +4,9 @@ TODOS
   * form set: inputs, buttons, checkboxes...
   * skinning system & examples
   
-  * templateRenderer with reverse template syntax		(!!!)
-- manage both syntaxes for components (with body and without)   (!!!) *** create Templatable contract ?
+  * templateRenderer with reverse template syntax	[WIP]	(!!!)
+- manage both syntaxes for components (with body and without)   [WIP]   (!!!) *** create Templatable contract ?
+- skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
 
 - MAKE A STATIC/SINGLETON CONFIGURATION COMPONENT   (!!!)
 - manage when no classname in the component (!!!)
@@ -18,17 +19,15 @@ TODOS
 
 - check we don't initialize a component twice  (!!!)
 
-- skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
-
-- Make a demo showing both code and rendered content (!!!)
+- find a way to avoid having the components <script> tags in the rendered HTML (!!!)
 
 - document everything (!!!)
 
 - parse the metadata and extract the viewport (!!!) ***
+- check what other meta data we could use/extract (!!!)
 
 - add a way to ignore some <script> headers (for non components libraries) : fe with a data-ignore tag (!!!)
 
-- a la complation, vérifier que les children attendus sont présents (les boutons de la galerie par exemple)
 - with the use of macro, force having a static override var className when extending DisplayObject ?
 
 REMARKS

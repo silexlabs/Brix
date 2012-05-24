@@ -11,23 +11,41 @@ using slplayer.ui.player.PlayerControl;
 import haxe.Timer;
 
 /**
- * ...
+ * A simple AutoPlayer component for Playables.
  * @author Thomas Fétiveau
  */
-
 class AutoPlayer  extends DisplayObject, implements IPlayerControl
 {
+	/**
+	 * The AutoPlayer classname.
+	 */
 	static var className = "autoplayer";
-	
+	/**
+	 * The custom attribute for setting the autoplay interval (in ms).
+	 */
 	static var AUTOPLAY_INTERVAL_TAG = "autoplay-interval";
 	
+	/**
+	 * The Timer component.
+	 */
 	var timer : Timer;
-	
+	/**
+	 * The autoplay intervak in ms. default is 2000 ms.
+	 */
 	var interval : Int;
 
-	override public function init():Void
+	/**
+	 * The AutoPlayer component initialization takes a ["data-"+AUTOPLAY_INTERVAL_TAG] argument.
+	 * @param	?args
+	 */
+	override public function init(?args:Hash<String>):Void
 	{
-		interval = Std.parseInt(rootElement.getAttribute("data-" + AUTOPLAY_INTERVAL_TAG));
+		var rowInterval = args.get("data-" + AUTOPLAY_INTERVAL_TAG);
+		
+		if (rowInterval == null)
+			interval = 2000;
+		else
+			interval = Std.parseInt(rowInterval);
 		
 		startPlayerControl(rootElement);
 		
