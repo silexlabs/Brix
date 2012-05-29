@@ -28,7 +28,7 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 	var nextButton : SkinnableUIElt;
 	var lastButton : SkinnableUIElt;
 
-	override public function init():Void
+	override public function init(?args:Hash<String>):Void
 	{
 		firstButton = { eltAttrId : FIRST_BUTTON_TAG , elt : null };
 		previousButton = { eltAttrId : PREVIOUS_BUTTON_TAG , elt : null };
