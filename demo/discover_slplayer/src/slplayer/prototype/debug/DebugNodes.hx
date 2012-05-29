@@ -1,4 +1,4 @@
-package ;
+package slplayer.prototype.debug;
 
 import slplayer.ui.DisplayObject;
 import slplayer.core.SLPlayer;
@@ -15,7 +15,7 @@ class DebugNodes  extends DisplayObject
 {
 	static override var className = "debugnode";
 	
-	override public function init(e:Event):Void 
+	override public function init(?args:Hash<String>):Void 
 	{
 		trace("DebugNodes component initialized");
 		
@@ -34,15 +34,16 @@ class DebugNodes  extends DisplayObject
 	{
 		for (cCount in 0...node.childNodes.length)
 		{
-			if (node.childNodes[cCount].className != null)
+			var elt : HtmlDom = cast(node.childNodes[cCount]);
+			if (elt.className != null)
 			{
-				var tagName = untyped node.childNodes[cCount].nodeName;
+				var tagName = untyped elt.nodeName;
 				trace("tag " + tagName +
-				" with class=" + node.childNodes[cCount].className +
-				" has associated components : "+SLPlayer.getAssociatedComponents(node.childNodes[cCount]));
+				" with class=" + elt.className +
+				" has associated components : "+SLPlayer.getAssociatedComponents(elt));
 			}
 			if (node.childNodes[cCount].hasChildNodes())
-				debugNode(node.childNodes[cCount]);
+				debugNode( elt );
 		}
 	}
 }
