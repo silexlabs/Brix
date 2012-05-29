@@ -1,0 +1,103 @@
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Proto SLPlayer Demo</title>
+	<script src="SLPlayer.js"></script>
+	<!--
+	If your components are already contained in the SLPlayer.js (or any other .js file included in the page)
+	and that you want just to declare their use, then add a <script> tag with the data-slp-use attribute 
+	specifying the full class name of the component to use.
+	
+	If your component takes any parameter for its initialization, specify it as a "data-..." attribute of its 
+	<script> tag declaration.
+	-->
+	<script data-slp-use="slplayer.prototype.ui.CodeViewer"></script>
+	<script data-slp-use="slplayer.prototype.data.RssConnector"></script>
+	<script data-slp-use="slplayer.prototype.player.ImagePlayer"></script>
+	<script data-slp-use="slplayer.prototype.ui.TemplateRenderer"></script>
+	<script data-slp-use="slplayer.prototype.player.BasicPlayerControl"></script>
+	<script data-slp-use="slplayer.prototype.player.AutoPlayer"></script>
+	<!-- <script src="slplayer/prototype/config/JsonConfiguration.js" data-json-src="conf.json"></script> -->
+</head>
+<body>
+	<div style="font-family:Sans-serif;">
+		<div>TRY <a href="index.html">JS VERSION</a> or <a href="index_as3.html">AS3 VERSION</a></div>
+		
+		<div style="margin:20px; margin-top:80px; width:1200px; padding:5px; font-size:14px;">
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a AutoPlayer component.</div>
+			<div>Code:</div>
+			<pre class="codeviewer" data-code-viewer-id="example01" style='color:#656565; font-size:14px; background-color:#d5d5d5; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example01">
+				<ul class="imageplayer autoplayer" data-autoplay-interval="1500">
+					<li><img src="assets/4.jpg" /></li>
+					<li><img src="assets/1.png" /></li>
+					<li><img src="assets/2.png" /></li>
+					<li><img src="assets/3.png" /></li>
+				</ul>
+			</div>
+		</div>
+		
+		<div style="margin:20px; margin-top:80px; width:1200px; padding:5px; font-size:14px;">
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a ControlBar component and an RssConnector component.</div>
+			<div>Code:</div>
+			<pre class="codeviewer" data-code-viewer-id="example02" style='color:#656565; font-size:14px; background-color:#d5d5d5; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example02" style="width:160px;">
+				<ul class="imageplayer controlbar rssconnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
+					<li><img src="assets/4.jpg" /></li>
+					::foreach data::<li><img style="height:155px;" title="::media_title::" alt="::media_title::" src="::media_thumbnail.url::" /></li>::end::
+					<li><img src="assets/1.png" /></li>
+					<li><img src="assets/2.png" /></li>
+					<li><img src="assets/3.png" /></li>
+				</ul>
+			</div>
+		</div>
+		
+		<div style="margin:20px; margin-top:80px; width:1200px; padding:5px; font-size:14px;">
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a ControlBar component. We've redefined the ControlBar buttons here.</div>
+			<div>Code:</div>
+			<pre class="codeviewer" data-code-viewer-id="example03" style='color:#656565; font-size:14px; background-color:#d5d5d5; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example03">
+				<div class="imageplayer controlbar">
+					<div style="width:155px">
+						<div style="display:inline-block; height:50px; width:50px; margin-right:50px;">
+							<img style="width:100%; height:100%;" src="assets/first.jpg" data-controlbar-first="true" />
+						</div>
+						<div style="display:inline-block; height:50px; width:50px;">
+							<img style="width:100%; height:100%;" src="assets/last.jpg" data-controlbar-last="true" />
+						</div>
+					</div>
+					<ul data-body="imageplayer">
+						<li><img src="assets/4.jpg" /></li>
+						<li><img src="assets/1.png" /></li>
+						<li><img src="assets/2.png" /></li>
+						<li><img src="assets/3.png" /></li>
+					</ul>
+					<div style="width:155px">
+						<div style="display:inline-block; height:50px; width:50px; margin-right:50px;">
+							<img style="width:100%; height:100%;" src="assets/previous.jpg" data-controlbar-previous="true" />
+						</div>
+						<div style="display:inline-block; height:50px; width:50px;">
+							<img style="width:100%; height:100%;" src="assets/next.jpg" data-controlbar-next="true" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div style="margin:20px; margin-top:80px; width:1200px; padding:5px; font-size:14px;">
+			<div style="margin-bottom:10px;">TemplateReader component combined with an RssConnector component.</div>
+			<div>Code:</div>
+			<pre class="codeviewer" data-code-viewer-id="example04" style='color:#656565; font-size:14px; background-color:#d5d5d5; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example04" style="height:200px;">
+				<ul class="template rssconnector" data-src-rss="http://feeds.bbci.co.uk/news/world/rss.xml">
+					::foreach data::<li><a href="::link::">::title:: : ::description::</a></li>::end::
+				</ul>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

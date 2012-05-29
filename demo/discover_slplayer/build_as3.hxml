@@ -1,4 +1,6 @@
--swf gallery.swf
+-swf discover_slplayer.swf
+-cp .
+-cp ./src/
 -cp ../../src/
 -cp ../../../haxe_libs/cocktail/src/
 -cp ../../../haxe_libs/cocktail/lib/
