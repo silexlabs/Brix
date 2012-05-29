@@ -22,6 +22,11 @@ import haxe.macro.Expr;
 class AppBuilder 
 {
 	/**
+	 * The data- attribute set by the slplayer on the HTML elements associated with one or more component.
+	 */
+	static public var SLP_USE_ATTR_NAME = "slp-use";
+	
+	/**
 	 * Builds an SLPlayer application from an HTML file.
 	 * Splits the input HTML file in two parts: the header part and the body.
 	 * The header part is used to configure the application. It also includes the components which may be used by the application.
@@ -57,73 +62,81 @@ class AppBuilder
 						switch(headElt.nodeName.toLowerCase())
 						{
 							case "script":
-								var cmpClassName = headElt.get("src");
 								
-								//FIXME
-								if (cmpClassName == "SLPlayer.js")
-									continue;
+								var cmpClassName = headElt.get("data-"+SLP_USE_ATTR_NAME);
 								
-								if (cmpClassName != null && StringTools.endsWith(cmpClassName.toLowerCase(), ".js"))
+								if (cmpClassName == null)
 								{
-									cmpClassName = cmpClassName.substr(0, cmpClassName.length - 3);
-									cmpClassName = StringTools.replace( cmpClassName, "/", "." );
-trace("found cmpClassName=" + cmpClassName);
+									/*
+									var srcPath = headElt.get("src");
 									
-									var initArgsElts:Iterable<String> = { iterator : headElt.attributes };
+									if (cmpClassName == "SLPlayer.js") //FIXME this has to be the name of the .js compilation output file.
+										continue;
 									
-									for (fc in 0...fields.length)
+									if StringTools.endsWith(cmpClassName.toLowerCase(), ".js"))
 									{
+										cmpClassName = cmpClassName.substr(0, cmpClassName.length - 3);
+										cmpClassName = StringTools.replace( cmpClassName, "/", "." );
+										trace("found cmpClassName=" + cmpClassName);
+									}
+									*/
+									continue;
+								}
+								
+								var initArgsElts:Iterable<String> = { iterator : headElt.attributes };
+								
+								for (fc in 0...fields.length)
+								{
 //trace("\n"+fields[fc]+"\n");
-										switch (fields[fc].kind)
-										{
-											case FFun(f) :
-												if (fields[fc].name != "initDisplayObjects")
-												{
-													continue;
-												}
+									switch (fields[fc].kind)
+									{
+										case FFun(f) :
+											if (fields[fc].name != "initDisplayObjects")
+											{
+												continue;
+											}
 //trace(fields[fc]);
-												switch (f.expr.expr)
-												{
-													case EBlock(exprs):
-														pos = haxe.macro.Context.currentPos();
-														//exprs.push({ expr : ENew( { name : cmpClassName, pack : [], params : [], sub : null }, []) , pos : pos });
-														//trace("added new "+cmpClassName+"() call");
+											switch (f.expr.expr)
+											{
+												case EBlock(exprs):
+													pos = haxe.macro.Context.currentPos();
+													//exprs.push({ expr : ENew( { name : cmpClassName, pack : [], params : [], sub : null }, []) , pos : pos });
+													//trace("added new "+cmpClassName+"() call");
 
-														//exprs.push({ expr : ECall( { expr : EField( { expr : EConst(CType(cmpClassName)), pos : pos }, "initAll"), pos : pos }, [] ) , pos : pos });
-														//trace("added call to "+cmpClassName+".main()");
-														
-														//generate import
-														exprs.push(generateImport(cmpClassName));
-														
-														if (Lambda.exists(initArgsElts, function(atName:String) { return StringTools.startsWith( atName , "data-" ); } )) //case the component initialization takes arguments (other than src or type)
-														{
-															//FIXME we may encode cmpClassName+"Args" in MD5 for more security (conflicts)
-															var shortCmpClassName = cmpClassName.split('.').pop();
-															exprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : shortCmpClassName + "Args", type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
-															
-															for (initArgElt in initArgsElts)
-															{
-																if (StringTools.startsWith( initArgElt , "data-" ))
-																	exprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
-															}
-															//generate call to initDisplayObjectsOfType with additionnal arguments
-															exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
-														}
-														else
-														{
-															//generate call to initDisplayObjectsOfType with no additionnal arguments
-															exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
-														}
-//trace("added call to initDisplayObjectsOfType("+cmpClassName+")");
-														break;
+													//exprs.push({ expr : ECall( { expr : EField( { expr : EConst(CType(cmpClassName)), pos : pos }, "initAll"), pos : pos }, [] ) , pos : pos });
+													//trace("added call to "+cmpClassName+".main()");
 													
-													default :
-														trace("expr type ignored for field initDisplayObjects.");
-												}
-											
-											default :
-												trace("field "+fields[fc].name+" ignored.");
-										}
+													//generate import
+													exprs.push(generateImport(cmpClassName));
+													
+													if (Lambda.exists(initArgsElts, function(atName:String) { return StringTools.startsWith( atName , "data-" ) && atName != "data-"+SLP_USE_ATTR_NAME; } )) //case the component initialization takes arguments (other than src or type)
+													{
+														//FIXME we may encode cmpClassName+"Args" in MD5 for more security (conflicts)
+														var shortCmpClassName = cmpClassName.split('.').pop();
+														exprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : shortCmpClassName + "Args", type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
+														
+														for (initArgElt in initArgsElts)
+														{
+															if (StringTools.startsWith( initArgElt , "data-" ) && initArgElt != "data-"+SLP_USE_ATTR_NAME)
+																exprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
+														}
+														//generate call to initDisplayObjectsOfType with additionnal arguments
+														exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
+													}
+													else
+													{
+														//generate call to initDisplayObjectsOfType with no additionnal arguments
+														exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
+													}
+//trace("added call to initDisplayObjectsOfType("+cmpClassName+")");
+													break;
+												
+												default :
+													trace("expr type ignored for field initDisplayObjects.");
+											}
+										
+										default :
+											trace("field "+fields[fc].name+" ignored.");
 									}
 								}
 								

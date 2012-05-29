@@ -6,13 +6,20 @@ import js.Dom;
 import slplayer.ui.DisplayObject;
 
 /**
- * ...
+ * The main SLPlayer class handles the application initialization. It instanciates the components, tracking for each of them their 
+ * association with their DOM rootElement. This class is based on the content of the application HTML file and is thus associated 
+ * with the AppBuilder building macro.
  * @author Thomas Fétiveau
  */
 @:build(slplayer.macro.AppBuilder.buildFromHtml('index.html')) class SLPlayer 
 {
+	/**
+	 * A Hash keeping all component instances indexed by node slplayer id.
+	 */
 	static private var nodeToCmpInstances = new Hash<List<DisplayObject>>();
-	
+	/**
+	 * The data- attribute set by the slplayer on the HTML elements associated with one or more component.
+	 */
 	static private var SLPID_ATTR_NAME = "slpid";
 	
 	public function new() 
@@ -22,31 +29,32 @@ import slplayer.ui.DisplayObject;
 			Lib.document.body.innerHTML = _htmlBody;
 		#end
 	}
-
+	
+	/**
+	 * The main entry point of every SLPlayer application.
+	 */
 	public static function main()
 	{
 		var mySLPlayerApp = new SLPlayer();
 		
 		#if js
-			Lib.window.onload = callback(mySLPlayerApp.initDisplayObjects);
+			Lib.window.onload = function (e:Event) { mySLPlayerApp.initDisplayObjects(); };
 		#else
-			mySLPlayerApp.initDisplayObjects(null);
+			mySLPlayerApp.initDisplayObjects();
 		#end
 	}
 
 	/**
-	 * This function is filled in by the macro.
-	 * @param	e
+	 * This function is filled in by the AppBuilder macro.
 	 */
-	private function initDisplayObjects(e : Event) { }
+	private function initDisplayObjects() { }
 	
 	/**
 	 * This is a kind of factory method for all kinds of components. This may need some cleanup...
 	 * 
 	 * TODO determine if it wouldn't be better to pass directly the Class. We would however loose the benefit of resolving it. but we could try catch the exceptions...
-	 * TODO Also, need to ask the mailing list if I have to use Reflect to access a Class static field.
 	 * 
-	 * @param	displayObjectClassName
+	 * @param	displayObjectClassName the full component class name (with packages, for example : slplayer.ui.player.ImagePlayer)
 	 */
 	private function initDisplayObjectsOfType(displayObjectClassName : String , ?args:Hash<String>)
 	{
@@ -70,12 +78,9 @@ trace("taggedNodes = "+taggedNodes.length);
 					
 					try
 					{
-						if (args != null)
-							newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt], args] );
-						else
-							newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] );
+						newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] );
 					
-						newDisplayObject.init();
+						newDisplayObject.init(args);
 					}
 					catch(unknown : Dynamic ) { trace(Std.string(unknown));}
 				}
@@ -94,6 +99,11 @@ trace("taggedNodes = "+taggedNodes.length);
 		}
 	}
 	
+	/**
+	 * 
+	 * @param	node
+	 * @param	cmp
+	 */
 	public static function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void
 	{
 trace("addAssociatedComponent("+node+", "+cmp+")");
@@ -118,6 +128,11 @@ trace("addAssociatedComponent("+node+", "+cmp+")");
 		nodeToCmpInstances.set( nodeId, associatedCmps );
 	}
 	
+	/**
+	 * 
+	 * @param	node
+	 * @return
+	 */
 	public static function getAssociatedComponents(node : HtmlDom) : Null<List<DisplayObject>>
 	{
 		//return cast Reflect.field(node, "slPlayerCmps");
