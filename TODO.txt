@@ -5,10 +5,11 @@ TODOS
   * skinning system & examples
   
   * templateRenderer with reverse template syntax	[WIP]	(!!!)
+  
+- CLEAN REPOSITORIES !!!
+
 - manage both syntaxes for components (with body and template and without)   [WIP]   (!!!) *** create Templatable contract ?
 - skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
-
-- make the <scripts> not trying to doznload anything if the corresponding component is in SLPlayer (!!!)
 
 - MAKE A STATIC/SINGLETON CONFIGURATION COMPONENT   (!!!)
 - manage when no classname in the component (!!!)
@@ -58,3 +59,30 @@ Things to discuss :
 	- the dynamically generated ids are not a good idea ? What if we want to add manually an id ? => change this with a two Hash objects !!!
 	
 	- Fait au runtime : exception au cas ou un composant n’est pas associé au bon type de noeud html. Faudrait-il le gérer à lq compilation ?
+	
+	
+	
+DONE
+- make the <scripts> not trying to download anything if the corresponding component is in SLPlayer (OK)
+
+
+
+
+
+Discussion lundi soir :
+
+- pour les surdefinition de skins :
+	
+	<div class="playerimg-first-button
+
+- pour les templates et bodys :	
+
+	<imgpl
+		<body data-body=""
+		<template data-tmpl=""
+
+- phase init slplayer ?
+
+- embed html dans .js
+
+
