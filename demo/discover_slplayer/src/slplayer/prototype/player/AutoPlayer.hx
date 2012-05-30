@@ -17,10 +17,6 @@ import haxe.Timer;
 class AutoPlayer  extends DisplayObject, implements IPlayerControl
 {
 	/**
-	 * The AutoPlayer classname.
-	 */
-	static var className = "autoplayer";
-	/**
 	 * The custom attribute for setting the autoplay interval (in ms).
 	 */
 	static var AUTOPLAY_INTERVAL_TAG = "autoplay-interval";

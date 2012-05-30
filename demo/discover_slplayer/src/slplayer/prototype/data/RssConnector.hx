@@ -19,8 +19,6 @@ using slplayer.data.DataProvider;
  */
 class RssConnector extends DisplayObject, implements IDataProvider
 {
-	static var className = "rssconnector";
-	
 	static var SRC_TAG = "src-rss";
 	
 	

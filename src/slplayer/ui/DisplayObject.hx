@@ -23,19 +23,14 @@ typedef SkinnableUIElt =
 class DisplayObject 
 {
 	/**
-	 * The class name associated with this component. It's what appears in the class attribute of the HTML
-	 * elements that have an instance of this component attached to them.
-	 */
-	static var className : String = "displayobject";
-	/**
 	 * A list of allowed tag names for the body element.
 	 * If this parameter isn't defined or if the list is empty, it means there is no filtering (all tag names are allowed).
 	 */
-	static var bodyElementNameFilter : List<String> = Lambda.list([]);
+	static var bodyElementNameFilter : List<String> = Lambda.list([]); //FIXME change to rootElementFilter
 	/**
 	 * The data- attribute to set on a direct child element to use as the body element (the root UI element).
 	 */
-	static public var BODY_TAG = "body";
+	static public var BODY_TAG = "body"; //FIXME get rid of this ?
 	
 	/**
 	 * The dom node associated with the instance of this component. By default, all events used for communication with other 
@@ -47,7 +42,7 @@ class DisplayObject
 	 * But if a direct child element of the rootElement has the data-body attribute set to the classname of this component, 
 	 * it will be used as the root UI element. However, the events will still be dispatched to and listen from the real rootElement.
 	 */
-	public var bodyElement(default, null) : HtmlDom;
+	public var bodyElement(default, null) : HtmlDom; //FIXME get rid of this ?
 	
 	/**
 	 * Common constructor for all DisplayObjects. If there is anything specific to a given component class initialization, override the init() method.
@@ -60,18 +55,20 @@ class DisplayObject
 		this.bodyElement = determineBodyElement(rootElement);
 		
 		if (!checkFilterOnElt(bodyElement))
-			throw "ERROR: cannot instantiate "+Reflect.field(Type.getClass(this), "className")+" on a "+bodyElement.nodeName+" element.";
+			throw "ERROR: cannot instantiate "+Type.getClassName(Type.getClass(this))+" on a "+bodyElement.nodeName+" element.";
 		
 		SLPlayer.addAssociatedComponent(rootElement, this);
 	}
 	
 	/**
-	 * Search in the direct rootElement's childs for an element having the data-body parameter containing this component's classname value.
+	 * Search in the rootElement's childs for a class="body" element having the data-body-ref parameter containing this component's classname value.
 	 * @param	rootElement, the root HtmlDom associated with the component.
 	 * @return  the bodyElement, ie: the root HtmlDom of the UI part of the component (defined by the data-body tag).
 	 */
 	private function determineBodyElement(rootElement : HtmlDom):HtmlDom
 	{
+		
+		/*
 		var childElts = rootElement.childNodes;
 		for (cnt in 0...childElts.length)
 		{
@@ -87,6 +84,7 @@ class DisplayObject
 						return childElt;
 			}
 		}
+		*/
 		return rootElement;
 	}
 	
