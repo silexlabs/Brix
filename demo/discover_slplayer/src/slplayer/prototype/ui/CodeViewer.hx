@@ -16,10 +16,6 @@ using StringTools;
 class CodeViewer extends DisplayObject
 {
 	/**
-	 * The class name associated with this component
-	 */
-	static var className = "codeviewer";
-	/**
 	 * A list of allowed tag names for the root element.
 	 */
 	static var rootElementNameFilter : List<String> = Lambda.list(["pre"]);

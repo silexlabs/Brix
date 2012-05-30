@@ -16,8 +16,6 @@ using slplayer.ui.player.PlayerControl;
  */
 class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 {
-	static var className = "controlbar";
-	
 	static var FIRST_BUTTON_TAG = "controlbar-first";	
 	static var PREVIOUS_BUTTON_TAG = "controlbar-previous";	
 	static var NEXT_BUTTON_TAG = "controlbar-next";	

@@ -91,7 +91,7 @@ class AppBuilder
 									switch (fields[fc].kind)
 									{
 										case FFun(f) :
-											if (fields[fc].name != "initDisplayObjects")
+											if (fields[fc].name != "registerComponentsforInit")
 											{
 												continue;
 											}
@@ -120,15 +120,15 @@ class AppBuilder
 															if (StringTools.startsWith( initArgElt , "data-" ) && initArgElt != "data-"+SLP_USE_ATTR_NAME)
 																exprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
 														}
-														//generate call to initDisplayObjectsOfType with additionnal arguments
-														exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
+														//generate call to registerComponent with additionnal arguments
+														exprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
 													}
 													else
 													{
-														//generate call to initDisplayObjectsOfType with no additionnal arguments
-														exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
+														//generate call to registerComponent with no additionnal arguments
+														exprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
 													}
-//trace("added call to initDisplayObjectsOfType("+cmpClassName+")");
+//trace("added call to registerComponent("+cmpClassName+")");
 													break;
 												
 												default :
