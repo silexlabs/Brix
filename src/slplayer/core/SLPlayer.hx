@@ -23,7 +23,7 @@ import slplayer.ui.DisplayObject;
 	static private var SLPID_ATTR_NAME = "slpid";
 	
 	/**
-	 * 
+	 * A collection of the <script> declared components with the optionnal data- args passed on the <script> tag.
 	 */
 	var registeredComponents : Hash<Null<Hash<String>>>;
 	
@@ -32,6 +32,10 @@ import slplayer.ui.DisplayObject;
 		//Set the body HTML content if not js
 		#if !js
 			Lib.document.body.innerHTML = _htmlBody;
+		#else
+			#if embedHtml
+				js.Lib.alert('embedHtml defined');
+			#end
 		#end
 		
 		registeredComponents = new Hash();
