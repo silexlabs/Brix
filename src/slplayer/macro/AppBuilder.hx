@@ -1,6 +1,7 @@
 package slplayer.macro;
 
 import sys.FileSystem;
+
 import haxe.macro.Expr;
 
 /**
@@ -64,7 +65,7 @@ class AppBuilder
 							case "script":
 								
 								var cmpClassName = headElt.get("data-"+SLP_USE_ATTR_NAME);
-								
+trace("found script "+cmpClassName);
 								if (cmpClassName == null)
 								{
 									/*

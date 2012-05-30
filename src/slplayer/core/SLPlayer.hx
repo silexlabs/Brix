@@ -71,12 +71,17 @@ import slplayer.ui.DisplayObject;
 	private function initComponents()
 	{
 		var registeredComponentsClassNames = registeredComponents.keys();
+		
+		//Create the components instances
 		while (registeredComponentsClassNames.hasNext())
 		{
 			var registeredComponentsClassName = registeredComponentsClassNames.next();
 			
-			initComponentsOfType(registeredComponentsClassName, registeredComponents.get(registeredComponentsClassName));
+			createComponentsOfType(registeredComponentsClassName, registeredComponents.get(registeredComponentsClassName));
 		}
+		
+		//call init on each component instances
+		callInitOnComponents();
 	}
 	
 	/**
@@ -84,7 +89,7 @@ import slplayer.ui.DisplayObject;
 	 * 
 	 * @param	componentClassName the full component class name (with packages, for example : slplayer.ui.player.ImagePlayer)
 	 */
-	private function initComponentsOfType(componentClassName : String , ?args:Hash<String>)
+	private function createComponentsOfType(componentClassName : String , ?args:Hash<String>)
 	{
 		var componentClass = Type.resolveClass(componentClassName);
 		
@@ -93,13 +98,13 @@ import slplayer.ui.DisplayObject;
 			trace("WARNING cannot resolve "+componentClassName);
 			return;
 		}
-trace(componentClassName+" class resolved ");
+//trace(componentClassName+" class resolved ");
 		if (isDisplayObject(componentClass)) // case DisplayObject component
 		{
 			var classTag = getUnconflictedClassTag(componentClassName);
 
 			var taggedNodes : Array<HtmlDom> = new Array();
-trace("searching now for class tag = "+classTag);
+//trace("searching now for class tag = "+classTag);
 			var taggedNodesCollection : HtmlCollection<HtmlDom> = untyped Lib.document.getElementsByClassName(classTag);
 			for (nodeCnt in 0...taggedNodesCollection.length)
 			{
@@ -107,14 +112,14 @@ trace("searching now for class tag = "+classTag);
 			}
 			if (componentClassName != classTag)
 			{
-trace("searching now for class tag = "+componentClassName);
+//trace("searching now for class tag = "+componentClassName);
 				taggedNodesCollection = untyped Lib.document.getElementsByClassName(componentClassName);
 				for (nodeCnt in 0...taggedNodesCollection.length)
 				{
 					taggedNodes.push(taggedNodesCollection[nodeCnt]);
 				}
 			}
-trace("taggedNodes = "+taggedNodes.length);
+//trace("taggedNodes = "+taggedNodes.length);
 			for (node in taggedNodes)
 			{
 				var newDisplayObject;
@@ -123,7 +128,7 @@ trace("taggedNodes = "+taggedNodes.length);
 				{
 					newDisplayObject = Type.createInstance( componentClass, [node] );
 				
-					newDisplayObject.init(args);
+					//newDisplayObject.init(args);
 				}
 				catch(unknown : Dynamic ) { trace(Std.string(unknown));}
 			}
@@ -138,6 +143,17 @@ trace("taggedNodes = "+taggedNodes.length);
 					Type.createInstance( componentClass, [] );
 			}
 			catch(unknown : Dynamic ) { trace(Std.string(unknown));}
+		}
+	}
+	
+	private function callInitOnComponents()
+	{
+		for (l in nodeToCmpInstances)
+		{
+			for (c in l)
+			{
+				c.init();
+			}
 		}
 	}
 	
@@ -188,7 +204,6 @@ trace("taggedNodes = "+taggedNodes.length);
 	 */
 	public static function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void
 	{
-trace("addAssociatedComponent("+node+", "+cmp+")");
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
 		var associatedCmps : List<DisplayObject>;

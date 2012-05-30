@@ -73,7 +73,6 @@ class DisplayObject
 	
 	/**
 	 * For specific initialization logic specific to your component class, override this method.
-	 * @param	args: the optionnal data- arguments a component could take for initialization.
 	 */
-	public dynamic function init(?args:Hash<String>) : Void { }
+	public dynamic function init() : Void { }
 }

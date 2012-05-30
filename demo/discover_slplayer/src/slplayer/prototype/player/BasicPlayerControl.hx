@@ -10,11 +10,13 @@ import slplayer.ui.DisplayObject;
 import slplayer.ui.player.PlayerControl;
 using slplayer.ui.player.PlayerControl;
 
+import slplayer.ui.group.IGroupable;
+
 /**
  * A basic control bar for Playable components. Implements the first, previous, next and last methods of IPlayerControl.
  * @author Thomas Fétiveau
  */
-class BasicPlayerControl extends DisplayObject, implements IPlayerControl
+class BasicPlayerControl extends DisplayObject, implements IPlayerControl, implements IGroupable
 {
 	static var FIRST_BUTTON_TAG = "controlbar-first";	
 	static var PREVIOUS_BUTTON_TAG = "controlbar-previous";	
@@ -25,9 +27,14 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 	var previousButton : SkinnableUIElt;
 	var nextButton : SkinnableUIElt;
 	var lastButton : SkinnableUIElt;
+	
+	public var groupElement:HtmlDom;
 
-	override public function init(?args:Hash<String>):Void
+	override public function init():Void
 	{
+		if (groupElement == null)
+			groupElement = rootElement;
+		
 		firstButton = { eltAttrId : FIRST_BUTTON_TAG , elt : null };
 		previousButton = { eltAttrId : PREVIOUS_BUTTON_TAG , elt : null };
 		nextButton = { eltAttrId : NEXT_BUTTON_TAG , elt : null };
@@ -36,21 +43,21 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 		//if no UI elements have been redefined, build the default UI
 		if ( !discoverUIElts() )
 			buildUI();
-		trace("firstButton="+firstButton+"  previousButton="+previousButton+"  nextButton="+nextButton+"  lastButton="+lastButton);
-		startPlayerControl(rootElement);
+
+		startPlayerControl(groupElement);
 		
 		var me = this;
 		if (firstButton.elt != null)
-			firstButton.elt.onclick = function(e:Event) { me.first(rootElement); };
+			firstButton.elt.onclick = function(e:Event) { me.first(groupElement); };
 		
 		if (previousButton.elt != null)
-			previousButton.elt.onclick = function(e:Event) { me.previous(rootElement); };
+			previousButton.elt.onclick = function(e:Event) { me.previous(groupElement); };
 		
 		if (nextButton.elt != null)
-			nextButton.elt.onclick = function(e:Event) { me.next(rootElement); };
+			nextButton.elt.onclick = function(e:Event) { me.next(groupElement); };
 		
 		if (lastButton.elt != null)
-			lastButton.elt.onclick = function(e:Event) { me.last(rootElement); };
+			lastButton.elt.onclick = function(e:Event) { me.last(groupElement); };
 	}
 	
 	/**

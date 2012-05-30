@@ -13,7 +13,7 @@ import js.Dom;
 
 class DebugNodes  extends DisplayObject
 {
-	override public function init(?args:Hash<String>):Void 
+	override public function init():Void 
 	{
 		trace("DebugNodes component initialized");
 		
