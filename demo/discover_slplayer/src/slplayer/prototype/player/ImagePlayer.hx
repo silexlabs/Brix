@@ -15,11 +15,13 @@ using slplayer.data.DataConsumer;
 import slplayer.ui.player.Playable;
 using slplayer.ui.player.Playable;
 
+import slplayer.ui.group.IGroupable;
+
 /**
  * Gallery component for SLPlayer applications.
  * @author Thomas Fétiveau
  */
-class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IPlayable
+class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IPlayable, implements IGroupable
 {
 	/**
 	 * A list of allowed tag names for the root element.
@@ -30,12 +32,14 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	
 	var tpl : Template;
 	
+	public var groupElement:HtmlDom;
+	
 	/**
 	 * This variable may contain data from different sources and/or DataProviders.
 	 */
 	var dataProviders(default,null) : Hash<Array<Dynamic>>;
 	
-	override public function init(?args:Hash<String>):Void 
+	override public function init():Void 
 	{
 		dataProviders = new Hash();
 		
@@ -45,11 +49,15 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 		rootElement.innerHTML = "";
 		
 		currentIndex = 0;
+		
+		if (groupElement == null)
+			groupElement = rootElement;
+
+		startConsuming(groupElement);
+		
+		startPlayable(groupElement);
+		
 		updateView();
-		
-		startConsuming(rootElement);
-		
-		startPlayable(rootElement);
 	}
 	
 	function initUI():Void
@@ -76,7 +84,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 		//execute template
 		rootElement.innerHTML = tpl.execute({data:providersData});
 		
-		dispatchOnChange(rootElement);
+		dispatchOnChange(groupElement);
 		
 		dispatchIndex();
 		
@@ -93,9 +101,9 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	{
 		var liChilds = rootElement.getElementsByTagName("li");
 		if (currentIndex <= 0)
-			dispatchOnFirst(rootElement);
+			dispatchOnFirst(groupElement);
 		else if (currentIndex >= liChilds.length-1)
-			dispatchOnLast(rootElement);
+			dispatchOnLast(groupElement);
 	}
 	
 	function next():Void

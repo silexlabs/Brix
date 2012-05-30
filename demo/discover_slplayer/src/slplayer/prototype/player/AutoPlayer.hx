@@ -8,13 +8,15 @@ import slplayer.ui.DisplayObject;
 import slplayer.ui.player.PlayerControl;
 using slplayer.ui.player.PlayerControl;
 
+import slplayer.ui.group.IGroupable;
+
 import haxe.Timer;
 
 /**
  * A simple AutoPlayer component for Playables.
  * @author Thomas Fétiveau
  */
-class AutoPlayer  extends DisplayObject, implements IPlayerControl
+class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements IGroupable
 {
 	/**
 	 * The custom attribute for setting the autoplay interval (in ms).
@@ -29,29 +31,33 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl
 	 * The autoplay intervak in ms. default is 2000 ms.
 	 */
 	var interval : Int;
-
+	
+	public var groupElement:HtmlDom;
+	
 	/**
 	 * The AutoPlayer component initialization takes a ["data-"+AUTOPLAY_INTERVAL_TAG] argument.
 	 * @param	?args
 	 */
-	override public function init(?args:Hash<String>):Void
+	override public function init():Void
 	{
 		var rowInterval = null;
 		
-		if (args != null)
-			rowInterval = args.get("data-" + AUTOPLAY_INTERVAL_TAG);
+		rowInterval = rootElement.getAttribute("data-" + AUTOPLAY_INTERVAL_TAG);
 		
 		if (rowInterval == null)
 			interval = 2000;
 		else
 			interval = Std.parseInt(rowInterval);
 		
-		startPlayerControl(rootElement);
+		if (groupElement == null)
+			groupElement = rootElement;
+		
+		startPlayerControl(groupElement);
 		
 		timer = new Timer(interval);
 		
 		var me = this;
-		timer.run = callback(me.next, rootElement);
+		timer.run = callback(me.next, groupElement);
 	}
 	
 	private function onPlayableFirst():Void

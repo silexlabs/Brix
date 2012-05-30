@@ -22,8 +22,10 @@ class CodeViewer extends DisplayObject
 	
 	static var CODE_VIEW_ID_TAG = "code-viewer-id";
 	
-	override public function init(?args:Hash<String>):Void 
+	override private function new(rootElement : HtmlDom) 
 	{
+		super(rootElement);
+		
 		//get container element
 		var container = Lib.document.getElementById(rootElement.getAttribute("data-"+CODE_VIEW_ID_TAG));
 		
