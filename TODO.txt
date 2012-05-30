@@ -1,35 +1,31 @@
 TODOS
-- make a set of components :
+  
 
-  * form set: inputs, buttons, checkboxes...
-  * skinning system & examples
+- don't put the gallery.html file in SLPlayer.hx (reference it at least as a compiler argument (!!!)
   
-  * templateRenderer with reverse template syntax	[WIP]	(!!!)
-  
-- manage both syntaxes for components (with body and template and without)   [WIP]   (!!!) *** create Templatable contract ?
-- skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
+- embed des assets (!!!)
+
+- manage the doctypes when parsing !!!
 
 - MAKE A STATIC/SINGLETON CONFIGURATION COMPONENT   (!!!)
 
 
 - produce documentation (!!!) ***
 
-- embed des assets (!!!)
-
-- don't put the gallery.html file in SLPlayer.hx (reference it at least as a compiler argument (!!!)
-
-- check we don't initialize a component twice  (!!!)
-
-- find a way to avoid having the components <script> tags in the rendered HTML (!!!)
 
 - document everything (!!!)
 
-- parse the metadata and extract the viewport (!!!) ***
-- check what other meta data we could use/extract (!!!)
+- parse the metadata and extract the viewport 
+- check what other meta data we could use/extract 
 
-- add a way to ignore some <script> headers (for non components libraries) : fe with a data-ignore tag (!!!)
+- add a way to ignore some <script> headers (for non components libraries) : fe with a data-ignore tag 
 
-- with the use of macro, force having a static override var className when extending DisplayObject ?
+
+- make a set of components :
+
+  * form set: inputs, buttons, checkboxes...
+  * skinning system & examples
+  
 
 REMARKS
 - there is a source HTML and a generated HTML
@@ -41,8 +37,6 @@ QUESTIONS
 - comment aller plus loin dans la compilation du html / erreurs de compilation
 - probleme: 2 data consumer sur le meme noeud
 - composition de composant: class du sous composant (control bar) sur le meme noeud que le composant (galerie)
-  
-
 - The connectors could have just one instance for the all document ( or could be static classes) ?
 
 	
@@ -53,7 +47,13 @@ DONE
 - CLEAN REPOSITORIES !!!
 - manage when no classname in the component (!!!)
 - get rid of the classnames static var ?
+- check we don't initialize a component twice  (!!!)
 
+
+ABORTED
+- manage both syntaxes for components (with body and template and without)   [WIP]   (!!!) *** create Templatable contract ?
+  * templateRenderer with reverse template syntax	[WIP]	(!!!)
+- skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
 
 
 ------------------------

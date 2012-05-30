@@ -1,6 +1,7 @@
 package slplayer.prototype.data;
 
 import slplayer.ui.DisplayObject;
+import slplayer.ui.group.IGroupable;
 
 import haxe.Http;
 
@@ -17,10 +18,11 @@ using slplayer.data.DataProvider;
  * TODO cleanup to allow different rss formats
  * @author Thomas Fétiveau
  */
-class RssConnector extends DisplayObject, implements IDataProvider
+class RssConnector extends DisplayObject, implements IDataProvider, implements IGroupable
 {
 	static var SRC_TAG = "src-rss";
 	
+	public var groupElement:HtmlDom;
 	
 	public var src(default, setSrc) : String;
 
@@ -35,9 +37,11 @@ class RssConnector extends DisplayObject, implements IDataProvider
 		return src;
 	}
 	
-	override public function init(?args:Hash<String>):Void 
+	override public function init():Void 
 	{
-//trace("initialization");
+		if (groupElement == null)
+			groupElement = rootElement;
+		
 		src = this.rootElement.getAttribute("data-" + SRC_TAG);
 		
 		if (src == null)
@@ -45,12 +49,11 @@ class RssConnector extends DisplayObject, implements IDataProvider
 		
 		var me = this;
 		
-		startProviding(rootElement);
+		startProviding(groupElement);
 	}
 	
 	public function getData()
 	{
-//trace("getting data...");
 		if (src == null)
 		{
 			trace("INFO src not set.");
@@ -84,7 +87,7 @@ class RssConnector extends DisplayObject, implements IDataProvider
 			itemsData.push( generateDataObject(items.next()) );
 		}
 		
-		rootElement.dispatchData( { src : src, srcTitle : null, data : itemsData } );
+		groupElement.dispatchData( { src : src, srcTitle : null, data : itemsData } );
 	}
 	
 	/**

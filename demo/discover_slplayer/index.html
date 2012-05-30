@@ -12,6 +12,13 @@
 	<script> tag declaration.
 	-->
 	<script data-slp-use="slplayer.prototype.ui.CodeViewer"></script>
+	
+	<!-- 
+	As for now, the Group component must be included/declared before any Groupable component.
+	We may improve that in the future.
+	-->
+	<script data-slp-use="slplayer.ui.group.Group"></script>
+	
 	<script data-slp-use="slplayer.prototype.data.RssConnector"></script>
 	<script data-slp-use="slplayer.prototype.player.ImagePlayer"></script>
 	<script data-slp-use="slplayer.prototype.ui.TemplateRenderer"></script>
@@ -86,16 +93,37 @@
 		</div>
 		
 		<div style="margin:20px; margin-top:80px; width:1200px; padding:5px; font-size:14px;">
-			<div style="margin-bottom:10px;">TemplateReader component combined with an RssConnector component.</div>
+			<div style="margin-bottom:10px;">An example of Group component (super-component) with its inner groupable components.</div>
 			<div>Code:</div>
 			<pre class="CodeViewer" data-code-viewer-id="example04" style='color:#656565; font-size:14px; background-color:#d5d5d5; padding:5px;'></pre>
 			<div>Output:</div>
-			<div id="example04" style="height:200px;">
+			<div id="example04">
+				<div class="Group">
+					<div class="RssConnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2"></div>
+					<ul class="ImagePlayer">
+						<li><img src="assets/4.jpg" /></li>
+						::foreach data::<li><img style="height:155px;" title="::media_title::" alt="::media_title::" src="::media_thumbnail.url::" /></li>::end::
+						<li><img src="assets/1.png" /></li>
+						<li><img src="assets/2.png" /></li>
+						<li><img src="assets/3.png" /></li>
+					</ul>
+					<div class="BasicPlayerControl"></div>
+				</div>
+			</div>
+		</div>
+		
+		<div style="margin:20px; margin-top:80px; width:1200px; padding:5px; font-size:14px;">
+			<div style="margin-bottom:10px;">TemplateReader component combined with an RssConnector component.</div>
+			<div>Code:</div>
+			<pre class="CodeViewer" data-code-viewer-id="example05" style='color:#656565; font-size:14px; background-color:#d5d5d5; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example05" style="height:200px;">
 				<ul class="TemplateRenderer RssConnector" data-src-rss="http://feeds.bbci.co.uk/news/world/rss.xml">
 					::foreach data::<li><a href="::link::">::title:: : ::description::</a></li>::end::
 				</ul>
 			</div>
 		</div>
+		
 	</div>
 </body>
 </html>
