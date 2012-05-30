@@ -63,7 +63,7 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 		//check if no inner element have the buttons data- tags
 		for (searchedPair in [ firstButton , previousButton , nextButton , lastButton ])
 		{
-			var results = bodyElement.getElementsByAttribute("data-"+searchedPair.eltAttrId, "*");
+			var results = rootElement.parentNode.getElementsByAttribute("data-"+searchedPair.eltAttrId, "*");
 			
 			if (results.length > 0)
 			{
@@ -109,7 +109,7 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl
 		buttonContainer.appendChild(divNext);
 		buttonContainer.appendChild(divLast);
 		
-		bodyElement.parentNode.appendChild(buttonContainer);
+		rootElement.parentNode.appendChild(buttonContainer);
 	}
 	
 	private function onPlayableFirst():Void

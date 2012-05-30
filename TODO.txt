@@ -10,11 +10,11 @@ TODOS
 - skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
 
 - MAKE A STATIC/SINGLETON CONFIGURATION COMPONENT   (!!!)
-- manage when no classname in the component (!!!)
+
 
 - produce documentation (!!!) ***
 
-- get rid of the classnames static var ?
+- embed des assets (!!!)
 
 - don't put the gallery.html file in SLPlayer.hx (reference it at least as a compiler argument (!!!)
 
@@ -51,6 +51,8 @@ QUESTIONS
 DONE
 - make the <scripts> not trying to download anything if the corresponding component is in SLPlayer (OK)
 - CLEAN REPOSITORIES !!!
+- manage when no classname in the component (!!!)
+- get rid of the classnames static var ?
 
 
 
