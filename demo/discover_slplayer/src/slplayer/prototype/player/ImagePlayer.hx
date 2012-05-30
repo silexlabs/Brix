@@ -24,7 +24,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	/**
 	 * A list of allowed tag names for the root element.
 	 */
-	static var bodyElementNameFilter : List<String> = Lambda.list(["ul"]);
+	static var rootElementNameFilter : List<String> = Lambda.list(["ul"]);
 	
 	var currentIndex:Int;
 	
@@ -41,8 +41,8 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 		
 		initUI();
 		
-		tpl = untyped new Template(bodyElement.innerHTML);
-		bodyElement.innerHTML = "";
+		tpl = untyped new Template(rootElement.innerHTML);
+		rootElement.innerHTML = "";
 		
 		currentIndex = 0;
 		updateView();
@@ -57,7 +57,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 		//rootElement.style.listStyleType = "none";
 		//rootElement.style.listStylePosition = "inside";
 		//rootElement.style.margin = "0";
-		bodyElement.style.paddingLeft = "0";
+		rootElement.style.paddingLeft = "0";
 		//rootElement.style.padding = "0";
 	}
 	
@@ -74,14 +74,14 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 		}
 		
 		//execute template
-		bodyElement.innerHTML = tpl.execute({data:providersData});
+		rootElement.innerHTML = tpl.execute({data:providersData});
 		
 		dispatchOnChange(rootElement);
 		
 		dispatchIndex();
 		
 		//hide all but the selected item
-		var liChilds = bodyElement.getElementsByTagName("li");
+		var liChilds = rootElement.getElementsByTagName("li");
 		for ( liCnt in 0...liChilds.length)
 		{
 			liChilds[liCnt].style.display = "none";
@@ -91,7 +91,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	
 	function dispatchIndex()
 	{
-		var liChilds = bodyElement.getElementsByTagName("li");
+		var liChilds = rootElement.getElementsByTagName("li");
 		if (currentIndex <= 0)
 			dispatchOnFirst(rootElement);
 		else if (currentIndex >= liChilds.length-1)
@@ -100,7 +100,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	
 	function next():Void
 	{
-		if ( currentIndex < bodyElement.getElementsByTagName("li").length - 1 )
+		if ( currentIndex < rootElement.getElementsByTagName("li").length - 1 )
 			currentIndex++;
 		updateView();
 	}
@@ -120,7 +120,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	
 	private function last():Void
 	{
-		currentIndex = bodyElement.getElementsByTagName("li").length - 1;
+		currentIndex = rootElement.getElementsByTagName("li").length - 1;
 		updateView();
 	}
 	
