@@ -5,18 +5,10 @@ import sys.FileSystem;
 import haxe.macro.Expr;
 
 /**
+ * The Builder macro of any SLplayer application.
+ * What this macro do is basically : parse the application HTML file, add the necessary components import and init calls,
+ * cut the body part of the page and set it as the application contents.
  * 
-	  une macro split la page html en deux : body et head
-
-		. prend le contenu de <body> comme une chaine de caractère et génère 
-		js.Lib.document.body.innerHTML = "... la chaine ..."; 
-
-		. parse puis interprete le contenu de <head> comme la config de l'appli SLPlayer (par exemple taille de l'appli dans la balise meta viewport)
-
-		. interprete <script src="classes/Galery.js" /> comme ceci :
-		génère un "import classes.Galery;" (le dev doit avoir ajouté le bon class path pour qu on le trouve)
-		génère un "new Galery();" pour qu il soit executé dès le lancement de l appli
-	 
  * @author Thomas Fétiveau
  */
 
@@ -46,13 +38,10 @@ class AppBuilder
 		
 		var rowHtmlContent = neko.io.File.getContent(fileName);
 		
-		//ignore first line if <!DOCTYPE html>
-		//TODO
-		
 		//HTML content parsing
-		var htmlContent : Xml = Xml.parse(rowHtmlContent);
+		var htmlContent : Xml = haxe.xml.Parser.parse(rowHtmlContent);
 
-		for ( elt in htmlContent.firstChild().elements() )
+		for ( elt in htmlContent.firstElement().elements() )
 		{
 			switch(elt.nodeName.toLowerCase())
 			{
@@ -65,7 +54,7 @@ class AppBuilder
 							case "script":
 								
 								var cmpClassName = headElt.get("data-"+SLP_USE_ATTR_NAME);
-trace("found script "+cmpClassName);
+//trace("found script "+cmpClassName);
 								if (cmpClassName == null)
 								{
 									/*
@@ -133,11 +122,11 @@ trace("found script "+cmpClassName);
 													break;
 												
 												default :
-													trace("expr type ignored for field initDisplayObjects.");
+													//trace("expr type ignored for field initDisplayObjects.");
 											}
 										
 										default :
-											trace("field "+fields[fc].name+" ignored.");
+											//trace("field "+fields[fc].name+" ignored.");
 									}
 								}
 								
@@ -145,7 +134,7 @@ trace("found script "+cmpClassName);
 								//TODO
 								
 							default:
-								trace("Application configuration node "+headElt.nodeName+" ignored.");
+								//trace("Application configuration node "+headElt.nodeName+" ignored.");
 						}
 					}
 					
@@ -170,10 +159,11 @@ trace("found script "+cmpClassName);
 		return fields;
 	}
 	
-	/*
-	{ expr => EType({ expr => EConst(CIdent(debug)), pos  : pos },DebugNodes), pos  : pos }
-	{ expr => EType({ expr => EField({ expr => EConst(CIdent(silexlabs)), pos : pos },slplayer), pos : pos },DebugNodes), pos : pos }
-	*/
+	/**
+	 * Generate an import expression for a given class.
+	 * @param	full classname (with packages)
+	 * @return	an import Expr
+	 */
 	static function generateImport(classname : String) : Expr
 	{
 		var splitedClassName = classname.split(".");
@@ -187,6 +177,11 @@ trace("found script "+cmpClassName);
 		return { expr : EConst(CType(classname)), pos : haxe.macro.Context.currentPos() };
 	}
 	
+	/**
+	 * Generates the package part of an import Expr.
+	 * @param	path
+	 * @return	an part of an import Expr
+	 */
 	static function generateImportPackagePath(path : Array<String>) : Expr
 	{
 		if (path.length > 1)

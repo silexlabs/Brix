@@ -12,7 +12,6 @@ import js.Lib;
  */
 class Group extends DisplayObject
 {
-	//override private function new(rootElement : HtmlDom)
 	override public dynamic function init() : Void
 	{
 		groupMembers();
