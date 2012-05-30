@@ -22,10 +22,6 @@ using slplayer.ui.player.Playable;
 class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IPlayable
 {
 	/**
-	 * The class name associated with this component
-	 */
-	static var className = "imageplayer";
-	/**
 	 * A list of allowed tag names for the root element.
 	 */
 	static var bodyElementNameFilter : List<String> = Lambda.list(["ul"]);

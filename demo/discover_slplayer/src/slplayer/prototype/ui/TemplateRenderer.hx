@@ -19,11 +19,6 @@ using slplayer.data.DataConsumer;
 class TemplateRenderer extends DisplayObject, implements IDataConsumer
 {
 	/**
-	 * The class name associated with this component
-	 */
-	static var className = "template";
-	
-	/**
 	 * The Template object used to render the template syntax.
 	 */
 	var tpl : Template;
