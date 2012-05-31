@@ -5,19 +5,33 @@ import sys.FileSystem;
 import haxe.macro.Expr;
 
 /**
- * The Builder macro of any SLplayer application.
+ * The Builder macro of any SLPlayer application.
  * What this macro do is basically : parse the application HTML file, add the necessary components import and init calls,
  * cut the body part of the page and set it as the application contents.
  * 
  * @author Thomas Fétiveau
  */
-
 class AppBuilder 
 {
 	/**
 	 * The data- attribute set by the slplayer on the HTML elements associated with one or more component.
 	 */
 	static public var SLP_USE_ATTR_NAME = "slp-use";
+	/**
+	 * The path to the application HTML source page.
+	 */
+	static public var htmlSourcePage = "index.html";
+	
+	/**
+	 * Sets the html page from the compile command line.
+	 * @param	key
+	 * @param	value
+	 */
+	@:macro static public function setHtmlSourcePage(value:String)
+	{
+        htmlSourcePage = value;
+        return null;
+    }
 	
 	/**
 	 * Builds an SLPlayer application from an HTML file.
@@ -25,18 +39,18 @@ class AppBuilder
 	 * The header part is used to configure the application. It also includes the components which may be used by the application.
 	 * The body part is the content and layout of the application.
 	 * @param	fileName
-	 * @return
+	 * @return	the updated SLPlayer class fields 
 	 */
-	@:macro static function buildFromHtml( fileName : String ) :  Array<Field>
+	@:macro static function buildFromHtml() :  Array<Field>
 	{
 		var fields = haxe.macro.Context.getBuildFields();
 		var pos;
 		
 		//First read the HTML file
-		if (!FileSystem.exists(fileName))
-			throw fileName + " not found !";
+		if (!FileSystem.exists(htmlSourcePage))
+			throw htmlSourcePage + " not found !";
 		
-		var rowHtmlContent = neko.io.File.getContent(fileName);
+		var rowHtmlContent = neko.io.File.getContent(htmlSourcePage);
 		
 		//HTML content parsing
 		var htmlContent : Xml = haxe.xml.Parser.parse(rowHtmlContent);
@@ -173,7 +187,6 @@ class AppBuilder
 		{
 			return { expr : EType( generateImportPackagePath(splitedClassName) , realClassName), pos : haxe.macro.Context.currentPos() };
 		}
-		
 		return { expr : EConst(CType(classname)), pos : haxe.macro.Context.currentPos() };
 	}
 	

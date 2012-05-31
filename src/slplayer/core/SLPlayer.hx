@@ -11,7 +11,7 @@ import slplayer.ui.DisplayObject;
  * with the AppBuilder building macro.
  * @author Thomas Fétiveau
  */
-@:build(slplayer.macro.AppBuilder.buildFromHtml('index.html')) class SLPlayer 
+@:build(slplayer.macro.AppBuilder.buildFromHtml()) class SLPlayer 
 {
 	/**
 	 * A Hash keeping all component instances indexed by node slplayer id.
