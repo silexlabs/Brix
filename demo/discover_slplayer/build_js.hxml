@@ -2,3 +2,4 @@
 -cp ./src/
 -cp ../../src/
 -main slplayer.core.SLPlayer
+--macro slplayer.macro.AppBuilder.setHtmlSourcePage('source.html')

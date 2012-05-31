@@ -7,3 +7,4 @@
 -main slplayer.core.SLPlayer
 --remap js:cocktail
 -swf-version 10.2
+--macro slplayer.macro.AppBuilder.setHtmlSourcePage('source.html')
