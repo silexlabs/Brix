@@ -51,7 +51,7 @@ class Group extends DisplayObject
 				}
 			}
 			
-			Lambda.concat(groupables, discoverGroupableChilds(directChilds[childCnt]));
+			groupables = Lambda.concat(groupables, discoverGroupableChilds(directChilds[childCnt]));
 		}
 		
 		return groupables;
