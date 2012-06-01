@@ -1,28 +1,65 @@
+IDEAS
+
+- 2 levels of asset embedding (local & full)
+
+- links parsed to embed other pages HTML ?
+
+- use in Macro Context : static function warning( msg : String, pos : Position ) : Void
+Available in neko
+Display a compilation warning at the given position in code
+
+
+TASKS
+-----------------------------------------------------
+BUGS
+-----------------------------------------------------
+- groups => takes into account all inner inner childs
+-----------------------------------------------------
+- getElementByClassName => case insensitive !!!! :S
+-----------------------------------------------------
+
+Thomas : reflexions SLPlayer
+
+- Dans le slplayer, passer à tous les display une référence au noeud racine du code embed du player 		<= obsolète ?
+
+- attributs des noeuds doivent êtres "passés" sur les composants											<= obsolète ?
+		<div class="moncomp" data-mavar="test" />
+		  => moncomp = new MonComp() et moncomp.mavar = "test"
+		remarque de JB
+
+- le .js généré est référencé	???
+
+- propriété margin et short hand	???
+
+cf plus bas, ce qui manque au SLPlayer pour ebuzzing
+
+compilation et verif HTML		 - 5j
+modifs archi					 - 5j (fonction des choix archi à faire dès la 1ere semaine)
+optim et refactoring proto		 - 5j
+debugage						 - 5j
+
+
 TODOS
   
 
-- don't put the gallery.html file in SLPlayer.hx (reference it at least as a compiler argument (!!!)
-  
-- embed des assets (!!!)
+@MAIN ISSUE
+- EMBED DES ASSETS
 
-- manage the doctypes when parsing !!!
+@MAIN ISSUE
+- EMBED HTML IN JS AND START POINT 
 
-- MAKE A STATIC/SINGLETON CONFIGURATION COMPONENT   (!!!)
+@MAIN ISSUE
+- PRODUCE DOCUMENTATION
 
+- a solution for the templates, not to appear at application startup ?
 
-- produce documentation (!!!) ***
+- an option that makes the main class changing its name and prefix all the app packages 
 
+- copy generated HTML ?
 
-- document everything (!!!)
-
-- parse the metadata and extract the viewport 
 - check what other meta data we could use/extract 
 
-- add a way to ignore some <script> headers (for non components libraries) : fe with a data-ignore tag 
-
-
 - make a set of components :
-
   * form set: inputs, buttons, checkboxes...
   * skinning system & examples
   
@@ -48,13 +85,15 @@ DONE
 - manage when no classname in the component (!!!)
 - get rid of the classnames static var ?
 - check we don't initialize a component twice  (!!!)
-
+- manage the doctypes when parsing !!!
+@MAIN ISSUES
+- DON'T PUT THE INDEX.HTML FILE IN SLPLAYER.HX (REFERENCE IT AT LEAST AS A COMPILER ARGUMENT (!!!)
 
 ABORTED
 - manage both syntaxes for components (with body and template and without)   [WIP]   (!!!) *** create Templatable contract ?
   * templateRenderer with reverse template syntax	[WIP]	(!!!)
 - skinning: class styles on the parts of the components, used also to get references in the component class, and also you can redefine the containers  (!!!)
-
+- parse the metadata and extract the viewport 
 
 ------------------------
 Discussion lundi soir :

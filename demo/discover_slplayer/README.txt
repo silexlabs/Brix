@@ -1,4 +1,6 @@
-Author: Thomas Fétiveau, Silex Labs.
+Author: Thomas Fétiveau
+Lisence: GPL
+Copyright: Silex Labs
 
 To run this demo: 
 

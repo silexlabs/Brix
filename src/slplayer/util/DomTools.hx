@@ -1,4 +1,4 @@
-package slplayer.prototype.util;
+package slplayer.util;
 
 import js.Lib;
 import js.Dom;

@@ -10,7 +10,8 @@
 	specifying the full class name of the component to use.
 	
 	If your component takes any parameter for its initialization, specify it as a "data-..." attribute of its 
-	<script> tag declaration.
+	<script> tag declaration. For example : 
+	<script src="slplayer/prototype/config/JsonConfiguration.js" data-json-src="conf.json"></script>
 	-->
 	<script data-slp-use="slplayer.prototype.ui.CodeViewer"></script>
 	
@@ -25,9 +26,9 @@
 	<script data-slp-use="slplayer.prototype.ui.TemplateRenderer"></script>
 	<script data-slp-use="slplayer.prototype.player.BasicPlayerControl"></script>
 	<script data-slp-use="slplayer.prototype.player.AutoPlayer"></script>
-	<!-- <script src="slplayer/prototype/config/JsonConfiguration.js" data-json-src="conf.json"></script> -->
 </head>
 <body>
+	
 	<div style="font-family:Sans-serif;">
 		<div>TRY <a href="index.html">JS VERSION</a> or <a href="index_as3.html">AS3 VERSION</a></div>
 		

@@ -5,6 +5,8 @@ import js.Dom;
 
 import slplayer.ui.DisplayObject;
 
+import slplayer.core.SLPlayer;
+
 using StringTools;
 
 /**

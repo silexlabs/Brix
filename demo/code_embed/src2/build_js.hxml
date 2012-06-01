@@ -1,0 +1,6 @@
+-js ../bin/myEmbeddedSLPlayerApplication2.js
+-cp .
+-cp ../../../src/
+-main slplayer.core.SLPlayer
+-D embedHtml
+-D noAutoStart

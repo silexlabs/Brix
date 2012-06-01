@@ -38,13 +38,40 @@ class AppBuilder
 	 * Splits the input HTML file in two parts: the header part and the body.
 	 * The header part is used to configure the application. It also includes the components which may be used by the application.
 	 * The body part is the content and layout of the application.
-	 * @param	fileName
 	 * @return	the updated SLPlayer class fields 
 	 */
 	@:macro static function buildFromHtml() :  Array<Field>
 	{
+		var pos = haxe.macro.Context.currentPos();
+		
+		var output = haxe.macro.Compiler.getOutput();
+		
+		//Sets the SLPlayer exposed name for js version
+		if (haxe.macro.Context.defined('js'))
+		{
+			var outputFileName = output.substr(output.lastIndexOf('/') + 1, output.lastIndexOf('.') - output.lastIndexOf('/') - 1);
+			
+			if (!haxe.macro.Context.defined('js-modern'))
+			{
+				#if debug
+					trace("Setting js-modern mode.");
+				#end
+				haxe.macro.Compiler.define("js-modern");
+			}
+			
+			//FIXME add a compile tag and a meta tag to set the expose name to something else than the default value which is the .js file name
+			
+			if ( haxe.macro.Context.getLocalClass().get().meta.has(":expose"))
+			{
+				haxe.macro.Context.warning( "You should not set manually the @:expose meta tag on SLPlayer class. SLPlayer sets it automatically to the name of your .js file." , pos );
+			}
+			else
+			{
+				haxe.macro.Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(outputFileName)), pos : pos }], pos);
+			}
+		}
+		
 		var fields = haxe.macro.Context.getBuildFields();
-		var pos;
 		
 		//First read the HTML file
 		if (!FileSystem.exists(htmlSourcePage))
@@ -60,7 +87,7 @@ class AppBuilder
 			switch(elt.nodeName.toLowerCase())
 			{
 				case "head":
-//trace("head content: "+elt.toString());
+					
 					for (headElt in elt.elements())
 					{
 						switch(headElt.nodeName.toLowerCase())
@@ -68,45 +95,38 @@ class AppBuilder
 							case "script":
 								
 								var cmpClassName = headElt.get("data-"+SLP_USE_ATTR_NAME);
-//trace("found script "+cmpClassName);
+								
 								if (cmpClassName == null)
 								{
-									/*
-									var srcPath = headElt.get("src");
-									
-									if (cmpClassName == "SLPlayer.js") //FIXME this has to be the name of the .js compilation output file.
-										continue;
-									
-									if StringTools.endsWith(cmpClassName.toLowerCase(), ".js"))
-									{
-										cmpClassName = cmpClassName.substr(0, cmpClassName.length - 3);
-										cmpClassName = StringTools.replace( cmpClassName, "/", "." );
-										trace("found cmpClassName=" + cmpClassName);
-									}
-									*/
 									continue;
 								}
+								
+								#if debug
+									trace("component found => "+cmpClassName);
+								#end
 								
 								var initArgsElts:Iterable<String> = { iterator : headElt.attributes };
 								
 								for (fc in 0...fields.length)
 								{
-//trace("\n"+fields[fc]+"\n");
 									switch (fields[fc].kind)
 									{
 										case FFun(f) :
+											
 											if (fields[fc].name != "registerComponentsforInit")
 											{
 												continue;
 											}
-//trace(fields[fc]);
+											
 											switch (f.expr.expr)
 											{
 												case EBlock(exprs):
+													
 													pos = haxe.macro.Context.currentPos();
+													
 													//exprs.push({ expr : ENew( { name : cmpClassName, pack : [], params : [], sub : null }, []) , pos : pos });
 													//trace("added new "+cmpClassName+"() call");
-
+													
 													//exprs.push({ expr : ECall( { expr : EField( { expr : EConst(CType(cmpClassName)), pos : pos }, "initAll"), pos : pos }, [] ) , pos : pos });
 													//trace("added call to "+cmpClassName+".main()");
 													
@@ -124,6 +144,7 @@ class AppBuilder
 															if (StringTools.startsWith( initArgElt , "data-" ) && initArgElt != "data-"+SLP_USE_ATTR_NAME)
 																exprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
 														}
+														
 														//generate call to registerComponent with additionnal arguments
 														exprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
 													}
@@ -132,9 +153,13 @@ class AppBuilder
 														//generate call to registerComponent with no additionnal arguments
 														exprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
 													}
-//trace("added call to registerComponent("+cmpClassName+")");
+													
+													#if debug
+														trace("added call to registerComponent("+cmpClassName+")");
+													#end
+													
 													break;
-												
+													
 												default :
 													//trace("expr type ignored for field initDisplayObjects.");
 											}
@@ -153,21 +178,39 @@ class AppBuilder
 					}
 					
 				case "body":
-					//Add the _htmlBody static var to the SLPlayer class
-					pos = haxe.macro.Context.currentPos();
 					
-					var htmlBodyFieldType = TPath( { pack : [], name : "String", params : [], sub : null } );
-					
-					var bodyInnerHtml = "";
-					if (elt.firstChild() != null)
-						bodyInnerHtml = elt.firstChild().toString();
-					
-					var htmlBodyFieldValue = { expr : EConst(CString(elt.firstChild().toString())) , pos : pos };
-					
-					fields.push({ name : "_htmlBody", doc : null, meta : [], access : [AStatic], kind : FVar(htmlBodyFieldType, htmlBodyFieldValue), pos : pos });
+					if (!haxe.macro.Context.defined('js') || haxe.macro.Context.defined('embedHtml')) //embed HTML only if not js except if we want to
+					{
+						//Add the _htmlBody static var to the SLPlayer class
+						pos = haxe.macro.Context.currentPos();
+						
+						var htmlBodyFieldType = TPath( { pack : [], name : "String", params : [], sub : null } );
+						
+						var bodyInnerHtml = "";
+						
+						if (elt.toString() != null)
+						{
+							bodyInnerHtml = haxe.Serializer.run(elt.toString());
+							
+							//#if debug
+								//trace("bodyInnerHtml = "+bodyInnerHtml);
+							//#end
+						}
+						
+						var htmlBodyFieldValue = { expr : EConst(CString(bodyInnerHtml)) , pos : pos };
+						
+						fields.push( { name : "_htmlBody", doc : null, meta : [], access : [AStatic], kind : FVar(htmlBodyFieldType, htmlBodyFieldValue), pos : pos } );
+							
+						#if debug
+							trace("bodyInnerHtml extracted and set on SLPlayer with a length of "+bodyInnerHtml.length);
+						#end
+					}
 					
 				default:
-					trace("Main application node "+elt.nodeName+" ignored.");
+					
+					#if debug
+						trace("Main application node " + elt.nodeName + " ignored.");
+					#end
 			}
 		}
 		return fields;

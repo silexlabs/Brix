@@ -25,7 +25,7 @@ class DebugNodes  extends DisplayObject
 	
 	public function debugNodes(e : Event)
 	{
-		debugNode(Lib.document.body);
+		debugNode(SLPlayer.htmlRootElement);
 	}
 	
 	public function debugNode(node : HtmlDom)
