@@ -58,6 +58,14 @@ import slplayer.core.SLPlayerComponent;
 	private var metaParameters : Hash<String>;
 	
 	/**
+	 * Gets a meta parameter value.
+	 */
+	public function getMetaParameter(metaParamKey:String):Null<String>
+	{
+		return metaParameters.get(metaParamKey);
+	}
+	
+	/**
 	 * SLPlayer application constructor.
 	 * @param	?args		optional, args of any nature from outside the SLPlayer application.
 	 */
@@ -86,7 +94,7 @@ import slplayer.core.SLPlayerComponent;
 	private function launch(?appendTo:Null<Dynamic>)
 	{
 		#if debug
-			trace("Launching SLPlayer id "+id+"...");
+			trace("Launching SLPlayer id "+id+" on "+appendTo);
 		#end
 		
 		if (appendTo != null) //set the SLPlayer application root element
@@ -96,9 +104,7 @@ import slplayer.core.SLPlayerComponent;
 		if (htmlRootElement == null || htmlRootElement.nodeType != Lib.document.body.nodeType)
 			htmlRootElement = Lib.document.body;
 		
-		#if (!js || embedHtml)
-			htmlRootElement.innerHTML = _htmlBody;
-		#end
+		initHtmlRootElementContent();
 		
 		//build the SLPlayer instance meta parameters Hash
 		initMetaParameters();
@@ -115,6 +121,16 @@ import slplayer.core.SLPlayerComponent;
 	}
 	
 	/**
+	 * This function is implemented by the AppBuilder macro
+	 */
+	private function initHtmlRootElementContent()
+	{
+		//#if (!js || embedHtml)
+		//htmlRootElement.innerHTML = _htmlBody; // this call is added by the macro if needed
+		//#end
+	}
+	
+	/**
 	 * Generates unique ids for SLPlayer instances and for HTML nodes.
 	 * FIXME ? there may be a better way to get a unique id...
 	 * @return String, a unique id.
@@ -125,14 +141,14 @@ import slplayer.core.SLPlayerComponent;
 	}
 	
 	/**
-	 * The main entry point of every SLPlayer application.
+	 * The main entry point of every SLPlayer application. The implementation of this method is completed by the AppBuilder macro.
 	 * @param	?appendTo	optional, the element (HTML DOM in js, Sprite in Flash) to which append the SLPlayer application to.
 	 * @param	?args		optional, args of any nature from outside the SLPlayer application.
 	 */
 	static public function init(?appendTo:Dynamic, ?args:Dynamic )
 	{
 		#if debug
-			trace("SLPlayer init() called !");
+			trace("SLPlayer init() called with appendTo="+appendTo+" and args="+args);
 		#end
 		
 		//generate a new SLPlayerInstance id
@@ -148,39 +164,20 @@ import slplayer.core.SLPlayerComponent;
 			trace("setting ref to SLPlayer instance "+newId);
 		#end
 		instances.set(newId, newInstance);
-		
-		#if (js && !embedHtml) //in js, if the HTML code isn't embedded, the SLPlayer application starts on window.onload
-			Lib.window.onload = function (e:Event) 	{ newInstance.launch(appendTo); }; //FIXME should this be managed by SLPlayer ?! 
-		#else
-			newInstance.launch(appendTo);
-		#end
 	}
 	
 	/**
-	 * The main entry point in autoStart mode.
+	 * The main entry point in autoStart mode. This function is implemented by the AppBuilder macro.
 	 */
-	static public function main()
-	{
-		#if debug
-			trace("SLPlayer main() called !");
-		#end
-		
-		#if (js && embedHtml && !noAutoStart)
-			trace("WARNING you've chosen the embedHtml option for the js target but didn't deactivate the auto start. The application will thus try to startup as soon as its .js script will be included in your page. To deactivate auto start, use -D noAutoStart in your compile command line.");
-		#end
-		#if !noAutoStart
-			init();
-		#end
-	}
-
+	static public function main() {	}
 	
 	/**
-	 * This function is filled in by the AppBuilder macro.
+	 * This function is implemented by the AppBuilder macro.
 	 */
 	private function initMetaParameters() { }
 	
 	/**
-	 * This function is filled in by the AppBuilder macro.
+	 * This function is implemented by the AppBuilder macro.
 	 */
 	private function registerComponentsforInit() { }
 	

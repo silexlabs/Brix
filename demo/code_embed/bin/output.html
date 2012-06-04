@@ -10,15 +10,18 @@
 		li { margin:8px; }
 		body {font-family:'Arial'; color:#656565;}
 	</style>
+	<script type="text/javascript" src="myEmbeddedSLPlayerApplication2.js" ></script>
+	<script type="text/javascript" src="myEmbeddedSLPlayerApplication.js" ></script>
 </head>
 <body>
 <script type="text/javascript" >
 	window.onload = function() {
 		myEmbeddedSLPlayerApplication.init(document.getElementById('myEmbeddedSLPlayerApplication'));
 		
-		myEmbeddedSLPlayerApplication2.init(document.getElementById('myEmbeddedSLPlayerApplication2'));
+		//see the HTML source of myEmbeddedSLPlayerApplication2.js to understand why the exposed name is MyGallery in that case
+		MyGallery.init(document.getElementById('myEmbeddedSLPlayerApplication2'));
 		
-		myEmbeddedSLPlayerApplication2.init(document.getElementById('myEmbeddedSLPlayerApplication2bis'));
+		MyGallery.init(document.getElementById('myEmbeddedSLPlayerApplication2bis'));
 	}
 </script>
 
@@ -34,13 +37,11 @@
 
 <div class="block">
 	My embedded SLPlayer application :
-	<script type="text/javascript" src="myEmbeddedSLPlayerApplication.js" ></script>
 	<div style="border:1px solid black;" id="myEmbeddedSLPlayerApplication"></div>
 </div>
 
 <div class="block">
 	Another SLPlayer embedded application :
-	<script type="text/javascript" src="myEmbeddedSLPlayerApplication2.js" ></script>
 	<div style="border:1px solid black;" id="myEmbeddedSLPlayerApplication2"></div>
 </div>
 

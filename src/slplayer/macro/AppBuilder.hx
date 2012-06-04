@@ -22,6 +22,13 @@ class AppBuilder
 	 */
 	static public var htmlSourcePage = "index.html";
 	
+	
+	/**
+	 * The js exposed name.
+	 * FIXME I don't like it to be an AppBuiler var...
+	 */
+	static public var jsExposedName : String;
+	
 	/**
 	 * Sets the html page from the compile command line.
 	 * @param	key
@@ -53,6 +60,9 @@ class AppBuilder
 		//parse the SLPlayer class fields to find the methods to fill in
 		var initMetaParametersExprs;
 		var registerComponentsforInitExprs;
+		var mainExprs;
+		var initExprs;
+		var initHtmlRootElementContentExprs;
 		
 		for (fc in 0...fields.length)
 		{
@@ -69,6 +79,15 @@ class AppBuilder
 							
 							if (fields[fc].name == "registerComponentsforInit")
 								registerComponentsforInitExprs = exprs;
+							
+							if (fields[fc].name == "main")
+								mainExprs = exprs;
+							
+							if (fields[fc].name == "init")
+								initExprs = exprs;
+							
+							if (fields[fc].name == "initHtmlRootElementContent")
+								initHtmlRootElementContentExprs = exprs;
 						
 						default : 
 					}
@@ -107,12 +126,6 @@ class AppBuilder
 								var initArgsElts:Iterable<String> = { iterator : headElt.attributes };
 								
 								pos = haxe.macro.Context.currentPos();
-								
-								//exprs.push({ expr : ENew( { name : cmpClassName, pack : [], params : [], sub : null }, []) , pos : pos });
-								//trace("added new "+cmpClassName+"() call");
-								
-								//exprs.push({ expr : ECall( { expr : EField( { expr : EConst(CType(cmpClassName)), pos : pos }, "initAll"), pos : pos }, [] ) , pos : pos });
-								//trace("added call to "+cmpClassName+".main()");
 								
 								//generate import
 								registerComponentsforInitExprs.push(generateImport(cmpClassName));
@@ -158,6 +171,40 @@ class AppBuilder
 								if (headElt.get("name") == null)
 									continue;
 								
+								pos = haxe.macro.Context.currentPos();
+								
+								#if debug
+									trace("found meta parameter : "+headElt.get("name")+" => "+headElt.get("content"));
+								#end
+								
+								//interpret meta parameter
+								var compilerFlags = ["noAutoStart", "embedHtml"];
+		
+								if ( Lambda.exists(compilerFlags, function(s:String) { return s == headElt.get("name"); } ) && headElt.get("content") == "true" )
+								{
+									//we define the tag for the compilation
+									haxe.macro.Compiler.define(headElt.get("name"));
+									//and remove the meta tag from the HTML (no need at runtime)
+									elt.removeChild(headElt);
+									continue;
+								}
+								
+								if (headElt.get("name") == "jsExposedName")
+								{
+									if (StringTools.replace(headElt.get("content"), " ", "") == "")
+									{
+										haxe.macro.Context.warning("Invalid jsExposedName value, use default one instead.", pos);
+									}
+									else
+									{
+										jsExposedName = headElt.get("content");
+									}
+									//no need of that at runtime, remove it from HTML
+									elt.removeChild(headElt);
+									continue;
+								}
+								
+								//then it's a custom meta param (or a HTML one => manage this case ?) potentially needed at runtime
 								initMetaParametersExprs.push(  { expr : ECall( { expr : EField( { expr : EConst(CIdent( "metaParameters" )), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString( headElt.get("name") )), pos : pos }, { expr : EConst(CString( headElt.get("content") )), pos : pos } ]), pos : pos }  );
 								
 							default:
@@ -186,6 +233,9 @@ class AppBuilder
 						#if debug
 							trace("bodyInnerHtml extracted and set on SLPlayer with a length of "+bodyInnerHtml.length);
 						#end
+						
+						//Add initalization expr of htmlRootElement.innerHTML to _htmlBody
+						initHtmlRootElementContentExprs.push({ expr : EBinop(OpAssign, { expr : EField( { expr : EConst(CIdent("htmlRootElement")), pos : pos }, "innerHTML"), pos : pos }, { expr : EConst(CIdent("_htmlBody")), pos : pos } ), pos : pos });
 					}
 					
 				default:
@@ -199,6 +249,29 @@ class AppBuilder
 		if (haxe.macro.Context.defined('js'))
 		{
 			packForJs(htmlContent.toString());
+		}
+		
+		if (!haxe.macro.Context.defined('noAutoStart'))
+		{
+			//if the noAutoStart method is not set, then add a call to init() in the SLPlayer main method.
+			mainExprs.push({ expr : ECall( { expr : EConst(CIdent("init")), pos : pos }, [ ] ) , pos : pos });
+		}
+		
+		if (haxe.macro.Context.defined('js') && !haxe.macro.Context.defined('embedHtml'))
+		{
+			#if debug
+				trace("Add call to launch on windows.onload");
+			#end
+			//Add this call in init() method :  Lib.window.onload = function (e:Event) 	{ newInstance.launch(appendTo); };
+			initExprs.push( { expr : EBinop(OpAssign, { expr : EField( { expr : EField( { expr : EConst(CType("Lib")), pos : pos }, "window"), pos : pos }, "onload"), pos : pos }, { expr : EFunction(null, { args : [ { name : "e", type : TPath( { name: "Event", pack : [], params : [], sub : null } ), opt : false, value : null } ], expr : { expr : EBlock([ { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } ]), pos : pos }, params : [], ret : null } ), pos : pos } ), pos : pos } );
+		}
+		else
+		{
+			#if debug
+				trace("Add call to launch");
+			#end
+			//Add this call in init method : newInstance.launch(appendTo);
+			initExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } );
 		}
 		
 		return fields;
@@ -225,8 +298,6 @@ class AppBuilder
 			haxe.macro.Compiler.define("js-modern");
 		}
 		
-		//FIXME add a compile tag and a meta tag to set the expose name to something else than the default value which is the .js file name
-		
 		//Set the SLPlayer Class exposed name for js version
 		if ( haxe.macro.Context.getLocalClass().get().meta.has(":expose"))
 		{
@@ -234,18 +305,32 @@ class AppBuilder
 		}
 		else
 		{
-			haxe.macro.Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(outputFileName)), pos : pos }], pos);
+			#if debug
+				trace("Setting @:expose meta tag on SLPlayer class.");
+			#end
+			
+			if (jsExposedName == null)
+			{
+				jsExposedName = outputFileName;
+			}
+			
+			haxe.macro.Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
 		}
 		
-		#if !embedHtml
+		if (!haxe.macro.Context.defined('embedHtml'))
+		{
 			var outputDirectory = "./";
 			
 			if (output.lastIndexOf('/') != null)
 				outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
 			
+			#if debug
+				trace("Saving "+outputDirectory + outputFileName+".html");
+			#end
+			
 			//generates the output HTML file if not embed
 			sys.io.File.saveContent( outputDirectory + outputFileName+".html" , compiledHTML );
-		#end
+		}
 	}
 	
 	/**
