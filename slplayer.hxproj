@@ -17,6 +17,7 @@
   <classpaths>
     <class path="demo\discover_slplayer\src" />
     <class path="src" />
+    <class path="demo\html_parsing\bin" />
   </classpaths>
   <!-- Build options -->
   <build>

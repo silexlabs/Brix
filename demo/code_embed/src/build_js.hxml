@@ -1,6 +1,7 @@
 -js ../bin/myEmbeddedSLPlayerApplication.js
 -cp .
 -cp ../../../src/
+-debug
 -main slplayer.core.SLPlayer
 -D embedHtml
 -D noAutoStart

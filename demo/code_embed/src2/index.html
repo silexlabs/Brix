@@ -1,6 +1,13 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
+	<!-- 
+	Here are defined SLPlayer meta parameters. One can also define custom params that will be accessible at runtime through the 
+	getMetaParameter(name:String):String method of the SLPlayer instance.
+	-->
+	<meta name="jsExposedName" content="MyGallery" /> <!-- This meta tag forces the js exposed name to the value we want -->
+	<meta name="embedHtml" content="true" /> <!-- Equivalent to the -embedHtml parameter -->
+	<meta name="noAutoStart" content="true" /> <!-- Equivalent to the -noAutoStart parameter -->
 	<script data-slp-use="slplayer.prototype.player.ImagePlayer"></script>
 	<script data-slp-use="slplayer.prototype.player.BasicPlayerControl"></script>
 	<title></title>
