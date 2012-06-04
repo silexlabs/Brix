@@ -5,6 +5,8 @@ import js.Dom;
 
 import slplayer.ui.DisplayObject;
 
+import slplayer.core.SLPlayerComponent;
+
 /**
  * The main SLPlayer class handles the application initialization. It instanciates the components, tracking for each of them their 
  * association with their DOM rootElement. This class is based on the content of the application HTML file and is thus associated 
@@ -20,8 +22,19 @@ import slplayer.ui.DisplayObject;
 	/**
 	 * A Hash of SLPlayer instances indexed by their id.
 	 */
-	static private var instance : Null<SLPlayer>;
+	static private var instances : Hash<SLPlayer> = new Hash();
+	/**
+	 * Gets an SLPlayer instance corresponding to an id.
+	 */
+	static public function get(SLPId:String):Null<SLPlayer>
+	{
+		return instances.get(SLPId);
+	}
 	
+	/**
+	 * The SLPlayer instance id.
+	 */
+	private var id : String;
 	/**
 	 * A Hash keeping all component instances indexed by node slplayer id.
 	 */
@@ -39,31 +52,30 @@ import slplayer.ui.DisplayObject;
 	 * A collection of the <script> declared components with the optionnal data- args passed on the <script> tag.
 	 */
 	private var registeredComponents : Hash<Null<Hash<String>>>;
-	
 	/**
-	 * Gets an SLPlayer instance corresponding to an id.
+	 * A collection of name => content <meta> header parameters from the source HTML page.
 	 */
-	static public function get():Null<SLPlayer>
-	{
-		return instance;
-	}
+	private var metaParameters : Hash<String>;
 	
 	/**
 	 * SLPlayer application constructor.
 	 * @param	?args		optional, args of any nature from outside the SLPlayer application.
 	 */
-	private function new(?args:Dynamic) 
+	private function new(id:String, ?args:Dynamic) 
 	{
-		dataObject = args;
+		this.dataObject = args;
 		
-		//Set the body HTML content if not js
-		#if (!js || embedHtml)
-			_htmlBody = haxe.Unserializer.run(_htmlBody);
+		this.id = id;
+		
+		this.registeredComponents = new Hash();
+		
+		this.nodeToCmpInstances = new Hash();
+		
+		this.metaParameters = new Hash();
+		
+		#if debug
+			trace("new SLPlayer instance built");
 		#end
-		
-		registeredComponents = new Hash();
-		
-		nodeToCmpInstances = new Hash();
 	}
 	
 	/**
@@ -71,8 +83,12 @@ import slplayer.ui.DisplayObject;
 	 * @param	?appendTo	optional, the parent application's node to which to hook this SLplayer application. By default or if
 	 * the given node is invalid, it's the document's body element (or equivalent if not js) that is used for that.
 	 */
-	private function launch(?appendTo:Dynamic)
+	private function launch(?appendTo:Null<Dynamic>)
 	{
+		#if debug
+			trace("Launching SLPlayer id "+id+"...");
+		#end
+		
 		if (appendTo != null) //set the SLPlayer application root element
 			htmlRootElement = cast appendTo;
 		
@@ -84,8 +100,28 @@ import slplayer.ui.DisplayObject;
 			htmlRootElement.innerHTML = _htmlBody;
 		#end
 		
+		//build the SLPlayer instance meta parameters Hash
+		initMetaParameters();
+		
+		//register the application components for initialization
 		registerComponentsforInit();
+		
+		//call the UI components init() method
 		initComponents();
+		
+		#if debug
+			trace("SLPlayer id "+id+" launched !");
+		#end
+	}
+	
+	/**
+	 * Generates unique ids for SLPlayer instances and for HTML nodes.
+	 * FIXME ? there may be a better way to get a unique id...
+	 * @return String, a unique id.
+	 */
+	static private function generateUniqueId():String
+	{
+		return haxe.Md5.encode(Date.now().toString()+Std.string(Std.random(Std.int(Date.now().getTime()))));
 	}
 	
 	/**
@@ -93,17 +129,30 @@ import slplayer.ui.DisplayObject;
 	 * @param	?appendTo	optional, the element (HTML DOM in js, Sprite in Flash) to which append the SLPlayer application to.
 	 * @param	?args		optional, args of any nature from outside the SLPlayer application.
 	 */
-	public static function init(?appendTo:Dynamic, ?args:Dynamic )
+	static public function init(?appendTo:Dynamic, ?args:Dynamic )
 	{
-		if (instance != null)
-			throw "ERROR cannot build more than one instance of SLPlayer in the same runtime.";
+		#if debug
+			trace("SLPlayer init() called !");
+		#end
 		
-		instance = new SLPlayer(args);
+		//generate a new SLPlayerInstance id
+		var newId = generateUniqueId();
+		
+		#if debug
+			trace("New SLPlayer id created : "+newId);
+		#end
+		
+		//the new SLPlayer instance
+		var newInstance = new SLPlayer(newId, args);
+		#if debug
+			trace("setting ref to SLPlayer instance "+newId);
+		#end
+		instances.set(newId, newInstance);
 		
 		#if (js && !embedHtml) //in js, if the HTML code isn't embedded, the SLPlayer application starts on window.onload
-			Lib.window.onload = function (e:Event) 	{ instance.launch(appendTo); }; //FIXME should this be managed by SLPlayer ?! 
+			Lib.window.onload = function (e:Event) 	{ newInstance.launch(appendTo); }; //FIXME should this be managed by SLPlayer ?! 
 		#else
-			instance.launch(appendTo);
+			newInstance.launch(appendTo);
 		#end
 	}
 	
@@ -112,14 +161,24 @@ import slplayer.ui.DisplayObject;
 	 */
 	static public function main()
 	{
+		#if debug
+			trace("SLPlayer main() called !");
+		#end
+		
 		#if (js && embedHtml && !noAutoStart)
-			trace("WARNING you've chosen the embedHtml option for the js target but didn't deactivate the auto start. The application will thus try to startup as soon as it's .js script will be included in your page. To deactivate auto start, use -D noAutoStart in your compile command line.");
+			trace("WARNING you've chosen the embedHtml option for the js target but didn't deactivate the auto start. The application will thus try to startup as soon as its .js script will be included in your page. To deactivate auto start, use -D noAutoStart in your compile command line.");
 		#end
 		#if !noAutoStart
 			init();
 		#end
 	}
 
+	
+	/**
+	 * This function is filled in by the AppBuilder macro.
+	 */
+	private function initMetaParameters() { }
+	
 	/**
 	 * This function is filled in by the AppBuilder macro.
 	 */
@@ -131,7 +190,8 @@ import slplayer.ui.DisplayObject;
 	}
 
 	/**
-	 * 
+	 * Initialize the application's components in 2 stages : first create the instances and then call init()
+	 * on each DisplayObject component.
 	 */
 	private function initComponents()
 	{
@@ -156,6 +216,10 @@ import slplayer.ui.DisplayObject;
 	 */
 	private function createComponentsOfType(componentClassName : String , ?args:Hash<String>)
 	{
+		#if debug
+			trace("Creating "+componentClassName+"...");
+		#end
+		
 		var componentClass = Type.resolveClass(componentClassName);
 		
 		if (componentClass == null)
@@ -206,7 +270,7 @@ import slplayer.ui.DisplayObject;
 				
 				try
 				{
-					newDisplayObject = Type.createInstance( componentClass, [node] );
+					newDisplayObject = Type.createInstance( componentClass, [node, id] );
 				}
 				catch(unknown : Dynamic ) { trace(Std.string(unknown));}
 			}
@@ -216,23 +280,35 @@ import slplayer.ui.DisplayObject;
 			#if debug
 				trace("Try to create an instance of "+componentClassName+" non visual component");
 			#end
-		
+			
+			var cmpInstance = null;
+			
 			try
 			{
 				if (args != null)
-					Type.createInstance( componentClass, [args] );
+					cmpInstance = Type.createInstance( componentClass, [args] );
 				else
-					Type.createInstance( componentClass, [] );
+					cmpInstance = Type.createInstance( componentClass, [] );
 			}
 			catch(unknown : Dynamic ) { trace(Std.string(unknown));}
+			
+			//if the component is an SLPlayer cmp (and it should be), then try to give him its SLPlayer instance id
+			if (cmpInstance != null && Std.is(cmpInstance, ISLPlayerComponent))
+			{
+				cmpInstance.initSLPlayerComponent(id);
+			}
 		}
 	}
 	
 	/**
-	 * Initializes all registered component instances.
+	 * Initializes all registered UI component instances.
 	 */
 	private function callInitOnComponents():Void
 	{
+		#if debug
+			trace("call Init On Components");
+		#end
+		
 		for (l in nodeToCmpInstances)
 		{
 			for (c in l)
@@ -267,7 +343,8 @@ import slplayer.ui.DisplayObject;
 	}
 	
 	/**
-	 * Tells if a given class is a DisplayObject.
+	 * Tells if a given class is a DisplayObject. 
+	 * FIXME we should probably expose and generalize this ? (in a SLPlayerTools.hx for example)
 	 * @param	cmpClass	the Class to check.
 	 * @return	Bool		true if DisplayObject is in the Class inheritance tree.
 	 */
@@ -287,7 +364,7 @@ import slplayer.ui.DisplayObject;
 	 * @param	node	the node we want to add an associated component instance to.
 	 * @param	cmp		the component instance to add.
 	 */
-	public static function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void
+	public function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
@@ -295,19 +372,18 @@ import slplayer.ui.DisplayObject;
 		
 		if (nodeId != null)
 		{
-			associatedCmps = instance.nodeToCmpInstances.get(nodeId);
+			associatedCmps = nodeToCmpInstances.get(nodeId);
 		}
 		else
 		{
-			//FIXME ? there may be a better way to get a unique id...
-			nodeId = haxe.Md5.encode(Std.string(Math.random()) + Date.now().toString());
+			nodeId = generateUniqueId();
 			node.setAttribute("data-" + SLPID_ATTR_NAME, nodeId);
 			associatedCmps = new List();
 		}
 		
 		associatedCmps.add(cmp);
 		
-		instance.nodeToCmpInstances.set( nodeId, associatedCmps );
+		nodeToCmpInstances.set( nodeId, associatedCmps );
 	}
 	
 	/**
@@ -315,12 +391,12 @@ import slplayer.ui.DisplayObject;
 	 * @param	node	the HTML node for which we search the associated component instances.
 	 * @return	null if no associated component, else a List<DisplayObject>.
 	 */
-	public static function getAssociatedComponents(node : HtmlDom) : Null<List<DisplayObject>>
+	public function getAssociatedComponents(node : HtmlDom) : Null<List<DisplayObject>>
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
 		if (nodeId != null)
-			return instance.nodeToCmpInstances.get(nodeId);
+			return nodeToCmpInstances.get(nodeId);
 		
 		return null;
 	}

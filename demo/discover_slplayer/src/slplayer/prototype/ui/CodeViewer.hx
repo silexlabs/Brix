@@ -21,15 +21,22 @@ class CodeViewer extends DisplayObject
 	 * A list of allowed tag names for the root element.
 	 */
 	static var rootElementNameFilter : List<String> = Lambda.list(["pre"]);
-	
+	/**
+	 * The data- attribute used to specify with HTML element we're viewing.
+	 */
 	static var CODE_VIEW_ID_TAG = "code-viewer-id";
 	
-	override private function new(rootElement : HtmlDom) 
+	/**
+	 * Overrides constructor to avoid having the slpid attributes in the HTML code at runtime.
+	 * @param	rootElement
+	 * @param	SLPId
+	 */
+	override private function new(rootElement : HtmlDom, SLPId:String) 
 	{
-		super(rootElement);
+		super(rootElement, SLPId);
 		
 		//get container element
-		var container = Lib.document.getElementById(rootElement.getAttribute("data-"+CODE_VIEW_ID_TAG));
+		var container = Lib.document.getElementById(rootElement.getAttribute("data-"+CODE_VIEW_ID_TAG).split(' ')[0]);
 		
 		if ( container == null)
 		{

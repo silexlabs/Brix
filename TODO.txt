@@ -4,9 +4,13 @@ IDEAS
 
 - links parsed to embed other pages HTML ?
 
-- use in Macro Context : static function warning( msg : String, pos : Position ) : Void
-Available in neko
-Display a compilation warning at the given position in code
+- compile HTML
+  -> remove <script data-use>			OK
+  -> add the <script src = "output filename..."> if not existing
+  -> remove all configuration meta tags useless at runtime
+  -> check in body if there is any inner <scripts> ?!
+  -> remove comments ? (option ?)
+  
 
 
 TASKS

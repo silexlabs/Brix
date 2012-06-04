@@ -38,7 +38,7 @@ class Group extends DisplayObject
 			if (directChilds[childCnt].nodeType != Lib.document.body.nodeType)
 				continue;
 			
-			var cmps = SLPlayer.getAssociatedComponents(directChilds[childCnt]);
+			var cmps = getSLPlayer().getAssociatedComponents(directChilds[childCnt]);
 			
 			if (cmps != null)
 			{
