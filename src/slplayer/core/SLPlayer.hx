@@ -269,7 +269,7 @@ import slplayer.core.SLPlayerComponent;
 				{
 					newDisplayObject = Type.createInstance( componentClass, [node, id] );
 				}
-				catch(unknown : Dynamic ) { trace(Std.string(unknown));}
+				catch( unknown : Dynamic ) { trace(Std.string(unknown));}
 			}
 		}
 		else //case of non-visual component: we just try to create an instance, no call on init()

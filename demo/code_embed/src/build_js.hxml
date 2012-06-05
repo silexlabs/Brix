@@ -1,5 +1,5 @@
 -js ../bin/myEmbeddedSLPlayerApplication.js
--cp .
+-cp ../../my_custom_components/src/
 -cp ../../../src/
 -debug
 -main slplayer.core.SLPlayer

@@ -6,8 +6,7 @@ import haxe.macro.Expr;
 
 /**
  * The Builder macro of any SLPlayer application.
- * What this macro do is basically : parse the application HTML file, add the necessary components import and init calls,
- * cut the body part of the page and set it as the application contents.
+ * This is the central point of the SLPlayer workflow. SLPlayer builds the application from a single HTML file thanks to this macro.
  * 
  * @author Thomas Fétiveau
  */
@@ -25,9 +24,29 @@ class AppBuilder
 	
 	/**
 	 * The js exposed name.
-	 * FIXME I don't like it to be an AppBuiler var...
 	 */
-	static public var jsExposedName : String;
+	static private var jsExposedName : String;
+	/**
+	 * The expressions array of the initMetaParameters() method.
+	 */
+	static private var initMetaParametersExprs;
+	/**
+	 * The expressions array of the registerComponentsforInit() method.
+	 */
+	static private var registerComponentsforInitExprs;
+	/**
+	 * The expressions array of the main() method.
+	 */
+	static private var mainExprs;
+	/**
+	 * The expressions array of the init() method.
+	 */
+	static private var initExprs;
+	/**
+	 * The expressions array of the initHtmlRootElementContent() method.
+	 */
+	static private var initHtmlRootElementContentExprs;
+	
 	
 	/**
 	 * Sets the html page from the compile command line.
@@ -41,36 +60,18 @@ class AppBuilder
     }
 	
 	/**
-	 * Builds an SLPlayer application from an HTML file.
-	 * Splits the input HTML file in two parts: the header part and the body.
-	 * The header part is used to configure the application. It also includes the components which may be used by the application.
-	 * The body part is the content and layout of the application.
-	 * @return	the updated SLPlayer class fields 
+	 * Parse the SLPlayer fields to create references to the methods to implement.
+	 * @param	fields, array of SLPlayer fields
 	 */
-	@:macro static function buildFromHtml() :  Array<Field>
+	static private function discoverSLPlayerMethods(fields : Array<Field>)
 	{
-		//Initial check
-		if (!FileSystem.exists(htmlSourcePage))
-			throw htmlSourcePage + " not found !";
-		
-		var pos;
-		
-		var fields = haxe.macro.Context.getBuildFields();
-		
-		//parse the SLPlayer class fields to find the methods to fill in
-		var initMetaParametersExprs;
-		var registerComponentsforInitExprs;
-		var mainExprs;
-		var initExprs;
-		var initHtmlRootElementContentExprs;
-		
 		for (fc in 0...fields.length)
 		{
 			switch (fields[fc].kind)
 			{
 				case FFun(f) :
 					
-					switch (f.expr.expr) //FIXME check if cannot access the enum params with no switch
+					switch (f.expr.expr)
 					{
 						case EBlock(exprs):
 							
@@ -95,6 +96,27 @@ class AppBuilder
 				default : 
 			}
 		}
+	}
+	
+	/**
+	 * Builds an SLPlayer application from an HTML file.
+	 * Splits the input HTML file in two parts: the header part and the body.
+	 * The header part is used to configure the application. It also includes the components which may be used by the application.
+	 * The body part is the content and layout of the application.
+	 * @return	the updated SLPlayer class fields 
+	 */
+	@:macro static function buildFromHtml() :  Array<Field>
+	{
+		//Initial check
+		if (!FileSystem.exists(htmlSourcePage))
+			throw htmlSourcePage + " not found !";
+		
+		var pos;
+		
+		var fields = haxe.macro.Context.getBuildFields();
+		
+		//parse the SLPlayer class fields to find the methods to fill in
+		discoverSLPlayerMethods(fields);
 		
 		//read the source page
 		var rowHtmlContent = neko.io.File.getContent(htmlSourcePage);
@@ -259,17 +281,11 @@ class AppBuilder
 		
 		if (haxe.macro.Context.defined('js') && !haxe.macro.Context.defined('embedHtml'))
 		{
-			#if debug
-				trace("Add call to launch on windows.onload");
-			#end
 			//Add this call in init() method :  Lib.window.onload = function (e:Event) 	{ newInstance.launch(appendTo); };
 			initExprs.push( { expr : EBinop(OpAssign, { expr : EField( { expr : EField( { expr : EConst(CType("Lib")), pos : pos }, "window"), pos : pos }, "onload"), pos : pos }, { expr : EFunction(null, { args : [ { name : "e", type : TPath( { name: "Event", pack : [], params : [], sub : null } ), opt : false, value : null } ], expr : { expr : EBlock([ { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } ]), pos : pos }, params : [], ret : null } ), pos : pos } ), pos : pos } );
 		}
 		else
 		{
-			#if debug
-				trace("Add call to launch");
-			#end
 			//Add this call in init method : newInstance.launch(appendTo);
 			initExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } );
 		}
@@ -328,7 +344,7 @@ class AppBuilder
 				trace("Saving "+outputDirectory + outputFileName+".html");
 			#end
 			
-			//generates the output HTML file if not embed
+			//generates the "compiled" HTML file if not embed
 			sys.io.File.saveContent( outputDirectory + outputFileName+".html" , compiledHTML );
 		}
 	}
