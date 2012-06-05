@@ -81,7 +81,7 @@ import slplayer.core.SLPlayerComponent;
 		
 		this.metaParameters = new Hash();
 		
-		#if debug
+		#if slp-debug
 			trace("new SLPlayer instance built");
 		#end
 	}
@@ -93,7 +93,7 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	private function launch(?appendTo:Null<Dynamic>)
 	{
-		#if debug
+		#if slp-debug
 			trace("Launching SLPlayer id "+id+" on "+appendTo);
 		#end
 		
@@ -115,7 +115,7 @@ import slplayer.core.SLPlayerComponent;
 		//call the UI components init() method
 		initComponents();
 		
-		#if debug
+		#if slp-debug
 			trace("SLPlayer id "+id+" launched !");
 		#end
 	}
@@ -147,20 +147,20 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	static public function init(?appendTo:Dynamic, ?args:Dynamic )
 	{
-		#if debug
+		#if slp-debug
 			trace("SLPlayer init() called with appendTo="+appendTo+" and args="+args);
 		#end
 		
 		//generate a new SLPlayerInstance id
 		var newId = generateUniqueId();
 		
-		#if debug
+		#if slp-debug
 			trace("New SLPlayer id created : "+newId);
 		#end
 		
 		//the new SLPlayer instance
 		var newInstance = new SLPlayer(newId, args);
-		#if debug
+		#if slp-debug
 			trace("setting ref to SLPlayer instance "+newId);
 		#end
 		instances.set(newId, newInstance);
@@ -213,7 +213,7 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	private function createComponentsOfType(componentClassName : String , ?args:Hash<String>)
 	{
-		#if debug
+		#if slp-debug
 			trace("Creating "+componentClassName+"...");
 		#end
 		
@@ -225,15 +225,15 @@ import slplayer.core.SLPlayerComponent;
 			return;
 		}
 		
-		#if debug
+		#if slp-debug
 			trace(componentClassName+" class resolved ");
 		#end
 		
-		if (isDisplayObject(componentClass)) // case DisplayObject component
+		if (SLPlayerComponentTools.isDisplayObject(componentClass)) // case DisplayObject component
 		{
-			var classTag = getUnconflictedClassTag(componentClassName);
+			var classTag = SLPlayerComponentTools.getUnconflictedClassTag(componentClassName, registeredComponents.keys());
 			
-			#if debug
+			#if slp-debug
 				trace("searching now for class tag = "+classTag);
 			#end
 			
@@ -246,7 +246,7 @@ import slplayer.core.SLPlayerComponent;
 			}
 			if (componentClassName != classTag)
 			{
-				#if debug
+				#if slp-debug
 					trace("searching now for class tag = "+componentClassName);
 				#end
 				
@@ -257,7 +257,7 @@ import slplayer.core.SLPlayerComponent;
 				}
 			}
 			
-			#if debug
+			#if slp-debug
 				trace("taggedNodes = "+taggedNodes.length);
 			#end
 			
@@ -274,7 +274,7 @@ import slplayer.core.SLPlayerComponent;
 		}
 		else //case of non-visual component: we just try to create an instance, no call on init()
 		{
-			#if debug
+			#if slp-debug
 				trace("Try to create an instance of "+componentClassName+" non visual component");
 			#end
 			
@@ -302,7 +302,7 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	private function callInitOnComponents():Void
 	{
-		#if debug
+		#if slp-debug
 			trace("call Init On Components");
 		#end
 		
@@ -313,47 +313,6 @@ import slplayer.core.SLPlayerComponent;
 				c.init();
 			}
 		}
-	}
-	
-	/**
-	 * Determine the class tag value for a component.
-	 * @param	displayObjectClassName
-	 * @return	a tag class value for the given component class name that will not conflict with other
-	 * components classnames / class tags.
-	 */
-	private function getUnconflictedClassTag(displayObjectClassName : String) : String
-	{
-		var classTag = displayObjectClassName;
-		
-		if (classTag.indexOf(".") != -1)
-			classTag = classTag.substr(classTag.lastIndexOf(".") + 1);
-		
-		var registeredComponentsClassNames = registeredComponents.keys();
-		while (registeredComponentsClassNames.hasNext())
-		{
-			var registeredComponentClassName = registeredComponentsClassNames.next();
-			
-			if (classTag == registeredComponentClassName.substr(classTag.lastIndexOf(".") + 1))
-				return displayObjectClassName;
-		}
-		return classTag;
-	}
-	
-	/**
-	 * Tells if a given class is a DisplayObject. 
-	 * FIXME we should probably expose and generalize this ? (in a SLPlayerTools.hx for example)
-	 * @param	cmpClass	the Class to check.
-	 * @return	Bool		true if DisplayObject is in the Class inheritance tree.
-	 */
-	private function isDisplayObject(cmpClass : Class<Dynamic>):Bool
-	{
-		if (cmpClass == Type.resolveClass("slplayer.ui.DisplayObject"))
-			return true;
-		
-		if (Type.getSuperClass(cmpClass) != null)
-			return isDisplayObject(Type.getSuperClass(cmpClass));
-		
-		return false;
 	}
 	
 	/**

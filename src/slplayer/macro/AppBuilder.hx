@@ -15,7 +15,7 @@ class AppBuilder
 	/**
 	 * The data- attribute set by the slplayer on the HTML elements associated with one or more component.
 	 */
-	static public var SLP_USE_ATTR_NAME = "slp-use";
+	static inline public var SLP_USE_ATTR_NAME = "slp-use";
 	/**
 	 * The path to the application HTML source page.
 	 */
@@ -46,7 +46,10 @@ class AppBuilder
 	 * The expressions array of the initHtmlRootElementContent() method.
 	 */
 	static private var initHtmlRootElementContentExprs;
-	
+	/**
+	 * TODO comment
+	 */
+	static private var registeredComponents : Hash<Iterable<String>> = new Hash();
 	
 	/**
 	 * Sets the html page from the compile command line.
@@ -111,18 +114,18 @@ class AppBuilder
 		if (!FileSystem.exists(htmlSourcePage))
 			throw htmlSourcePage + " not found !";
 		
+		//read the source page
+		var rowHtmlContent = neko.io.File.getContent(htmlSourcePage);
+		
+		//source HTML content parsing
+		var htmlContent : Xml = haxe.xml.Parser.parse(rowHtmlContent);
+		
 		var pos;
 		
 		var fields = haxe.macro.Context.getBuildFields();
 		
 		//parse the SLPlayer class fields to find the methods to fill in
 		discoverSLPlayerMethods(fields);
-		
-		//read the source page
-		var rowHtmlContent = neko.io.File.getContent(htmlSourcePage);
-		
-		//source HTML content parsing
-		var htmlContent : Xml = haxe.xml.Parser.parse(rowHtmlContent);
 
 		for ( elt in htmlContent.firstElement().elements() )
 		{
@@ -141,11 +144,13 @@ class AppBuilder
 								if (cmpClassName == null)
 									continue;
 								
-								#if debug
+								#if slp-debug
 									trace("component found => "+cmpClassName);
 								#end
 								
 								var initArgsElts:Iterable<String> = { iterator : headElt.attributes };
+								
+								registeredComponents.set(cmpClassName, initArgsElts);
 								
 								pos = haxe.macro.Context.currentPos();
 								
@@ -154,18 +159,17 @@ class AppBuilder
 								
 								if (Lambda.exists(initArgsElts, function(atName:String) { return StringTools.startsWith( atName , "data-" ) && atName != "data-"+SLP_USE_ATTR_NAME; } )) //case the component initialization takes arguments (other than src or type)
 								{
-									//FIXME we may encode cmpClassName+"Args" in MD5 for more security (conflicts)
-									var shortCmpClassName = cmpClassName.split('.').pop();
-									registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : shortCmpClassName + "Args", type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
+									var argsArrayName = StringTools.replace( cmpClassName , ".", "" ) + "Args";
+									registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
 									
 									for (initArgElt in initArgsElts)
 									{
 										if (StringTools.startsWith( initArgElt , "data-" ) && initArgElt != "data-"+SLP_USE_ATTR_NAME)
-											registerComponentsforInitExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
+											registerComponentsforInitExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(argsArrayName)), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
 									}
 									
 									//generate call to registerComponent with additionnal arguments
-									registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
+									registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(argsArrayName)), pos : pos } ]), pos : pos } );
 								}
 								else
 								{
@@ -173,7 +177,7 @@ class AppBuilder
 									registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
 								}
 								
-								#if debug
+								#if slp-debug
 									trace("added call to registerComponent("+cmpClassName+")");
 								#end
 								
@@ -195,7 +199,7 @@ class AppBuilder
 								
 								pos = haxe.macro.Context.currentPos();
 								
-								#if debug
+								#if slp-debug
 									trace("found meta parameter : "+headElt.get("name")+" => "+headElt.get("content"));
 								#end
 								
@@ -252,7 +256,7 @@ class AppBuilder
 						
 						fields.push( { name : "_htmlBody", doc : null, meta : [], access : [APrivate, AStatic], kind : FVar(null, htmlBodyFieldValue), pos : pos } );
 							
-						#if debug
+						#if slp-debug
 							trace("bodyInnerHtml extracted and set on SLPlayer with a length of "+bodyInnerHtml.length);
 						#end
 						
@@ -262,7 +266,7 @@ class AppBuilder
 					
 				default:
 					
-					#if debug
+					#if slp-debug
 						trace("Main application node " + elt.nodeName + " ignored.");
 					#end
 			}
@@ -294,6 +298,41 @@ class AppBuilder
 	}
 	
 	/**
+	 * TODO
+	 */
+	static function checkComponents() : Void
+	{
+		/*
+		for (rc in { iterator : registeredComponents.keys } )
+		{
+			var cmpClass = Type.resolveClass(rc);
+			
+			if (cmpClass != null)
+			{
+				if (slplayer.core.SLPlayerComponentTools.isDisplayObject(cmpClass))
+				{
+					var unconflictedClassName = slplayer.core.SLPlayerComponentTools.getUnconflictedClassTag(cmpClass);
+					
+					
+					
+						//compile time check on required tag name if DisplayObject
+						slplayer.core.SLPlayerComponentTools.checkFilterOnElt(cmpClass, );
+						
+						//compile time check on required parameters
+						slplayer.core.SLPlayerComponentTools.checkRequiredParameters(cmpClass, );
+					
+				}
+				else
+				{
+					compile time check on required parameters on all other components
+					TODO
+				}
+			}
+		}
+		*/
+	}
+	
+	/**
 	 * Performs the js-specific compile config and output generating tasks.
 	 */
 	static function packForJs(compiledHTML:String) : Void
@@ -303,12 +342,17 @@ class AppBuilder
 		var output = haxe.macro.Compiler.getOutput();
 		
 		//the compiled SLPlayer application filename
-		var outputFileName = output.substr(output.lastIndexOf('/') + 1, output.lastIndexOf('.') - output.lastIndexOf('/') - 1);
+		var outputFileName = output;
+		
+		if (output.indexOf('/') != -1)
+		{
+			outputFileName = output.substr(output.lastIndexOf('/') + 1, (( output.lastIndexOf('.') > -1 ) ? output.lastIndexOf('.') : output.length) - output.lastIndexOf('/') - 1);
+		}
 		
 		//Set the js-modern mode
 		if (!haxe.macro.Context.defined('js-modern'))
 		{
-			#if debug
+			#if slp-debug
 				trace("Setting js-modern mode.");
 			#end
 			haxe.macro.Compiler.define("js-modern");
@@ -321,7 +365,7 @@ class AppBuilder
 		}
 		else
 		{
-			#if debug
+			#if slp-debug
 				trace("Setting @:expose meta tag on SLPlayer class.");
 			#end
 			
@@ -340,7 +384,7 @@ class AppBuilder
 			if (output.lastIndexOf('/') != null)
 				outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
 			
-			#if debug
+			#if slp-debug
 				trace("Saving "+outputDirectory + outputFileName+".html");
 			#end
 			

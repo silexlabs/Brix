@@ -12,7 +12,7 @@ import haxe.Template;
 
 /**
  * Structure helping with handling the skinnable elts of a component.
- * TODO keep this and generalize a skining sub-cmps handling logic or remove this.
+ * FIXME / TODO keep this and generalize a skining sub-cmps handling logic or remove this.
  */
 typedef SkinnableUIElt = 
 {
@@ -24,8 +24,15 @@ typedef SkinnableUIElt =
  * A displayObject is a UI component associated with an HTML DOM element. You declare an instance of a DisplayObject by putting
  * class="[YourDisplayObjectClassName]" in the attributes of the HTML DOM element you want to associate to.
  * 
- * In case you want to allow your component only on specific HTML tags, set the @tagNameFilter() with an array value 
- * containing the tag names, for instance: @tagNameFilter("ul", "ol")
+ * In case you want to allow your component only on specific HTML tags, set the @tagNameFilter() meta tag before your component 
+ * Class declaration with an array value containing the tag names, for instance:
+ * 
+ * @tagNameFilter("ul", "ol") class MyComponent extends DisplayObject { }
+ * 
+ * If you want to ensure that users of your component sets required "data-<MyCustonParam>" attributes on its HTML element, you can 
+ * set the @requires() meta tag before your component Class declaration, like below : 
+ * 
+ * @requires(<MyCustonParam>, <MyCustonParam2>, ...) class MyComponent extends DisplayObject { }
  * 
  * @author Thomas Fétiveau
  */
@@ -49,33 +56,13 @@ class DisplayObject implements ISLPlayerComponent
 	{
 		this.rootElement = rootElement;
 		
-		if (!checkFilterOnElt(rootElement))
-			throw "ERROR: cannot instantiate "+Type.getClassName(Type.getClass(this))+" on this kind of node: "+rootElement.nodeName.toLowerCase()+" (type="+rootElement.nodeType+")";
+		slplayer.core.SLPlayerComponentTools.checkFilterOnElt(Type.getClass(this), rootElement);
+		
+		slplayer.core.SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this), rootElement);
 		
 		SLPlayerInstanceId = SLPId;
 		
 		SLPlayer.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
-	}
-	
-	/**
-	 * Checks if a given element is allowed to be the component's rootElement against the tag filters.
-	 * @param	elt: the HtmlDom to check.
-	 * @return true if allowed, false if not.
-	 */
-	private function checkFilterOnElt( elt:HtmlDom ) : Bool
-	{
-		if (elt.nodeType != Lib.document.body.nodeType) //FIXME cleaner way to do this comparison ?
-			return false;
-		
-		var tagFilter = haxe.rtti.Meta.getType(Type.getClass(this)).tagNameFilter;
-		
-		if ( tagFilter == null)
-			return true;
-		
-		if ( Lambda.exists( tagFilter , function(s:Dynamic) { return elt.nodeName.toLowerCase() == Std.string(s).toLowerCase(); } ) )
-			return true;
-		
-		return false;
 	}
 	
 	/**
