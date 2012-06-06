@@ -2,6 +2,8 @@ package slplayer.macro;
 
 import haxe.macro.Expr;
 
+import haxe.macro.Type;
+
 /**
  * The Builder macro of any SLPlayer application.
  * This is the central point of the SLPlayer workflow. SLPlayer builds the application from a single HTML file thanks to this macro.
@@ -114,30 +116,34 @@ class AppBuilder
 	 */
 	@:macro static function buildFromHtml() :  Array<Field>
 	{
-		//Initial check
-		if (!sys.FileSystem.exists(htmlSourcePage))
-			throw htmlSourcePage + " not found !";
-		
-		//source HTML content reading
-		cocktail.Lib.document.documentElement.innerHTML = neko.io.File.getContent(htmlSourcePage);
-		
-		//init fields var
-		fields = haxe.macro.Context.getBuildFields();
-		
-		//parse the SLPlayer class fields to find the methods to fill in
-		discoverSLPlayerMethods();
-		
-		//parse <script> elements
-		parseScripts();
-		
-		//parse <meta> elements
-		parseMetas();
-		
-		//parse the <body> element
-		parseBody();
-		
-		//pack the application (interpret or set compiler flags, generate compiled HTML file...)
-		pack();
+		try
+		{
+			//Initial check
+			if (!sys.FileSystem.exists(htmlSourcePage))
+				throw htmlSourcePage + " not found !";
+			
+			//source HTML content reading
+			cocktail.Lib.document.documentElement.innerHTML = neko.io.File.getContent(htmlSourcePage);
+			
+			//init fields var
+			fields = haxe.macro.Context.getBuildFields();
+			
+			//parse the SLPlayer class fields to find the methods to fill in
+			discoverSLPlayerMethods();
+			
+			//parse <script> elements
+			parseScripts();
+			
+			//parse <meta> elements
+			parseMetas();
+			
+			//parse the <body> element
+			parseBody();
+			
+			//pack the application (interpret or set compiler flags, generate compiled HTML file...)
+			pack();
+		}
+		catch (unknown : Dynamic) { neko.Lib.println("\nERROR : "+Std.string(unknown)); }
 		
 		return fields;
 	}
@@ -235,54 +241,67 @@ class AppBuilder
 		
 		for (scriptElt in scriptElts)
 		{
-			var cmpClassName = scriptElt.getAttribute("data-"+SLP_USE_ATTR_NAME);
+			var cmpDeclarations = scriptElt.getAttribute("data-"+SLP_USE_ATTR_NAME);
 			
-			if (cmpClassName == null)
+			if (cmpDeclarations == null || StringTools.trim(cmpDeclarations) == "" )
 				continue;
 			
-			#if slpdebug
-				trace("component found => "+cmpClassName);
-			#end
-			
+			//Extract data- attributes
 			var scriptEltAttrs : Hash<String> = new Hash();
 			
 			for (itCnt in 0...scriptElt.attributes.length)
 			{
-				scriptEltAttrs.set( scriptElt.attributes.item(itCnt).nodeName , scriptElt.attributes.item(itCnt).nodeValue );
+				if ( StringTools.startsWith( scriptElt.attributes.item(itCnt).nodeName , "data-" ) && scriptElt.attributes.item(itCnt).nodeName != "data-" + SLP_USE_ATTR_NAME )
+				{
+					scriptEltAttrs.set( scriptElt.attributes.item(itCnt).nodeName , scriptElt.attributes.item(itCnt).nodeValue );
+				}
 			}
 			
-			registeredComponents.set(cmpClassName, scriptEltAttrs);
+			//include declared components into application
+			var cmpClassNames = cmpDeclarations.split(" ");
 			
-			pos = haxe.macro.Context.currentPos();
-			
-			//TODO #1 try to resolve ? #2 checks on cmps ? #3 forbid the javascript inline code #4 add the src="" if necessary and if not found ?
-			
-			//generate import
-			registerComponentsforInitExprs.push(generateImport(cmpClassName));
-			
-			if ( Lambda.exists( { iterator : scriptEltAttrs.keys } , function(atName:String) { return StringTools.startsWith( atName , "data-" ) && atName != "data-"+SLP_USE_ATTR_NAME; }) )
-			{	//case the component has data-arguments on its script tag
-				var argsArrayName = StringTools.replace( cmpClassName , ".", "_" ) + "Args";
-				registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
+			for (cmpClassName in cmpClassNames)
+			{
+				#if slpdebug
+					trace("component found => "+cmpClassName);
+				#end
 				
-				for ( scriptEltAttrName in {iterator : scriptEltAttrs.keys})
+				registeredComponents.set(cmpClassName, scriptEltAttrs);
+				
+				pos = haxe.macro.Context.currentPos();
+				
+				//generate import
+				registerComponentsforInitExprs.push(generateImport(cmpClassName));
+				
+				if ( !Lambda.empty(scriptEltAttrs) )
 				{
-					if (StringTools.startsWith( scriptEltAttrName , "data-" ) && scriptEltAttrName != "data-"+SLP_USE_ATTR_NAME)
-						registerComponentsforInitExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(argsArrayName)), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(scriptEltAttrName)), pos : pos }, { expr : EConst(CString(scriptElt.getAttribute(scriptEltAttrName))), pos : pos } ]), pos : pos } );
+					//case the component has data-arguments on its script tag
+					var argsArrayName = StringTools.replace( cmpClassName , ".", "_" ) + "Args";
+					registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
+					
+					for ( scriptEltAttrName in {iterator : scriptEltAttrs.keys})
+					{
+						if (StringTools.startsWith( scriptEltAttrName , "data-" ) && scriptEltAttrName != "data-"+SLP_USE_ATTR_NAME)
+							registerComponentsforInitExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(argsArrayName)), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(scriptEltAttrName)), pos : pos }, { expr : EConst(CString(scriptElt.getAttribute(scriptEltAttrName))), pos : pos } ]), pos : pos } );
+					}
+					
+					//generate call to registerComponent with additionnal arguments
+					registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(argsArrayName)), pos : pos } ]), pos : pos } );
+				}
+				else
+				{
+					//generate call to registerComponent with no additionnal arguments
+					registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
 				}
 				
-				//generate call to registerComponent with additionnal arguments
-				registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(argsArrayName)), pos : pos } ]), pos : pos } );
-			}
-			else
-			{
-				//generate call to registerComponent with no additionnal arguments
-				registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
+				#if slpdebug
+					trace("added call to registerComponent("+cmpClassName+")");
+				#end
 			}
 			
-			#if slpdebug
-				trace("added call to registerComponent("+cmpClassName+")");
-			#end
+			//TODO FIXME #3 forbid the javascript inline code for flash
+			
+			//TODO #4 add the src="" if necessary (js) and if not found and forbid for other targets (flash)
 			
 			if (scriptElt.getAttribute("src") == null)
 			{
@@ -295,41 +314,173 @@ class AppBuilder
 				scriptElt.removeAttribute("data-" + SLP_USE_ATTR_NAME);
 			}
 		}
+		
+		//check the registered components
+		checkComponents();
 	}
 	
 	/**
-	 * TODO
+	 * 
+	 * @param	type
+	 * @return
+	 */
+	static function isDisplayObject( classType : haxe.macro.ClassType ) : Bool
+	{
+		if ( classType.name == "DisplayObject" && classType.pack.length == 2 && classType.pack[0] == "slplayer" && classType.pack[1] == "ui" ) // FIXME cleaner way to do that
+		{
+			return true;
+		}
+		if ( classType.superClass != null )
+		{
+			return isDisplayObject(classType.superClass.t.get());
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if the declared components can be found in the classpath and if their use 
+	 * complies with their potential restriction (on html tags or attribute settings).
+	 * 
+	 * FIXME There is certainly some cleanup / better implementation to find...
 	 */
 	static function checkComponents() : Void
 	{
-		/*
-		for (rc in { iterator : registeredComponents.keys } )
+		for (cmpClassName in { iterator : registeredComponents.keys })
 		{
-			var cmpClass = Type.resolveClass(rc);
+			var cmpType = haxe.macro.Context.getType(cmpClassName);
 			
-			if (cmpClass != null)
+			if (cmpType == null)
 			{
-				if (slplayer.core.SLPlayerComponentTools.isDisplayObject(cmpClass))
-				{
-					var unconflictedClassName = slplayer.core.SLPlayerComponentTools.getUnconflictedClassTag(cmpClass);
+				throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath.";
+			}
+			
+			switch( cmpType ) 
+			{
+				case TInst( classRef , params ):
 					
+					var metaData = classRef.get().meta.get();
 					
-					
-						//compile time check on required tag name if DisplayObject
-						slplayer.core.SLPlayerComponentTools.checkFilterOnElt(cmpClass, );
+					if ( isDisplayObject( classRef.get() ) )
+					{
+						var unconflictedClassName = slplayer.core.SLPlayerComponentTools.getUnconflictedClassTag(cmpClassName, registeredComponents.keys());
 						
-						//compile time check on required parameters
-						slplayer.core.SLPlayerComponentTools.checkRequiredParameters(cmpClass, );
+						var tagsToSearchFor = [unconflictedClassName];
+						
+						if (unconflictedClassName != cmpClassName)
+							tagsToSearchFor.push(cmpClassName);
+						
+						var taggedElts : Array<cocktail.Dom.HtmlDom> = new Array();
+						
+						for (tagToSearchFor in tagsToSearchFor)
+						{
+							taggedElts = taggedElts.concat(cocktail.Lib.document.body.getElementsByClassName(tagToSearchFor));
+						}
+						
+						for (metaDataTag in metaData)
+						{
+							switch (metaDataTag.name)
+							{
+								case "requires":
+									
+									for (taggedElt in taggedElts)
+									{
+										var missingAttr:String = null;
+										for (metaParam in metaDataTag.params)
+										{
+											switch (metaParam.expr) {
+												case EConst(c) :
+													switch(c) {
+														case CString(s) :
+															if ( taggedElt.getAttribute(s) == null || StringTools.trim(taggedElt.getAttribute(s)) == "" )
+															{
+																missingAttr = s;
+																break;
+															}
+														default :
+													}
+												default :
+											}
+										}
+										if (missingAttr != null)
+										{
+											throw missingAttr+" not set on "+taggedElt.nodeName+" while it's required by "+cmpClassName;
+										}
+									}
+									
+								case "tagNameFilter":
+									
+									for (taggedElt in taggedElts)
+									{
+										var requirePassed = false;
+										var requiresList : Array<String> = new Array();
+										for (metaParam in metaDataTag.params)
+										{
+											switch (metaParam.expr) {
+												case EConst(c) :
+													switch(c) {
+														case CString(s) :
+															if ( taggedElt.nodeName == s )
+															{
+																requirePassed = true;
+																break;
+															}
+															else
+															{
+																requiresList.push(s);
+															}
+														default :
+													}
+												default :
+											}
+										}
+										if (!requirePassed)
+										{
+											throw taggedElt.nodeName+" is not allowed to be a "+cmpClassName;
+										}
+									}
+									
+								default :
+									
+							}
+						}
+					}
+					else
+					{
+						for (metaDataTag in metaData)
+						{
+							switch (metaDataTag.name)
+							{
+								case "requires":
+									var missingAttr:String = null;
+									for (metaParam in metaDataTag.params)
+									{
+										switch (metaParam.expr) {
+											case EConst(c) :
+												switch(c) {
+													case CString(s) :
+														if ( registeredComponents.get("cmpClassName").get(s) == null || StringTools.trim(registeredComponents.get("cmpClassName").get(s)) == "" )
+														{
+															missingAttr = s;
+															break;
+														}
+													default :
+												}
+											default :
+										}
+									}
+									if (missingAttr != null)
+									{
+										throw missingAttr+" not set on "+cmpClassName+" <script> declaration while it's required by the component";
+									}
+									
+								default :
+							}
+						}
+					}
 					
-				}
-				else
-				{
-					compile time check on required parameters on all other components
-					TODO
-				}
+				default: 
 			}
 		}
-		*/
 	}
 	
 	/**

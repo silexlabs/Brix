@@ -56,9 +56,9 @@ class DisplayObject implements ISLPlayerComponent
 	{
 		this.rootElement = rootElement;
 		
-		slplayer.core.SLPlayerComponentTools.checkFilterOnElt(Type.getClass(this), rootElement);
+		checkFilterOnElt(Type.getClass(this), rootElement);
 		
-		//slplayer.core.SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this), rootElement);
+		slplayer.core.SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this), rootElement);
 		
 		SLPlayerInstanceId = SLPId;
 		
@@ -76,6 +76,44 @@ class DisplayObject implements ISLPlayerComponent
 	public function getSLPlayer():SLPlayer
 	{
 		return SLPlayer.get(SLPlayerInstanceId);
+	}
+	
+	/**
+	 * Tells if a given class is a DisplayObject. 
+	 * 
+	 * @param	cmpClass	the Class to check.
+	 * @return	Bool		true if DisplayObject is in the Class inheritance tree.
+	 */
+	static public function isDisplayObject(cmpClass : Class<Dynamic>):Bool
+	{
+		if (cmpClass == Type.resolveClass("slplayer.ui.DisplayObject"))
+			return true;
+		
+		if (Type.getSuperClass(cmpClass) != null)
+			return isDisplayObject(Type.getSuperClass(cmpClass));
+		
+		return false;
+	}
+	
+	/**
+	 * Checks if a given element is allowed to be the component's rootElement against the tag filters.
+	 * @param	cmpClass: the component class to check
+	 * @param	elt: the DOM element to check. By default the rootElement.
+	 */
+	static public function checkFilterOnElt( cmpClass:Class<Dynamic> , elt:HtmlDom ) : Void
+	{
+		if (elt.nodeType != Lib.document.body.nodeType)
+			throw "cannot instantiate "+Type.getClassName(cmpClass)+" on a non element node.";
+
+		var tagFilter = (haxe.rtti.Meta.getType(cmpClass) != null) ? haxe.rtti.Meta.getType(cmpClass).tagNameFilter : null ;
+		
+		if ( tagFilter == null)
+			return;
+
+		if ( Lambda.exists( tagFilter , function(s:Dynamic) { return elt.nodeName.toLowerCase() == Std.string(s).toLowerCase(); } ) )
+			return;
+		
+		throw "cannot instantiate "+Type.getClassName(cmpClass)+" on this type of HTML element: "+elt.nodeName.toLowerCase();
 	}
 	
 	// --- CUSTOMIZABLE API ---

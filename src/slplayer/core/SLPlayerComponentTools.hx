@@ -1,78 +1,26 @@
+/*
+ * This file is part of SLPlayer http://www.silexlabs.org/groups/labs/slplayer/
+ * This project is © 2011-2012 Silex Labs and is released under the GPL License:
+ * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * To read the license please visit http://www.gnu.org/copyleft/gpl.html
+ */
 package slplayer.core;
 
 /**
- * ...
+ * A class grouping together util functions to handle SLPlayer components.
  * @author Thomas Fétiveau
  */
 class SLPlayerComponentTools 
 {
-	/**
-	 * Tells if a given class is a DisplayObject. 
-	 * FIXME we should probably expose and generalize this ? (in a SLPlayerTools.hx for example)
-	 * @param	cmpClass	the Class to check.
-	 * @return	Bool		true if DisplayObject is in the Class inheritance tree.
-	 */
-	static public function isDisplayObject(cmpClass : Class<Dynamic>):Bool
-	{
-		if (cmpClass == Type.resolveClass("slplayer.ui.DisplayObject"))
-			return true;
-		
-		if (Type.getSuperClass(cmpClass) != null)
-			return isDisplayObject(Type.getSuperClass(cmpClass));
-		
-		return false;
-	}
-	
-	/**
-	 * Checks if a given element is allowed to be the component's rootElement against the tag filters.
-	 * @param	elt: the DOM element to check. By default the rootElement.
-	 */
-	static public function checkFilterOnElt( cmpClass : Class<Dynamic> , elt:Dynamic ) : Void
-	{
-		#if macro
-		
-		var castedElt : Xml = cast elt; 
-		var isElt = (castedElt.nodeType == Xml.Element);
-		
-		#else
-		
-		var castedElt : js.Dom.HtmlDom = cast elt;
-		var isElt = (castedElt.nodeType == js.Lib.document.body.nodeType); //FIXME cleaner way to do this comparison ?
-		
-		#end
-		
-		if (!isElt)
-			throw "ERROR: cannot instantiate "+Type.getClassName(cmpClass)+" on a non element node.";
-		
-		var tagFilter = haxe.rtti.Meta.getType(cmpClass).tagNameFilter;
-		
-		if ( tagFilter == null)
-			return;
-
-		if ( Lambda.exists( tagFilter , function(s:Dynamic) { return castedElt.nodeName.toLowerCase() == Std.string(s).toLowerCase(); } ) )
-			return;
-		
-		throw "ERROR: cannot instantiate "+Type.getClassName(cmpClass)+" on this type of HTML element: "+castedElt.nodeName.toLowerCase();
-	}
-	
+	#if !macro
 	/**
 	 * Checks if there is any missing required attribute on the associated HTML element of this component.
-	 * @param	elt: the DOM element to check. By default the rootElement.
+	 * @param	the class of the component to check.
+	 * @param	the DOM element to check. By default the rootElement.
 	 */
-	static public function checkRequiredParameters( cmpClass : Class<Dynamic> , elt:Dynamic ) : Void
+	static public function checkRequiredParameters( cmpClass : Class<Dynamic> , elt:js.Dom.HtmlDom ) : Void
 	{
-		#if macro
-		
-		var xmlElt : Xml = cast elt;
-		var getAttr : String -> Null<String> = xmlElt.get;
-		
-		#else
-		
-		var htmlElt : js.Dom.HtmlDom = cast elt; trace("htmlElt = "+htmlElt);
-		var getAttr : String -> Null<String> = htmlElt.getAttribute; trace("getAttr = "+getAttr);
-		
-		#end
-		
 		var requires = haxe.rtti.Meta.getType(cmpClass).requires;
 		
 		if (requires == null)
@@ -80,15 +28,16 @@ class SLPlayerComponentTools
 
 		for (r in requires)
 		{
-			if ( getAttr("data-" + Std.string(r)) == null || StringTools.trim(getAttr("data-" + Std.string(r))) == "" )
+			if ( elt.getAttribute("data-" + Std.string(r)) == null || StringTools.trim(elt.getAttribute("data-" + Std.string(r))) == "" )
 			{
-				throw "ERROR: data-" + Std.string(r) + " parameter is requiredcfor "+Type.getClassName(cmpClass);
+				throw "data-" + Std.string(r) + " parameter is requiredcfor "+Type.getClassName(cmpClass);
 			}
 		}
 	}
+	#end
 	
 	/**
-	 * Determine the class tag value for a component.
+	 * Determine a class tag value for a component that won't be conflicting with other components.
 	 * 
 	 * @param	displayObjectClassName
 	 * @param 	an Iterator of Strings containing the classnames we check against.
@@ -105,7 +54,7 @@ class SLPlayerComponentTools
 		{
 			var registeredComponentClassName = registeredComponentsClassNames.next();
 			
-			if (classTag == registeredComponentClassName.substr(classTag.lastIndexOf(".") + 1))
+			if (registeredComponentClassName != displayObjectClassName && classTag == registeredComponentClassName.substr(classTag.lastIndexOf(".") + 1))
 			{
 				return displayObjectClassName;
 			}

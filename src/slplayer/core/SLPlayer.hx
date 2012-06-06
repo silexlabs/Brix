@@ -229,7 +229,7 @@ import slplayer.core.SLPlayerComponent;
 			trace(componentClassName+" class resolved ");
 		#end
 		
-		if (SLPlayerComponentTools.isDisplayObject(componentClass)) // case DisplayObject component
+		if (DisplayObject.isDisplayObject(componentClass)) // case DisplayObject component
 		{
 			var classTag = SLPlayerComponentTools.getUnconflictedClassTag(componentClassName, registeredComponents.keys());
 			

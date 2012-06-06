@@ -18,7 +18,7 @@ using slplayer.data.DataProvider;
  * TODO cleanup to allow different rss formats
  * @author Thomas Fétiveau
  */
-@requires("src-rss") // FIXME use inline const below
+@requires("data-src-rss")
 class RssConnector extends DisplayObject, implements IDataProvider, implements IGroupable
 {
 	static public inline var SRC_TAG = "src-rss";
