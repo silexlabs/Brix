@@ -18,6 +18,7 @@
     <class path="demo\discover_slplayer\src" />
     <class path="src" />
     <class path="demo\html_parsing\bin" />
+    <class path="..\haxe_libs\Cocktail\src" />
   </classpaths>
   <!-- Build options -->
   <build>

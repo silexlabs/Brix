@@ -18,10 +18,10 @@ import slplayer.ui.group.IGroupable;
  */
 class BasicPlayerControl extends DisplayObject, implements IPlayerControl, implements IGroupable
 {
-	static var FIRST_BUTTON_TAG = "controlbar-first";	
-	static var PREVIOUS_BUTTON_TAG = "controlbar-previous";	
-	static var NEXT_BUTTON_TAG = "controlbar-next";	
-	static var LAST_BUTTON_TAG = "controlbar-last";
+	static inline var FIRST_BUTTON_TAG = "controlbar-first";	
+	static inline var PREVIOUS_BUTTON_TAG = "controlbar-previous";	
+	static inline var NEXT_BUTTON_TAG = "controlbar-next";	
+	static inline var LAST_BUTTON_TAG = "controlbar-last";
 	
 	var firstButton : SkinnableUIElt;
 	var previousButton : SkinnableUIElt;
@@ -70,7 +70,8 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl, imple
 		//check if no inner element have the buttons data- tags
 		for (searchedPair in [ firstButton , previousButton , nextButton , lastButton ])
 		{
-			var results = rootElement.parentNode.getElementsByAttribute("data-"+searchedPair.eltAttrId, "*");
+			var rootParent : HtmlDom = cast rootElement.parentNode;
+			var results = rootParent.getElementsByAttribute("data-"+searchedPair.eltAttrId, "*");
 			
 			if (results.length > 0)
 			{

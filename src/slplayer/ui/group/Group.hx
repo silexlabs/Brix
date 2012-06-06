@@ -31,11 +31,12 @@ class Group extends DisplayObject
 	{
 		var groupables : List<IGroupable> = new List();
 		
-		var directChilds:HtmlCollection<HtmlDom> = elt.childNodes;
+		var directChilds:HtmlCollection<Dynamic> = elt.childNodes;
 		
 		for (childCnt in 0...directChilds.length)
 		{
-			if (directChilds[childCnt].nodeType != Lib.document.body.nodeType)
+			var childElt : HtmlDom = cast directChilds[childCnt];
+			if (childElt.nodeType != Lib.document.body.nodeType)
 				continue;
 			
 			var cmps = getSLPlayer().getAssociatedComponents(directChilds[childCnt]);

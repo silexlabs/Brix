@@ -1,6 +1,7 @@
 -js ../bin/myEmbeddedSLPlayerApplication.js
--cp .
+-cp ../../my_custom_components/src/
 -cp ../../../src/
+-cp ../../../../haxe_libs/Cocktail/src/
 -debug
 -main slplayer.core.SLPlayer
 -D embedHtml
