@@ -58,11 +58,15 @@ class DisplayObject implements ISLPlayerComponent
 		
 		slplayer.core.SLPlayerComponentTools.checkFilterOnElt(Type.getClass(this), rootElement);
 		
-		slplayer.core.SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this), rootElement);
+		//slplayer.core.SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this), rootElement);
 		
 		SLPlayerInstanceId = SLPId;
 		
 		SLPlayer.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
+		
+		#if slpdebug
+			trace("Successfuly created instance of "+Type.getClassName(Type.getClass(this)));
+		#end
 	}
 	
 	/**

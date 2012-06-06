@@ -49,7 +49,7 @@ class AppBuilder
 	/**
 	 * TODO comment
 	 */
-	static private var registeredComponents : Hash<Iterable<String>> = new Hash();
+	static private var registeredComponents : Hash<Hash<String>> = new Hash();
 	
 	/**
 	 * Sets the html page from the compile command line.
@@ -118,7 +118,7 @@ class AppBuilder
 		var rowHtmlContent = neko.io.File.getContent(htmlSourcePage);
 		
 		//source HTML content parsing
-		var htmlContent : Xml = haxe.xml.Parser.parse(rowHtmlContent);
+		cocktail.Lib.document.documentElement.innerHTML = rowHtmlContent;
 		
 		var pos;
 		
@@ -126,155 +126,151 @@ class AppBuilder
 		
 		//parse the SLPlayer class fields to find the methods to fill in
 		discoverSLPlayerMethods(fields);
-
-		for ( elt in htmlContent.firstElement().elements() )
-		{
-			switch(elt.nodeName.toLowerCase())
-			{
-				case "head":
-					
-					for (headElt in elt.elements())
-					{
-						switch(headElt.nodeName.toLowerCase())
-						{
-							case "script":
-								
-								var cmpClassName = headElt.get("data-"+SLP_USE_ATTR_NAME);
-								
-								if (cmpClassName == null)
-									continue;
-								
-								#if slp-debug
-									trace("component found => "+cmpClassName);
-								#end
-								
-								var initArgsElts:Iterable<String> = { iterator : headElt.attributes };
-								
-								registeredComponents.set(cmpClassName, initArgsElts);
-								
-								pos = haxe.macro.Context.currentPos();
-								
-								//generate import
-								registerComponentsforInitExprs.push(generateImport(cmpClassName));
-								
-								if (Lambda.exists(initArgsElts, function(atName:String) { return StringTools.startsWith( atName , "data-" ) && atName != "data-"+SLP_USE_ATTR_NAME; } )) //case the component initialization takes arguments (other than src or type)
-								{
-									var argsArrayName = StringTools.replace( cmpClassName , ".", "" ) + "Args";
-									registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
-									
-									for (initArgElt in initArgsElts)
-									{
-										if (StringTools.startsWith( initArgElt , "data-" ) && initArgElt != "data-"+SLP_USE_ATTR_NAME)
-											registerComponentsforInitExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(argsArrayName)), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
-									}
-									
-									//generate call to registerComponent with additionnal arguments
-									registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(argsArrayName)), pos : pos } ]), pos : pos } );
-								}
-								else
-								{
-									//generate call to registerComponent with no additionnal arguments
-									registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
-								}
-								
-								#if slp-debug
-									trace("added call to registerComponent("+cmpClassName+")");
-								#end
-								
-								if (headElt.get("src") == null)
-								{
-									//remove the element as it won't be useful at runtime
-									elt.removeChild(headElt);
-								}
-								else
-								{
-									//remove the "data-"+SLP_USE_ATTR_NAME attribute but leave the tag as there is a src attr
-									elt.remove("data-" + SLP_USE_ATTR_NAME);
-								}
-							
-							case "meta":
-								
-								if (headElt.get("name") == null)
-									continue;
-								
-								pos = haxe.macro.Context.currentPos();
-								
-								#if slp-debug
-									trace("found meta parameter : "+headElt.get("name")+" => "+headElt.get("content"));
-								#end
-								
-								//interpret meta parameter
-								var compilerFlags = ["noAutoStart", "embedHtml"];
 		
-								if ( Lambda.exists(compilerFlags, function(s:String) { return s == headElt.get("name"); } ) && headElt.get("content") == "true" )
-								{
-									//we define the tag for the compilation
-									haxe.macro.Compiler.define(headElt.get("name"));
-									//and remove the meta tag from the HTML (no need at runtime)
-									elt.removeChild(headElt);
-									continue;
-								}
-								
-								if (headElt.get("name") == "jsExposedName")
-								{
-									if (StringTools.replace(headElt.get("content"), " ", "") == "")
-									{
-										haxe.macro.Context.warning("Invalid jsExposedName value, use default one instead.", pos);
-									}
-									else
-									{
-										jsExposedName = headElt.get("content");
-									}
-									//no need of that at runtime, remove it from HTML
-									elt.removeChild(headElt);
-									continue;
-								}
-								
-								//then it's a custom meta param (or a HTML one => manage this case ?) potentially needed at runtime
-								initMetaParametersExprs.push(  { expr : ECall( { expr : EField( { expr : EConst(CIdent( "metaParameters" )), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString( headElt.get("name") )), pos : pos }, { expr : EConst(CString( headElt.get("content") )), pos : pos } ]), pos : pos }  );
-								
-							default:
-								//trace("Application configuration node "+headElt.nodeName+" ignored.");
-						}
-					}
-					
-				case "body":
-					
-					if (!haxe.macro.Context.defined('js') || haxe.macro.Context.defined('embedHtml'))
-					{
-						//Add the _htmlBody static var to the SLPlayer class
-						pos = haxe.macro.Context.currentPos();
-						
-						var bodyInnerHtml = haxe.Serializer.run("");
-						
-						if (elt.toString() != null)
-						{
-							bodyInnerHtml = haxe.Serializer.run(elt.toString());
-						}
-						
-						var htmlBodyFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(bodyInnerHtml)), pos : pos }]), pos : pos };
-						
-						fields.push( { name : "_htmlBody", doc : null, meta : [], access : [APrivate, AStatic], kind : FVar(null, htmlBodyFieldValue), pos : pos } );
-							
-						#if slp-debug
-							trace("bodyInnerHtml extracted and set on SLPlayer with a length of "+bodyInnerHtml.length);
-						#end
-						
-						//Add initalization expr of htmlRootElement.innerHTML to _htmlBody
-						initHtmlRootElementContentExprs.push({ expr : EBinop(OpAssign, { expr : EField( { expr : EConst(CIdent("htmlRootElement")), pos : pos }, "innerHTML"), pos : pos }, { expr : EConst(CIdent("_htmlBody")), pos : pos } ), pos : pos });
-					}
-					
-				default:
-					
-					#if slp-debug
-						trace("Main application node " + elt.nodeName + " ignored.");
-					#end
+		//parse <script> elements
+		var scriptElts = cocktail.Lib.document.getElementsByTagName("script");
+		
+		for (scriptElt in scriptElts)
+		{
+			var cmpClassName = scriptElt.getAttribute("data-"+SLP_USE_ATTR_NAME);
+			
+			if (cmpClassName == null)
+				continue;
+			
+			#if slpdebug
+				trace("component found => "+cmpClassName);
+			#end
+			
+			var scriptEltAttrs : Hash<String> = new Hash();
+			
+			for (itCnt in 0...scriptElt.attributes.length)
+			{
+				scriptEltAttrs.set( scriptElt.attributes.item(itCnt).nodeName , scriptElt.attributes.item(itCnt).nodeValue );
+			}
+			
+			registeredComponents.set(cmpClassName, scriptEltAttrs);
+			
+			pos = haxe.macro.Context.currentPos();
+			
+			//TODO #1 try to resolve ? #2 checks on cmps ? #3 forbid the javascript inline code #4 add the src="" if necessary and if not found ?
+			
+			//generate import
+			registerComponentsforInitExprs.push(generateImport(cmpClassName));
+			
+			if ( Lambda.exists( { iterator : scriptEltAttrs.keys } , function(atName:String) { return StringTools.startsWith( atName , "data-" ) && atName != "data-"+SLP_USE_ATTR_NAME; }) )
+			{	//case the component has data-arguments on its script tag
+				var argsArrayName = StringTools.replace( cmpClassName , ".", "_" ) + "Args";
+				registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
+				
+				for ( scriptEltAttrName in {iterator : scriptEltAttrs.keys})
+				{
+					if (StringTools.startsWith( scriptEltAttrName , "data-" ) && scriptEltAttrName != "data-"+SLP_USE_ATTR_NAME)
+						registerComponentsforInitExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(argsArrayName)), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(scriptEltAttrName)), pos : pos }, { expr : EConst(CString(scriptElt.getAttribute(scriptEltAttrName))), pos : pos } ]), pos : pos } );
+				}
+				
+				//generate call to registerComponent with additionnal arguments
+				registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(argsArrayName)), pos : pos } ]), pos : pos } );
+			}
+			else
+			{
+				//generate call to registerComponent with no additionnal arguments
+				registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
+			}
+			
+			#if slpdebug
+				trace("added call to registerComponent("+cmpClassName+")");
+			#end
+			
+			if (scriptElt.getAttribute("src") == null)
+			{
+				//remove the element as it won't be useful at runtime
+				scriptElt.parentNode.removeChild(scriptElt);
+			}
+			else
+			{
+				//remove the "data-"+SLP_USE_ATTR_NAME attribute but leave the tag as there is a src attr
+				scriptElt.removeAttribute("data-" + SLP_USE_ATTR_NAME);
 			}
 		}
 		
+		
+		//parse <meta> elements
+		var metaElts = cocktail.Lib.document.getElementsByTagName("meta");
+		
+		for (metaElt in metaElts)
+		{
+			if (metaElt.getAttribute("name") == null)
+				continue;
+			
+			pos = haxe.macro.Context.currentPos();
+			
+			#if slpdebug
+				trace("found meta parameter : "+metaElt.getAttribute("name")+" => "+metaElt.getAttribute("content"));
+			#end
+			
+			//interpret the meta parameter
+			var compilerFlags = ["noAutoStart", "embedHtml"]; //FIXME should this be a static var ?
+			
+			if ( Lambda.exists(compilerFlags, function(s:String) { return s == metaElt.getAttribute("name"); } ) && metaElt.getAttribute("content") == "true" )
+			{
+				//we define the tag for the compilation
+				haxe.macro.Compiler.define(metaElt.getAttribute("name"));
+				//and remove the meta tag from the HTML (no need at runtime)
+				metaElt.parentNode.removeChild(metaElt);
+				continue;
+			}
+			
+			if (metaElt.getAttribute("name") == "jsExposedName")
+			{
+				if (metaElt.getAttribute("content") == null || StringTools.replace(metaElt.getAttribute("content"), " ", "") == "")
+				{
+					haxe.macro.Context.warning("Invalid jsExposedName value specified, will use default one instead.", pos);
+				}
+				else
+				{
+					jsExposedName = metaElt.getAttribute("content");
+				}
+				//no need of that at runtime, remove it from HTML
+				metaElt.parentNode.removeChild(metaElt);
+				continue;
+			}
+			
+			//then it's a custom meta param (or a HTML one => manage this case ?) potentially needed at runtime
+			initMetaParametersExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent( "metaParameters" )), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString( metaElt.getAttribute("name") )), pos : pos }, { expr : EConst(CString( metaElt.getAttribute("content") )), pos : pos } ]), pos : pos } );
+		}
+		
+		
+		//parse the <body> element
+		var bodyElt = cocktail.Lib.document.body;
+		
+		if (!haxe.macro.Context.defined('js') || haxe.macro.Context.defined('embedHtml'))
+		{
+			//Add the _htmlBody static var to the SLPlayer class
+			pos = haxe.macro.Context.currentPos();
+			
+			var bodyInnerHtml = haxe.Serializer.run("");
+			
+			if (bodyElt.innerHTML != null)
+			{
+				bodyInnerHtml = haxe.Serializer.run(bodyElt.innerHTML);
+			}
+			
+			var htmlBodyFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(bodyInnerHtml)), pos : pos }]), pos : pos };
+			
+			fields.push( { name : "_htmlBody", doc : null, meta : [], access : [APrivate, AStatic], kind : FVar(null, htmlBodyFieldValue), pos : pos } );
+				
+			#if slpdebug
+				trace("bodyInnerHtml extracted and set on SLPlayer with a size of "+bodyInnerHtml.length);
+			#end
+			
+			//Add initalization expr of htmlRootElement.innerHTML to _htmlBody
+			initHtmlRootElementContentExprs.push({ expr : EBinop(OpAssign, { expr : EField( { expr : EConst(CIdent("htmlRootElement")), pos : pos }, "innerHTML"), pos : pos }, { expr : EConst(CIdent("_htmlBody")), pos : pos } ), pos : pos });
+		}
+		
+		
 		if (haxe.macro.Context.defined('js'))
 		{
-			packForJs(htmlContent.toString());
+			packForJs();
 		}
 		
 		if (!haxe.macro.Context.defined('noAutoStart'))
@@ -335,7 +331,7 @@ class AppBuilder
 	/**
 	 * Performs the js-specific compile config and output generating tasks.
 	 */
-	static function packForJs(compiledHTML:String) : Void
+	static function packForJs() : Void
 	{
 		var pos = haxe.macro.Context.currentPos();
 		
@@ -352,7 +348,7 @@ class AppBuilder
 		//Set the js-modern mode
 		if (!haxe.macro.Context.defined('js-modern'))
 		{
-			#if slp-debug
+			#if slpdebug
 				trace("Setting js-modern mode.");
 			#end
 			haxe.macro.Compiler.define("js-modern");
@@ -365,7 +361,7 @@ class AppBuilder
 		}
 		else
 		{
-			#if slp-debug
+			#if slpdebug
 				trace("Setting @:expose meta tag on SLPlayer class.");
 			#end
 			
@@ -384,12 +380,12 @@ class AppBuilder
 			if (output.lastIndexOf('/') != null)
 				outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
 			
-			#if slp-debug
+			#if slpdebug
 				trace("Saving "+outputDirectory + outputFileName+".html");
 			#end
 			
 			//generates the "compiled" HTML file if not embed
-			sys.io.File.saveContent( outputDirectory + outputFileName+".html" , compiledHTML );
+			sys.io.File.saveContent( outputDirectory + outputFileName+".html" , cocktail.Lib.document.documentElement.innerHTML );
 		}
 	}
 	

@@ -56,20 +56,20 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements I
 		
 		timer = new Timer(interval);
 		
-		var me = this;
-		timer.run = callback(me.next, groupElement);
+		var me = this; trace("DEBUG = "+me+"  timer="+timer);
+		timer.run = function () { trace("run me.next="+me.next+"  rootElement="+rootElement);  me.next(rootElement); };
 	}
 	
 	private function onPlayableFirst():Void
 	{
-		var me = this;
-		timer.run = callback(me.next, rootElement);
+		var me = this; trace("DEBUG = "+me+"  timer="+timer);
+		timer.run = function () { trace("run me.next="+me.next+"  rootElement="+rootElement);  me.next(rootElement); };
 	}
 	
 	private function onPlayableLast():Void
 	{
 		var me = this;
-		timer.run = callback(me.first, rootElement);
+		timer.run = function () { trace("run me.first="+me.first+"  rootElement="+rootElement);  me.first(rootElement); };
 	}
 	
 	private function onPlayableChange():Void { }

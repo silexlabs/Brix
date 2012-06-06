@@ -70,7 +70,8 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl, imple
 		//check if no inner element have the buttons data- tags
 		for (searchedPair in [ firstButton , previousButton , nextButton , lastButton ])
 		{
-			var results = rootElement.parentNode.getElementsByAttribute("data-"+searchedPair.eltAttrId, "*");
+			var rootParent : HtmlDom = cast rootElement.parentNode;
+			var results = rootParent.getElementsByAttribute("data-"+searchedPair.eltAttrId, "*");
 			
 			if (results.length > 0)
 			{

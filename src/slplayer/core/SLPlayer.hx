@@ -81,7 +81,7 @@ import slplayer.core.SLPlayerComponent;
 		
 		this.metaParameters = new Hash();
 		
-		#if slp-debug
+		#if slpdebug
 			trace("new SLPlayer instance built");
 		#end
 	}
@@ -93,7 +93,7 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	private function launch(?appendTo:Null<Dynamic>)
 	{
-		#if slp-debug
+		#if slpdebug
 			trace("Launching SLPlayer id "+id+" on "+appendTo);
 		#end
 		
@@ -115,7 +115,7 @@ import slplayer.core.SLPlayerComponent;
 		//call the UI components init() method
 		initComponents();
 		
-		#if slp-debug
+		#if slpdebug
 			trace("SLPlayer id "+id+" launched !");
 		#end
 	}
@@ -147,20 +147,20 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	static public function init(?appendTo:Dynamic, ?args:Dynamic )
 	{
-		#if slp-debug
+		#if slpdebug
 			trace("SLPlayer init() called with appendTo="+appendTo+" and args="+args);
 		#end
 		
 		//generate a new SLPlayerInstance id
 		var newId = generateUniqueId();
 		
-		#if slp-debug
+		#if slpdebug
 			trace("New SLPlayer id created : "+newId);
 		#end
 		
 		//the new SLPlayer instance
 		var newInstance = new SLPlayer(newId, args);
-		#if slp-debug
+		#if slpdebug
 			trace("setting ref to SLPlayer instance "+newId);
 		#end
 		instances.set(newId, newInstance);
@@ -213,7 +213,7 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	private function createComponentsOfType(componentClassName : String , ?args:Hash<String>)
 	{
-		#if slp-debug
+		#if slpdebug
 			trace("Creating "+componentClassName+"...");
 		#end
 		
@@ -225,7 +225,7 @@ import slplayer.core.SLPlayerComponent;
 			return;
 		}
 		
-		#if slp-debug
+		#if slpdebug
 			trace(componentClassName+" class resolved ");
 		#end
 		
@@ -233,7 +233,7 @@ import slplayer.core.SLPlayerComponent;
 		{
 			var classTag = SLPlayerComponentTools.getUnconflictedClassTag(componentClassName, registeredComponents.keys());
 			
-			#if slp-debug
+			#if slpdebug
 				trace("searching now for class tag = "+classTag);
 			#end
 			
@@ -246,7 +246,7 @@ import slplayer.core.SLPlayerComponent;
 			}
 			if (componentClassName != classTag)
 			{
-				#if slp-debug
+				#if slpdebug
 					trace("searching now for class tag = "+componentClassName);
 				#end
 				
@@ -257,7 +257,7 @@ import slplayer.core.SLPlayerComponent;
 				}
 			}
 			
-			#if slp-debug
+			#if slpdebug
 				trace("taggedNodes = "+taggedNodes.length);
 			#end
 			
@@ -274,7 +274,7 @@ import slplayer.core.SLPlayerComponent;
 		}
 		else //case of non-visual component: we just try to create an instance, no call on init()
 		{
-			#if slp-debug
+			#if slpdebug
 				trace("Try to create an instance of "+componentClassName+" non visual component");
 			#end
 			
@@ -302,7 +302,7 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	private function callInitOnComponents():Void
 	{
-		#if slp-debug
+		#if slpdebug
 			trace("call Init On Components");
 		#end
 		

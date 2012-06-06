@@ -31,13 +31,13 @@ class SLPlayerComponentTools
 	{
 		#if macro
 		
-		var xmlElt : Xml = cast elt; trace("macro checkFilterOnElt ELT **************** ");
-		var isElt = (xmlElt.nodeType == Xml.Element);
+		var castedElt : Xml = cast elt; 
+		var isElt = (castedElt.nodeType == Xml.Element);
 		
 		#else
 		
-		var htmlElt : js.Dom.HtmlDom = cast elt;
-		var isElt = (htmlElt.nodeType == js.Lib.document.body.nodeType); //FIXME cleaner way to do this comparison ?
+		var castedElt : js.Dom.HtmlDom = cast elt;
+		var isElt = (castedElt.nodeType == js.Lib.document.body.nodeType); //FIXME cleaner way to do this comparison ?
 		
 		#end
 		
@@ -48,11 +48,11 @@ class SLPlayerComponentTools
 		
 		if ( tagFilter == null)
 			return;
-		
-		if ( Lambda.exists( tagFilter , function(s:Dynamic) { return elt.nodeName.toLowerCase() == Std.string(s).toLowerCase(); } ) )
+
+		if ( Lambda.exists( tagFilter , function(s:Dynamic) { return castedElt.nodeName.toLowerCase() == Std.string(s).toLowerCase(); } ) )
 			return;
 		
-		throw "ERROR: cannot instantiate "+Type.getClassName(cmpClass)+" on this type of HTML element: "+elt.nodeName.toLowerCase();
+		throw "ERROR: cannot instantiate "+Type.getClassName(cmpClass)+" on this type of HTML element: "+castedElt.nodeName.toLowerCase();
 	}
 	
 	/**
@@ -68,8 +68,8 @@ class SLPlayerComponentTools
 		
 		#else
 		
-		var htmlElt : js.Dom.HtmlDom = cast elt;
-		var getAttr : String -> Null<String> = htmlElt.getAttribute;
+		var htmlElt : js.Dom.HtmlDom = cast elt; trace("htmlElt = "+htmlElt);
+		var getAttr : String -> Null<String> = htmlElt.getAttribute; trace("getAttr = "+getAttr);
 		
 		#end
 		
@@ -77,7 +77,7 @@ class SLPlayerComponentTools
 		
 		if (requires == null)
 			return;
-		
+
 		for (r in requires)
 		{
 			if ( getAttr("data-" + Std.string(r)) == null || StringTools.trim(getAttr("data-" + Std.string(r))) == "" )

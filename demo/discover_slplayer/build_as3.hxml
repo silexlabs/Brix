@@ -2,9 +2,9 @@
 -cp .
 -cp ../my_custom_components/src/
 -cp ../../src/
--cp ../../../haxe_libs/cocktail/src/
--cp ../../../haxe_libs/cocktail/lib/
+-cp ../../../haxe_libs/Cocktail/src/
 -main slplayer.core.SLPlayer
 --remap js:cocktail
 -swf-version 10.2
 --macro slplayer.macro.AppBuilder.setHtmlSourcePage('source.html')
+-D slpdebug
