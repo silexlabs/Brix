@@ -15,16 +15,13 @@ using StringTools;
  * reading its content from another component.
  * @author Thomas Fétiveau
  */
+@tagNameFilter("pre")
 class CodeViewer extends DisplayObject
 {
 	/**
-	 * A list of allowed tag names for the root element.
+	 * The data- optional attribute used to specify with HTML element we're viewing.
 	 */
-	static var rootElementNameFilter : List<String> = Lambda.list(["pre"]);
-	/**
-	 * The data- attribute used to specify with HTML element we're viewing.
-	 */
-	static var CODE_VIEW_ID_TAG = "code-viewer-id";
+	static inline var CODE_VIEW_ID_TAG = "code-viewer-id";
 	
 	/**
 	 * Overrides constructor to avoid having the slpid attributes in the HTML code at runtime.

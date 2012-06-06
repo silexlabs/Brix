@@ -12,11 +12,12 @@ using slplayer.data.DataProvider;
  * ...
  * @author Thomas Fétiveau
  */
+@requires(TAG_SRC)
 class JsonConfiguration implements IDataProvider
 {
-	static var TAG_SRC = "json-src";
+	static inline var TAG_SRC = "json-src";
 	
-	static var TAG_LISTENERS = "json-conf-listen";
+	static inline var TAG_LISTENERS = "json-conf-listen";
 	
 	static var instance : JsonConfiguration;
 	

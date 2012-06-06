@@ -12,7 +12,7 @@ import haxe.Template;
 
 /**
  * Structure helping with handling the skinnable elts of a component.
- * TODO keep this and generalize a skining sub-cmps handling logic or remove this.
+ * FIXME / TODO keep this and generalize a skining sub-cmps handling logic or remove this.
  */
 typedef SkinnableUIElt = 
 {
@@ -22,17 +22,22 @@ typedef SkinnableUIElt =
 
 /**
  * A displayObject is a UI component associated with an HTML DOM element. You declare an instance of a DisplayObject by putting
- * class="[YourDisplayObjectClassName]" in the attributes of the HTML DOM element you want to associate it to.
+ * class="[YourDisplayObjectClassName]" in the attributes of the HTML DOM element you want to associate to.
+ * 
+ * In case you want to allow your component only on specific HTML tags, set the @tagNameFilter() meta tag before your component 
+ * Class declaration with an array value containing the tag names, for instance:
+ * 
+ * @tagNameFilter("ul", "ol") class MyComponent extends DisplayObject { }
+ * 
+ * If you want to ensure that users of your component sets required "data-<MyCustonParam>" attributes on its HTML element, you can 
+ * set the @requires() meta tag before your component Class declaration, like below : 
+ * 
+ * @requires(<MyCustonParam>, <MyCustonParam2>, ...) class MyComponent extends DisplayObject { }
+ * 
  * @author Thomas Fétiveau
  */
 class DisplayObject implements ISLPlayerComponent
 {
-	/**
-	 * A list of allowed tag names for the body element.
-	 * If this parameter isn't defined or if the list is empty, it means there is no filtering (all tag names are allowed).
-	 */
-	static var rootElementNameFilter : List<String> = Lambda.list([]); //FIXME use meta tag for this
-	
 	/**
 	 * The id of the containing SLPlayer instance.
 	 */
@@ -51,33 +56,17 @@ class DisplayObject implements ISLPlayerComponent
 	{
 		this.rootElement = rootElement;
 		
-		if (!checkFilterOnElt(rootElement))
-			throw "ERROR: cannot instantiate "+Type.getClassName(Type.getClass(this))+" on a "+rootElement.nodeName+" element.";
+		checkFilterOnElt(Type.getClass(this), rootElement);
+		
+		slplayer.core.SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this), rootElement);
 		
 		SLPlayerInstanceId = SLPId;
 		
 		SLPlayer.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
-	}
-	
-	/**
-	 * Checks if a given element is allowed to be the component's rootElement against the tag filters.
-	 * @param	elt: the HtmlDom to check.
-	 * @return true if allowed, false if not.
-	 */
-	private function checkFilterOnElt( elt:HtmlDom ) : Bool
-	{
-		if (elt.nodeType != Lib.document.body.nodeType) //FIXME cleaner way to do this comparison ?
-			return false;
 		
-		var tagFilter = Reflect.field(Type.getClass(this), "rootElementNameFilter");
-		
-		if ( tagFilter == null || tagFilter.isEmpty() )
-			return true;
-		
-		if ( Lambda.exists( tagFilter , function(s:String) { return elt.nodeName.toLowerCase() == s.toLowerCase(); } ) )
-			return true;
-		
-		return false;
+		#if slpdebug
+			trace("Successfuly created instance of "+Type.getClassName(Type.getClass(this)));
+		#end
 	}
 	
 	/**
@@ -87,6 +76,44 @@ class DisplayObject implements ISLPlayerComponent
 	public function getSLPlayer():SLPlayer
 	{
 		return SLPlayer.get(SLPlayerInstanceId);
+	}
+	
+	/**
+	 * Tells if a given class is a DisplayObject. 
+	 * 
+	 * @param	cmpClass	the Class to check.
+	 * @return	Bool		true if DisplayObject is in the Class inheritance tree.
+	 */
+	static public function isDisplayObject(cmpClass : Class<Dynamic>):Bool
+	{
+		if (cmpClass == Type.resolveClass("slplayer.ui.DisplayObject"))
+			return true;
+		
+		if (Type.getSuperClass(cmpClass) != null)
+			return isDisplayObject(Type.getSuperClass(cmpClass));
+		
+		return false;
+	}
+	
+	/**
+	 * Checks if a given element is allowed to be the component's rootElement against the tag filters.
+	 * @param	cmpClass: the component class to check
+	 * @param	elt: the DOM element to check. By default the rootElement.
+	 */
+	static public function checkFilterOnElt( cmpClass:Class<Dynamic> , elt:HtmlDom ) : Void
+	{
+		if (elt.nodeType != Lib.document.body.nodeType)
+			throw "cannot instantiate "+Type.getClassName(cmpClass)+" on a non element node.";
+
+		var tagFilter = (haxe.rtti.Meta.getType(cmpClass) != null) ? haxe.rtti.Meta.getType(cmpClass).tagNameFilter : null ;
+		
+		if ( tagFilter == null)
+			return;
+
+		if ( Lambda.exists( tagFilter , function(s:Dynamic) { return elt.nodeName.toLowerCase() == Std.string(s).toLowerCase(); } ) )
+			return;
+		
+		throw "cannot instantiate "+Type.getClassName(cmpClass)+" on this type of HTML element: "+elt.nodeName.toLowerCase();
 	}
 	
 	// --- CUSTOMIZABLE API ---

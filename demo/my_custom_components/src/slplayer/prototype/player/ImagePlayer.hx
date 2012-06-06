@@ -21,13 +21,9 @@ import slplayer.ui.group.IGroupable;
  * Gallery component for SLPlayer applications.
  * @author Thomas Fétiveau
  */
+@tagNameFilter("ul","ol")
 class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IPlayable, implements IGroupable
 {
-	/**
-	 * A list of allowed tag names for the root element.
-	 */
-	static var rootElementNameFilter : List<String> = Lambda.list(["ul"]);
-	
 	var currentIndex:Int;
 	
 	var tpl : Template;

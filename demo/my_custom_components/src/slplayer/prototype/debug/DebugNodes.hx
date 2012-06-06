@@ -10,7 +10,6 @@ import js.Dom;
  * ...
  * @author Thomas Fétiveau
  */
-
 class DebugNodes  extends DisplayObject
 {
 	override public function init():Void 
@@ -38,7 +37,7 @@ class DebugNodes  extends DisplayObject
 				var tagName = untyped elt.nodeName;
 				trace("tag " + tagName +
 				" with class=" + elt.className +
-				" has associated components : "+SLPlayer.getAssociatedComponents(elt));
+				" has associated components : "+getSLPlayer().getAssociatedComponents(elt));
 			}
 			if (node.childNodes[cCount].hasChildNodes())
 				debugNode( elt );

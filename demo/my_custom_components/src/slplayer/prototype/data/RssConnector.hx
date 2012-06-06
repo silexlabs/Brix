@@ -18,9 +18,10 @@ using slplayer.data.DataProvider;
  * TODO cleanup to allow different rss formats
  * @author Thomas Fétiveau
  */
+@requires("data-src-rss")
 class RssConnector extends DisplayObject, implements IDataProvider, implements IGroupable
 {
-	static var SRC_TAG = "src-rss";
+	static public inline var SRC_TAG = "src-rss";
 	
 	public var groupElement:HtmlDom;
 	
@@ -43,9 +44,6 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 			groupElement = rootElement;
 		
 		src = this.rootElement.getAttribute("data-" + SRC_TAG);
-		
-		if (src == null)
-			trace("INFO " + SRC_TAG + " attribute not set on html element");
 		
 		var me = this;
 		

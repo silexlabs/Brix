@@ -19,9 +19,9 @@ import haxe.Timer;
 class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements IGroupable
 {
 	/**
-	 * The custom attribute for setting the autoplay interval (in ms).
+	 * The custom attribute for setting the autoplay interval (in ms). Default is 2000 ms.
 	 */
-	static var AUTOPLAY_INTERVAL_TAG = "autoplay-interval";
+	static inline var AUTOPLAY_INTERVAL_TAG = "autoplay-interval";
 	
 	/**
 	 * The Timer component.
@@ -57,19 +57,19 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements I
 		timer = new Timer(interval);
 		
 		var me = this;
-		timer.run = callback(me.next, groupElement);
+		timer.run = function () { me.next(rootElement); };
 	}
 	
 	private function onPlayableFirst():Void
 	{
 		var me = this;
-		timer.run = callback(me.next, rootElement);
+		timer.run = function () { me.next(rootElement); };
 	}
 	
 	private function onPlayableLast():Void
 	{
 		var me = this;
-		timer.run = callback(me.first, rootElement);
+		timer.run = function () { me.first(rootElement); };
 	}
 	
 	private function onPlayableChange():Void { }
