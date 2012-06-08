@@ -143,7 +143,7 @@ class AppBuilder
 			//pack the application (interpret or set compiler flags, generate compiled HTML file...)
 			pack();
 		}
-		catch (unknown : Dynamic) { neko.Lib.println("\nERROR : "+Std.string(unknown)); }
+		catch (unknown : Dynamic) { neko.Lib.println("\nERROR : " + Std.string(unknown)); Sys.exit(1); }
 		
 		return fields;
 	}
@@ -347,12 +347,11 @@ class AppBuilder
 	{
 		for (cmpClassName in { iterator : registeredComponents.keys })
 		{
-			var cmpType = haxe.macro.Context.getType(cmpClassName);
 			
-			if (cmpType == null)
-			{
-				throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath.";
-			}
+			var cmpType;
+			
+			try { cmpType = haxe.macro.Context.getType(cmpClassName); }
+			catch(unknown:Dynamic) { throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath."; }
 			
 			switch( cmpType ) 
 			{
@@ -438,9 +437,7 @@ class AppBuilder
 											throw taggedElt.nodeName+" is not allowed to be a "+cmpClassName;
 										}
 									}
-									
 								default :
-									
 							}
 						}
 					}
@@ -472,12 +469,10 @@ class AppBuilder
 									{
 										throw missingAttr+" not set on "+cmpClassName+" <script> declaration while it's required by the component";
 									}
-									
 								default :
 							}
 						}
 					}
-					
 				default: 
 			}
 		}
