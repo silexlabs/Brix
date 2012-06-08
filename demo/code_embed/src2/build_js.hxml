@@ -3,4 +3,4 @@
 -cp ../../../src/
 -cp ../../../../haxe_libs/Cocktail/src/
 -debug
--main slplayer.core.SLPlayer
+-main slplayer.core.Application

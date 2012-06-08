@@ -1,7 +1,6 @@
 package slplayer.ui.group;
 
 import slplayer.ui.DisplayObject;
-import slplayer.core.SLPlayer;
 
 import js.Dom;
 import js.Lib;
