@@ -3,6 +3,6 @@
 -cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
 -debug
--main slplayer.core.SLPlayer
---macro slplayer.macro.AppBuilder.setHtmlSourcePage('source.html')
+-main slplayer.core.Application
+--macro slplayer.core.Builder.create('source.html')
 -D slpdebug
