@@ -1,8 +1,9 @@
 package slplayer.ui;
 
-import slplayer.core.SLPlayer;
+import slplayer.core.Application;
 
 import slplayer.core.SLPlayerComponent;
+import slplayer.core.SLPlayerComponentTools;
 using slplayer.core.SLPlayerComponent;
 
 import js.Lib;
@@ -50,19 +51,23 @@ class DisplayObject implements ISLPlayerComponent
 	
 	/**
 	 * Common constructor for all DisplayObjects. If there is anything specific to a given component class initialization, override the init() method.
+	 * 
 	 * @param	rootElement
 	 */
 	private function new(rootElement : HtmlDom, SLPId:String) 
 	{
 		this.rootElement = rootElement;
 		
-		checkFilterOnElt(Type.getClass(this), rootElement);
-		
-		slplayer.core.SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this), rootElement);
+		#if disableFastInit
+			//check the @tagNameFilter constraints
+			checkFilterOnElt(Type.getClass(this) , rootElement);
+			//check the @requires constraints
+			SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this) , rootElement);
+		#end
 		
 		SLPlayerInstanceId = SLPId;
 		
-		SLPlayer.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
+		Application.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
 		
 		#if slpdebug
 			trace("Successfuly created instance of "+Type.getClassName(Type.getClass(this)));
@@ -71,11 +76,12 @@ class DisplayObject implements ISLPlayerComponent
 	
 	/**
 	 * Get the containing SLPlayer instance.
-	 * @return SLPlayer
+	 * 
+	 * @return Application
 	 */
-	public function getSLPlayer():SLPlayer
+	public function getSLPlayer():Application
 	{
-		return SLPlayer.get(SLPlayerInstanceId);
+		return Application.get(SLPlayerInstanceId);
 	}
 	
 	/**
@@ -97,6 +103,7 @@ class DisplayObject implements ISLPlayerComponent
 	
 	/**
 	 * Checks if a given element is allowed to be the component's rootElement against the tag filters.
+	 * 
 	 * @param	cmpClass: the component class to check
 	 * @param	elt: the DOM element to check. By default the rootElement.
 	 */
@@ -104,7 +111,7 @@ class DisplayObject implements ISLPlayerComponent
 	{
 		if (elt.nodeType != Lib.document.body.nodeType)
 			throw "cannot instantiate "+Type.getClassName(cmpClass)+" on a non element node.";
-
+trace("checkFilterOnElt #################################################");
 		var tagFilter = (haxe.rtti.Meta.getType(cmpClass) != null) ? haxe.rtti.Meta.getType(cmpClass).tagNameFilter : null ;
 		
 		if ( tagFilter == null)
