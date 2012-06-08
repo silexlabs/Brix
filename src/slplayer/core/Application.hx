@@ -348,15 +348,15 @@ import slplayer.core.SLPlayerComponent;
 	/**
 	 * Gets the component instance(s) associated with a given node.
 	 * @param	node	the HTML node for which we search the associated component instances.
-	 * @return	null if no associated component, else a List<DisplayObject>.
+	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
-	public function getAssociatedComponents(node : HtmlDom) : Null<List<slplayer.ui.DisplayObject>>
+	public function getAssociatedComponents(node : HtmlDom) : List<slplayer.ui.DisplayObject>
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
 		if (nodeId != null)
 			return nodeToCmpInstances.get(nodeId);
 		
-		return null;
+		return new List();
 	}
 }
