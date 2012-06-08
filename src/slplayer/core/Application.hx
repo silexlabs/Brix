@@ -3,30 +3,30 @@ package slplayer.core;
 import js.Lib;
 import js.Dom;
 
-import slplayer.ui.DisplayObject;
-
 import slplayer.core.SLPlayerComponent;
 
 /**
  * The main SLPlayer class handles the application initialization. It instanciates the components, tracking for each of them their 
  * association with their DOM rootElement. This class is based on the content of the application HTML file and is thus associated 
  * with the AppBuilder building macro.
+ * 
  * @author Thomas Fétiveau
  */
-@:build(slplayer.macro.AppBuilder.buildFromHtml()) class SLPlayer 
+@:build(slplayer.core.Builder.build()) class Application 
 {
 	/**
 	 * The data- attribute set by the slplayer on the HTML elements associated with one or more component.
 	 */
-	static private var SLPID_ATTR_NAME = "slpid";
+	static inline private var SLPID_ATTR_NAME = "slpid";
+	
 	/**
 	 * A Hash of SLPlayer instances indexed by their id.
 	 */
-	static private var instances : Hash<SLPlayer> = new Hash();
+	static private var instances : Hash<Application> = new Hash();
 	/**
 	 * Gets an SLPlayer instance corresponding to an id.
 	 */
-	static public function get(SLPId:String):Null<SLPlayer>
+	static public function get(SLPId:String):Null<Application>
 	{
 		return instances.get(SLPId);
 	}
@@ -38,7 +38,7 @@ import slplayer.core.SLPlayerComponent;
 	/**
 	 * A Hash keeping all component instances indexed by node slplayer id.
 	 */
-	private var nodeToCmpInstances : Hash<List<DisplayObject>>;
+	private var nodeToCmpInstances : Hash<List<slplayer.ui.DisplayObject>>;
 	/**
 	 * The SLPlayer root application node. Usually, any class used in a SLPlayer application shouldn't use 
 	 * Lib.document.body directly but this variable instead.
@@ -159,7 +159,7 @@ import slplayer.core.SLPlayerComponent;
 		#end
 		
 		//the new SLPlayer instance
-		var newInstance = new SLPlayer(newId, args);
+		var newInstance = new Application(newId, args);
 		#if slpdebug
 			trace("setting ref to SLPlayer instance "+newId);
 		#end
@@ -169,7 +169,10 @@ import slplayer.core.SLPlayerComponent;
 	/**
 	 * The main entry point in autoStart mode. This function is implemented by the AppBuilder macro.
 	 */
-	static public function main() {	}
+	static public function main()
+	{
+		//slplayer.core.Test.addFlag();
+	}
 	
 	/**
 	 * This function is implemented by the AppBuilder macro.
@@ -229,7 +232,7 @@ import slplayer.core.SLPlayerComponent;
 			trace(componentClassName+" class resolved ");
 		#end
 		
-		if (DisplayObject.isDisplayObject(componentClass)) // case DisplayObject component
+		if (slplayer.ui.DisplayObject.isDisplayObject(componentClass)) // case DisplayObject component
 		{
 			var classTag = SLPlayerComponentTools.getUnconflictedClassTag(componentClassName, registeredComponents.keys());
 			
@@ -320,11 +323,11 @@ import slplayer.core.SLPlayerComponent;
 	 * @param	node	the node we want to add an associated component instance to.
 	 * @param	cmp		the component instance to add.
 	 */
-	public function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void
+	public function addAssociatedComponent(node : HtmlDom, cmp : slplayer.ui.DisplayObject) : Void
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
-		var associatedCmps : List<DisplayObject>;
+		var associatedCmps : List<slplayer.ui.DisplayObject>;
 		
 		if (nodeId != null)
 		{
@@ -345,9 +348,9 @@ import slplayer.core.SLPlayerComponent;
 	/**
 	 * Gets the component instance(s) associated with a given node.
 	 * @param	node	the HTML node for which we search the associated component instances.
-	 * @return	a List<DisplayObject>, empty if there is no component
+	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
-	public function getAssociatedComponents(node : HtmlDom) : List<DisplayObject>
+	public function getAssociatedComponents(node : HtmlDom) : List<slplayer.ui.DisplayObject>
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		

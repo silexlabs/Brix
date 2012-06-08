@@ -1,6 +1,14 @@
 <html>
 <head>
 	<meta charset="utf-8" />
+	<!-- You can configure your SLPlayer application right in the source HTML file via the meta tags. See the 
+	documentation to get the list of configuration meta tags.-->
+	<!-- 
+	uncomment this meta tag to make your Application checking your components against their restrictions at runtime 
+	as well (ie: not only at compile time)
+	-->
+	<meta name="disableFastInit" content="true" /> 
+	
 	<title>Proto SLPlayer Demo</title>
 	<script src="SLPlayer.js"></script>
 	<!--
@@ -19,7 +27,6 @@
 	We may improve that in the future.
 	-->
 	<script data-slp-use="slplayer.ui.group.Group"></script>
-	
 	<script data-slp-use="slplayer.prototype.data.RssConnector"></script>
 	<script data-slp-use="slplayer.prototype.player.ImagePlayer"></script>
 	<script data-slp-use="slplayer.prototype.ui.TemplateRenderer"></script>
