@@ -28,9 +28,9 @@ class SLPlayerComponentTools
 
 		for (r in requires)
 		{
-			if ( elt.getAttribute("data-" + Std.string(r)) == null || StringTools.trim(elt.getAttribute("data-" + Std.string(r))) == "" )
+			if ( elt.getAttribute( Std.string(r) ) == null || StringTools.trim( elt.getAttribute( Std.string(r) ) ) == "" )
 			{
-				throw "data-" + Std.string(r) + " parameter is requiredcfor "+Type.getClassName(cmpClass);
+				throw Std.string(r) + " parameter is required for "+Type.getClassName(cmpClass);
 			}
 		}
 	}

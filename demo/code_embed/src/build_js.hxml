@@ -4,5 +4,6 @@
 -cp ../../../../haxe_libs/Cocktail/src/
 -debug
 -main slplayer.core.Application
--D embedHtml
+--macro slplayer.core.Builder.create('index.html')
 -D noAutoStart
+-D slpdebug

@@ -98,11 +98,21 @@ import slplayer.core.SLPlayerComponent;
 		#end
 		
 		if (appendTo != null) //set the SLPlayer application root element
+		{
+			#if slpdebug
+				trace("setting htmlRootElement to "+appendTo);
+			#end
 			htmlRootElement = cast appendTo;
+		}
 		
 		//it can't be a non element node
 		if (htmlRootElement == null || htmlRootElement.nodeType != Lib.document.body.nodeType)
+		{
+			#if slpdebug
+				trace("setting htmlRootElement to Lib.document.body");
+			#end
 			htmlRootElement = Lib.document.body;
+		}
 		
 		initHtmlRootElementContent();
 		
@@ -171,7 +181,14 @@ import slplayer.core.SLPlayerComponent;
 	 */
 	static public function main()
 	{
-		//slplayer.core.Test.addFlag();
+		#if !noAutoStart
+		
+			#if slpdebug
+				trace("noAutoStart not defined: calling init()...");
+			#end
+			
+			init();
+		#end
 	}
 	
 	/**
@@ -272,7 +289,7 @@ import slplayer.core.SLPlayerComponent;
 				{
 					newDisplayObject = Type.createInstance( componentClass, [node, id] );
 				}
-				catch( unknown : Dynamic ) { trace(Std.string(unknown));}
+				catch( unknown : Dynamic ) { trace("ERROR "+Std.string(unknown));}
 			}
 		}
 		else //case of non-visual component: we just try to create an instance, no call on init()
@@ -290,7 +307,7 @@ import slplayer.core.SLPlayerComponent;
 				else
 					cmpInstance = Type.createInstance( componentClass, [] );
 			}
-			catch(unknown : Dynamic ) { trace(Std.string(unknown));}
+			catch(unknown : Dynamic ) { "ERROR "+trace(Std.string(unknown));}
 			
 			//if the component is an SLPlayer cmp (and it should be), then try to give him its SLPlayer instance id
 			if (cmpInstance != null && Std.is(cmpInstance, ISLPlayerComponent))

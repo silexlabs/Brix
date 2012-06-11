@@ -3,8 +3,9 @@ package slplayer.ui;
 import slplayer.core.Application;
 
 import slplayer.core.SLPlayerComponent;
-import slplayer.core.SLPlayerComponentTools;
 using slplayer.core.SLPlayerComponent;
+
+import slplayer.core.SLPlayerComponentTools;
 
 import js.Lib;
 import js.Dom;
@@ -111,7 +112,7 @@ class DisplayObject implements ISLPlayerComponent
 	{
 		if (elt.nodeType != Lib.document.body.nodeType)
 			throw "cannot instantiate "+Type.getClassName(cmpClass)+" on a non element node.";
-trace("checkFilterOnElt #################################################");
+		
 		var tagFilter = (haxe.rtti.Meta.getType(cmpClass) != null) ? haxe.rtti.Meta.getType(cmpClass).tagNameFilter : null ;
 		
 		if ( tagFilter == null)

@@ -8,7 +8,7 @@ import haxe.macro.Context;
 using StringTools;
 
 /**
- * 
+ * Implements the pre-compile and compile logic of SLPlayer.
  * 
  * @author Thomas Fétiveau
  */
@@ -25,7 +25,7 @@ class Builder
 	/**
 	 * The SLPlayer-reserved flags which should be set as compiler flags
 	 */
-	static inline public var SLP_COMPILER_FLAGS = ["noAutoStart", "embedHtml", "disableFastInit"];
+	static inline public var SLP_COMPILER_FLAGS = ["noAutoStart", "disableEmbedHtml", "disableFastInit"];
 	/**
 	 * The value (<meta name=key content=value />) to give a meta tag to make it a compiler flag
 	 */
@@ -221,14 +221,14 @@ class Builder
 	{
 		var scriptElts = cocktail.Lib.document.getElementsByTagName("script");
 		
+		//flag telling if we've found the inclusion script tag for the application (js target with no embedHtml only)
+		var appScriptInclusionFound = false;
+
+		var applicationFileName = Compiler.getOutput();
+		applicationFileName = applicationFileName.substr( (applicationFileName.indexOf('/') > -1) ? applicationFileName.lastIndexOf('/') + 1 : 0 );
+		
 		for (scriptElt in scriptElts)
 		{
-			//TODO FIXME check the src first (case no data-slp-use but src => WARNING)
-			
-			//TODO FIXME forbid the javascript inline code for flash
-			
-			//TODO add the src="" if necessary (js) and if not found and forbid for other targets (flash)
-			
 			//search for components declarations
 			var cmpDeclarations = scriptElt.getAttribute("data-"+SLP_USE_ATTR_NAME);
 			
@@ -268,9 +268,33 @@ class Builder
 			}
 			else
 			{
+				if ( Context.defined('js') && scriptElt.getAttribute("src") != null && 
+						Context.defined('disableEmbedHtml') && scriptElt.getAttribute("src").endsWith(applicationFileName) )
+				{
+					appScriptInclusionFound = true;
+					
+					#if slpdebug
+						trace("Found application script inclusion ");
+					#end
+				}
+				
+				neko.Lib.println( "\nWARNING You should not include nor put any script in your HTML source file as it's not cross platform.\n" );
+				
 				//just remove the declare part but leave it as there may be an associated script.
 				scriptElt.removeAttribute( "data-" + SLP_USE_ATTR_NAME );
 			}
+		}
+		
+		if ( Context.defined('js') && Context.defined('disableEmbedHtml') && !appScriptInclusionFound )
+		{
+			//Add the <script src="<application .js file>" /> in js/disableEmbedHtml mode.
+			var appScriptInclusionTag = cocktail.Lib.document.createElement("script");
+			appScriptInclusionTag.setAttribute( "src" , applicationFileName );
+			cocktail.Lib.document.getElementsByTagName("head")[0].appendChild(appScriptInclusionTag);
+			
+			#if slpdebug
+				trace("Adding <script src='"+applicationFileName+"'></script>");
+			#end
 		}
 	}
 	
@@ -487,7 +511,7 @@ class Builder
 	{
 		var pos = Context.currentPos();
 		
-		if (!Context.defined('js') || Context.defined('embedHtml'))
+		if (!Context.defined('disableEmbedHtml'))
 		{
 			//add the _htmlBody static var to the SLPlayer class
 			var bodyInnerHtml = haxe.Serializer.run("");
@@ -568,7 +592,8 @@ class Builder
 		}
 		
 		//launch method call
-		if (Context.defined('js') && !Context.defined('embedHtml'))
+		//FIXME it may not work with already loaded pages
+		if (Context.defined('js') && Context.defined('disableEmbedHtml')) //the application is included in an existing HTML page
 		{
 			pos = Context.currentPos();
 			
@@ -579,11 +604,12 @@ class Builder
 		{
 			pos = Context.currentPos();
 			
-			//Add this call in init method : newInstance.launch(appendTo);
+			//add this call in init method : newInstance.launch(appendTo);
 			initExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } );
 		}
 		
 		//manage the auto start mode
+		/*
 		if (!Context.defined('noAutoStart'))
 		{
 			pos = Context.currentPos();
@@ -591,6 +617,7 @@ class Builder
 			//if the noAutoStart method is not set, then add a call to init() in the SLPlayer main method.
 			mainExprs.push({ expr : ECall( { expr : EConst(CIdent("init")), pos : pos }, [ ] ) , pos : pos });
 		}
+		*/
 	}
 	
 	/**
@@ -600,7 +627,7 @@ class Builder
 	{
 		var pos = Context.currentPos();
 		
-		var output = haxe.macro.Compiler.getOutput();
+		var output = Compiler.getOutput();
 		
 		//the compiled SLPlayer application filename
 		var outputFileName = output;
@@ -639,7 +666,7 @@ class Builder
 		}
 		
 		
-		if (!Context.defined('embedHtml'))
+		if (Context.defined('disableEmbedHtml'))
 		{
 			//generates the "compiled" HTML file if not embed
 			var outputDirectory = "./";
