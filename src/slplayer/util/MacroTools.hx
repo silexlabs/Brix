@@ -15,34 +15,42 @@
  */
 package slplayer.util;
 
-import js.Lib;
-import js.Dom;
+import haxe.macro.Type;
 
 /**
- * TODO comment
+ * Helper tools for macros.
  * 
  * @author Thomas Fétiveau
  */
-class DomTools 
+class MacroTools 
 {
 	/**
-	 * Search for all children elements of the given element that have the given attribute with the given value.
-	 * @param	elt the DOM element
-	 * @param	attr the attr name to search for
-	 * @param	value the attr value to search for, specifying '*' means "any value"
-	 * @return an Array<HtmlDom>
+	 * Tells if a given ClassType implements or extends or is <fullName>.
+	 * 
+	 * @param	classType, the classType to check.
+	 * @param	fullName, the full name of the class or interface to compare to.
+	 * @return	true if classType extends, implements or is fullname.
 	 */
-	static public function getElementsByAttribute(elt : HtmlDom, attr:String, value:String):Array<HtmlDom>
+	static public function is( classType : haxe.macro.ClassType , fullName : String ) : Bool
 	{
-		var childElts = elt.getElementsByTagName('*');
-		var filteredChildElts:Array<HtmlDom> = new Array();
-		
-		for (cCount in 0...childElts.length)
+		if ( classType.pack.join(".") + "." + classType.name == fullName )
 		{
-			if ( childElts[cCount].getAttribute(attr)!=null && ( value == "*" || childElts[cCount].getAttribute(attr) == value) )
-                filteredChildElts.push(childElts[cCount]);
+			return true;
 		}
-		return filteredChildElts;
+		
+		for ( i in classType.interfaces )
+		{
+			if ( i.t.get().pack.join(".")+"."+i.t.get().name == fullName )
+			{
+				return true;
+			}
+		}
+		
+		if ( classType.superClass != null )
+		{
+			return is(classType.superClass.t.get(), fullName);
+		}
+		
+		return false;
 	}
-	
 }

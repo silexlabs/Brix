@@ -1,7 +1,9 @@
 package slplayer.prototype.data;
 
 import slplayer.ui.DisplayObject;
+
 import slplayer.ui.group.IGroupable;
+using slplayer.ui.group.IGroupable.Groupable;
 
 import haxe.Http;
 
@@ -36,6 +38,13 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 		//getData(null);
 		
 		return src;
+	}
+	
+	private override function new(rootElement : HtmlDom, SLPId:String)
+	{
+		super(rootElement,SLPId);
+		
+		startGroupable();
 	}
 	
 	override public function init():Void 
