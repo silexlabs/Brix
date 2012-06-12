@@ -126,7 +126,12 @@ class Builder
 			//parse the <body> element
 			parseBody();
 		}
-		catch (unknown : Dynamic) { neko.Lib.println("\nERROR : " + Std.string(unknown)); Sys.exit(1); }
+		catch (unknown : Dynamic) 
+		{
+			neko.Lib.println("\nERROR : " + Std.string(unknown));
+			
+			Sys.exit(1);
+		}
 	}
 	
 	/**
@@ -164,7 +169,12 @@ class Builder
 			//finalize the application compilation
 			pack();
 		}
-		catch (unknown : Dynamic) { neko.Lib.println("\nERROR : " + Std.string(unknown)); Sys.exit(1); }
+		catch (unknown : Dynamic)
+		{
+			neko.Lib.println("\nERROR : " + Std.string(unknown));
+		
+			Sys.exit(1);
+		}
 		
 		return fields;
 	}
@@ -331,11 +341,13 @@ class Builder
 		{
 			var cmpType;
 			
-			try {
+			try
+			{
 				cmpType = Context.getType(cmpClassName);
 			}
-			catch (unknown:Dynamic) {
-				throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath.";
+			catch (unknown:Dynamic)
+			{	
+				throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath and that it compiles correctly. Cause: "+Std.string(unknown);
 			}
 			
 			switch( cmpType ) 
