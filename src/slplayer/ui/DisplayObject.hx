@@ -2,8 +2,8 @@ package slplayer.ui;
 
 import slplayer.core.Application;
 
-import slplayer.core.SLPlayerComponent;
-using slplayer.core.SLPlayerComponent;
+import slplayer.core.ISLPlayerComponent;
+using slplayer.core.ISLPlayerComponent.SLPlayerComponent;
 
 import slplayer.core.SLPlayerComponentTools;
 
@@ -23,6 +23,16 @@ typedef SkinnableUIElt =
 }
 
 /**
+ * TODO comment
+ */
+interface IDisplayObject implements ISLPlayerComponent
+{
+	public var SLPlayerInstanceId : String;
+	
+	public var rootElement(default, null) : HtmlDom;
+}
+
+/**
  * A displayObject is a UI component associated with an HTML DOM element. You declare an instance of a DisplayObject by putting
  * class="[YourDisplayObjectClassName]" in the attributes of the HTML DOM element you want to associate to.
  * 
@@ -38,7 +48,7 @@ typedef SkinnableUIElt =
  * 
  * @author Thomas Fétiveau
  */
-class DisplayObject implements ISLPlayerComponent
+class DisplayObject implements IDisplayObject
 {
 	/**
 	 * The id of the containing SLPlayer instance.
@@ -51,6 +61,16 @@ class DisplayObject implements ISLPlayerComponent
 	public var rootElement(default, null) : HtmlDom;
 	
 	/**
+	 * Returns the associated running Application instance.
+	 * 
+	 * @return	an Application object.
+	 */
+	public function getSLPlayer() : Application
+	{
+		return SLPlayerComponent.getSLPlayer(this);
+	}
+	
+	/**
 	 * Common constructor for all DisplayObjects. If there is anything specific to a given component class initialization, override the init() method.
 	 * 
 	 * @param	rootElement
@@ -59,6 +79,8 @@ class DisplayObject implements ISLPlayerComponent
 	{
 		this.rootElement = rootElement;
 		
+		initSLPlayerComponent(SLPId);
+		
 		#if disableFastInit
 			//check the @tagNameFilter constraints
 			checkFilterOnElt(Type.getClass(this) , rootElement);
@@ -66,23 +88,11 @@ class DisplayObject implements ISLPlayerComponent
 			SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this) , rootElement);
 		#end
 		
-		SLPlayerInstanceId = SLPId;
-		
 		Application.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
 		
 		#if slpdebug
 			trace("Successfuly created instance of "+Type.getClassName(Type.getClass(this)));
 		#end
-	}
-	
-	/**
-	 * Get the containing SLPlayer instance.
-	 * 
-	 * @return Application
-	 */
-	public function getSLPlayer():Application
-	{
-		return Application.get(SLPlayerInstanceId);
 	}
 	
 	/**
