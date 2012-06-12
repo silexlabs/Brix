@@ -121,6 +121,26 @@
 		</div>
 		
 		<div style="margin:20px; margin-top:80px; width:1200px; padding:5px; font-size:14px;">
+			<div style="margin-bottom:10px;">A second example of Group.</div>
+			<div>Code:</div>
+			<pre class="CodeViewer" data-code-viewer-id="example045" style='color:#656565; font-size:14px; background-color:#d5d5d5; padding:5px;'></pre>
+			<div>Output:</div>
+			<div id="example045">
+				<div class="Group">
+					<div class="RssConnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2"></div>
+					<ul class="ImagePlayer">
+						<li><img src="assets/4.jpg" /></li>
+						::foreach data::<li><img style="height:155px;" title="::media_title::" alt="::media_title::" src="::media_thumbnail.url::" /></li>::end::
+						<li><img src="assets/1.png" /></li>
+						<li><img src="assets/2.png" /></li>
+						<li><img src="assets/3.png" /></li>
+					</ul>
+					<div class="AutoPlayer"></div>
+				</div>
+			</div>
+		</div>
+		
+		<div style="margin:20px; margin-top:80px; width:1200px; padding:5px; font-size:14px;">
 			<div style="margin-bottom:10px;">TemplateReader component combined with an RssConnector component.</div>
 			<div>Code:</div>
 			<pre class="CodeViewer" data-code-viewer-id="example05" style='color:#656565; font-size:14px; background-color:#d5d5d5; padding:5px;'></pre>

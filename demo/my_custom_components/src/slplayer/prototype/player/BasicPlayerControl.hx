@@ -11,6 +11,7 @@ import slplayer.ui.player.PlayerControl;
 using slplayer.ui.player.PlayerControl;
 
 import slplayer.ui.group.IGroupable;
+using slplayer.ui.group.IGroupable.Groupable;
 
 /**
  * A basic control bar for Playable components. Implements the first, previous, next and last methods of IPlayerControl.
@@ -29,6 +30,13 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl, imple
 	var lastButton : SkinnableUIElt;
 	
 	public var groupElement:HtmlDom;
+	
+	private override function new(rootElement : HtmlDom, SLPId:String)
+	{
+		super(rootElement,SLPId);
+		
+		startGroupable();
+	}
 
 	override public function init():Void
 	{

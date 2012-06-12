@@ -9,6 +9,7 @@ import slplayer.ui.player.PlayerControl;
 using slplayer.ui.player.PlayerControl;
 
 import slplayer.ui.group.IGroupable;
+using slplayer.ui.group.IGroupable.Groupable;
 
 import haxe.Timer;
 
@@ -34,6 +35,13 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements I
 	
 	public var groupElement:HtmlDom;
 	
+	private override function new(rootElement : HtmlDom, SLPId:String)
+	{
+		super(rootElement,SLPId);
+		
+		startGroupable();
+	}
+	
 	/**
 	 * The AutoPlayer component initialization takes a ["data-"+AUTOPLAY_INTERVAL_TAG] argument.
 	 * @param	?args
@@ -57,19 +65,19 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements I
 		timer = new Timer(interval);
 		
 		var me = this;
-		timer.run = function () { me.next(rootElement); };
+		timer.run = function () { me.next(groupElement); };
 	}
 	
 	private function onPlayableFirst():Void
 	{
 		var me = this;
-		timer.run = function () { me.next(rootElement); };
+		timer.run = function () { me.next(groupElement); };
 	}
 	
 	private function onPlayableLast():Void
 	{
 		var me = this;
-		timer.run = function () { me.first(rootElement); };
+		timer.run = function () { me.first(groupElement); };
 	}
 	
 	private function onPlayableChange():Void { }

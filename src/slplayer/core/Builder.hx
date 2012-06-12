@@ -1,9 +1,26 @@
+/*
+ * This file is part of SLPlayer http://www.silexlabs.org/groups/labs/slplayer/
+ * 
+ * This project is © 2011-2012 Silex Labs and is released under the GPL License:
+ * 
+ * This program is free software; you can redistribute it and/or modify it under the terms 
+ * of the GNU General Public License (GPL) as published by the Free Software Foundation; 
+ * either version 2 of the License, or (at your option) any later version. 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * See the GNU General Public License for more details.
+ * 
+ * To read the license please visit http://www.gnu.org/copyleft/gpl.html
+ */
 package slplayer.core;
 
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 import haxe.macro.Context;
+
+using slplayer.util.MacroTools;
 
 using StringTools;
 
@@ -45,8 +62,9 @@ class Builder
 	static private var metaParameters : Hash<String> = new Hash();
 	/**
 	 * A [<component name> => <component args>, ...] Hash containing the components declared in the application.
+	 * FIXME find a way to expose in read only mode
 	 */
-	static private var declaredComponents : Hash<Hash<String>> = new Hash();
+	static public var declaredComponents : Hash<Hash<String>> = new Hash();
 	/**
 	 * The js exposed name.
 	 */
@@ -108,7 +126,12 @@ class Builder
 			//parse the <body> element
 			parseBody();
 		}
-		catch (unknown : Dynamic) { neko.Lib.println("\nERROR : " + Std.string(unknown)); Sys.exit(1); }
+		catch (unknown : Dynamic) 
+		{
+			neko.Lib.println("\nERROR : " + Std.string(unknown));
+			
+			Sys.exit(1);
+		}
 	}
 	
 	/**
@@ -146,7 +169,12 @@ class Builder
 			//finalize the application compilation
 			pack();
 		}
-		catch (unknown : Dynamic) { neko.Lib.println("\nERROR : " + Std.string(unknown)); Sys.exit(1); }
+		catch (unknown : Dynamic)
+		{
+			neko.Lib.println("\nERROR : " + Std.string(unknown));
+		
+			Sys.exit(1);
+		}
 		
 		return fields;
 	}
@@ -313,11 +341,13 @@ class Builder
 		{
 			var cmpType;
 			
-			try {
+			try
+			{
 				cmpType = Context.getType(cmpClassName);
 			}
-			catch (unknown:Dynamic) {
-				throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath.";
+			catch (unknown:Dynamic)
+			{	
+				throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath and that it compiles correctly. Cause: "+Std.string(unknown);
 			}
 			
 			switch( cmpType ) 
@@ -326,14 +356,9 @@ class Builder
 					
 					var metaData = classRef.get().meta.get();
 					
-					if ( isDisplayObject( classRef.get() ) )
+					if ( classRef.get().is("slplayer.ui.DisplayObject") )
 					{
-						var unconflictedClassName = slplayer.core.SLPlayerComponentTools.getUnconflictedClassTag(cmpClassName, declaredComponents.keys());
-						
-						var tagsToSearchFor = [unconflictedClassName];
-						
-						if (unconflictedClassName != cmpClassName)
-							tagsToSearchFor.push(cmpClassName);
+						var tagsToSearchFor = getUnconflictedClassTags(cmpClassName);
 						
 						var taggedElts : Array<cocktail.Dom.HtmlDom> = new Array();
 						
@@ -446,25 +471,6 @@ class Builder
 	}
 	
 	/**
-	 * Tells is a Class is a DisplayObject at macro time.
-	 * 
-	 * @param	the ClassType to check.
-	 * @return	true if it extends or is DisplayObject, false if not.
-	 */
-	static function isDisplayObject( classType : haxe.macro.ClassType ) : Bool
-	{
-		if ( classType.name == "DisplayObject" && classType.pack.length == 2 && classType.pack[0] == "slplayer" && classType.pack[1] == "ui" ) // FIXME cleaner way to do that
-		{
-			return true;
-		}
-		if ( classType.superClass != null )
-		{
-			return isDisplayObject(classType.superClass.t.get());
-		}
-		return false;
-	}
-	
-	/**
 	 * Parse the SLPlayer fields to create references to the methods to implement.
 	 * 
 	 * @param	fields, array of SLPlayer fields
@@ -551,15 +557,15 @@ class Builder
 			var cmpClassType = switch( Context.getType(cmpClassName) ) { case TInst( classRef , params ): classRef.get(); default: };
 			
 			//TODO FIXME wouldn't it be better to initialize the components knowing that they are DisplayObjects or not, right from here
-			if ( !Lambda.empty(cmpArgs) && isDisplayObject( cmpClassType ) )
+			if ( !Lambda.empty(cmpArgs) && cmpClassType.is("slplayer.ui.DisplayObject") )
 			{
 				//case the component has data-arguments on its script tag
-				var argsArrayName = StringTools.replace( cmpClassName , ".", "_" ) + "Args";
+				var argsArrayName = cmpClassName.replace( "." , "_" ) + "Args";
 				registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
 				
 				for ( cmpArg in {iterator : cmpArgs.keys})
 				{
-					if (StringTools.startsWith( cmpArg , "data-" ) && cmpArg != "data-"+SLP_USE_ATTR_NAME)
+					if (cmpArg.startsWith( "data-" ) && cmpArg != "data-"+SLP_USE_ATTR_NAME)
 						registerComponentsforInitExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(argsArrayName)), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(cmpArg)), pos : pos }, { expr : EConst(CString(cmpArgs.get(cmpArg))), pos : pos } ]), pos : pos } );
 				}
 				
@@ -714,5 +720,59 @@ class Builder
 			return { expr : EField( generateImportPackagePath(path), lastPathElt), pos : Context.currentPos() };
 		}
 		return { expr : EConst(CIdent(path[0])), pos : Context.currentPos() };
+	}
+	
+	/**
+	 * Determine a class tag value for a component that won't be conflicting with other declared components.
+	 * 
+	 * @param	className
+	 * @return	a tag class value for the given component class name that will not conflict with other components classnames / class tags.
+	 */
+	static public function getUnconflictedClassTags( className : String ) : List<String>
+	{
+		if ( Lambda.empty(declaredComponents) )
+			throw "There has been no declared components so far. You thus cannot use getUnconflictedClassTag().";
+		
+		var classTags : List<String> = new List();
+		
+		classTags.add(className);
+		
+		var classTag = className;
+		
+		if (classTag.indexOf(".") != -1)
+			classTag = classTag.substr(classTag.lastIndexOf(".") + 1);
+		
+		var declaredCmpsClassNames = declaredComponents.keys();
+		
+		while (declaredCmpsClassNames.hasNext())
+		{
+			var declaredComponentClassName = declaredCmpsClassNames.next();
+			
+			if ( declaredComponentClassName != className && classTag == declaredComponentClassName.substr(classTag.lastIndexOf(".") + 1) )
+			{
+				return classTags;
+			}
+		}
+		
+		classTags.add(classTag);
+		
+		return classTags;
+	}
+	
+	/**
+	 * TODO comment
+	 * @return
+	 */
+	static public function getClassNameFromClassTag( classTag : String ) : List<String>
+	{
+		var classNames : List<String> = new List();
+		
+		for ( className in { iterator : declaredComponents.keys } )
+		{
+			if ( className.endsWith( classTag ) )
+				classNames.add( className );
+		}
+		
+		return classNames;
 	}
 }
