@@ -16,6 +16,7 @@ import slplayer.ui.player.Playable;
 using slplayer.ui.player.Playable;
 
 import slplayer.ui.group.IGroupable;
+using slplayer.ui.group.IGroupable.Groupable;
 
 /**
  * Gallery component for SLPlayer applications.
@@ -35,6 +36,13 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	 */
 	var dataProviders(default,null) : Hash<Array<Dynamic>>;
 	
+	private override function new(rootElement : HtmlDom, SLPId:String)
+	{
+		super(rootElement,SLPId);
+		
+		startGroupable();
+	}
+	
 	override public function init():Void 
 	{
 		dataProviders = new Hash();
@@ -47,7 +55,9 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 		currentIndex = 0;
 		
 		if (groupElement == null)
+		{
 			groupElement = rootElement;
+		}
 
 		startConsuming(groupElement);
 		
