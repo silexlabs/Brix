@@ -27,6 +27,7 @@ import cocktail.core.html.HTMLElement;
 import cocktail.Lib;
 
 using StringTools;
+using Lambda;
 
 /**
  * Implements the pre-compile and compile logic of SLPlayer.
@@ -144,9 +145,20 @@ class Builder
 		catch (unknown : Dynamic) 
 		{
 			neko.Lib.println("\nERROR " + Std.string(unknown));
-			neko.Lib.println( "\n"+haxe.Stack.exceptionStack().toString() );
+			haxe.Stack.exceptionStack().iter(function(si:haxe.Stack.StackItem) { switch (si) { case FilePos(sis, sifile, siline): neko.Lib.println("Called from "+sifile+" : "+siline); default: } } );
 			Sys.exit(1);
 		}
+		/*
+		[
+		FilePos(null,C:\Motion-Twin\Haxe/std/neko/_std/EReg.hx,37),
+		FilePos(null,<builtin>,1),
+		FilePos(null,C:\Motion-Twin\Haxe/std/neko/_std/EReg.hx,26),
+		FilePos(null,../../src/slplayer/core/Builder.hx,1),
+		FilePos(null,../../src/slplayer/core/Builder.hx,1),
+		FilePos(null,../../src/slplayer/core/Builder.hx,1),
+		FilePos(null,../../src/slplayer/core/Builder.hx,185)
+		]
+		*/
 	}
 	
 	/**
@@ -187,7 +199,7 @@ class Builder
 		catch (unknown : Dynamic)
 		{
 			neko.Lib.println("\nERROR " + Std.string(unknown));
-			neko.Lib.println( "\n"+haxe.Stack.exceptionStack().toString() );
+			haxe.Stack.exceptionStack().iter(function(si:haxe.Stack.StackItem) { switch (si) { case FilePos(sis, sifile, siline): neko.Lib.println("Called from "+sifile+" : "+siline); default: } } );
 			Sys.exit(1);
 		}
 		
@@ -696,7 +708,7 @@ class Builder
 							var er2 : EReg = ~/  +/;
 							
 							nc.nodeValue = er2.replace( er1.replace( nc.nodeValue , " " ) , " " );
-							
+						
 						case preLine: // spaces
 							
 							var er1 : EReg = ~/ *$^ */m;
