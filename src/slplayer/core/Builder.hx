@@ -57,6 +57,10 @@ class Builder
 	// SET AT PRE-COMPILE TIME
 	//////////////////////////
 	/**
+	 * Keep a reference to the path of the HTML source file.
+	 */
+	static private var sourceFilePath : String;
+	/**
 	 * A collection of custom name => content <meta> header parameters from the source HTML page.
 	 */
 	static private var metaParameters : Hash<String> = new Hash();
@@ -110,12 +114,14 @@ class Builder
 	{
 		try
 		{
+			sourceFilePath = htmlSourcePath;
+			
 			//Initial check
-			if (!sys.FileSystem.exists(htmlSourcePath))
-				throw htmlSourcePath + " not found !";
+			if (!sys.FileSystem.exists(sourceFilePath))
+				throw sourceFilePath + " not found !";
 			
 			//source HTML content reading
-			cocktail.Lib.document.documentElement.innerHTML = sys.io.File.getContent(htmlSourcePath);
+			cocktail.Lib.document.documentElement.innerHTML = sys.io.File.getContent(sourceFilePath);
 			
 			//parse <meta> elements
 			parseMetas();
@@ -224,7 +230,7 @@ class Builder
 			{
 				if (metaValue == null || metaValue.replace( " ", "" ) == "" )
 				{
-					neko.Lib.println("Invalid jsExposedName value specified, will use default one instead.");
+					neko.Lib.println(sourceFilePath+" line "+metaElt.getLineNumber()+": Invalid jsExposedName value specified, will use default one instead.");
 				}
 				else
 				{
@@ -306,7 +312,7 @@ class Builder
 					#end
 				}
 				
-				neko.Lib.println( "\nWARNING You should not include nor put any script in your HTML source file as it's not cross platform.\n" );
+				neko.Lib.println( sourceFilePath+" line "+scriptElt.getLineNumber()+": WARNING You should not include nor put any script in your HTML source file as it's not cross platform.\n" );
 				
 				//just remove the declare part but leave it as there may be an associated script.
 				scriptElt.removeAttribute( "data-" + SLP_USE_ATTR_NAME );
@@ -394,7 +400,7 @@ class Builder
 										}
 										if (missingAttr != null)
 										{
-											throw missingAttr+" not set on "+taggedElt.nodeName+" while it's required by "+cmpClassName;
+											throw sourceFilePath+" line "+taggedElt.getLineNumber()+": "+missingAttr+" not set on "+taggedElt.nodeName+" while it's required by "+cmpClassName;
 										}
 									}
 									
@@ -426,7 +432,7 @@ class Builder
 										}
 										if (!requirePassed)
 										{
-											throw taggedElt.nodeName+" is not allowed to be a "+cmpClassName;
+											throw sourceFilePath+" line "+taggedElt.getLineNumber()+": "+taggedElt.nodeName+" is not allowed to be a "+cmpClassName;
 										}
 									}
 								default :
@@ -459,7 +465,7 @@ class Builder
 									}
 									if (missingAttr != null)
 									{
-										throw missingAttr+" not set on "+cmpClassName+" <script> declaration while it's required by the component";
+										throw missingAttr+" not set on "+cmpClassName+" <script> declaration while it's required by the component"; //FIXME need to be able to give the line number
 									}
 								default :
 							}
@@ -556,7 +562,7 @@ class Builder
 			
 			var cmpClassType = switch( Context.getType(cmpClassName) ) { case TInst( classRef , params ): classRef.get(); default: };
 			
-			//TODO FIXME wouldn't it be better to initialize the components knowing that they are DisplayObjects or not, right from here
+			//TODO wouldn't it be better to initialize the components knowing that they are DisplayObjects or not, right from here
 			if ( !Lambda.empty(cmpArgs) && cmpClassType.is("slplayer.ui.DisplayObject") )
 			{
 				//case the component has data-arguments on its script tag
@@ -613,17 +619,6 @@ class Builder
 			//add this call in init method : newInstance.launch(appendTo);
 			initExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } );
 		}
-		
-		//manage the auto start mode
-		/*
-		if (!Context.defined('noAutoStart'))
-		{
-			pos = Context.currentPos();
-			
-			//if the noAutoStart method is not set, then add a call to init() in the SLPlayer main method.
-			mainExprs.push({ expr : ECall( { expr : EConst(CIdent("init")), pos : pos }, [ ] ) , pos : pos });
-		}
-		*/
 	}
 	
 	/**
@@ -760,8 +755,10 @@ class Builder
 	}
 	
 	/**
-	 * TODO comment
-	 * @return
+	 * Gets the declared components class names that could have the given class tag. Having more than one result 
+	 * in the list means the given class tag is not valid for your application (as it leads to conflicts).
+	 * 
+	 * @return a List of classnames.
 	 */
 	static public function getClassNameFromClassTag( classTag : String ) : List<String>
 	{
