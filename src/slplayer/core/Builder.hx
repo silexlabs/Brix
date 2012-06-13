@@ -22,6 +22,10 @@ import haxe.macro.Context;
 
 using slplayer.util.MacroTools;
 
+import cocktail.core.dom.Node;
+import cocktail.core.html.HTMLElement;
+import cocktail.Lib;
+
 using StringTools;
 
 /**
@@ -42,7 +46,8 @@ class Builder
 	/**
 	 * The SLPlayer-reserved flags which should be set as compiler flags
 	 */
-	static inline public var SLP_COMPILER_FLAGS = ["noAutoStart", "disableEmbedHtml", "disableFastInit"];
+	static inline public var SLP_COMPILER_FLAGS = ["noAutoStart", "disableEmbedHtml", "disableFastInit", 
+	"keepComments", "minimizeHtml"];
 	/**
 	 * The value (<meta name=key content=value />) to give a meta tag to make it a compiler flag
 	 */
@@ -73,6 +78,10 @@ class Builder
 	 * The js exposed name.
 	 */
 	static private var jsExposedName : String;
+	/**
+	 * The list of HTML nodes to remove before packing.
+	 */
+	static private var nodesToRemove : List<Node> = new List();
 	
 	//////////////////////
 	// SET AT COMPILE TIME
@@ -134,8 +143,8 @@ class Builder
 		}
 		catch (unknown : Dynamic) 
 		{
-			neko.Lib.println("\nERROR : " + Std.string(unknown));
-			
+			neko.Lib.println("\nERROR " + Std.string(unknown));
+			neko.Lib.println( "\n"+haxe.Stack.exceptionStack().toString() );
 			Sys.exit(1);
 		}
 	}
@@ -177,8 +186,8 @@ class Builder
 		}
 		catch (unknown : Dynamic)
 		{
-			neko.Lib.println("\nERROR : " + Std.string(unknown));
-		
+			neko.Lib.println("\nERROR " + Std.string(unknown));
+			neko.Lib.println( "\n"+haxe.Stack.exceptionStack().toString() );
 			Sys.exit(1);
 		}
 		
@@ -221,7 +230,7 @@ class Builder
 				haxe.macro.Compiler.define(metaKey);
 				
 				//and remove the meta tag from the HTML (no need at runtime)
-				metaElt.parentNode.removeChild(metaElt);
+				nodesToRemove.add(metaElt);
 				
 				continue;
 			}
@@ -238,7 +247,7 @@ class Builder
 				}
 				
 				//no need of that at runtime, remove it from HTML
-				metaElt.parentNode.removeChild(metaElt);
+				nodesToRemove.add(metaElt);
 				
 				continue;
 			}
@@ -298,7 +307,7 @@ class Builder
 			if ( scriptElt.getAttribute("src") == null && scriptElt.innerHTML.trim() == "" )
 			{
 				//remove the element as it won't be useful at runtime
-				scriptElt.parentNode.removeChild(scriptElt);
+				nodesToRemove.add(scriptElt);
 			}
 			else
 			{
@@ -597,6 +606,29 @@ class Builder
 	{
 		var pos;
 		
+		//keepComments option
+		if ( !Context.defined('keepComments') )
+		{
+			removeComments(Lib.document.documentElement);
+		}
+		
+		//minimizeHtml option
+		if ( Context.defined('minimizeHtml') )
+		{
+			minimizeHtml(Lib.document.documentElement);
+		}
+		
+		//removes useless nodes
+		for (n in nodesToRemove)
+		{
+			if (n.parentNode != null)
+			{
+				var parent : HTMLElement = cast n.parentNode;
+				
+				parent.removeChild(n);
+			}
+		}
+		
 		//specific js-target application packaging
 		if (Context.defined('js'))
 		{
@@ -618,6 +650,75 @@ class Builder
 			
 			//add this call in init method : newInstance.launch(appendTo);
 			initExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } );
+		}
+	}
+	
+	/**
+	 * Adds to the nodes-to-remove-list the comments in the content of an HTMLElement.
+	 * 
+	 * @param	the HTMLElement to parse for comments removing
+	 */
+	static function removeComments(elt:HTMLElement) : Void
+	{
+		for (nc in elt.childNodes)
+		{
+			switch (nc.nodeType)
+			{
+				case Node.COMMENT_NODE:
+					elt.removeChild(nc);
+				case Node.ELEMENT_NODE:
+					var innerElt : HTMLElement = cast nc;
+					removeComments(innerElt);
+				default:
+			}
+		}
+	}
+	
+	/**
+	 * Recursively adds the white spaces, tabulations and line breaks to the nodes-to-remove-list 
+	 * so that they will be removed just before packing.
+	 * 
+	 * @param	the HTMLElement to minimize.
+	 */
+	static function minimizeHtml(elt:HTMLElement) : Void
+	{
+		for (nc in elt.childNodes)
+		{
+			switch (nc.nodeType)
+			{
+				case Node.TEXT_NODE:
+					
+					switch (elt.coreStyle.whiteSpace)
+					{
+						case normal, nowrap: // both lines and spaces
+							
+							var er1 : EReg = ~/[ \t]+/;
+							var er2 : EReg = ~/  +/;
+							
+							nc.nodeValue = er2.replace( er1.replace( nc.nodeValue , " " ) , " " );
+							
+						case preLine: // spaces
+							
+							var er1 : EReg = ~/ *$^ */m;
+							var er2 : EReg = ~/[ \t]+/;
+							
+							nc.nodeValue = er2.replace( er1.replace( nc.nodeValue , "\n" ) , " " );
+						
+						default:
+					}
+					
+					if (nc.nodeValue == "" || nc.nodeValue.trim() == "")
+					{
+						elt.removeChild(nc);
+					}
+					
+				case Node.ELEMENT_NODE:
+					
+					var innerElt : HTMLElement = cast nc;
+					minimizeHtml(innerElt);
+					
+				default:
+			}
 		}
 	}
 	
@@ -650,7 +751,7 @@ class Builder
 		//set the SLPlayer Class exposed name for js version
 		if ( Context.getLocalClass().get().meta.has(":expose"))
 		{
-			neko.Lib.println( "\nWARNING you should not set manually the @:expose meta tag on SLPlayer class. SLPlayer sets it automatically to the name of your .js file." );
+			neko.Lib.println( "\nWARNING you should not set manually the @:expose meta tag on Application class as SLPlayer sets it automatically." );
 		}
 		else
 		{

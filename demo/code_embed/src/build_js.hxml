@@ -7,3 +7,4 @@
 --macro slplayer.core.Builder.create('index.html')
 -D noAutoStart
 -D slpdebug
+-D minimizeHtml
