@@ -129,6 +129,18 @@ import slplayer.core.ISLPlayerComponent;
 			htmlRootElement = Lib.document.body;
 		}
 		
+		if ( htmlRootElement == null )
+		{
+			#if js
+			trace("ERROR You are trying to start your application while the document loading is not complete yet. Add the noAutoStart option to your application" +
+			" and control the application startup with: window.onload = function() { myApplication.init() };");
+			#else
+			trace("ERROR could not set Application's root element.");
+			#end
+			//do not continue
+			return;
+		}
+		
 		initHtmlRootElementContent();
 		
 		//build the SLPlayer instance meta parameters Hash
