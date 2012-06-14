@@ -23,8 +23,14 @@ package slplayer.core;
 //@:autoBuild(slplayer.core.SLPlayerComponentBuilder.build())
 interface ISLPlayerComponent
 {
+	/**
+	 * the CLPlayer Application instance id.
+	 */
 	public var SLPlayerInstanceId : String;
 	
+	/**
+	 * a method to get transparently the associated Application instance.
+	 */
 	public function getSLPlayer() : Application;
 }
 

@@ -14,6 +14,16 @@ import slplayer.ui.group.IGroupable;
 using slplayer.ui.group.IGroupable.Groupable;
 
 /**
+ * Structure helping with handling the skinnable elts of a component.
+ * FIXME / TODO keep this and generalize a skining sub-cmps handling logic or remove this.
+ */
+typedef SkinnableUIElt = 
+{
+	eltAttrId : String,
+	elt : HtmlDom
+}
+
+/**
  * A basic control bar for Playable components. Implements the first, previous, next and last methods of IPlayerControl.
  * @author Thomas Fétiveau
  */
