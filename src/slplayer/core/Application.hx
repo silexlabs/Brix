@@ -132,8 +132,8 @@ import slplayer.core.ISLPlayerComponent;
 		if ( htmlRootElement == null )
 		{
 			#if js
-			trace("ERROR You are trying to start your application while the document loading is not complete yet. Add the noAutoStart option to your application" +
-			" and control the application startup with: window.onload = function() { myApplication.init() };");
+			trace("ERROR windows.document.body is null => You are trying to start your application while the document loading is probably not complete yet." +
+			" To fix that, add the noAutoStart option to your slplayer application and control the application startup with: window.onload = function() { myApplication.init() };");
 			#else
 			trace("ERROR could not set Application's root element.");
 			#end
@@ -357,7 +357,16 @@ import slplayer.core.ISLPlayerComponent;
 		{
 			for (c in l)
 			{
-				c.init();
+				try
+				{
+					c.init();
+				}
+				catch (unknown : Dynamic)
+				{
+					trace("ERROR while trying to call init() on a DisplayObject "+unknown);
+					//Lambda.iter( haxe.Stack.exceptionStack() , function(si:haxe.Stack.StackItem) { switch (si) { case FilePos(sis, sifile, siline): trace("Called from " + sifile + " : " + siline); default: } } );
+					trace("haxe.Stack.exceptionStack()"+haxe.Stack.exceptionStack());
+				}
 			}
 		}
 	}
