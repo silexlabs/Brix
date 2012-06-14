@@ -19,7 +19,7 @@ import js.Dom;
 import js.Lib;
 
 /**
- * TODO comment 
+ * Mixin methods for Playable components.
  * 
  * @author Thomas Fétiveau
  */
@@ -35,68 +35,70 @@ class Playable
 	
 	/**
 	 * 
+	 * 
 	 * @param	playable
 	 */
 	static public function startPlayable(playable : IPlayable, target : Dynamic):Void
 	{
-		untyped target.addEventListener(PlayerControl.FIRST, function(e:Event) { playable.first();} , false);
+		target.addEventListener(PlayerControl.FIRST, function(e:Event) { playable.first();} , false);
 		
-		untyped target.addEventListener(PlayerControl.LAST, function(e:Event) { playable.last();} , false);
+		target.addEventListener(PlayerControl.LAST, function(e:Event) { playable.last();} , false);
 		
-		untyped target.addEventListener(PlayerControl.NEXT, function(e:Event) { playable.next();} , false);
+		target.addEventListener(PlayerControl.NEXT, function(e:Event) { playable.next();} , false);
 		
-		untyped target.addEventListener(PlayerControl.PREVIOUS, function(e:Event) { playable.previous();} , false);
+		target.addEventListener(PlayerControl.PREVIOUS, function(e:Event) { playable.previous();} , false);
 		
-		untyped target.addEventListener(PlayerControl.NEW_PLAYER_CONTROL, function(e:Event) { playable.onNewPlayerControl();} , false);
+		target.addEventListener(PlayerControl.NEW_PLAYER_CONTROL, function(e:Event) { playable.onNewPlayerControl();} , false);
 		
-		var onStartPlayableEvent = untyped Lib.document.createEvent("CustomEvent");
+		var onStartPlayableEvent : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		
-		untyped onStartPlayableEvent.initCustomEvent(START_PLAYABLE, false, false, playable);
+		onStartPlayableEvent.initCustomEvent(START_PLAYABLE, false, false, playable);
 		
-		untyped target.dispatchEvent(onStartPlayableEvent);
+		target.dispatchEvent(onStartPlayableEvent);
 	}
 	
 	static public function dispatchOnLast(playable : IPlayable, target : Dynamic)
 	{
-		var onLastEvent = untyped Lib.document.createEvent("CustomEvent");
+		var onLastEvent : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		
-		untyped onLastEvent.initCustomEvent(ON_LAST, false, false, playable);
+		onLastEvent.initCustomEvent(ON_LAST, false, false, playable);
 		
-		untyped target.dispatchEvent(onLastEvent);
+		target.dispatchEvent(onLastEvent);
 	}
 	
 	static public function dispatchOnFirst(playable : IPlayable, target : Dynamic)
 	{
-		var onFirstEvent = untyped Lib.document.createEvent("CustomEvent");
+		var onFirstEvent : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		
-		untyped onFirstEvent.initCustomEvent(ON_FIRST, false, false, playable);
+		onFirstEvent.initCustomEvent(ON_FIRST, false, false, playable);
 		
-		untyped target.dispatchEvent(onFirstEvent);
+		target.dispatchEvent(onFirstEvent);
 	}
 	
 	static public function dispatchOnChange(playable : IPlayable, target : Dynamic)
 	{
-		var onChangeEvent = untyped Lib.document.createEvent("CustomEvent");
+		var onChangeEvent : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		
-		untyped onChangeEvent.initCustomEvent(ON_CHANGE, false, false, playable);
+		onChangeEvent.initCustomEvent(ON_CHANGE, false, false, playable);
 		
-		untyped target.dispatchEvent(onChangeEvent);
+		target.dispatchEvent(onChangeEvent);
 	}
 }
 
 /**
- * 
+ * Any playable component should implement this interface and be "using slplayer.ui.player.Playable" to be compliant with
+ * PlayerControls.
  */
 interface IPlayable 
 {
-	private function next():Void;
+	public function next():Void;
 	
-	private function previous():Void;
+	public function previous():Void;
 	
-	private function first():Void;
+	public function first():Void;
 	
-	private function last():Void;
+	public function last():Void;
 	
-	private function onNewPlayerControl():Void;
+	public function onNewPlayerControl():Void;
 	
 }
