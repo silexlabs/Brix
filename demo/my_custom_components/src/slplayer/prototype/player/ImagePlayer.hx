@@ -8,9 +8,9 @@ import haxe.Template;
 import slplayer.ui.DisplayObject;
 
 //these two lines below are mandatory to be a standard data consumer
-import slplayer.data.Common;
 import slplayer.data.DataConsumer;
 using slplayer.data.DataConsumer;
+import slplayer.data.DataProvider;
 
 import slplayer.ui.player.Playable;
 using slplayer.ui.player.Playable;
@@ -112,38 +112,38 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 			dispatchOnLast(groupElement);
 	}
 	
-	function next():Void
+	public function next():Void
 	{
 		if ( currentIndex < rootElement.getElementsByTagName("li").length - 1 )
 			currentIndex++;
 		updateView();
 	}
 	
-	function previous():Void
+	public function previous():Void
 	{
 		if ( currentIndex > 0 )
 			currentIndex--;
 		updateView();
 	}
 	
-	private function first():Void
+	public function first():Void
 	{
 		currentIndex = 0;
 		updateView();
 	}
 	
-	private function last():Void
+	public function last():Void
 	{
 		currentIndex = rootElement.getElementsByTagName("li").length - 1;
 		updateView();
 	}
 	
-	private function onNewPlayerControl():Void
+	public function onNewPlayerControl():Void
 	{
 		dispatchIndex();
 	}
 	
-	private function onData(dataObj:DataObject):Void
+	public function onData(dataObj:DataObject):Void
 	{
 		if (dataObj != null)
 		{

@@ -7,9 +7,9 @@ import haxe.Template;
 
 import slplayer.ui.DisplayObject;
 
-import slplayer.data.Common;
 import slplayer.data.DataConsumer;
 using slplayer.data.DataConsumer;
+import slplayer.data.DataProvider;
 
 /**
  * The TemplateRenderer is a simple DataConsumer component that renders a template against 
@@ -55,7 +55,7 @@ class TemplateRenderer extends DisplayObject, implements IDataConsumer
 		rootElement.innerHTML = tpl.execute({data:providersData});
 	}
 	
-	private function onData(dataObj:DataObject):Void
+	public function onData(dataObj:DataObject):Void
 	{
 		if (dataObj != null)
 		{
