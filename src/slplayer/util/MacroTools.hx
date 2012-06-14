@@ -17,6 +17,9 @@ package slplayer.util;
 
 import haxe.macro.Type;
 
+import cocktail.core.dom.Node;
+import cocktail.core.html.HTMLElement;
+
 /**
  * Helper tools for macros.
  * 
@@ -52,5 +55,39 @@ class MacroTools
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Gets the line number of a given node in the HTML file in memory.
+	 * 
+	 * @return the line number of the node's position.
+	 */
+	static public function getLineNumber(elt:Node) : Int
+	{
+		if (elt.parentNode == null)
+			return 0;
+		
+		var parent:HTMLElement = cast(elt.parentNode);
+		var count = 0;
+		
+		for ( i in 0...parent.childNodes.length )
+		{
+			var child = parent.childNodes[i];
+			
+			if ( elt == child )
+				return count + getLineNumber(parent); 
+			
+			switch (child.nodeType)
+			{
+				case Node.ELEMENT_NODE:
+					var childElt : HTMLElement = cast child;
+					count += childElt.innerHTML.split('\n').length - 1;
+					
+				case Node.TEXT_NODE:
+					count += child.nodeValue.split('\n').length - 1;
+			}
+		}
+		
+		throw 'error parsing DOM tree';
 	}
 }
