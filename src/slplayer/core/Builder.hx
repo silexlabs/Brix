@@ -148,17 +148,6 @@ class Builder
 			haxe.Stack.exceptionStack().iter(function(si:haxe.Stack.StackItem) { switch (si) { case FilePos(sis, sifile, siline): neko.Lib.println("Called from "+sifile+" : "+siline); default: } } );
 			Sys.exit(1);
 		}
-		/*
-		[
-		FilePos(null,C:\Motion-Twin\Haxe/std/neko/_std/EReg.hx,37),
-		FilePos(null,<builtin>,1),
-		FilePos(null,C:\Motion-Twin\Haxe/std/neko/_std/EReg.hx,26),
-		FilePos(null,../../src/slplayer/core/Builder.hx,1),
-		FilePos(null,../../src/slplayer/core/Builder.hx,1),
-		FilePos(null,../../src/slplayer/core/Builder.hx,1),
-		FilePos(null,../../src/slplayer/core/Builder.hx,185)
-		]
-		*/
 	}
 	
 	/**
@@ -173,7 +162,7 @@ class Builder
 		
 		try
 		{
-			//parse the SLPlayer class fields to find the methods to fill in
+			//parse the Application class fields to find the methods to fill in
 			discoverSLPlayerMethods(fields);
 			
 			var pos = Context.currentPos();
