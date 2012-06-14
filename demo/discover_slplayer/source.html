@@ -3,14 +3,22 @@
 	<meta charset="utf-8" />
 	<!-- You can configure your SLPlayer application right in the source HTML file via the meta tags. See the 
 	documentation to get the list of configuration meta tags.-->
-	<!-- 
-	uncomment this meta tag to make your Application checking your components against their restrictions at runtime 
-	as well (ie: not only at compile time)
-	-->
+	
+	<!-- Uncomment this meta tag to make your Application checking your components against their restrictions at runtime 
+	as well (ie: not only at compile time) -->
 	<meta name="disableFastInit" content="true" />
-	<meta name="disableEmbedHtml" content="true" />
+	
+	<!-- For js target only, generate a compiled .html file instead of embedding the Application's HTML in the .js file -->
+	<!-- <meta name="disableEmbedHtml" content="true" /> -->
+	
+	<!-- Uncomment this meta tag if you want to keep the comments in the compiled/embedded HTML. -->
+	<meta name="keepComments" content="true" />
+	
+	<!--  -->
+	<!-- <meta name="minimizeHtml" content="true" /> -->
 	
 	<title>Proto SLPlayer Demo</title>
+	
 	<!--
 	If your components are already contained in the SLPlayer.js (or any other .js file included in the page)
 	and that you want just to declare their use, then add a <script> tag with the data-slp-use attribute 

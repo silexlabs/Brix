@@ -13,22 +13,13 @@ import js.Dom;
 import haxe.Template;
 
 /**
- * Structure helping with handling the skinnable elts of a component.
- * FIXME / TODO keep this and generalize a skining sub-cmps handling logic or remove this.
- */
-typedef SkinnableUIElt = 
-{
-	eltAttrId : String,
-	elt : HtmlDom
-}
-
-/**
- * TODO comment
+ * The contract a DisplayObject must fulfill.
  */
 interface IDisplayObject implements ISLPlayerComponent
 {
-	public var SLPlayerInstanceId : String;
-	
+	/**
+	 * having a associated HTML DOM element.
+	 */
 	public var rootElement(default, null) : HtmlDom;
 }
 

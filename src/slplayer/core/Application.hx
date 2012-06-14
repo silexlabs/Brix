@@ -256,7 +256,7 @@ import slplayer.core.ISLPlayerComponent;
 		
 		if (componentClass == null)
 		{
-			trace("WARNING cannot resolve "+componentClassName);
+			trace("ERROR cannot resolve "+componentClassName);
 			return;
 		}
 		
