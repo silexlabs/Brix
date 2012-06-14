@@ -18,40 +18,40 @@ package slplayer.data;
 import js.Dom;
 import js.Lib;
 
-import slplayer.ui.DisplayObject;
-
-import slplayer.data.Common;
+import slplayer.data.DataProvider;
 
 /**
  * To be a standard data consumer, a component must implement IDataConsumer. Also, It should use DataConsumer (using slplayer.data.DataConsumer).
+ * 
  * @author Thomas Fétiveau
  */
 class DataConsumer 
 {
+	static public var ON_DATA_EVENT_TYPE = "data";
+	
+	static public var ON_DATA_CONSUMER_EVENT_TYPE = "newDataConsumer";
+	
 	static public function startConsuming(consumer : IDataConsumer, from : Dynamic)
 	{
-		untyped from.addEventListener(Common.ON_DATA_EVENT_TYPE, function(e:Event) {
-																						#if flash9
-																							var evt:cocktail.core.event.CustomEvent = cast(e);
-																						#else
-																							var evt = e;
-																						#end
-																						consumer.onData(e.detail); 
-																					} , false);
+		from.addEventListener(ON_DATA_EVENT_TYPE, function(e:CustomEvent) { consumer.onData(e.detail); } , false);
 		
-		var onNewConsumerEvent = untyped Lib.document.createEvent("CustomEvent");
+		var onNewConsumerEvent : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		
-		untyped onNewConsumerEvent.initCustomEvent(Common.ON_DATA_CONSUMER_EVENT_TYPE, false, false, consumer);
+		onNewConsumerEvent.initCustomEvent(ON_DATA_CONSUMER_EVENT_TYPE, false, false, consumer);
 		
-		untyped from.dispatchEvent(onNewConsumerEvent);
+		from.dispatchEvent(onNewConsumerEvent);
 	}
 }
 
+/**
+ * A DataConsumer should implement and be "using slplayer.data.DataConsumer" to be compliant with DataProviders.
+ */
 interface IDataConsumer
 {
 	/**
 	 * Common callback to all data consumers to receive data.
-	 * @param	e
+	 * 
+	 * @param	a DataObject instance.
 	 */
-	private function onData(dataObj : DataObject):Void;
+	function onData(dataObj : DataObject):Void;
 }

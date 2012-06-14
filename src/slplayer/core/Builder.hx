@@ -15,6 +15,8 @@
  */
 package slplayer.core;
 
+typedef HaxeType = Type;
+
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.Type;
@@ -22,8 +24,7 @@ import haxe.macro.Context;
 
 using slplayer.util.MacroTools;
 
-import cocktail.core.dom.Node;
-import cocktail.core.html.HTMLElement;
+import cocktail.Dom;
 import cocktail.Lib;
 
 using StringTools;
@@ -67,6 +68,10 @@ class Builder
 	 */
 	static private var sourceFilePath : String;
 	/**
+	 * Keep a copy of the original HTML Source.
+	 */
+	static private var sourceHTMLDocument : Document;
+	/**
 	 * A collection of custom name => content <meta> header parameters from the source HTML page.
 	 */
 	static private var metaParameters : Hash<String> = new Hash();
@@ -82,7 +87,7 @@ class Builder
 	/**
 	 * The list of HTML nodes to remove before packing.
 	 */
-	static private var nodesToRemove : List<Node> = new List();
+	static private var nodesToRemove : List<HtmlDom> = new List();
 	
 	//////////////////////
 	// SET AT COMPILE TIME
@@ -130,8 +135,14 @@ class Builder
 			if (!sys.FileSystem.exists(sourceFilePath))
 				throw sourceFilePath + " not found !";
 			
-			//source HTML content reading
-			cocktail.Lib.document.documentElement.innerHTML = sys.io.File.getContent(sourceFilePath);
+			var htmlSource : String = sys.io.File.getContent(sourceFilePath);
+			
+			//init the DOM tree from source HTML file content
+			cocktail.Lib.document.documentElement.innerHTML = htmlSource;
+			
+			//init a copy of the source DOM tree
+			sourceHTMLDocument = new Document();
+			sourceHTMLDocument.documentElement.innerHTML = htmlSource;
 			
 			//parse <meta> elements
 			parseMetas();
@@ -380,7 +391,8 @@ class Builder
 						
 						for (tagToSearchFor in tagsToSearchFor)
 						{
-							taggedElts = taggedElts.concat(cocktail.Lib.document.body.getElementsByClassName(tagToSearchFor));
+							//taggedElts = taggedElts.concat(cocktail.Lib.document.body.getElementsByClassName(tagToSearchFor));
+							taggedElts = taggedElts.concat(sourceHTMLDocument.body.getElementsByClassName(tagToSearchFor));
 						}
 						
 						for (metaDataTag in metaData)
@@ -475,7 +487,8 @@ class Builder
 									}
 									if (missingAttr != null)
 									{
-										throw missingAttr+" not set on "+cmpClassName+" <script> declaration while it's required by the component"; //FIXME need to be able to give the line number
+										throw missingAttr+" not set on "+cmpClassName+" <script> declaration while it's required by the component";
+										//FIXME need to be able to give the line number
 									}
 								default :
 							}
@@ -624,7 +637,7 @@ class Builder
 		{
 			if (n.parentNode != null)
 			{
-				var parent : HTMLElement = cast n.parentNode;
+				var parent : HtmlDom = n.parentNode;
 				
 				parent.removeChild(n);
 			}
@@ -637,7 +650,7 @@ class Builder
 		}
 		
 		//launch method call
-		//FIXME it may not work with already loaded pages
+		//FIXME should this really be managed by SLPLayer ? we could also do if Lib.document.body != null => start, else on Load...
 		if (Context.defined('js') && Context.defined('disableEmbedHtml')) //the application is included in an existing HTML page
 		{
 			pos = Context.currentPos();
@@ -655,21 +668,21 @@ class Builder
 	}
 	
 	/**
-	 * Adds to the nodes-to-remove-list the comments in the content of an HTMLElement.
+	 * Adds to the nodes-to-remove-list the comments in the content of an HtmlDom.
 	 * 
-	 * @param	the HTMLElement to parse for comments removing
+	 * @param	the HtmlDom to parse for comments removing
 	 */
-	static function removeComments(elt:HTMLElement) : Void
+	static function removeComments(elt:HtmlDom) : Void
 	{
 		for (nc in elt.childNodes)
 		{
 			switch (nc.nodeType)
 			{
-				case Node.COMMENT_NODE:
+				//FIXME use constants (add to Dom.hx?)
+				case 8:	//Node.COMMENT_NODE
 					elt.removeChild(nc);
-				case Node.ELEMENT_NODE:
-					var innerElt : HTMLElement = cast nc;
-					removeComments(innerElt);
+				case 1:	//Node.ELEMENT_NODE:
+					removeComments(nc);
 				default:
 			}
 		}
@@ -679,15 +692,16 @@ class Builder
 	 * Recursively adds the white spaces, tabulations and line breaks to the nodes-to-remove-list 
 	 * so that they will be removed just before packing.
 	 * 
-	 * @param	the HTMLElement to minimize.
+	 * @param	the HtmlDom to minimize.
 	 */
-	static function minimizeHtml(elt:HTMLElement) : Void
+	static function minimizeHtml(elt:HtmlDom) : Void
 	{
 		for (nc in elt.childNodes)
 		{
 			switch (nc.nodeType)
 			{
-				case Node.TEXT_NODE:
+				//FIXME use constants
+				case 3:		//Node.TEXT_NODE
 					
 					switch (elt.coreStyle.whiteSpace)
 					{
@@ -713,10 +727,9 @@ class Builder
 						elt.removeChild(nc);
 					}
 					
-				case Node.ELEMENT_NODE:
+				case 1:		//Node.ELEMENT_NODE
 					
-					var innerElt : HTMLElement = cast nc;
-					minimizeHtml(innerElt);
+					minimizeHtml(nc);
 					
 				default:
 			}

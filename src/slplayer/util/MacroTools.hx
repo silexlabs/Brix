@@ -17,8 +17,7 @@ package slplayer.util;
 
 import haxe.macro.Type;
 
-import cocktail.core.dom.Node;
-import cocktail.core.html.HTMLElement;
+import cocktail.Dom;
 
 /**
  * Helper tools for macros.
@@ -62,12 +61,12 @@ class MacroTools
 	 * 
 	 * @return the line number of the node's position.
 	 */
-	static public function getLineNumber(elt:Node) : Int
+	static public function getLineNumber(elt:HtmlDom) : Int
 	{
 		if (elt.parentNode == null)
 			return 0;
 		
-		var parent:HTMLElement = cast(elt.parentNode);
+		var parent:HtmlDom = elt.parentNode;
 		var count = 0;
 		
 		for ( i in 0...parent.childNodes.length )
@@ -79,11 +78,13 @@ class MacroTools
 			
 			switch (child.nodeType)
 			{
-				case Node.ELEMENT_NODE:
-					var childElt : HTMLElement = cast child;
-					count += childElt.innerHTML.split('\n').length - 1;
+				//FIXME Use constants (add to Dom.hx ?)
+				case 1: // Node.ELEMENT_NODE
 					
-				case Node.TEXT_NODE:
+					count += child.innerHTML.split('\n').length - 1;
+					
+				case 3: // Node.TEXT_NODE
+					
 					count += child.nodeValue.split('\n').length - 1;
 			}
 		}
