@@ -6,3 +6,4 @@
 -main slplayer.core.Application
 --macro slplayer.core.Builder.create('source.html')
 -D slpdebug
+-D disableEmbedHtml
