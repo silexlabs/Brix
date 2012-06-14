@@ -138,19 +138,19 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl, imple
 		rootElement.parentNode.appendChild(buttonContainer);
 	}
 	
-	private function onPlayableFirst():Void
+	public function onPlayableFirst():Void
 	{
 		firstButton.elt.style.display = "none";
 		previousButton.elt.style.display = "none";
 	}
 	
-	private function onPlayableLast():Void
+	public function onPlayableLast():Void
 	{
 		nextButton.elt.style.display = "none";
 		lastButton.elt.style.display = "none";
 	}
 	
-	private function onPlayableChange():Void
+	public function onPlayableChange():Void
 	{
 		firstButton.elt.style.display = previousButton.elt.style.display = nextButton.elt.style.display = lastButton.elt.style.display = "block";
 	}
