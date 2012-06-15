@@ -15,8 +15,6 @@
  */
 package slplayer.core;
 
-typedef HaxeType = Type;
-
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.Type;
@@ -156,7 +154,7 @@ class Builder
 		catch (unknown : Dynamic) 
 		{
 			neko.Lib.println("\nERROR " + Std.string(unknown));
-			haxe.Stack.exceptionStack().iter(function(si:haxe.Stack.StackItem) { switch (si) { case FilePos(sis, sifile, siline): neko.Lib.println("Called from "+sifile+" : "+siline); default: } } );
+			neko.Lib.println( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
 			Sys.exit(1);
 		}
 	}
@@ -199,7 +197,7 @@ class Builder
 		catch (unknown : Dynamic)
 		{
 			neko.Lib.println("\nERROR " + Std.string(unknown));
-			haxe.Stack.exceptionStack().iter(function(si:haxe.Stack.StackItem) { switch (si) { case FilePos(sis, sifile, siline): neko.Lib.println("Called from "+sifile+" : "+siline); default: } } );
+			neko.Lib.println( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
 			Sys.exit(1);
 		}
 		

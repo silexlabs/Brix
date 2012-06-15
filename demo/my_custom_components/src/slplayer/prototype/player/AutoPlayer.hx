@@ -40,11 +40,13 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements I
 		super(rootElement,SLPId);
 		
 		startGroupable();
+		
+		if (groupElement == null)
+			groupElement = rootElement;
 	}
 	
 	/**
 	 * The AutoPlayer component initialization takes a ["data-"+AUTOPLAY_INTERVAL_TAG] argument.
-	 * @param	?args
 	 */
 	override public function init():Void
 	{
@@ -57,12 +59,9 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements I
 		else
 			interval = Std.parseInt(rowInterval);
 		
-		if (groupElement == null)
-			groupElement = rootElement;
+		timer = new Timer(interval);
 		
 		startPlayerControl(groupElement);
-		
-		timer = new Timer(interval);
 		
 		var me = this;
 		timer.run = function () { me.next(groupElement); };
