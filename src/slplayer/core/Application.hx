@@ -363,9 +363,8 @@ import slplayer.core.ISLPlayerComponent;
 				}
 				catch (unknown : Dynamic)
 				{
-					trace("ERROR while trying to call init() on a DisplayObject "+unknown);
-					//Lambda.iter( haxe.Stack.exceptionStack() , function(si:haxe.Stack.StackItem) { switch (si) { case FilePos(sis, sifile, siline): trace("Called from " + sifile + " : " + siline); default: } } );
-					trace("haxe.Stack.exceptionStack()"+haxe.Stack.exceptionStack());
+					trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(c)));
+					trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
 				}
 			}
 		}

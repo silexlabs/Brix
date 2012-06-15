@@ -5,4 +5,5 @@
 -debug
 -main slplayer.core.Application
 --macro slplayer.core.Builder.create('index.html')
+-D noAutoStart
 -D slpdebug
