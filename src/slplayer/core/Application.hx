@@ -357,15 +357,7 @@ import slplayer.core.ISLPlayerComponent;
 		{
 			for (c in l)
 			{
-				try
-				{
-					c.init();
-				}
-				catch (unknown : Dynamic)
-				{
-					trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(c)));
-					trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
-				}
+				c.init();
 			}
 		}
 	}
