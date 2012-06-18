@@ -33,7 +33,9 @@ class DataConsumer
 	
 	static public function startConsuming(consumer : IDataConsumer, from : Dynamic)
 	{
-		from.addEventListener(ON_DATA_EVENT_TYPE, function(e:CustomEvent) { consumer.onData(e.detail); } , false);
+		from.addEventListener(ON_DATA_EVENT_TYPE, function(e:CustomEvent) { consumer.onData( e.detail ); } , false);
+		
+		from.addEventListener(DataProvider.ON_DATA_PROVIDER_EVENT_TYPE, function(e:CustomEvent) { consumer.onNewDataProvider( e.detail ); } , false);
 		
 		var onNewConsumerEvent : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		
@@ -54,4 +56,8 @@ interface IDataConsumer
 	 * @param	a DataObject instance.
 	 */
 	function onData(dataObj : DataObject):Void;
+	/**
+	 * Callback invoked when a new data provider is showing up.
+	 */
+	public function onNewDataProvider( dataProvider : IDataProvider ):Void;
 }
