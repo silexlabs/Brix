@@ -151,4 +151,12 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 			updateView();
 		}
 	}
+	
+	/**
+	 * Callback invoked when a new data provider is showing up.
+	 */
+	public function onNewDataProvider( dataProvider : IDataProvider ):Void
+	{
+		dataProvider.onNewDataConsumer(this);
+	}
 }

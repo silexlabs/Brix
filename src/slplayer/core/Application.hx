@@ -316,7 +316,7 @@ import slplayer.core.ISLPlayerComponent;
 				{
 					newDisplayObject = Type.createInstance( componentClass, [node, id] );
 				}
-				catch( unknown : Dynamic ) { trace("ERROR "+Std.string(unknown));}
+				catch( unknown : Dynamic ) { trace("ERROR "+Std.string(unknown)); trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) ); }
 			}
 		}
 		else //case of non-visual component: we just try to create an instance, no call on init()
@@ -334,7 +334,7 @@ import slplayer.core.ISLPlayerComponent;
 				else
 					cmpInstance = Type.createInstance( componentClass, [] );
 			}
-			catch(unknown : Dynamic ) { "ERROR "+trace(Std.string(unknown));}
+			catch(unknown : Dynamic ) { "ERROR "+trace(Std.string(unknown)); trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) ); }
 			
 			//if the component is an SLPlayer cmp (and it should be), then try to give him its SLPlayer instance id
 			if (cmpInstance != null && Std.is(cmpInstance, ISLPlayerComponent))
