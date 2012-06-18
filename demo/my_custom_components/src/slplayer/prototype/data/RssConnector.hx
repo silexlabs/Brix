@@ -28,6 +28,10 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 	public var groupElement:HtmlDom;
 	
 	public var src(default, setSrc) : String;
+	
+	var lastResult : DataObject;
+	
+	var gettingData : Bool;
 
 	public function setSrc(newSrc : String) : String
 	{
@@ -45,16 +49,18 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 		super(rootElement,SLPId);
 		
 		startGroupable();
+		
+		if (groupElement == null)
+			groupElement = rootElement;
 	}
 	
 	override public function init():Void 
 	{
-		if (groupElement == null)
-			groupElement = rootElement;
-		
 		src = this.rootElement.getAttribute("data-" + SRC_TAG);
 		
 		var me = this;
+		
+		gettingData = false;
 		
 		startProviding(groupElement);
 	}
@@ -66,7 +72,8 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 			trace("INFO src not set.");
 			return;
 		}
-		
+		gettingData = true;
+trace("[DEBUG] getting data");
 		var r = new Http("XMLProxy.php");
 		r.setParameter( "url" , src);
 		var me = this;
@@ -75,9 +82,21 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 		r.request(true);
 	}
 	
+	/**
+	 * Callback invoked when a new data consumer is showing up.
+	 */
+	public function onNewDataConsumer( dataConsumer : slplayer.data.DataConsumer.IDataConsumer ):Void
+	{
+		if ( lastResult != null )
+			dataConsumer.onData( lastResult );
+		else
+			getData();
+	}
+	
 	private function onData(data : String):Void
 	{
-//trace("data received");
+		gettingData = false;
+trace("[DEBUG] data received");
 		var dataXml :  Xml;
 		try
 		{
@@ -94,7 +113,9 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 			itemsData.push( generateDataObject(items.next()) );
 		}
 		
-		groupElement.dispatchData( { src : src, srcTitle : null, data : itemsData } );
+		lastResult = { src : src, srcTitle : null, data : itemsData };
+trace("[DEBUG] dispatching to "+groupElement+"   data "+lastResult);
+		groupElement.dispatchData( lastResult );
 	}
 	
 	/**
@@ -136,12 +157,12 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 				Reflect.setField( data, nodeName, xmlChild.firstChild());
 			}
 		}
-	
 		return data;
 	}
 	
 	private function onError(msg : String)
 	{
+		gettingData = false;
 		trace("ERROR cannot access to rss feed "+src);
 	}
 }
