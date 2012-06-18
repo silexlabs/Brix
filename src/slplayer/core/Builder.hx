@@ -196,8 +196,8 @@ class Builder
 		}
 		catch (unknown : Dynamic)
 		{
-			neko.Lib.println("\nERROR " + Std.string(unknown));
-			neko.Lib.println( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+			if (unknown.message != null) neko.Lib.println("\nERROR " + Std.string(unknown.message));
+			neko.Lib.println( haxe.Stack.toString( haxe.Stack.exceptionStack() ) );
 			Sys.exit(1);
 		}
 		
