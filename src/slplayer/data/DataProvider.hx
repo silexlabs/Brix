@@ -18,6 +18,8 @@ package slplayer.data;
 import js.Dom;
 import js.Lib;
 
+import slplayer.data.DataConsumer;
+
 /**
  * The DataObject structure common with DataConsumers.
  */
@@ -35,17 +37,19 @@ typedef DataObject =
  */
 class DataProvider 
 {
+	static public var ON_DATA_PROVIDER_EVENT_TYPE = "newDataProvider";
+	
 	static public function startProviding(provider : IDataProvider, target : Dynamic)
 	{
-		target.addEventListener(DataConsumer.ON_DATA_CONSUMER_EVENT_TYPE, function(e:CustomEvent) { provider.getData(); }, false);
+		target.addEventListener(DataConsumer.ON_DATA_CONSUMER_EVENT_TYPE, function(e:CustomEvent) { provider.onNewDataConsumer( e.detail ); }, false);
 	}
 	
-	static public function dispatchData(target : Dynamic, data : DataObject)
+	static public function dispatchData(target : HtmlDom, data : DataObject)
 	{
-		var onDataEvent = untyped Lib.document.createEvent("CustomEvent");
+		var onDataEvent : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		
 		onDataEvent.initCustomEvent(DataConsumer.ON_DATA_EVENT_TYPE, false, false, data);
-		
+trace("[DEBUG] actually dispatching to "+target+"   data "+data);
 		target.dispatchEvent(onDataEvent);
 	}
 }
@@ -59,4 +63,8 @@ interface IDataProvider
 	 * Common callback to all data provider to retreive data.
 	 */
 	public function getData():Void;
+	/**
+	 * Callback invoked when a new data consumer is showing up.
+	 */
+	public function onNewDataConsumer( dataConsumer : IDataConsumer ):Void;
 }

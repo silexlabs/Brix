@@ -7,4 +7,3 @@
 --macro slplayer.core.Builder.create('source.html')
 --remap js:cocktail
 -swf-version 10.2
--D slpdebug
