@@ -49,7 +49,7 @@ class DataProvider
 		var onDataEvent : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		
 		onDataEvent.initCustomEvent(DataConsumer.ON_DATA_EVENT_TYPE, false, false, data);
-trace("[DEBUG] actually dispatching to "+target+"   data "+data);
+		
 		target.dispatchEvent(onDataEvent);
 	}
 }

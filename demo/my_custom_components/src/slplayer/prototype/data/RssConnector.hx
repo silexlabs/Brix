@@ -73,7 +73,7 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 			return;
 		}
 		gettingData = true;
-trace("[DEBUG] getting data");
+		
 		var r = new Http("XMLProxy.php");
 		r.setParameter( "url" , src);
 		var me = this;
@@ -96,7 +96,7 @@ trace("[DEBUG] getting data");
 	private function onData(data : String):Void
 	{
 		gettingData = false;
-trace("[DEBUG] data received");
+		
 		var dataXml :  Xml;
 		try
 		{
@@ -114,7 +114,7 @@ trace("[DEBUG] data received");
 		}
 		
 		lastResult = { src : src, srcTitle : null, data : itemsData };
-trace("[DEBUG] dispatching to "+groupElement+"   data "+lastResult);
+		
 		groupElement.dispatchData( lastResult );
 	}
 	
