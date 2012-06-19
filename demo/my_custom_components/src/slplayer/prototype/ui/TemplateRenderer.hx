@@ -47,7 +47,7 @@ class TemplateRenderer extends DisplayObject, implements IDataConsumer
 		//consolidate data from providers
 		var providersData : Array<Dynamic> = new Array();
 		for (pvdData in dataProviders)
-		{ trace("[DEBUG] updateView  pvdData="+pvdData);
+		{
 			providersData = providersData.concat(pvdData);
 		}
 		
@@ -57,9 +57,8 @@ class TemplateRenderer extends DisplayObject, implements IDataConsumer
 	
 	public function onData(dataObj:DataObject):Void
 	{
-trace("[DEBUG] dataObj="+dataObj);
 		if (dataObj != null)
-		{ trace("[DEBUG] dataObj.src="+dataObj.src+"  dataObj.data="+dataObj.data);
+		{
 			dataProviders.set(dataObj.src,dataObj.data);
 			updateView();
 		}
