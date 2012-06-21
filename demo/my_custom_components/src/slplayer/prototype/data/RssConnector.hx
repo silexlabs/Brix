@@ -7,7 +7,7 @@ using slplayer.ui.group.IGroupable.Groupable;
 
 import haxe.Http;
 
-import js.Dom;
+
 import js.Lib;
 
 //need this to be a standard compliant data provider
