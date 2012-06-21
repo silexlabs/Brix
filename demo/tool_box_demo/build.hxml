@@ -1,0 +1,9 @@
+-js bin/SLPlayer.js
+-main slplayer.core.Application
+-cp ../../src/
+-cp ../../../Cocktail/src/
+#-D embedHtml
+#-D minimizeHtml
+#-D slpdebug
+-D disableEmbedHtml
+--macro slplayer.core.Builder.create('src/index.html')
