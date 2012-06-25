@@ -1,9 +1,5 @@
 TODO LIST
 
-All comps
-- constants for all class names (ndz: you mean for all event types ?)
-- fork slplayer + integration
-
 With Zabojad
 - templates with the 2nd "method"? and retrieve content of the dataprovider in the list
   => un mixin qui permet d'init une liste avec des données qui viennent d'une de ces sources
@@ -25,8 +21,6 @@ With Zabojad
 
 
 Dragable: 
-- !! Draggable
-- slplayer.ui.interaction.Draggable
 - use computed style of rootElement instead of absolute values ---- window.getComputedStyle ---- currentStyle ----- in initPhantomStyle ----- http://www.javascriptkit.com/dhtmltutors/dhtmlcascade4.shtml et http://javascript.gakaa.com/window-getcomputedstyle-4-0-5-.aspx
 - tests: position absolute, horizontal/vertical...
 - functional tests 

@@ -1,8 +1,9 @@
-package components;
+package slplayer.ui.list;
 
 import js.Lib;
 import js.Dom;
-import components.List;
+import slplayer.ui.list.List;
+import slplayer.util.DomTools;
 
 /**
  * list component with XML as an input
@@ -10,17 +11,18 @@ import components.List;
  * convert the XML into an object tree in the data provider
  */
 class XmlList extends List<Xml>{
+	static inline var ATTR_ITEMS:String = "data-items";
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom) {
-		super(rootElement);
-		var attr = rootElement.getAttribute("data-items");
+	public function new(rootElement:HtmlDom, SLPId:String) {
+		super(rootElement, SLPId);
+		var attr = rootElement.getAttribute(ATTR_ITEMS);
 		var xmlData:Xml = Xml.parse(StringTools.htmlUnescape(attr));
 		dataProvider = [];
 		for(item in xmlData.elements()){
 			dataProvider.push(xmlToObj(item));
-			components.Utils.inspectTrace(xmlToObj(item));
+			DomTools.inspectTrace(xmlToObj(item));
 		}
 	}
 	private function xmlToObj(xml:Xml):Dynamic{

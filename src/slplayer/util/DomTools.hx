@@ -57,7 +57,7 @@ class DomTools
 	 * If the element is not found, returns null or throws an error, depending on the param "required"
 	 */
 	public static function getSingleElement(rootElement:HtmlDom, className:String, required:Bool=true):Null<HtmlDom>{
-		var domElements = Utils.getElementsByClassName(rootElement, className);
+		var domElements = DomTools.getElementsByClassName(rootElement, className);
 		if (domElements != null && domElements.length == 1){
 			return domElements[0];
 		}

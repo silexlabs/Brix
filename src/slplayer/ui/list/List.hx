@@ -6,11 +6,11 @@
 	selected index/item
 	selected indexes / items
 */
-package components;
+package slplayer.ui.list;
 
 import js.Lib;
 import js.Dom;
-import components.Utils;
+import slplayer.util.DomTools;
 
 import slplayer.ui.DisplayObject;
 
@@ -50,8 +50,8 @@ class List<ElementClass> extends DisplayObject{
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom) {
-		super(rootElement);
+	public function new(rootElement:HtmlDom, SLPId:String) {
+		super(rootElement, SLPId);
 		_selectedIndex = -1;
 		dataProvider = [];
 	}
@@ -60,7 +60,7 @@ class List<ElementClass> extends DisplayObject{
 	 * get elements by class names 
 	 * initializes the process of refreshing the list
 	 */
-	override public dynamic function init() : Void { 
+	override public function init() : Void { 
 		super.init();
 
 		listTemplate = rootElement.innerHTML;
@@ -187,7 +187,7 @@ class List<ElementClass> extends DisplayObject{
 	 */
 	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> {
 		trace("setSelectedItem "+selected+" - "+Type.getClassName(Type.getClass(this)));
-		Utils.inspectTrace(selected); 
+		DomTools.inspectTrace(selected); 
 		if (selected != selectedItem){
 			if (selected != null){
 				var tmpIdx:Int = -1;

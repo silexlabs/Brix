@@ -1,17 +1,21 @@
-package components;
+package slplayer.ui.layout;
 
 import js.Lib;
 import js.Dom;
 import Xml;
 
-import components.Utils;
+import slplayer.util.DomTools;
 import slplayer.ui.DisplayObject;
 
 /**
- * PannelLayout class
+ * Pannel class
  *
  */
-class PannelLayout extends DisplayObject {
+class Pannel extends DisplayObject {
+	static inline var CSS_CLASS_HEADER:String = "pannel-header";
+	static inline var CSS_CLASS_BODY:String = "pannel-body";
+	static inline var CSS_CLASS_FOOTER:String = "pannel-footer";
+
 	/**
 	 * is the layer vertical or horizontal
 	 * default is vertical
@@ -32,8 +36,8 @@ class PannelLayout extends DisplayObject {
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom){
-		super(rootElement);
+	public function new(rootElement:HtmlDom, SLPId:String){
+		super(rootElement, SLPId);
 		haxe.Firebug.redirectTraces();
 		var _this_ = this;
 		untyped __js__("window.addEventListener('resize', function(e){_this_.redraw()});");
@@ -41,14 +45,14 @@ class PannelLayout extends DisplayObject {
 	/**
 	 * init the component
 	 */
-	override public dynamic function init() : Void { 
+	override public function init() : Void { 
 		super.init();
-		trace("PannelLayout init");
+		trace("Pannel init");
 
 		// retrieve references to the elements
-		header = Utils.getSingleElement(rootElement, "pannel-layout-header", false);
-		body = Utils.getSingleElement(rootElement, "pannel-layout-body", true);
-		footer = Utils.getSingleElement(rootElement, "pannel-layout-footer", false);
+		header = DomTools.getSingleElement(rootElement, CSS_CLASS_HEADER, false);
+		body = DomTools.getSingleElement(rootElement, CSS_CLASS_BODY, true);
+		footer = DomTools.getSingleElement(rootElement, CSS_CLASS_FOOTER, false);
 
 		// attributes
 		if (rootElement.getAttribute("data-is-horizontal") == "true")
@@ -63,7 +67,7 @@ class PannelLayout extends DisplayObject {
 	 * computes the size of each element
 	 */
 	public function redraw(dummy=null){
-		trace("PannelLayout redraw");
+		trace("Pannel redraw");
 		var bodySize:Int;
 		if (isHorizontal){
 			bodySize = rootElement.clientWidth;
@@ -73,7 +77,7 @@ class PannelLayout extends DisplayObject {
 			if (footer != null){
 				bodySize -= footer.clientWidth;
 			}
-			body.style.width = bodySize+"px";
+			body.style.width = (bodySize-1)+"px";
 		}
 		else{
 			bodySize = rootElement.clientHeight;
@@ -83,7 +87,7 @@ class PannelLayout extends DisplayObject {
 			if (footer != null){
 				bodySize -= footer.clientHeight;
 			}
-			body.style.height = bodySize+"px";
+			body.style.height = (bodySize-1)+"px";
 		}
 	}
 }

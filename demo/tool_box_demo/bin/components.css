@@ -24,11 +24,11 @@
 .XmlList .listSelectedItem{
     background-color: DarkRed;
 }
-.pannel-layout-element-horizontal{
+.pannel-element-horizontal{
     float: left;
     height: 100%;
 }
-.PannelLayout{
+.Pannel{
     border-style: groove;
     border-width: thin;
     border-color: gray;
@@ -38,7 +38,7 @@
     width: 40%;
     overflow: hidden;
 }
-.pannellayout button {
+.Pannel button {
     border-radius: 5px 5px 5px 5px;
     border-style: solid;
     border-width: medium;
@@ -47,35 +47,38 @@
     background-color: DarkSlateGray;
     padding: 2px 6px;
 }
-.pannel-layout-header{
+.pannel-header{
 	background-color: Gainsboro;
     padding: 5px;
     padding-top: 0px;
 }
-.pannel-layout-header h1{
+.pannel-header h1{
     font-size: 14pt;
     font-variant: small-caps;
     margin-bottom: 0;
     margin-top: 0;
 }
-.pannel-layout-footer{
-//	position: absolute;
-//	bottom: 0;
+.pannel-element-horizontal h1{
+    overflow: auto;
+    width: 100px;
+}
+.pannel-footer{
 	background-color: Gainsboro;
 }
-.Dragable{
+.Draggable{
     
 }
-.drag-zone{
+.draggable-dragzone{
     cursor: move
 }
-.dropzone{
+.draggable-dropzone{
     background-color: DarkSlateGray;
     border: 1px solid green;
     width: 40%;
     height: 80%;
     float: left;
 }
-.dragable-phantom{
-    border: 1px solid red;
+.draggable-phantom{
+//    border: 1px solid red !important;
+    background-color: DarkRed !important;
 }
