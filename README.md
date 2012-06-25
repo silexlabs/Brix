@@ -1,4 +1,4 @@
-Author: Thomas Fétiveau
+Lead developer: Thomas Fétiveau
 Lisence: GPL
 Copyright: Silex Labs
 
