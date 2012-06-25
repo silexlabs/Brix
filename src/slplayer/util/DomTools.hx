@@ -44,5 +44,37 @@ class DomTools
 		}
 		return filteredChildElts;
 	}
-	
+	/**
+	 * wrapper for the javascript function
+	 * TODO: remove this when the typedef is integrated into haxe js
+	 */
+	public static function getElementsByClassName(rootElement:HtmlDom, className:String):HtmlCollection<HtmlDom>{
+		return untyped __js__("rootElement.getElementsByClassName(className)");
+	}
+	/**
+	 * Retrieve an element with the given css class in the dom
+	 * The element is supposed to be the only one with this css class
+	 * If the element is not found, returns null or throws an error, depending on the param "required"
+	 */
+	public static function getSingleElement(rootElement:HtmlDom, className:String, required:Bool=true):Null<HtmlDom>{
+		var domElements = DomTools.getElementsByClassName(rootElement, className);
+		if (domElements != null && domElements.length == 1){
+			return domElements[0];
+		}
+		else{
+			if (required)
+				throw("Error: search for the element with class name \""+className+"\" gave "+domElements.length+" results");
+
+			return null;
+		}
+	}
+	/**
+	 * for debug purpose
+	 * trace the properties of an object
+	 */
+	public static function inspectTrace(obj:Dynamic):Void{
+		for (prop in Reflect.fields(obj)){
+			trace("- "+prop+" = "+Reflect.field(obj, prop));
+		}
+	}
 }
