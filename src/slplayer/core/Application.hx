@@ -367,7 +367,7 @@ import slplayer.core.ISLPlayerComponent;
 			{
 				try
 				{
-					c.init();
+					c.init(this.dataObject);
 				}
 				catch (unknown : Dynamic)
 				{
