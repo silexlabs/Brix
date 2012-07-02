@@ -444,7 +444,7 @@ class Builder
 												case EConst(c) :
 													switch(c) {
 														case CString(s) :
-															if ( taggedElt.nodeName == s )
+															if ( taggedElt.nodeName.toLowerCase() == s.toLowerCase() )
 															{
 																requirePassed = true;
 																break;
