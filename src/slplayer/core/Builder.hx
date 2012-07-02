@@ -125,8 +125,9 @@ class Builder
 	 */
 	@:macro static public function create(?htmlSourcePath:String="index.html") : Void
 	{
-		try
-		{
+		//try
+		//{
+		//TODO debug error catching: why some errors in component are catch and other not ?
 			sourceFilePath = htmlSourcePath;
 			
 			//Initial check
@@ -150,13 +151,13 @@ class Builder
 			
 			//parse the <body> element
 			parseBody();
-		}
-		catch (unknown : Dynamic) 
-		{
-			neko.Lib.println("\nERROR " + Std.string(unknown));
-			neko.Lib.println( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
-			Sys.exit(1);
-		}
+		//}
+		//catch (unknown : Dynamic) 
+		//{
+			//neko.Lib.println("\nERROR " + Std.string(unknown));
+			//neko.Lib.println( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+			//Sys.exit(1);
+		//}
 	}
 	
 	/**
@@ -169,8 +170,9 @@ class Builder
 		//init fields var
 		var fields = haxe.macro.Context.getBuildFields();
 		
-		try
-		{
+		//try
+		//{
+		//TODO debug error catching: why some errors in component are catch and other not ?
 			//parse the Application class fields to find the methods to fill in
 			discoverSLPlayerMethods(fields);
 			
@@ -193,21 +195,21 @@ class Builder
 			
 			//finalize the application compilation
 			pack();
-		}
-		catch (unknown : Dynamic)
-		{
-			if (unknown.message != null)
-			{
-				neko.Lib.println("\nERROR " + Std.string(unknown.message));
-				neko.Lib.println("at " + Std.string(unknown.pos).substr( 5 , Std.string(unknown.pos).length-6 ) );
-			}
-			else
-			{
-				neko.Lib.println("\nERROR " + Std.string(unknown));
-				neko.Lib.println( haxe.Stack.toString( haxe.Stack.exceptionStack() ) );
-			}
-			Sys.exit(1);
-		}
+		//}
+		//catch (unknown : Dynamic)
+		//{
+			//if (unknown.message != null)
+			//{
+				//neko.Lib.println("\nERROR " + Std.string(unknown.message));
+				//neko.Lib.println("at " + Std.string(unknown.pos).substr( 5 , Std.string(unknown.pos).length-6 ) );
+			//}
+			//else
+			//{
+				//neko.Lib.println("\nERROR " + Std.string(unknown));
+				//neko.Lib.println( haxe.Stack.toString( haxe.Stack.exceptionStack() ) );
+			//}
+			//Sys.exit(1);
+		//}
 		
 		return fields;
 	}
@@ -374,14 +376,15 @@ class Builder
 		{
 			var cmpType;
 			
-			try
-			{
+			//try
+			//{
+			//TODO debug error catching: why some errors in component are catch and other not ?
 				cmpType = Context.getType(cmpClassName);
-			}
-			catch (unknown:Dynamic)
-			{	
-				throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath and that it compiles correctly. Cause: "+Std.string(unknown);
-			}
+			//}
+			//catch (unknown:Dynamic)
+			//{	
+				//throw "cannot resolve " + cmpClassName + ", ensure this class is in your application classpath and that it compiles correctly. Cause: "+Std.string(unknown);
+			//}
 			
 			switch( cmpType ) 
 			{
