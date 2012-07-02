@@ -66,7 +66,7 @@ import slplayer.core.ISLPlayerComponent;
 	/**
 	 * A collection of the <script> declared components with the optionnal data- args passed on the <script> tag.
 	 */
-	private var registeredComponents : Hash<Null<Hash<String>>>;
+	private var registeredComponents : Array<RegisteredComponent>;
 	/**
 	 * A collection of name => content <meta> header parameters from the source HTML page.
 	 */
@@ -90,7 +90,7 @@ import slplayer.core.ISLPlayerComponent;
 		
 		this.id = id;
 		
-		this.registeredComponents = new Hash();
+		this.registeredComponents = new Array();
 		
 		this.nodeToCmpInstances = new Hash();
 		
@@ -230,7 +230,7 @@ import slplayer.core.ISLPlayerComponent;
 	
 	private function registerComponent(componentClassName : String , ?args:Hash<String>)
 	{
-		registeredComponents.set(componentClassName, args);
+		registeredComponents.push({classname:componentClassName, args:args});
 	}
 
 	/**
@@ -239,14 +239,10 @@ import slplayer.core.ISLPlayerComponent;
 	 */
 	private function initComponents()
 	{
-		var registeredComponentsClassNames = registeredComponents.keys();
-		
 		//Create the components instances
-		while (registeredComponentsClassNames.hasNext())
+		for (rc in registeredComponents)
 		{
-			var registeredComponentsClassName = registeredComponentsClassNames.next();
-			
-			createComponentsOfType(registeredComponentsClassName, registeredComponents.get(registeredComponentsClassName));
+			createComponentsOfType(rc.classname, rc.args);
 		}
 		
 		//call init on each component instances
@@ -278,7 +274,7 @@ import slplayer.core.ISLPlayerComponent;
 		
 		if (slplayer.ui.DisplayObject.isDisplayObject(componentClass)) // case DisplayObject component
 		{
-			var classTag = SLPlayerComponentTools.getUnconflictedClassTag(componentClassName, registeredComponents.keys());
+			var classTag = SLPlayerComponentTools.getUnconflictedClassTag(componentClassName, Lambda.map( registeredComponents , function(rc:RegisteredComponent) { return rc.classname; } ).iterator()  );
 			
 			#if slpdebug
 				trace("searching now for class tag = "+classTag);
@@ -419,4 +415,13 @@ import slplayer.core.ISLPlayerComponent;
 		
 		return new List();
 	}
+}
+
+/**
+ * A struct for describing a component declared in the application.
+ */
+typedef RegisteredComponent = 
+{
+	var classname : String;
+	var args : Null<Hash<String>>;
 }
