@@ -373,10 +373,11 @@ import slplayer.core.ISLPlayerComponent;
 			trace("call Init On Components");
 		#end
 		
+		var groupElement: HtmlDom = null;
 		for (l in nodeToCmpInstances)
-		{
+		{	
 			for (c in l)
-			{
+			{	
 				try
 				{
 					c.init(this.dataObject);
@@ -386,7 +387,21 @@ import slplayer.core.ISLPlayerComponent;
 					trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(c))+": "+Std.string(unknown));
 					trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
 				}
+
+				var cmp:Dynamic = c;
+				if (cmp.groupElement != null){
+					groupElement = cmp.groupElement;
+				}
+				
 			}
+
+		}
+
+		if (groupElement != null){
+			var e:CustomEvent = cast(Lib.document.createEvent("CustomEvent"));
+	        e.initCustomEvent("applicationReady", false, false, null);
+	        groupElement.dispatchEvent(e);
+	        trace("application ready: all components are initialized");
 		}
 	}
 	
