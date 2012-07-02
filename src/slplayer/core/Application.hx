@@ -18,6 +18,9 @@ package slplayer.core;
 import js.Lib;
 import js.Dom;
 
+import haxe.Json;
+import haxe.Resource;
+
 import slplayer.core.ISLPlayerComponent;
 
 /**
@@ -194,7 +197,16 @@ import slplayer.core.ISLPlayerComponent;
 		#if slpdebug
 			trace("New SLPlayer id created : "+newId);
 		#end
-		
+
+		if (args == null)
+		{
+			var data = Resource.getString("dataObject");
+			if (data != null)
+			{
+				args = Json.parse(data);
+			}
+		}
+
 		//the new SLPlayer instance
 		var newInstance = new Application(newId, args);
 		#if slpdebug
@@ -361,20 +373,35 @@ import slplayer.core.ISLPlayerComponent;
 			trace("call Init On Components");
 		#end
 		
+		var groupElement: HtmlDom = null;
 		for (l in nodeToCmpInstances)
-		{
+		{	
 			for (c in l)
-			{
+			{	
 				try
 				{
-					c.init();
+					c.init(this.dataObject);
 				}
 				catch (unknown : Dynamic)
 				{
 					trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(c))+": "+Std.string(unknown));
 					trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
 				}
+
+				var cmp:Dynamic = c;
+				if (cmp.groupElement != null){
+					groupElement = cmp.groupElement;
+				}
+				
 			}
+
+		}
+
+		if (groupElement != null){
+			var e:CustomEvent = cast(Lib.document.createEvent("CustomEvent"));
+	        e.initCustomEvent("applicationReady", false, false, null);
+	        groupElement.dispatchEvent(e);
+	        trace("application ready: all components are initialized");
 		}
 	}
 	

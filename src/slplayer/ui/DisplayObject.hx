@@ -130,5 +130,5 @@ class DisplayObject implements IDisplayObject
 	/**
 	 * For specific initialization logic specific to your component class, override this method.
 	 */
-	public function init() : Void { }
+	public function init(?data:Dynamic) : Void { }
 }
