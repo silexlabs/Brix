@@ -22,11 +22,17 @@ typedef DropZone = {
  * define the drop zones with a "drop-zone" class name on the elements, or by setting the dropZones attribute
  */
 class Draggable extends DisplayObject {
+	////////////////////////////////////
+	// events
+	////////////////////////////////////
 	static inline var CSS_CLASS_DRAGZONE:String = "draggable-dragzone";
 	static inline var CSS_CLASS_DROPZONE:String = "draggable-dropzone";
 	static inline var CSS_CLASS_PHANTOM:String = "draggable-phantom";
 
 	static inline var ATTR_DROPZONE:String = "data-dropzones-class-name";
+
+	static inline var EVENT_DRAG:String = "dragEventDrag";
+	static inline var EVENT_DROPPED:String = "dragEventDropped";
 	/**
 	 * div element used to show where the element is about to be dropped
 	 */
@@ -103,7 +109,7 @@ class Draggable extends DisplayObject {
 		phantom = Lib.document.createElement("div");
 
 		// retrieve references to the elements
-		dragZone = DomTools.getSingleElement(rootElement, "draggable-dragzone", false);
+		dragZone = DomTools.getSingleElement(rootElement, CSS_CLASS_DRAGZONE, false);
 		if (dragZone == null)
 			dragZone = rootElement;
 
@@ -114,7 +120,7 @@ class Draggable extends DisplayObject {
 
 		// attach the events
 		dragZone.onmousedown = startDrag;
-		Lib.document.body.onmouseup = stopDrag;
+		dragZone.onmouseup = stopDrag;
 		dragZone.style.cursor = "move";
 	}
 	/**
@@ -185,9 +191,17 @@ class Draggable extends DisplayObject {
 			initRootElementStyle();
 			//initialStylePosition = rootElement.style.position;
 
-			Lib.document.body.onmousemove = move;
+			Lib.document.onmousemove = function(e){move(e);};
 //			rootElement.style.position = "absolute";
+			move(e);
+
+			// dispatch a custom event
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_DRAG, false, false, rootElement);
+			rootElement.dispatchEvent(event);
 		}
+		// prevent default behavior
+		untyped __js__ ("return false;");
 	}
 	/**
 	 * stop dragging
@@ -196,13 +210,24 @@ class Draggable extends DisplayObject {
 	 * reset the rootElement.style.position value to initial position
 	 */
 	public function stopDrag(e:js.Event){
+		trace("Draggable stopDrag droped! "+state);
 		if (state == dragging){
-			//trace("Draggable stopDrag droped! "+initialStylePosition);
+			trace("Draggable stopDrag droped! "+bestDropZone);
 			// change parent node
 			if (bestDropZone != null){
 				rootElement.parentNode.removeChild(rootElement);
 				bestDropZone.parent.insertBefore(rootElement, bestDropZone.parent.childNodes[bestDropZone.position]);
 				trace("Draggable stopDrag droped! "+state);
+				
+				// dispatch a custom event
+				var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+				event.initCustomEvent(EVENT_DROPPED, false, false, bestDropZone.parent);
+				bestDropZone.parent.dispatchEvent(event);
+				
+				// dispatch a custom event
+				event = cast Lib.document.createEvent("CustomEvent");
+				event.initCustomEvent(EVENT_DROPPED, false, false, rootElement);
+				rootElement.dispatchEvent(event);
 			}
 			// reset state
 			state = none;
@@ -210,15 +235,18 @@ class Draggable extends DisplayObject {
 			resetRootElementStyle();
 			Lib.document.body.onmousemove = null;
 			setAsBestDropZone(null);
+			// prevent default behavior
+			untyped __js__ ("return false;");
 		}
+		untyped __js__ ("return true;");
 	}
 	/**
 	 * move during dragging
-	 * move the root element 
+	 * move the root element
 	 * look for closest drop zone if there are some
 	 */
 	public function move(e:js.Event){
-		//trace("Draggable move "+state);
+		// trace("Draggable move "+state);
 		if (state == dragging){
 			var x = e.clientX - initialMouseX + initialX;
 			var y = e.clientY - initialMouseY + initialY;
