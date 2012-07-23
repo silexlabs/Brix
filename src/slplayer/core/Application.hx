@@ -441,15 +441,31 @@ import slplayer.core.ISLPlayerComponent;
 	
 	/**
 	 * Gets the component instance(s) associated with a given node.
-	 * @param	node	the HTML node for which we search the associated component instances.
+	 * @param	node		the HTML node for which we search the associated component instances.
+	 * @param	typeFilter	an optionnal type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
 	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
-	public function getAssociatedComponents(node : HtmlDom) : List<slplayer.ui.DisplayObject>
+	public function getAssociatedComponents(node : HtmlDom, ?typeFilter:Dynamic=null) : List<slplayer.ui.DisplayObject>
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
 		if (nodeId != null)
-			return nodeToCmpInstances.get(nodeId);
+		{
+			if (typeFilter == null)
+			{
+				return nodeToCmpInstances.get(nodeId);
+			}
+			else
+			{
+				var l = new List();
+				for (i in nodeToCmpInstances.get(nodeId))
+				{
+					if (Std.is(i, typeFilter))
+						l.add(i);
+				}
+				return l;
+			}
+		}
 		
 		return new List();
 	}
