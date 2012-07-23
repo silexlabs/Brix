@@ -1,0 +1,4 @@
+-swf ../bin/output.swf
+-cp .
+-main Output
+-swf-version 10.2
