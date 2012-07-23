@@ -3,8 +3,8 @@
 -cp ../../../src/
 -cp ../../../../haxe_libs/Cocktail/src/
 -debug
--main slplayer.core.Application
---macro slplayer.core.Builder.create('index.html')
+-main org.slplayer.core.Application
+--macro org.slplayer.core.Builder.create('index.html')
 -D noAutoStart
 -D slpdebug
 -D minimizeHtml

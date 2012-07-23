@@ -3,15 +3,15 @@ package slplayer.prototype.player;
 import js.Dom;
 import js.Lib;
 
-using slplayer.util.DomTools;
+using org.slplayer.util.DomTools;
 
-import slplayer.ui.DisplayObject;
+import org.slplayer.ui.DisplayObject;
 
-import slplayer.ui.player.PlayerControl;
-using slplayer.ui.player.PlayerControl;
+import org.slplayer.ui.player.PlayerControl;
+using org.slplayer.ui.player.PlayerControl;
 
-import slplayer.ui.group.IGroupable;
-using slplayer.ui.group.IGroupable.Groupable;
+import org.slplayer.ui.group.IGroupable;
+using org.slplayer.ui.group.IGroupable.Groupable;
 
 /**
  * Structure helping with handling the skinnable elts of a component.

@@ -1,9 +1,9 @@
 package slplayer.prototype.data;
 
-import slplayer.ui.DisplayObject;
+import org.slplayer.ui.DisplayObject;
 
-import slplayer.ui.group.IGroupable;
-using slplayer.ui.group.IGroupable.Groupable;
+import org.slplayer.ui.group.IGroupable;
+using org.slplayer.ui.group.IGroupable.Groupable;
 
 import haxe.Http;
 
@@ -11,8 +11,8 @@ import js.Dom;
 import js.Lib;
 
 //need this to be a standard compliant data provider
-import slplayer.data.DataProvider;
-using slplayer.data.DataProvider;
+import org.slplayer.data.DataProvider;
+using org.slplayer.data.DataProvider;
 
 /**
  * 
@@ -85,7 +85,7 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 	/**
 	 * Callback invoked when a new data consumer is showing up.
 	 */
-	public function onNewDataConsumer( dataConsumer : slplayer.data.DataConsumer.IDataConsumer ):Void
+	public function onNewDataConsumer( dataConsumer : org.slplayer.data.DataConsumer.IDataConsumer ):Void
 	{
 		if ( lastResult != null )
 			dataConsumer.onData( lastResult );

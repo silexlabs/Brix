@@ -3,8 +3,8 @@
 -cp ../../my_custom_components/src/
 -cp ../../../src/
 -cp ../../../../haxe_libs/Cocktail/src/
--main slplayer.core.Application
---macro slplayer.core.Builder.create('index.html')
+-main org.slplayer.core.Application
+--macro org.slplayer.core.Builder.create('index.html')
 --remap js:cocktail
 -swf-version 10.2
 -D slpdebug
