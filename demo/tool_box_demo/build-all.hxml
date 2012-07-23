@@ -1,0 +1,38 @@
+-js bin/toolBox.js
+-cp ../../src/
+-cp ../../../Cocktail/src/
+-main slplayer.core.Application
+--macro slplayer.core.Builder.create('./src/toolBox.html')
+-D slpdebug
+-D disableEmbedHtml
+
+--next
+
+-js bin/dragDrop.js
+-cp ../../src/
+-cp ../../../Cocktail/src/
+-main slplayer.core.Application
+--macro slplayer.core.Builder.create('./src/dragDrop.html')
+-D slpdebug
+-D disableEmbedHtml
+
+--next
+
+-js bin/lists.js
+-cp ../../src/
+-cp ../../../Cocktail/src/
+-main slplayer.core.Application
+--macro slplayer.core.Builder.create('./src/lists.html')
+-D slpdebug
+-D disableEmbedHtml
+
+--next
+
+-js bin/pannel.js
+-cp ../../src/
+-cp ../../../Cocktail/src/
+-main slplayer.core.Application
+--macro slplayer.core.Builder.create('./src/pannel.html')
+-D slpdebug
+-D disableEmbedHtml
+
