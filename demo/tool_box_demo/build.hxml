@@ -1,7 +1,7 @@
 -js bin/dragDrop.js
 -cp ../../src/
 -cp ../../../Cocktail/src/
--main slplayer.core.Application
---macro slplayer.core.Builder.create('./src/dragDrop.html')
+-main org.slplayer.core.Application
+--macro org.slplayer.core.Builder.create('./src/dragDrop.html')
 -D slpdebug
 -D disableEmbedHtml

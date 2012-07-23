@@ -5,8 +5,8 @@ import js.Dom;
 
 using slplayer.prototype.util.DomTools;
 
-import slplayer.data.DataProvider;
-using slplayer.data.DataProvider;
+import org.slplayer.component.data.DataProvider;
+using org.slplayer.component.data.DataProvider;
 
 /**
  * ...

@@ -9,7 +9,7 @@ package slplayer.prototype.ui;
  */
 @tagNameFilter("pre")
 @:build(slplayer.prototype.ui.CodeViewerBuilder.build())
-class CodeViewer extends slplayer.ui.DisplayObject
+class CodeViewer extends org.slplayer.component.ui.DisplayObject
 {
 	/**
 	 * The data- optional attribute used to specify with HTML element we're viewing.
