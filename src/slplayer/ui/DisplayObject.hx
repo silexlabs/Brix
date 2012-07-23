@@ -80,10 +80,6 @@ class DisplayObject implements IDisplayObject
 		#end
 		
 		Application.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
-		
-		#if slpdebug
-			trace("Successfuly created instance of "+Type.getClassName(Type.getClass(this)));
-		#end
 	}
 	
 	/**
