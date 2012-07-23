@@ -3,13 +3,13 @@ package slplayer.prototype.player;
 import js.Dom;
 import js.Lib;
 
-import slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
-import slplayer.ui.player.PlayerControl;
-using slplayer.ui.player.PlayerControl;
+import org.slplayer.component.player.PlayerControl;
+using org.slplayer.component.player.PlayerControl;
 
-import slplayer.ui.group.IGroupable;
-using slplayer.ui.group.IGroupable.Groupable;
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
 
 import haxe.Timer;
 
