@@ -13,7 +13,7 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.ui.group;
+package org.slplayer.component.group;
 
 import org.slplayer.core.Builder;
 import org.slplayer.util.MacroTools;
@@ -113,7 +113,7 @@ class GroupBuilder
 				if ( potentialClasses.length != 1 )
 					continue; //can't be a valid component class tag value
 				
-				if ( !MacroTools.is( switch( Context.getType(potentialClasses.first()) ) { case TInst( classRef , params ): classRef.get(); default : } , "org.slplayer.ui.group.IGroupable" ) )
+				if ( !MacroTools.is( switch( Context.getType(potentialClasses.first()) ) { case TInst( classRef , params ): classRef.get(); default : } , "org.slplayer.component.group.IGroupable" ) )
 					continue;
 				
 				groupables.add(childElt);

@@ -13,7 +13,7 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.ui.player;
+package org.slplayer.component.player;
 
 import js.Dom;
 import js.Lib;
@@ -86,7 +86,7 @@ class Playable
 }
 
 /**
- * Any playable component should implement this interface and be "using org.slplayer.ui.player.Playable" to be compliant with
+ * Any playable component should implement this interface and be "using org.slplayer.component.player.Playable" to be compliant with
  * PlayerControls.
  */
 interface IPlayable 

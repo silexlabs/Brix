@@ -1,11 +1,9 @@
-package org.slplayer.ui;
+package org.slplayer.component.ui;
 
 import org.slplayer.core.Application;
 
-import org.slplayer.core.ISLPlayerComponent;
-using org.slplayer.core.ISLPlayerComponent.SLPlayerComponent;
-
-import org.slplayer.core.SLPlayerComponentTools;
+import org.slplayer.component.ISLPlayerComponent;
+using org.slplayer.component.ISLPlayerComponent.SLPlayerComponent;
 
 import js.Lib;
 import js.Dom;
@@ -76,7 +74,7 @@ class DisplayObject implements IDisplayObject
 			//check the @tagNameFilter constraints
 			checkFilterOnElt(Type.getClass(this) , rootElement);
 			//check the @requires constraints
-			SLPlayerComponentTools.checkRequiredParameters(Type.getClass(this) , rootElement);
+			SLPlayerComponent.checkRequiredParameters(Type.getClass(this) , rootElement);
 		#end
 		
 		Application.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
@@ -90,7 +88,7 @@ class DisplayObject implements IDisplayObject
 	 */
 	static public function isDisplayObject(cmpClass : Class<Dynamic>):Bool
 	{
-		if (cmpClass == Type.resolveClass("org.slplayer.ui.DisplayObject"))
+		if (cmpClass == Type.resolveClass("org.slplayer.component.ui.DisplayObject"))
 			return true;
 		
 		if (Type.getSuperClass(cmpClass) != null)

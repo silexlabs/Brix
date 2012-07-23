@@ -5,13 +5,13 @@ import js.Lib;
 
 using org.slplayer.util.DomTools;
 
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
-import org.slplayer.ui.player.PlayerControl;
-using org.slplayer.ui.player.PlayerControl;
+import org.slplayer.component.player.PlayerControl;
+using org.slplayer.component.player.PlayerControl;
 
-import org.slplayer.ui.group.IGroupable;
-using org.slplayer.ui.group.IGroupable.Groupable;
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
 
 /**
  * Structure helping with handling the skinnable elts of a component.

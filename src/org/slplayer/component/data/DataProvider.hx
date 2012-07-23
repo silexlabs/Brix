@@ -13,12 +13,12 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.data;
+package org.slplayer.component.data;
 
 import js.Dom;
 import js.Lib;
 
-import org.slplayer.data.DataConsumer;
+import org.slplayer.component.data.DataConsumer;
 
 /**
  * The DataObject structure common with DataConsumers.
@@ -31,7 +31,7 @@ typedef DataObject =
 }
 
 /**
- * To be a standard data provider, a component must implement IDataProvider. Also, It should use DataProvider (using org.slplayer.data.DataProvider).
+ * To be a standard data provider, a component must implement IDataProvider. Also, It should use DataProvider (using org.slplayer.component.data.DataProvider).
  * 
  * @author Thomas Fétiveau
  */
@@ -55,7 +55,7 @@ class DataProvider
 }
 
 /**
- * A DataProvider component should implement this interface and be "using org.slplayer.data.DataProvider" to be compliant with DataConsumers.
+ * A DataProvider component should implement this interface and be "using org.slplayer.component.data.DataProvider" to be compliant with DataConsumers.
  */
 interface IDataProvider
 {

@@ -5,18 +5,18 @@ import js.Dom;
 
 import haxe.Template;
 
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
 //these two lines below are mandatory to be a standard data consumer
-import org.slplayer.data.DataConsumer;
-using org.slplayer.data.DataConsumer;
-import org.slplayer.data.DataProvider;
+import org.slplayer.component.data.DataConsumer;
+using org.slplayer.component.data.DataConsumer;
+import org.slplayer.component.data.DataProvider;
 
-import org.slplayer.ui.player.Playable;
-using org.slplayer.ui.player.Playable;
+import org.slplayer.component.player.Playable;
+using org.slplayer.component.player.Playable;
 
-import org.slplayer.ui.group.IGroupable;
-using org.slplayer.ui.group.IGroupable.Groupable;
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
 
 /**
  * Gallery component for SLPlayer applications.

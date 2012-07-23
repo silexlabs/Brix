@@ -13,14 +13,14 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.ui.group;
+package org.slplayer.component.group;
 
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
 /**
  * Gives its child elements a common event-based communication point.
  * 
  * @author Thomas Fétiveau
  */
-@:build(org.slplayer.ui.group.GroupBuilder.build())
+@:build(org.slplayer.component.group.GroupBuilder.build())
 class Group extends DisplayObject { }

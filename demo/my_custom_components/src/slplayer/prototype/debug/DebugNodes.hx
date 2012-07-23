@@ -1,6 +1,6 @@
 package slplayer.prototype.debug;
 
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 import org.slplayer.core.SLPlayer;
 
 import js.Lib;

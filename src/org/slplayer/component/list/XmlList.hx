@@ -1,8 +1,8 @@
-package org.slplayer.ui.list;
+package org.slplayer.component.list;
 
 import js.Lib;
 import js.Dom;
-import org.slplayer.ui.list.List;
+import org.slplayer.component.list.List;
 import org.slplayer.util.DomTools;
 
 /**

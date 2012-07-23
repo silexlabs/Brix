@@ -1,10 +1,10 @@
-package org.slplayer.ui.interaction;
+package org.slplayer.component.interaction;
 
 import js.Lib;
 import js.Dom;
 
 import org.slplayer.util.DomTools;
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
 enum DraggableState {
 	none;

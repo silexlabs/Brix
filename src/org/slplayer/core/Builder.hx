@@ -392,7 +392,7 @@ class Builder
 					
 					var metaData = classRef.get().meta.get();
 					
-					if ( classRef.get().is("org.slplayer.ui.DisplayObject") )
+					if ( classRef.get().is("org.slplayer.component.ui.DisplayObject") )
 					{
 						var tagsToSearchFor = getUnconflictedClassTags(cmpClassName);
 						
@@ -595,7 +595,7 @@ class Builder
 			var cmpClassType = switch( Context.getType(cmpClassName) ) { case TInst( classRef , params ): classRef.get(); default: };
 			
 			//TODO wouldn't it be better to initialize the components knowing that they are DisplayObjects or not, right from here
-			if ( !Lambda.empty(cmpArgs) && cmpClassType.is("org.slplayer.ui.DisplayObject") )
+			if ( !Lambda.empty(cmpArgs) && cmpClassType.is("org.slplayer.component.ui.DisplayObject") )
 			{
 				//case the component has data-arguments on its script tag
 				var argsArrayName = cmpClassName.replace( "." , "_" ) + "Args";

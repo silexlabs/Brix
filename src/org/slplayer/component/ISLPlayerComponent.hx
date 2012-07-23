@@ -13,7 +13,9 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.core;
+package org.slplayer.component;
+
+import org.slplayer.core.Application;
 
 /**
  * The interface each SLPlayer component should implement to be able to standardly retreive their SLPlayer Application instance.
@@ -48,6 +50,28 @@ class SLPlayerComponent
 	{
 		return Application.get(component.SLPlayerInstanceId);
 	}
+	
+	/**
+	 * Checks if there is any missing required attribute on the associated HTML element of this component.
+	 * 
+	 * @param	the class of the component to check.
+	 * @param	the DOM element to check. By default the rootElement.
+	 */
+	static public function checkRequiredParameters( cmpClass : Class<Dynamic> , elt:js.Dom.HtmlDom ) : Void
+	{
+		var requires = haxe.rtti.Meta.getType(cmpClass).requires;
+		
+		if (requires == null)
+			return;
+
+		for (r in requires)
+		{
+			if ( elt.getAttribute( Std.string(r) ) == null || StringTools.trim( elt.getAttribute( Std.string(r) ) ) == "" )
+			{
+				throw Std.string(r) + " parameter is required for "+Type.getClassName(cmpClass);
+			}
+		}
+	}
 }
 
 /**
@@ -69,12 +93,12 @@ class SLPlayerComponent
 		////
 		//Disable the cumulative behavior of @:autoBuild ( @see https://groups.google.com/forum/?hl=fr&fromgroups#!topic/haxelang/5KxTAO3BrHw ).
 		//TODO find a way to generalize this
-		//if ( Context.getLocalClass().get().meta.has( "org.slplayer.core.ISLPlayerComponent" ) )
+		//if ( Context.getLocalClass().get().meta.has( "org.slplayer.component.ISLPlayerComponent" ) )
 			//return fields;
 		//
 		//var pos = Context.currentPos();
 		//
-		//Context.getLocalClass().get().meta.add( "org.slplayer.core.ISLPlayerComponent" , [] , pos);
+		//Context.getLocalClass().get().meta.add( "org.slplayer.component.ISLPlayerComponent" , [] , pos);
 		////
 		//
 		//#if slpdebug

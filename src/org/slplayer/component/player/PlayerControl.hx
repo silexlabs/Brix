@@ -13,7 +13,7 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.ui.player;
+package org.slplayer.component.player;
 
 import js.Dom;
 import js.Lib;
@@ -99,7 +99,7 @@ class PlayerControl
 }
 
 /**
- * Any PlayerControl component should implement and be "using org.slplayer.ui.player.PlayerControl" to be compliant with
+ * Any PlayerControl component should implement and be "using org.slplayer.component.player.PlayerControl" to be compliant with
  * Playable components.
  */
 interface IPlayerControl

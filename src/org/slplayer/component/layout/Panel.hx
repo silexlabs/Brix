@@ -1,17 +1,18 @@
-package org.slplayer.ui.layout;
+package org.slplayer.component.layout;
 
 import js.Lib;
 import js.Dom;
 import Xml;
 
 import org.slplayer.util.DomTools;
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
 /**
  * Pannel class
  *
  */
-class Pannel extends DisplayObject {
+class Panel extends DisplayObject
+{
 	static inline var CSS_CLASS_HEADER:String = "pannel-header";
 	static inline var CSS_CLASS_BODY:String = "pannel-body";
 	static inline var CSS_CLASS_FOOTER:String = "pannel-footer";

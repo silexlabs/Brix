@@ -13,15 +13,15 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.data;
+package org.slplayer.component.data;
 
 import js.Dom;
 import js.Lib;
 
-import org.slplayer.data.DataProvider;
+import org.slplayer.component.data.DataProvider;
 
 /**
- * To be a standard data consumer, a component must implement IDataConsumer. Also, It should use DataConsumer (using org.slplayer.data.DataConsumer).
+ * To be a standard data consumer, a component must implement IDataConsumer. Also, It should use DataConsumer (using org.slplayer.component.data.Consumer).
  * 
  * @author Thomas Fétiveau
  */
@@ -46,7 +46,7 @@ class DataConsumer
 }
 
 /**
- * A DataConsumer should implement and be "using org.slplayer.data.DataConsumer" to be compliant with DataProviders.
+ * A DataConsumer should implement and be "using org.slplayer.component.data.Consumer" to be compliant with DataProviders.
  */
 interface IDataConsumer
 {

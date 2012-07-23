@@ -6,13 +6,13 @@
 	selected index/item
 	selected indexes / items
 */
-package org.slplayer.ui.list;
+package org.slplayer.component.list;
 
 import js.Lib;
 import js.Dom;
 import org.slplayer.util.DomTools;
 
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
 /**
  * list component

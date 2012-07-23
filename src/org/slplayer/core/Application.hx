@@ -18,7 +18,7 @@ package org.slplayer.core;
 import js.Lib;
 import js.Dom;
 
-import org.slplayer.core.ISLPlayerComponent;
+import org.slplayer.component.ISLPlayerComponent;
 
 /**
  * The main SLPlayer class handles the application initialization. It instanciates the components, tracking for each of them their 
@@ -53,7 +53,7 @@ import org.slplayer.core.ISLPlayerComponent;
 	/**
 	 * A Hash keeping all component instances indexed by node slplayer id.
 	 */
-	private var nodeToCmpInstances : Hash<List<org.slplayer.ui.DisplayObject>>;
+	private var nodeToCmpInstances : Hash<List<org.slplayer.component.ui.DisplayObject>>;
 	/**
 	 * The SLPlayer root application node. Usually, any class used in a SLPlayer application shouldn't use 
 	 * Lib.document.body directly but this variable instead.
@@ -252,7 +252,7 @@ import org.slplayer.core.ISLPlayerComponent;
 	/**
 	 * This is a kind of factory method for all kinds of components (DisplayObjects and no DisplayObjects).
 	 * 
-	 * @param	componentClassName the full component class name (with packages, for example : org.slplayer.ui.player.ImagePlayer)
+	 * @param	componentClassName the full component class name (with packages, for example : org.slplayer.component.player.ImagePlayer)
 	 */
 	private function createComponentsOfType(componentClassName : String , ?args:Hash<String>)
 	{
@@ -272,9 +272,9 @@ import org.slplayer.core.ISLPlayerComponent;
 			trace(componentClassName+" class resolved ");
 		#end
 		
-		if (org.slplayer.ui.DisplayObject.isDisplayObject(componentClass)) // case DisplayObject component
+		if (org.slplayer.component.ui.DisplayObject.isDisplayObject(componentClass)) // case DisplayObject component
 		{
-			var classTag = SLPlayerComponentTools.getUnconflictedClassTag(componentClassName, Lambda.map( registeredComponents , function(rc:RegisteredComponent) { return rc.classname; } ).iterator()  );
+			var classTag = getUnconflictedClassTag(componentClassName );
 			
 			#if slpdebug
 				trace("searching now for class tag = "+classTag);
@@ -417,11 +417,11 @@ import org.slplayer.core.ISLPlayerComponent;
 	 * @param	node	the node we want to add an associated component instance to.
 	 * @param	cmp		the component instance to add.
 	 */
-	public function addAssociatedComponent(node : HtmlDom, cmp : org.slplayer.ui.DisplayObject) : Void
+	public function addAssociatedComponent(node : HtmlDom, cmp : org.slplayer.component.ui.DisplayObject) : Void
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
-		var associatedCmps : List<org.slplayer.ui.DisplayObject>;
+		var associatedCmps : List<org.slplayer.component.ui.DisplayObject>;
 		
 		if (nodeId != null)
 		{
@@ -445,7 +445,7 @@ import org.slplayer.core.ISLPlayerComponent;
 	 * @param	typeFilter	an optionnal type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
 	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
-	public function getAssociatedComponents(node : HtmlDom, ?typeFilter:Dynamic=null) : List<org.slplayer.ui.DisplayObject>
+	public function getAssociatedComponents(node : HtmlDom, ?typeFilter:Dynamic=null) : List<org.slplayer.component.ui.DisplayObject>
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
@@ -468,6 +468,30 @@ import org.slplayer.core.ISLPlayerComponent;
 		}
 		
 		return new List();
+	}
+	
+	/**
+	 * Determine a class tag value for a component that won't be conflicting with other components.
+	 * 
+	 * @param	displayObjectClassName
+	 * @return	a tag class value for the given component class name that will not conflict with other components classnames / class tags.
+	 */
+	public function getUnconflictedClassTag(displayObjectClassName : String) : String
+	{
+		var classTag = displayObjectClassName;
+		
+		if (classTag.indexOf(".") != -1)
+			classTag = classTag.substr(classTag.lastIndexOf(".") + 1);
+		
+		for (rc in registeredComponents)
+		{
+			if (rc.classname != displayObjectClassName && classTag == rc.classname.substr(classTag.lastIndexOf(".") + 1))
+			{
+				return displayObjectClassName;
+			}
+		}
+		
+		return classTag;
 	}
 }
 

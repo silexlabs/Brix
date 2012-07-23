@@ -5,11 +5,11 @@ import js.Dom;
 
 import haxe.Template;
 
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
-import org.slplayer.data.DataConsumer;
-using org.slplayer.data.DataConsumer;
-import org.slplayer.data.DataProvider;
+import org.slplayer.component.data.DataConsumer;
+using org.slplayer.component.data.DataConsumer;
+import org.slplayer.component.data.DataProvider;
 
 /**
  * The TemplateRenderer is a simple DataConsumer component that renders a template against 

@@ -13,10 +13,10 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.ui.group;
+package org.slplayer.component.group;
 
 import org.slplayer.core.Application;
-import org.slplayer.ui.DisplayObject;
+import org.slplayer.component.ui.DisplayObject;
 
 import js.Dom;
 import js.Lib;
