@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"CSS",
+				"CSS_CLASS_PHANTOM	var"
+			],
+			[
+				"Dom",
+				"DomTools	class"
+			],
+			[
+				"u",
+				"util	package"
+			],
+			[
 				"selec",
 				"selectedItem(getSelectedItem,	var"
 			],
@@ -292,10 +304,6 @@
 				"font	font-size: size"
 			],
 			[
-				"u",
-				"ul	Tag"
-			],
-			[
 				"pages",
 				"pagesWidget"
 			],
@@ -387,6 +395,14 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "/home/lexa/Dropbox/silex-v2/generated/edit/Publication.java",
+			"settings":
+			{
+				"buffer_size": 2172,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "Packages/HaXe/Hxml.sublime-build",
 	"command_palette":
@@ -420,15 +436,21 @@
 	},
 	"file_history":
 	[
-		"/Users/lexa/Documents/repositories/silex-trunk/framework/as2/org/silex/core/Application.as",
-		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/src/index.html",
-		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/build.hxml",
-		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/.dropbox",
-		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/README (lexa yo's conflicted copy 2012-06-22).md",
-		"/Users/lexa/Library/Application Support/Sublime Text 2/Packages/User/haxe-lexa.sublime-build",
-		"/Users/lexa/Library/Application Support/Sublime Text 2/Packages/HaXe/Hxml.sublime-build",
-		"/Users/lexa/Documents/repositories/haxe-sublime2-bundle/Hxml.sublime-build",
-		"/Users/lexa/Library/Application Support/Sublime Text 2/Packages/User/Package Control.sublime-settings",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/bin/components.css",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/readme.txt",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/DisplayObject.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/list/List.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/list/XmlList.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/layout/Pannel.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/util/DomTools.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/src/index.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/interaction/Draggable.hx",
+		"/home/lexa/Dropbox/silex-v2/generated/edit/Publication.java",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/group/GroupBuilder.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/group/Group.hx",
+		"/home/lexa/Dropbox/fdt-workspace/Cocktail/src/cocktail/core/html/HTMLHtmlElement.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/build.hxml",
+		"/home/lexa/.config/sublime-text-2/Packages/HaXe/Hxml.sublime-build",
 		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/toolboxdemo.sublime-project",
 		"/Users/lexa/Dropbox/fdt-workspace/tmp-comps/src/slplayer/macro/AppBuilder.hx",
 		"/Users/lexa/Dropbox/fdt-workspace/tmp-comps/src/components/Utils.hx",
@@ -522,6 +544,18 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"ragable",
+			"Dragable",
+			"dragable",
+			"Dragable",
+			"drag",
+			"DROPZONE",
+			"Dragable",
+			"layout-",
+			"pannellayout",
+			"dynamic ",
+			"Utils",
+			"PannelLayout",
 			"cursor",
 			"LIST_SELECTED_ITEM_CSS_CLASS",
 			"listSelectedItem",
@@ -637,19 +671,7 @@
 			"add",
 			"initDomReferences",
 			"LayersWidget",
-			"mode",
-			"onSelectionChanged",
-			"getElementsByClassName",
-			"addlayerBtn",
-			"addBtn",
-			"dsLayers",
-			"root\nroot\n\nroot",
-			"root\nroot\n\n",
-			"ds",
-			"company",
-			"conta",
-			"displayName\n",
-			"createLayer"
+			"mode"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -670,8 +692,37 @@
 	"groups":
 	[
 		{
+			"selected": 0,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "/home/lexa/Dropbox/silex-v2/generated/edit/Publication.java",
+					"settings":
+					{
+						"buffer_size": 2172,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15,
+								15
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
 			]
 		}
 	],

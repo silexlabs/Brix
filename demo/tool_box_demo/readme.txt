@@ -1,7 +1,7 @@
 TODO LIST
 
 With Zabojad
-- templates with the 2nd "method"? and retrieve content of the dataprovider in the list
+- templates with the 2nd "method"? and retrieve content of the dataprovider in the list VS dataProvider dans les enfants au lien de param html?
   => un mixin qui permet d'init une liste avec des données qui viennent d'une de ces sources
      1- name.html en resource haxe
      2- data-name sur le noeud
@@ -21,19 +21,18 @@ With Zabojad
 
 
 Dragable: 
-- use computed style of rootElement instead of absolute values ---- window.getComputedStyle ---- currentStyle ----- in initPhantomStyle ----- http://www.javascriptkit.com/dhtmltutors/dhtmlcascade4.shtml et http://javascript.gakaa.com/window-getcomputedstyle-4-0-5-.aspx
 - tests: position absolute, horizontal/vertical...
 - functional tests 
 
 PannelLayout
-- slplayer.ui.layout.Pannel
-- dispatch redraw events on the nodes
 - functional tests
 
 List
 - slplayer.ui.lists.List et slplayer.ui.lists.XmlList
+- dataProvider dans les enfants au lieu de param html?
 - Lists doivent etre DataConsumer
 - multiple selection
+- items Draggable
 
 next comps
 - Redrawable
