@@ -7,9 +7,9 @@ import haxe.Template;
 
 import org.slplayer.component.ui.DisplayObject;
 
-import org.slplayer.component.data.DataConsumer;
-using org.slplayer.component.data.DataConsumer;
-import org.slplayer.component.data.DataProvider;
+import org.slplayer.component.data.IDataConsumer;
+using org.slplayer.component.data.IDataConsumer.DataConsumer;
+import org.slplayer.component.data.IDataProvider;
 
 /**
  * The TemplateRenderer is a simple DataConsumer component that renders a template against 

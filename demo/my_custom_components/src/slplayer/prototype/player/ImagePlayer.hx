@@ -8,12 +8,13 @@ import haxe.Template;
 import org.slplayer.component.ui.DisplayObject;
 
 //these two lines below are mandatory to be a standard data consumer
-import org.slplayer.component.data.DataConsumer;
-using org.slplayer.component.data.DataConsumer;
-import org.slplayer.component.data.DataProvider;
+import org.slplayer.component.data.IDataConsumer;
+using org.slplayer.component.data.IDataConsumer.DataConsumer;
+import org.slplayer.component.data.IDataProvider;
 
-import org.slplayer.component.player.Playable;
-using org.slplayer.component.player.Playable;
+import org.slplayer.component.player.IPlayable;
+import org.slplayer.component.player.IPlayerControl;
+using org.slplayer.component.player.IPlayable.Playable;
 
 import org.slplayer.component.group.IGroupable;
 using org.slplayer.component.group.IGroupable.Groupable;
@@ -138,7 +139,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 		updateView();
 	}
 	
-	public function onNewPlayerControl():Void
+	public function onNewPlayerControl(newPlayerControl:IPlayerControl):Void
 	{
 		dispatchIndex();
 	}

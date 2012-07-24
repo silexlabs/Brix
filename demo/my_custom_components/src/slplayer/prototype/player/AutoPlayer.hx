@@ -5,8 +5,8 @@ import js.Lib;
 
 import org.slplayer.component.ui.DisplayObject;
 
-import org.slplayer.component.player.PlayerControl;
-using org.slplayer.component.player.PlayerControl;
+import org.slplayer.component.player.IPlayerControl;
+using org.slplayer.component.player.IPlayerControl.PlayerControl;
 
 import org.slplayer.component.group.IGroupable;
 using org.slplayer.component.group.IGroupable.Groupable;

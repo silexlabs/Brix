@@ -11,10 +11,11 @@ import js.Dom;
 import js.Lib;
 
 //need this to be a standard compliant data provider
-import org.slplayer.component.data.DataProvider;
-using org.slplayer.component.data.DataProvider;
+import org.slplayer.component.data.IDataProvider;
+using org.slplayer.component.data.IDataProvider.DataProvider;
 
 /**
+ * An RSS data provider component.
  * 
  * TODO allow multiple adresses in src
  * TODO cleanup to allow different rss formats
@@ -85,7 +86,7 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 	/**
 	 * Callback invoked when a new data consumer is showing up.
 	 */
-	public function onNewDataConsumer( dataConsumer : org.slplayer.component.data.DataConsumer.IDataConsumer ):Void
+	public function onNewDataConsumer( dataConsumer : org.slplayer.component.data.IDataConsumer ):Void
 	{
 		if ( lastResult != null )
 			dataConsumer.onData( lastResult );
