@@ -1,0 +1,46 @@
+.body{
+	font-family: Verdana, Arial;
+	font-size: 14pt;
+}
+button {
+    float: left;
+    width: 50px;
+    height: 50px;
+}
+
+.box {
+    float: left;
+    width: 150px;
+    height: 150px;
+    background-color: grey;
+    border: 4px solid #999;
+}
+.boxsmall {
+    float: left;
+    width: 100px;
+    height: 100px;
+    background-color: yellow;
+    border: 4px solid #999;
+}
+.Draggable{
+    float: left;
+}
+h1{
+    color: white;
+}
+.draggable-dragzone{
+    cursor: move
+    float: left;
+}
+.draggable-dropzone{
+    background-color: DarkSlateGray;
+    border: 1px solid green;
+    width: 40%;
+    height: 80%;
+    float: left;
+    overflow: auto;
+}
+.draggable-phantom{
+//    border: 1px solid red !important;
+    background-color: DarkRed !important;
+}
