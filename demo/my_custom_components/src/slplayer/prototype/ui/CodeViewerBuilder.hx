@@ -16,7 +16,7 @@ using StringTools;
 	{
 		var codeViewerFullClassName = Context.getLocalClass().get().pack.join(".") + "." + Context.getLocalClass().get().name;
 		
-		var codeViewerClassNames = slplayer.core.Builder.getUnconflictedClassTags( codeViewerFullClassName );
+		var codeViewerClassNames = org.slplayer.core.Builder.getUnconflictedClassTags( codeViewerFullClassName );
 		
 		var shortestClassName = codeViewerClassNames.first();
 		

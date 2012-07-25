@@ -1,0 +1,9 @@
+-js ../bin/myEmbeddedSLPlayerApplication2.js
+-cp ../../my_custom_components/src/
+-cp ../../../src/
+-cp ../../../../haxe_libs/Cocktail/src/
+-debug
+-main org.slplayer.core.Application
+--macro org.slplayer.core.Builder.create('index.html')
+-D noAutoStart
+-D slpdebug
