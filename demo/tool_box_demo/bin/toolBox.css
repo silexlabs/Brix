@@ -1,0 +1,84 @@
+.body{
+	font-family: Verdana, Arial;
+	font-size: 14pt;
+}
+.XmlList{
+    overflow: auto;
+	padding: 0px;
+	margin: 0px;
+}
+.XmlList li{
+    border-width: 1px 0;
+    border-style: solid;
+    border-width: thin;
+    border-collapse: separate;
+	border-spacing: 0;
+    list-style-type: none;
+    vertical-align: top;
+    background-color: DarkSlateGrey;
+    color: white;
+    padding: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.XmlList .listSelectedItem{
+    background-color: DarkRed;
+}
+.pannel-element-horizontal{
+    float: left;
+    height: 100%;
+}
+.Pannel{
+    border-style: groove;
+    border-width: thin;
+    border-color: gray;
+    float: left;
+    margin-right: 5px;
+    height: 80%;
+    width: 40%;
+    overflow: hidden;
+}
+.Pannel button {
+    border-radius: 5px 5px 5px 5px;
+    border-style: solid;
+    border-width: medium;
+    color: white;
+    margin-bottom: 3px;
+    background-color: DarkSlateGray;
+    padding: 2px 6px;
+}
+.pannel-header{
+	background-color: Gainsboro;
+    padding: 5px;
+    padding-top: 0px;
+}
+.pannel-header h1{
+    font-size: 14pt;
+    font-variant: small-caps;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+.pannel-element-horizontal h1{
+    overflow: auto;
+    width: 100px;
+}
+.pannel-footer{
+	background-color: Gainsboro;
+}
+.Draggable{
+    
+}
+.draggable-dragzone{
+    cursor: move
+}
+.draggable-dropzone{
+    background-color: DarkSlateGray;
+    border: 1px solid green;
+    width: 40%;
+    height: 80%;
+    float: left;
+}
+.draggable-phantom{
+//    border: 1px solid red !important;
+    background-color: DarkRed !important;
+}
