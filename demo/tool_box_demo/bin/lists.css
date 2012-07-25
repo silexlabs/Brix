@@ -1,0 +1,30 @@
+.body{
+	font-family: Verdana, Arial;
+	font-size: 14pt;
+}
+.container{
+    width: 250px;
+    height: 500px;
+}
+.XmlList{
+    overflow: auto;
+	padding: 0px;
+	margin: 0px;
+}
+.XmlList li{
+    border-width: 1px 0;
+    border-style: solid;
+    border-width: thin;
+    border-collapse: separate;
+	border-spacing: 0;
+    list-style-type: none;
+    vertical-align: top;
+    background-color: DarkSlateGrey;
+    color: white;
+    padding: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.XmlList .listSelectedItem{
+    background-color: DarkRed;
+}
