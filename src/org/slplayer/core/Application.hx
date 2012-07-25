@@ -264,7 +264,12 @@ import org.slplayer.component.ISLPlayerComponent;
 		
 		if (componentClass == null)
 		{
-			trace("ERROR cannot resolve "+componentClassName);
+			var rslErrMsg = "ERROR cannot resolve " + componentClassName;
+			#if stopOnError
+			throw(rslErrMsg);
+			#else
+			trace(rslErrMsg);
+			#end
 			return;
 		}
 		
