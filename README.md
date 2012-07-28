@@ -14,7 +14,7 @@ The SLPlayer framework is compatible with Cocktail and NME Haxe libraries, so it
 Links
 
 <ul>
-<li><a href="http://www.silexlabs.org/groups/labs/slplayer-project/slplayer-developers/home/">Developers home</a></li>
-<li><a href="http://www.silexlabs.org/groups/labs/slplayer-project/slplayer/home/">Users home</a></li>
+<li><a href="http://www.silexlabs.org/groups/labs/slplayer-project/slplayer-developers/home/">Contributors home</a></li>
+<li><a href="http://www.silexlabs.org/groups/labs/slplayer-project/slplayer/home/">Developers home</a></li>
 <li><a href="https://github.com/silexlabs/SLPlayer">SLPlayer source code</a></li>
 </ul>
