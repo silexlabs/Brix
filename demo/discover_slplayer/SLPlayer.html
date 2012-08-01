@@ -1,0 +1,231 @@
+<html>
+<head>
+	<meta charset="utf-8"></meta>
+	<!-- You can configure your SLPlayer application right in the source HTML file via the meta tags. See the 
+	documentation to get the list of configuration meta tags.-->
+	
+	<!-- Uncomment this meta tag to make your Application checking your components against their restrictions at runtime 
+	as well (ie: not only at compile time) -->
+	
+	
+	<!-- For js target only, generate a compiled .html file instead of embedding the Application's HTML in the .js file -->
+	<!-- <meta name="disableEmbedHtml" content="true" /> -->
+	
+	<!-- Uncomment this meta tag if you want to keep the comments in the compiled/embedded HTML. -->
+	
+	
+	<!--  -->
+	<!-- <meta name="minimizeHtml" content="true" /> -->
+	
+	<title>Proto SLPlayer Demo</title>
+	
+	<!--
+	If your components are already contained in the SLPlayer.js (or any other .js file included in the page)
+	and that you want just to declare their use, then add a <script> tag with the data-slp-use attribute 
+	specifying the full class name of the component to use.
+	
+	If your component takes any parameter for its initialization, specify it as a "data-..." attribute of its 
+	<script> tag declaration. For example : 
+	<script src="slplayer/prototype/config/JsonConfiguration.js" data-json-src="conf.json"></script>
+	-->
+	
+	
+	<!-- 
+	As for now, the Group component must be included/declared before any Groupable component.
+	We may improve that in the future.
+	-->
+	
+	
+	
+	
+	
+	
+<script src="SLPlayer.js"></script></head>
+
+</html><body>
+	
+	<div style="font-family:sans-serif;">
+		<div>TRY <a href="index.html">JS VERSION</a> or <a href="index_as3.html">AS3 VERSION</a></div>
+		
+		<div style="margin-top:80px;margin-right:20px;margin-bottom:20px;margin-left:20px;width:1200px;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;font-size:14px;">
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a AutoPlayer component.</div>
+			<div>Code:</div>
+			<pre class="CodeViewer" data-code-viewer-id="example01" style="color:#656565;font-size:14px;background-color:#null;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;">
+&lt;ol class="slplayer.prototype.player.ImagePlayer AutoPlayer" data-autoplay-interval="1500"&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/4.jpg"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/1.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/2.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/3.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+			<div>Output:</div>
+			<div id="example01">
+				<ol class="slplayer.prototype.player.ImagePlayer AutoPlayer" data-autoplay-interval="1500">
+					<li><img src="assets/4.jpg"></img></li>
+					<li><img src="assets/1.png"></img></li>
+					<li><img src="assets/2.png"></img></li>
+					<li><img src="assets/3.png"></img></li>
+				</ol>
+			</div>
+		</div>
+		
+		<div style="margin-top:80px;margin-right:20px;margin-bottom:20px;margin-left:20px;width:1200px;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;font-size:14px;">
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a ControlBar component and an RssConnector component.</div>
+			<div>Code:</div>
+			<pre class="CodeViewer" data-code-viewer-id="example02" style="color:#656565;font-size:14px;background-color:#null;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;">
+&lt;ul class="ImagePlayer BasicPlayerControl RssConnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2"&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/4.jpg"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;::foreach data::&lt;li&gt;&lt;img alt="::media_title::" src="::media_thumbnail.url::" style="height:155px;" title="::media_title::"&gt;&lt;/img&gt;&lt;/li&gt;::end::
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/1.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/2.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/3.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+			<div>Output:</div>
+			<div id="example02" style="width:160px;">
+				<ul class="ImagePlayer BasicPlayerControl RssConnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2">
+					<li><img src="assets/4.jpg"></img></li>
+					::foreach data::<li><img alt="::media_title::" src="::media_thumbnail.url::" style="height:155px;" title="::media_title::"></img></li>::end::
+					<li><img src="assets/1.png"></img></li>
+					<li><img src="assets/2.png"></img></li>
+					<li><img src="assets/3.png"></img></li>
+				</ul>
+			</div>
+		</div>
+		
+		<div style="margin-top:80px;margin-right:20px;margin-bottom:20px;margin-left:20px;width:1200px;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;font-size:14px;">
+			<div style="margin-bottom:10px;">ImagePlayer component combined with a ControlBar component. We've redefined the ControlBar buttons here.</div>
+			<div>Code:</div>
+			<pre class="CodeViewer" data-code-viewer-id="example03" style="color:#656565;font-size:14px;background-color:#null;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;">
+&lt;div style="width:155px;"&gt;
+&nbsp;&nbsp;&lt;div style="display:inline-block;height:50px;width:50px;margin-right:50px;"&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;img src="assets/first.jpg" style="width:100%;height:100%;" data-controlbar-first="true"&gt;&lt;/img&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&nbsp;&nbsp;&lt;div style="display:inline-block;height:50px;width:50px;"&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;img data-controlbar-last="true" src="assets/last.jpg" style="width:100%;height:100%;"&gt;&lt;/img&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="ImagePlayer BasicPlayerControl"&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/4.jpg"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/1.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/2.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/3.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div style="width:155px;"&gt;
+&nbsp;&nbsp;&lt;div style="display:inline-block;height:50px;width:50px;margin-right:50px;"&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;img src="assets/previous.jpg" style="width:100%;height:100%;" data-controlbar-previous="true"&gt;&lt;/img&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&nbsp;&nbsp;&lt;div style="display:inline-block;height:50px;width:50px;"&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;img data-controlbar-next="true" src="assets/next.jpg" style="width:100%;height:100%;"&gt;&lt;/img&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+			<div>Output:</div>
+			<div id="example03">
+				<div style="width:155px;">
+					<div style="display:inline-block;height:50px;width:50px;margin-right:50px;">
+						<img src="assets/first.jpg" style="width:100%;height:100%;" data-controlbar-first="true"></img>
+					</div>
+					<div style="display:inline-block;height:50px;width:50px;">
+						<img data-controlbar-last="true" src="assets/last.jpg" style="width:100%;height:100%;"></img>
+					</div>
+				</div>
+				<ul class="ImagePlayer BasicPlayerControl">
+					<li><img src="assets/4.jpg"></img></li>
+					<li><img src="assets/1.png"></img></li>
+					<li><img src="assets/2.png"></img></li>
+					<li><img src="assets/3.png"></img></li>
+				</ul>
+				<div style="width:155px;">
+					<div style="display:inline-block;height:50px;width:50px;margin-right:50px;">
+						<img src="assets/previous.jpg" style="width:100%;height:100%;" data-controlbar-previous="true"></img>
+					</div>
+					<div style="display:inline-block;height:50px;width:50px;">
+						<img data-controlbar-next="true" src="assets/next.jpg" style="width:100%;height:100%;"></img>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div style="margin-top:80px;margin-right:20px;margin-bottom:20px;margin-left:20px;width:1200px;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;font-size:14px;">
+			<div style="margin-bottom:10px;">An example of Group component (super-component) with its inner groupable components.</div>
+			<div>Code:</div>
+			<pre class="CodeViewer" data-code-viewer-id="example04" style="color:#656565;font-size:14px;background-color:#null;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;">
+&lt;div class="Group"&gt;
+&nbsp;&nbsp;&lt;div class="RssConnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2"&gt;&lt;/div&gt;
+&nbsp;&nbsp;&lt;ul class="ImagePlayer"&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/4.jpg"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;::foreach data::&lt;li&gt;&lt;img alt="::media_title::" src="::media_thumbnail.url::" style="height:155px;" title="::media_title::"&gt;&lt;/img&gt;&lt;/li&gt;::end::
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/1.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/2.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/3.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;/ul&gt;
+&nbsp;&nbsp;&lt;div class="BasicPlayerControl"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+			<div>Output:</div>
+			<div id="example04">
+				<div class="Group1">
+					<div class="RssConnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2" data-group-id="Group1"></div>
+					<ul class="ImagePlayer" data-group-id="Group1">
+						<li><img src="assets/4.jpg"></img></li>
+						::foreach data::<li><img alt="::media_title::" src="::media_thumbnail.url::" style="height:155px;" title="::media_title::"></img></li>::end::
+						<li><img src="assets/1.png"></img></li>
+						<li><img src="assets/2.png"></img></li>
+						<li><img src="assets/3.png"></img></li>
+					</ul>
+					<div class="BasicPlayerControl" data-group-id="Group1"></div>
+				</div>
+			</div>
+		</div>
+		
+		<div style="margin-top:80px;margin-right:20px;margin-bottom:20px;margin-left:20px;width:1200px;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;font-size:14px;">
+			<div style="margin-bottom:10px;">A second example of Group.</div>
+			<div>Code:</div>
+			<pre class="CodeViewer" data-code-viewer-id="example045" style="color:#656565;font-size:14px;background-color:#null;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;">
+&lt;div class="Group"&gt;
+&nbsp;&nbsp;&lt;div class="RssConnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2"&gt;&lt;/div&gt;
+&nbsp;&nbsp;&lt;ul class="ImagePlayer"&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/4.jpg"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;::foreach data::&lt;li&gt;&lt;img alt="::media_title::" src="::media_thumbnail.url::" style="height:155px;" title="::media_title::"&gt;&lt;/img&gt;&lt;/li&gt;::end::
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/1.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/2.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;&lt;img src="assets/3.png"&gt;&lt;/img&gt;&lt;/li&gt;
+&nbsp;&nbsp;&lt;/ul&gt;
+&nbsp;&nbsp;&lt;div class="AutoPlayer"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+			<div>Output:</div>
+			<div id="example045">
+				<div class="Group2">
+					<div class="RssConnector" data-src-rss="http://api.flickr.com/services/feeds/photos_public.gne?format=rss2" data-group-id="Group2"></div>
+					<ul class="ImagePlayer" data-group-id="Group2">
+						<li><img src="assets/4.jpg"></img></li>
+						::foreach data::<li><img alt="::media_title::" src="::media_thumbnail.url::" style="height:155px;" title="::media_title::"></img></li>::end::
+						<li><img src="assets/1.png"></img></li>
+						<li><img src="assets/2.png"></img></li>
+						<li><img src="assets/3.png"></img></li>
+					</ul>
+					<div class="AutoPlayer" data-group-id="Group2"></div>
+				</div>
+			</div>
+		</div>
+		
+		<div style="margin-top:80px;margin-right:20px;margin-bottom:20px;margin-left:20px;width:1200px;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;font-size:14px;">
+			<div style="margin-bottom:10px;">TemplateReader component combined with an RssConnector component.</div>
+			<div>Code:</div>
+			<pre class="CodeViewer" data-code-viewer-id="example05" style="color:#656565;font-size:14px;background-color:#null;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;">
+&lt;ul class="TemplateRenderer RssConnector" data-src-rss="http://feeds.bbci.co.uk/news/world/rss.xml"&gt;
+&nbsp;&nbsp;::foreach data::&lt;li&gt;&lt;a href="::link::"&gt;::title:: : ::description::&lt;/a&gt;&lt;/li&gt;::end::
+&lt;/ul&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+			<div>Output:</div>
+			<div id="example05" style="height:200px;">
+				<ul class="TemplateRenderer RssConnector" data-src-rss="http://feeds.bbci.co.uk/news/world/rss.xml">
+					::foreach data::<li><a href="::link::">::title:: : ::description::</a></li>::end::
+				</ul>
+			</div>
+		</div>
+		
+	</div>
+</body>
