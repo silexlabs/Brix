@@ -395,14 +395,6 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "/home/lexa/Dropbox/silex-v2/generated/edit/Publication.java",
-			"settings":
-			{
-				"buffer_size": 2172,
-				"line_ending": "Unix"
-			}
-		}
 	],
 	"build_system": "Packages/HaXe/Hxml.sublime-build",
 	"command_palette":
@@ -436,6 +428,9 @@
 	},
 	"file_history":
 	[
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/interaction/Draggable.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/build.hxml",
+		"/home/lexa/Dropbox/silex-v2/generated/edit/Publication.java",
 		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/bin/components.css",
 		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/readme.txt",
 		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/DisplayObject.hx",
@@ -445,7 +440,6 @@
 		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/util/DomTools.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/src/index.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/interaction/Draggable.hx",
-		"/home/lexa/Dropbox/silex-v2/generated/edit/Publication.java",
 		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/group/GroupBuilder.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/group/Group.hx",
 		"/home/lexa/Dropbox/fdt-workspace/Cocktail/src/cocktail/core/html/HTMLHtmlElement.hx",
@@ -544,6 +538,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"onmouseup\n",
+			"initialStylePosition",
+			"initialStylePosition\n",
+			"onmouse",
+			"over",
+			"press",
+			"click",
 			"ragable",
 			"Dragable",
 			"dragable",
@@ -664,14 +665,7 @@
 			"layers",
 			"NAME_COLUMN_TITLE",
 			"layer",
-			"Layer",
-			"list",
-			"Layer",
-			"onSelectionChanged",
-			"add",
-			"initDomReferences",
-			"LayersWidget",
-			"mode"
+			"Layer"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -692,37 +686,8 @@
 	"groups":
 	[
 		{
-			"selected": 0,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "/home/lexa/Dropbox/silex-v2/generated/edit/Publication.java",
-					"settings":
-					{
-						"buffer_size": 2172,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								15,
-								15
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Java/Java.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
 			]
 		}
 	],
