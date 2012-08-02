@@ -450,13 +450,13 @@ import org.slplayer.component.ISLPlayerComponent;
 	 * @param	typeFilter	an optionnal type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
 	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
-	public function getAssociatedComponents<TypeFilter>(node : HtmlDom, typeFilter:Class<TypeFilter>) : List<TypeFilter>
+	public function getAssociatedComponents<TypeFilter : org.slplayer.component.ui.DisplayObject>(node : HtmlDom, typeFilter:Class<TypeFilter>) : List<TypeFilter>
 	{
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
 		if (nodeId != null)
 		{
-			var l = new List();
+			var l = new List<TypeFilter>();
 			for (i in nodeToCmpInstances.get(nodeId))
 			{
 				if (Std.is(i, typeFilter)){
@@ -467,7 +467,7 @@ import org.slplayer.component.ISLPlayerComponent;
 			return l;
 		}
 		
-		return new List();
+		return new List<TypeFilter>();
 	}
 	
 	/**
