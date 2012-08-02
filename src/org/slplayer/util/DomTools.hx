@@ -26,7 +26,9 @@ import js.Dom;
 class DomTools 
 {
 	/**
-	 * Search for all children elements of the given element that have the given attribute with the given value.
+	 * Search for all children elements of the given element that have the given attribute with the given value. Note that you should
+	 * avoid to use any non standard methods like this one to select elements as it's much less efficient than the standard ones 
+	 * implemented right into the browsers for the js target (like getElementById or getElementsByClassname).
 	 * @param	elt the DOM element
 	 * @param	attr the attr name to search for
 	 * @param	value the attr value to search for, specifying '*' means "any value"
