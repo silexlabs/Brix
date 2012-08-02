@@ -1,3 +1,18 @@
+/*
+ * This file is part of SLPlayer http://www.silexlabs.org/groups/labs/slplayer/
+ * 
+ * This project is © 2011-2012 Silex Labs and is released under the GPL License:
+ * 
+ * This program is free software; you can redistribute it and/or modify it under the terms 
+ * of the GNU General Public License (GPL) as published by the Free Software Foundation; 
+ * either version 2 of the License, or (at your option) any later version. 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * See the GNU General Public License for more details.
+ * 
+ * To read the license please visit http://www.gnu.org/copyleft/gpl.html
+ */
 package org.slplayer.component.interaction;
 
 import js.Lib;
@@ -12,16 +27,17 @@ enum DraggableState {
 }
 typedef DropZone = {
 	parent:HtmlDom,
-	position:Int,
+	position:Int
 }
 
 /**
  * Draggable class
- * Attache mouse events to a "drag zone" and make it drag/drop the "Draggable" node
+ * Attach mouse events to a "drag zone" and make it drag/drop the "Draggable" node
  * If drop zones are provided, display the best drop zone found and enable only these zones to be parents
  * define the drop zones with a "drop-zone" class name on the elements, or by setting the dropZones attribute
  */
-class Draggable extends DisplayObject {
+class Draggable extends DisplayObject
+{
 	////////////////////////////////////
 	// events
 	////////////////////////////////////
@@ -85,7 +101,8 @@ class Draggable extends DisplayObject {
 	 * init properties
 	 * retrieve atributes of the html dom node
 	 */
-	public function new(rootElement:HtmlDom, SLPId:String){
+	public function new(rootElement:HtmlDom, SLPId:String)
+	{
 		super(rootElement, SLPId);
 
 		// init
@@ -101,7 +118,8 @@ class Draggable extends DisplayObject {
 	/**
 	 * init the component
 	 */
-	override public function init() : Void { 
+	override public function init() : Void 
+	{ 
 		super.init();
 		trace("Draggable init");
 
@@ -126,13 +144,17 @@ class Draggable extends DisplayObject {
 	/**
 	 * set all properties of root element with absolute values 
 	 */
-	private function initRootElementStyle(){
+	private function initRootElementStyle()
+	{
 		initialStyle = {};
-/*		for (styleName in Reflect.fields(rootElement.style)){
-			var val:String = Reflect.field(rootElement.style, styleName);
-			Reflect.setField(initialStyle, styleName, val);
-			trace("initRootElementStyle keep style "+styleName+" = "+val);
-		}*/
+		
+		//for (styleName in Reflect.fields(rootElement.style))
+		//{
+			//var val:String = Reflect.field(rootElement.style, styleName);
+			//Reflect.setField(initialStyle, styleName, val);
+			//trace("initRootElementStyle keep style "+styleName+" = "+val);
+		//}
+		
 		initialStyle.width = rootElement.style.width;
 		rootElement.style.width = rootElement.clientWidth + "px";
 
@@ -145,7 +167,8 @@ class Draggable extends DisplayObject {
 	/**
 	 * init phantom according to root element properties
 	 */
-	private function initPhantomStyle(){
+	private function initPhantomStyle()
+	{
 
 		var computedStyle:Style = untyped __js__("window.getComputedStyle(this.rootElement, null)");
 		trace("initPhantomStyle "+computedStyle);
@@ -168,8 +191,10 @@ class Draggable extends DisplayObject {
 	/**
 	 * init phantom according to root element properties
 	 */
-	private function resetRootElementStyle(){
-		for (styleName in Reflect.fields(initialStyle)){
+	private function resetRootElementStyle()
+	{
+		for (styleName in Reflect.fields(initialStyle))
+		{
 			var val:String = Reflect.field(initialStyle, styleName);
 			Reflect.setField(rootElement.style, styleName, val);
 		}
@@ -179,9 +204,11 @@ class Draggable extends DisplayObject {
 	 * attach an onmousemove event to the body
 	 * memorize the rootElement style values and prepare it to be moved
 	 */
-	private function startDrag(e:js.Event){
+	private function startDrag(e:js.Event)
+	{
 		trace("Draggable startDrag "+state);
-		if (state == none){
+		if (state == none)
+		{
 			state = dragging;
 			initialX = rootElement.offsetLeft;
 			initialY = rootElement.offsetTop;
@@ -192,7 +219,7 @@ class Draggable extends DisplayObject {
 			//initialStylePosition = rootElement.style.position;
 
 			Lib.document.onmousemove = function(e){move(e);};
-//			rootElement.style.position = "absolute";
+			//rootElement.style.position = "absolute";
 			move(e);
 
 			// dispatch a custom event
@@ -209,12 +236,15 @@ class Draggable extends DisplayObject {
 	 * if there is a best drop zone, set it as the parent of the component
 	 * reset the rootElement.style.position value to initial position
 	 */
-	public function stopDrag(e:js.Event){
+	public function stopDrag(e:js.Event)
+	{
 		trace("Draggable stopDrag droped! "+state);
-		if (state == dragging){
+		if (state == dragging)
+		{
 			trace("Draggable stopDrag droped! "+bestDropZone);
 			// change parent node
-			if (bestDropZone != null){
+			if (bestDropZone != null)
+			{
 				rootElement.parentNode.removeChild(rootElement);
 				bestDropZone.parent.insertBefore(rootElement, bestDropZone.parent.childNodes[bestDropZone.position]);
 				trace("Draggable stopDrag droped! "+state);
@@ -245,9 +275,11 @@ class Draggable extends DisplayObject {
 	 * move the root element
 	 * look for closest drop zone if there are some
 	 */
-	public function move(e:js.Event){
+	public function move(e:js.Event)
+	{
 		// trace("Draggable move "+state);
-		if (state == dragging){
+		if (state == dragging)
+		{
 			var x = e.clientX - initialMouseX + initialX;
 			var y = e.clientY - initialMouseY + initialY;
 			rootElement.style.left = x + "px";
@@ -258,32 +290,32 @@ class Draggable extends DisplayObject {
 	/**
 	 * the closest drop zone
 	 */
-	public function getBestDropZone(mouseX:Int, mouseY:Int):Null<DropZone>{
-		for (zoneIdx in 0...dropZones.length){
+	public function getBestDropZone(mouseX:Int, mouseY:Int):Null<DropZone>
+	{
+		for (zoneIdx in 0...dropZones.length)
+		{
 			var zone = dropZones[zoneIdx];
 
 			// if the mouse is in the zone
-			if (mouseX > zone.offsetLeft && mouseX < zone.offsetLeft + zone.offsetWidth
-				&& mouseY > zone.offsetTop && mouseY < zone.offsetTop + zone.offsetHeight
-			){
+			if ( mouseX > zone.offsetLeft && mouseX < zone.offsetLeft + zone.offsetWidth
+				&& mouseY > zone.offsetTop && mouseY < zone.offsetTop + zone.offsetHeight )
+			{
 				var lastChildIdx:Int = 0;
 				// browse all children to see which one is after the desired zone
 				for (childIdx in 0...zone.childNodes.length){
 					var child = zone.childNodes[childIdx];
 
 					// do not take the phantom into account
-//					if (child.className == PHANTOM_CLASS_NAME)
-//						continue;
+					//if (child.className == PHANTOM_CLASS_NAME)
+					//	continue;
 
 					// get the child which is after the mouse
-					if (mouseX > child.offsetLeft + Math.round(child.offsetWidth/2)){
+					if (mouseX > child.offsetLeft + Math.round(child.offsetWidth / 2))
+					{
 						lastChildIdx = childIdx;
 					}
 				}
-				return {
-					parent: zone,
-					position: lastChildIdx,
-				}
+				return { parent: zone, position: lastChildIdx }
 			}
 		}
 		return null;
@@ -294,15 +326,19 @@ class Draggable extends DisplayObject {
 	 * apply the "dropping" style to the new best drop zone
 	 * pass null if you need to remove the best drop zone
 	 */
-	public function setAsBestDropZone(zone:DropZone=null){
+	public function setAsBestDropZone(zone:DropZone = null)
+	{
 		//trace("setAsBestDropZone "+zone.parent.style);
 		//DomTools.inspectTrace(zone.parent.style);
 		if (zone == bestDropZone)
 			return;
-		if(bestDropZone != null){
+		
+		if (bestDropZone != null)
+		{
 			bestDropZone.parent.removeChild(phantom);
 		}
-		if (zone != null){
+		if (zone != null)
+		{
 			zone.parent.insertBefore(phantom, zone.parent.childNodes[zone.position]);
 		}
 		bestDropZone = zone;

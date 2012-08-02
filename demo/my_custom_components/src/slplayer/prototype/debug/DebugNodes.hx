@@ -1,7 +1,7 @@
 package slplayer.prototype.debug;
 
 import org.slplayer.component.ui.DisplayObject;
-import org.slplayer.core.SLPlayer;
+import org.slplayer.core.Application;
 
 import js.Lib;
 import js.Dom;
@@ -24,7 +24,7 @@ class DebugNodes  extends DisplayObject
 	
 	public function debugNodes(e : Event)
 	{
-		debugNode(SLPlayer.htmlRootElement);
+		debugNode(getSLPlayer().htmlRootElement);
 	}
 	
 	public function debugNode(node : HtmlDom)
@@ -37,7 +37,7 @@ class DebugNodes  extends DisplayObject
 				var tagName = untyped elt.nodeName;
 				trace("tag " + tagName +
 				" with class=" + elt.className +
-				" has associated components : "+getSLPlayer().getAssociatedComponents(elt));
+				" has associated components : "+getSLPlayer().getAssociatedComponents(elt,Type.resolveClass("org.slplayer.component.ui.DisplayObject")));
 			}
 			if (node.childNodes[cCount].hasChildNodes())
 				debugNode( elt );

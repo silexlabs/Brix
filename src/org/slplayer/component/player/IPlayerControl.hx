@@ -15,8 +15,40 @@
  */
 package org.slplayer.component.player;
 
+import org.slplayer.component.player.IPlayable;
+
 import js.Dom;
 import js.Lib;
+
+/**
+ * Any PlayerControl component should implement and be "using org.slplayer.component.player.PlayerControl" to be compliant with
+ * Playable components.
+ * 
+ * The goal of the Playable/PlayerControl contracts is to allow having highly reusable micro components 
+ * able to switch together in order to form a customized Player component. A Player control bar could thus be 
+ * used for a galery (image player) as well as for a video player or any player-like component.
+ * 
+ * The PlayerControl contract is part of the contract that sends the player control commands. For example, in a 
+ * case of a simple Gallery with a simple control bar (play/pause/previous/next), the Image part would be the 
+ * Playable part while the control bar the PlayerControl part.
+ * 
+ * This contract is for the moment a draft as no Player components has been released yet in the slplayer distribution.
+ */
+interface IPlayerControl
+{
+	/**
+	 * Callback triggered when an associated Playable is playing its first item.
+	 */
+	public function onPlayableFirst():Void;
+	/**
+	 * Callback triggered when an associated Playable is playing its last item.
+	 */
+	public function onPlayableLast():Void;
+	/**
+	 * Callback triggered when an associated Playable changed its currently playing item.
+	 */
+	public function onPlayableChange():Void;
+}
 
 /**
  * Mixin methods for PlayerControl components.
@@ -45,7 +77,12 @@ class PlayerControl
 	 * This event is to notify any Playable that a new PlayerControl just initialized for them.
 	 */
 	static public var NEW_PLAYER_CONTROL = "onNewPlayerControl";
-	
+	/**
+	 * Starts sending PlayerControl events to and receiving PlayableEvent from the given target.
+	 * @param	playerControl	the PlayerControl instance
+	 * @param	target			usually the DOM element associated with the PlayerControl when it's a DisplayObject but it 
+	 * could be any other object.
+	 */
 	static public function startPlayerControl(playerControl : IPlayerControl, target : Dynamic):Void
 	{
 		target.addEventListener(Playable.ON_LAST, function(e:Event) { playerControl.onPlayableLast();} , false);
@@ -60,7 +97,11 @@ class PlayerControl
 		
 		target.dispatchEvent(newPlayerControlEvent);
 	}
-	
+	/**
+	 * Send a Next command to potentially associated Playable component.
+	 * @param	playerControl
+	 * @param	target
+	 */
 	static public function next(playerControl : IPlayerControl, target : Dynamic):Void
 	{
 		var nextEvent = Lib.document.createEvent("Event");
@@ -69,7 +110,11 @@ class PlayerControl
 		
 		target.dispatchEvent(nextEvent);
 	}
-	
+	/**
+	 * Send a Previous command to potentially associated Playable component.
+	 * @param	playerControl
+	 * @param	target
+	 */
 	static public function previous(playerControl : IPlayerControl, target : Dynamic):Void
 	{
 		var previousEvent = Lib.document.createEvent("Event");
@@ -78,7 +123,11 @@ class PlayerControl
 		
 		target.dispatchEvent(previousEvent);
 	}
-	
+	/**
+	 * Send a First command to potentially associated Playable component.
+	 * @param	playerControl
+	 * @param	target
+	 */
 	static public function first(playerControl : IPlayerControl, target : Dynamic):Void
 	{
 		var firstEvent = Lib.document.createEvent("Event");
@@ -87,7 +136,11 @@ class PlayerControl
 		
 		target.dispatchEvent(firstEvent);
 	}
-	
+	/**
+	 * Send a Last command to potentially associated Playable component.
+	 * @param	playerControl
+	 * @param	target
+	 */
 	static public function last(playerControl : IPlayerControl, target : Dynamic):Void
 	{
 		var lastEvent = Lib.document.createEvent("Event");
@@ -96,17 +149,4 @@ class PlayerControl
 		
 		target.dispatchEvent(lastEvent);
 	}
-}
-
-/**
- * Any PlayerControl component should implement and be "using org.slplayer.component.player.PlayerControl" to be compliant with
- * Playable components.
- */
-interface IPlayerControl
-{
-	public function onPlayableFirst():Void;
-	
-	public function onPlayableLast():Void;
-	
-	public function onPlayableChange():Void;
 }

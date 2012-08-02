@@ -22,7 +22,6 @@ import org.slplayer.core.Application;
  * 
  * @author Thomas Fétiveau
  */
-//@:autoBuild(org.slplayer.core.SLPlayerComponentBuilder.build())
 interface ISLPlayerComponent
 {
 	/**
@@ -73,78 +72,3 @@ class SLPlayerComponent
 		}
 	}
 }
-
-/**
- * The macro code adding the common pieces of code to all implementations of ISLPlayerComponent.
- */
-//@:macro class SLPlayerComponentBuilder
-//{
-	///**
-	 //* Automatically adds the initialization call of an ISLPlayerComponent component at the first line of the constructors 
-	 //* of your ISLPlayerComponent components.
-	 //*/
-	//static public function build() : Array<Field>
-	//{
-		//var fields = Context.getBuildFields();
-		//
-		//if ( Context.getLocalClass().get().isInterface )
-			//return fields;
-		//
-		////
-		//Disable the cumulative behavior of @:autoBuild ( @see https://groups.google.com/forum/?hl=fr&fromgroups#!topic/haxelang/5KxTAO3BrHw ).
-		//TODO find a way to generalize this
-		//if ( Context.getLocalClass().get().meta.has( "org.slplayer.component.ISLPlayerComponent" ) )
-			//return fields;
-		//
-		//var pos = Context.currentPos();
-		//
-		//Context.getLocalClass().get().meta.add( "org.slplayer.component.ISLPlayerComponent" , [] , pos);
-		////
-		//
-		//#if slpdebug
-			//trace("Executing SLPlayerComponentBuilder on : "+Context.getLocalClass().get().name);
-		//#end
-		//
-		//discover new or create it
-		//var newExprs : Array<Expr> = null;
-		//
-		//tells if a getSLPlayer method already exists
-		//var getSLPlayerFound = false;
-		//
-		//TODO FIXME throw an error if already existing getSLPlayer() method ?
-		//for (fc in 0...fields.length) { 
-			//switch (fields[fc].kind) { case FFun(f) : switch (f.expr.expr) { case EBlock(exprs): 
-				//if (fields[fc].name == "new") { newExprs = exprs; } 
-				//if (fields[fc].name == "getSLPlayer") { getSLPlayerFound = true; } 
-			//default : } default : } 
-		//}
-				//
-		//append groupElement initialization as first expr of new method
-		// TODO FIXME search for any contructor in any potential parent class and get the constructor signature
-		//if ( newExprs == null ) newExprs = new Array();
-		///*{
-			//case new() hasn't been overriden
-			//newExprs = new Array();
-			//
-			//newExprs.push( { expr : ECall({ expr : EConst(CIdent("super")), pos : pos },[{ expr : EConst(CIdent("rootElement")), pos : pos }, { expr : EConst(CType("SLPId")), pos : pos }]), pos : pos } );
-			//
-			//fields.push( { kind : FFun( { args : [ { name : "rootElement", type : TPath( { name : "HtmlDom", pack : [], params : [], sub : null } ), opt : false, value : null },
-							//{ name : "SLPId", type : TPath( { name : "String", pack : [], params : [], sub : null } ), opt : false, value : null } ], expr : { expr : EBlock( newExprs ), pos : pos },
-								//params : [], ret : null }), meta : [], name : "new" , doc : null, pos : pos , access : [APrivate, AOverride] } );
-		//}
-		//*/
-		//
-		//Add the SLPlayerComponent initialization call in component constructor
-		//newExprs.insert( 0 , { expr : ECall( { expr : EField( { expr : EType( { expr : EType( { expr : EField( { expr : EConst(CIdent("slplayer")), pos : pos }, "core"), pos : pos }, "ISLPlayerComponent"), pos : pos }, "SLPlayerComponent"), pos : pos }, "initSLPlayerComponent"), pos : pos } , [{ expr : EConst(CIdent("this")), pos : pos }, { expr : EConst(CType("SLPId")) , pos : pos }]) , pos : pos } );
-		//
-		//Add in the components fields the getSLPlayer() method which returns the running SLPlayer Application instance of the component.
-		//if ( getSLPlayerFound )
-		//{
-			//fields.push( { kind : FFun( { args : [], expr : { expr : EBlock( [ { expr : ECall( { expr : EField( { expr : EType( { expr : EType( { expr : EField( { expr : EConst(CIdent("slplayer")), pos : pos },
-				//"core"), pos : pos }, "ISLPlayerComponent"), pos : pos }, "SLPlayerComponent"), pos : pos }, "getSLPlayer"), pos : pos } , [{ expr : EConst(CIdent("this")), pos : pos }]) , pos : pos } ] ), pos : pos },
-					//params : [], ret : null } ), meta : [], name : "getSLPlayer" , doc : null, pos : pos , access : [APublic] } );
-		//}
-		//
-		//return fields;
-	//}
-//}

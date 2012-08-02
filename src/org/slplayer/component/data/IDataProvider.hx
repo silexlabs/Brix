@@ -18,7 +18,7 @@ package org.slplayer.component.data;
 import js.Dom;
 import js.Lib;
 
-import org.slplayer.component.data.DataConsumer;
+import org.slplayer.component.data.IDataConsumer;
 
 /**
  * The DataObject structure common with DataConsumers.
@@ -31,9 +31,26 @@ typedef DataObject =
 }
 
 /**
- * To be a standard data provider, a component must implement IDataProvider. Also, It should use DataProvider (using org.slplayer.component.data.DataProvider).
+ * A data provider component should implement this interface to be compliant with data consumer components.
+ * 
+ * note : this is a draft and may be abandonned / revised again in a near future.
  * 
  * @author Thomas Fétiveau
+ */
+interface IDataProvider
+{
+	/**
+	 * Common callback to all data provider to retreive data.
+	 */
+	public function getData():Void;
+	/**
+	 * Callback invoked when a new data consumer is showing up.
+	 */
+	public function onNewDataConsumer( dataConsumer : IDataConsumer ):Void;
+}
+
+/**
+ * Mixin methods for DataProvider components.
  */
 class DataProvider 
 {
@@ -52,19 +69,4 @@ class DataProvider
 		
 		target.dispatchEvent(onDataEvent);
 	}
-}
-
-/**
- * A DataProvider component should implement this interface and be "using org.slplayer.component.data.DataProvider" to be compliant with DataConsumers.
- */
-interface IDataProvider
-{
-	/**
-	 * Common callback to all data provider to retreive data.
-	 */
-	public function getData():Void;
-	/**
-	 * Callback invoked when a new data consumer is showing up.
-	 */
-	public function onNewDataConsumer( dataConsumer : IDataConsumer ):Void;
 }
