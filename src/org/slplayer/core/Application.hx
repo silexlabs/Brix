@@ -51,6 +51,10 @@ import org.slplayer.component.ISLPlayerComponent;
 	 */
 	private var id : String;
 	/**
+	 * The node ID sequence ( data-slpid="..." ).
+	 */
+	private var nodesIdSequence : Int;
+	/**
 	 * A Hash keeping all component instances indexed by node slplayer id.
 	 */
 	private var nodeToCmpInstances : Hash<List<org.slplayer.component.ui.DisplayObject>>;
@@ -89,6 +93,8 @@ import org.slplayer.component.ISLPlayerComponent;
 		this.dataObject = args;
 		
 		this.id = id;
+		
+		this.nodesIdSequence = 0;
 		
 		this.registeredComponents = new Array();
 		
@@ -434,7 +440,8 @@ import org.slplayer.component.ISLPlayerComponent;
 		}
 		else
 		{
-			nodeId = generateUniqueId();
+			nodesIdSequence++;
+			nodeId = Std.string(nodesIdSequence);
 			node.setAttribute("data-" + SLPID_ATTR_NAME, nodeId);
 			associatedCmps = new List();
 		}
