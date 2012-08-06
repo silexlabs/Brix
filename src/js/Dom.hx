@@ -173,7 +173,7 @@ var fgColor;
 var linkColor;
 var vlinkColor;
 */
-
+var documentElement : HtmlDom;
 var body : Body;
 var cookie : String;
 var domain : String;
@@ -235,6 +235,28 @@ function initCustomEvent( eventName: String, canBubble: Bool, cancelable: Bool, 
 
 typedef MouseEvent = {> Event,
 
+}
+
+typedef TouchEvent = { > Event,
+var touches:TouchList;
+var changedTouches:TouchList;
+var targetTouches:TouchList;
+}
+
+typedef TouchList = {
+	var length:Int;
+	function item(index:Int):Touch;
+}
+
+typedef Touch = {
+	var identifier:Int;
+	var target:HtmlDom;
+	var screenX:Int;
+	var screenY:Int;
+	var clientX:Int;
+	var clientY:Int;
+	var pageX:Int;
+	var pageY:Int;
 }
 
 typedef FileUpload = {> FormElement,
@@ -430,6 +452,12 @@ function remove( o : Int ) : Void;
 }
 
 typedef Style = {
+var opacity : Dynamic;
+var transitionProperty : Dynamic;
+var transitionDuration : Dynamic;
+var transitionTimingFunction : Dynamic;
+var transitionDelay : Dynamic;
+
 // Position
 var left : String;
 var bottom : String;
