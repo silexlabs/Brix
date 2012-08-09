@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<style type="text/css">
+		.code { font-family:monospace; font-size:12pt; }
+		.block { margin:25px; }
+		.intro { background-color:#d5d5d5; }
+		li { margin:8px; }
+		body {font-family:'Arial'; color:#656565;}
+	</style>
+	<script type="text/javascript" src="myEmbeddedSLPlayerApplication2.js" ></script>
+	<script type="text/javascript" src="myEmbeddedSLPlayerApplication.js" ></script>
+</head>
+<body>
+<script type="text/javascript" >
+	window.onload = function() {
+		//alert(document.getElementById('myEmbeddedSLPlayerApplication'));
+		myEmbeddedSLPlayerApplication.init(document.getElementById('myEmbeddedSLPlayerApplication'));
+		
+		//see the HTML source of myEmbeddedSLPlayerApplication2.js to understand why the exposed name is MyGallery in that case
+		MyGallery.init(document.getElementById('myEmbeddedSLPlayerApplication2'));
+		
+		MyGallery.init(document.getElementById('myEmbeddedSLPlayerApplication2bis'));
+	}
+</script>
+
+<div class="block intro">
+	To embed an SLPlayer application for the js target, you should :
+	<ol style="list-">
+	<li>as a general good practice, ensure your SLPlayer components never use <span class="code">Lib.document</span> or <span class="code">Lib.document.body</span> but the htmlRootElement attribute of the SLPlayer instance in which they're supposed to run.</li>
+	<li>compile your SLPlayer application with the -D embedHtml and -D noAutoStart compile options. The first one embeds the HTML source page in your .js file and the second one prevents the application to start automatically when included in your page through a <span class="code"> &lt;script src="[...].js"&gt; </span>tag.</li>
+	<li>then to start your SLPlayer application, do : <span class="code"> &lt; name of your .js application script without the .js extension &gt;.init(&lt; the html DOM element where to put your SLPlayer app. &gt;); </span></li>
+	</ol>
+	Each SLPlayer application instance won't share the same namespace (no use of the global one) which will avoid any conflict between them or with other js libraries your pages might use.
+</div>
+
+<div class="block">
+	My embedded SLPlayer application :
+	<div style="border:1px solid black;" id="myEmbeddedSLPlayerApplication"></div>
+</div>
+
+<div class="block">
+	Another SLPlayer embedded application :
+	<div style="border:1px solid black;" id="myEmbeddedSLPlayerApplication2"></div>
+</div>
+
+<div class="block">
+	Another instance of the same SLPlayer embedded application :
+	<div style="border:1px solid black;" id="myEmbeddedSLPlayerApplication2bis"></div>
+</div>
+
+</body>
+</html>
