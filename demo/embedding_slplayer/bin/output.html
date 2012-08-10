@@ -17,12 +17,15 @@
 <script type="text/javascript" >
 	window.onload = function() {
 		//alert(document.getElementById('myEmbeddedSLPlayerApplication'));
-		myEmbeddedSLPlayerApplication.init(document.getElementById('myEmbeddedSLPlayerApplication'));
+		var myEmbed1 = myEmbeddedSLPlayerApplication.createApplication();
+		myEmbed1.init(document.getElementById('myEmbeddedSLPlayerApplication'));
 		
 		//see the HTML source of myEmbeddedSLPlayerApplication2.js to understand why the exposed name is MyGallery in that case
-		MyGallery.init(document.getElementById('myEmbeddedSLPlayerApplication2'));
+		var myEmbed2 = MyGallery.createApplication();
+		myEmbed2.init(document.getElementById('myEmbeddedSLPlayerApplication2'));
 		
-		MyGallery.init(document.getElementById('myEmbeddedSLPlayerApplication2bis'));
+		var myEmbed3 = MyGallery.createApplication();
+		myEmbed3.init(document.getElementById('myEmbeddedSLPlayerApplication2bis'));
 	}
 </script>
 
