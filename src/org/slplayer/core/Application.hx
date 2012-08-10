@@ -18,8 +18,6 @@ package org.slplayer.core;
 import js.Lib;
 import js.Dom;
 
-import org.slplayer.component.ISLPlayerComponent;
-
 /**
  * The main SLPlayer class handles the application initialization. It instanciates the components, tracking for each of them their 
  * association with their DOM rootElement. This class is based on the content of the application HTML file and is thus associated 
@@ -83,7 +81,31 @@ import org.slplayer.component.ISLPlayerComponent;
 	{
 		return metaParameters.get(metaParamKey);
 	}
-	
+
+	/**
+	 * The main entry point in autoStart mode. This function is implemented by the AppBuilder macro.
+	 */
+	static public function main()
+	{
+		#if !noAutoStart
+
+			#if slpdebug
+				trace("noAutoStart not defined: calling init()...");
+			#end
+
+			var newApp = createApplication();
+
+			#if (js && disableEmbedHtml)
+				//special case in js when auto starting the application, 
+				//we need to ensure first that the parent document is ready
+				Lib.window.onload = function(e:Event) { newApp.init(); };
+			#else
+				newApp.init(appendTo);
+			#end
+
+		#end
+	}
+
 	/**
 	 * SLPlayer application constructor.
 	 * @param	?args		optional, args of any nature from outside the SLPlayer application.
@@ -91,41 +113,62 @@ import org.slplayer.component.ISLPlayerComponent;
 	private function new(id:String, ?args:Dynamic) 
 	{
 		this.dataObject = args;
-		
 		this.id = id;
-		
 		this.nodesIdSequence = 0;
-		
 		this.registeredComponents = new Array();
-		
 		this.nodeToCmpInstances = new Hash();
-		
 		this.metaParameters = new Hash();
-		
+
 		#if slpdebug
 			trace("new SLPlayer instance built");
 		#end
 	}
-	
+
 	/**
-	 * Launch the application on a given node.
+	 * Factory method for an SLPlayer application.
+	 * @param	?args		optional, args of any nature from outside the SLPlayer application.
+	 * @return an instance of SLPlayer application.
+	 */
+	static public function createApplication(?args:Null<Dynamic>) : Application
+	{
+		#if slpdebug
+			trace("SLPlayer createApplication() called with args="+args);
+		#end
+
+		//generate a new SLPlayerInstance id
+		var newId = generateUniqueId();
+		
+		#if slpdebug
+			trace("New SLPlayer id created : "+newId);
+		#end
+
+		//the new SLPlayer instance
+		var newInstance = new Application(newId, args);
+		#if slpdebug
+			trace("setting ref to SLPlayer instance "+newId);
+		#end
+		instances.set(newId, newInstance);
+		
+		return newInstance;
+	}
+
+	/**
+	 * Initialize the application on a given node.
 	 * @param	?appendTo	optional, the parent application's node to which to hook this SLplayer application. By default or if
 	 * the given node is invalid, it's the document's body element (or equivalent if not js) that is used for that.
 	 */
-	private function launch(?appendTo:Null<Dynamic>)
+	public function init(?appendTo:Null<HtmlDom>) : Void
 	{
 		#if slpdebug
-			trace("Launching SLPlayer id "+id+" on "+appendTo);
+			trace("Initializing SLPlayer id "+id+" on "+appendTo);
 		#end
-		
-		if (appendTo != null) //set the SLPlayer application root element
-		{
-			#if slpdebug
-				trace("setting htmlRootElement to "+appendTo);
-			#end
-			htmlRootElement = cast appendTo;
-		}
-		
+
+		//set the SLPlayer application root element
+		#if slpdebug
+			trace("setting htmlRootElement to "+appendTo);
+		#end
+		htmlRootElement = appendTo;
+
 		//it can't be a non element node
 		if (htmlRootElement == null || htmlRootElement.nodeType != Lib.document.body.nodeType)
 		{
@@ -138,7 +181,7 @@ import org.slplayer.component.ISLPlayerComponent;
 		if ( htmlRootElement == null )
 		{
 			#if js
-			trace("ERROR windows.document.body is null => You are trying to start your application while the document loading is probably not complete yet." +
+			trace("ERROR Lib.document.body is null => You are trying to start your application while the document loading is probably not complete yet." +
 			" To fix that, add the noAutoStart option to your slplayer application and control the application startup with: window.onload = function() { myApplication.init() };");
 			#else
 			trace("ERROR could not set Application's root element.");
@@ -147,7 +190,9 @@ import org.slplayer.component.ISLPlayerComponent;
 			return;
 		}
 		
-		initHtmlRootElementContent();
+		#if !disableEmbedHtml
+			htmlRootElement.innerHTML = _htmlBody;
+		#end
 		
 		//build the SLPlayer instance meta parameters Hash
 		initMetaParameters();
@@ -164,16 +209,6 @@ import org.slplayer.component.ISLPlayerComponent;
 	}
 	
 	/**
-	 * This function is implemented by the AppBuilder macro
-	 */
-	private function initHtmlRootElementContent()
-	{
-		//#if (!js || embedHtml)
-		//htmlRootElement.innerHTML = _htmlBody; // this call is added by the macro if needed
-		//#end
-	}
-	
-	/**
 	 * Generates unique ids for SLPlayer instances and for HTML nodes.
 	 * FIXME ? there may be a better way to get a unique id...
 	 * @return String, a unique id.
@@ -181,47 +216,6 @@ import org.slplayer.component.ISLPlayerComponent;
 	static private function generateUniqueId():String
 	{
 		return haxe.Md5.encode(Date.now().toString()+Std.string(Std.random(Std.int(Date.now().getTime()))));
-	}
-	
-	/**
-	 * The main entry point of every SLPlayer application. The implementation of this method is completed by the AppBuilder macro.
-	 * @param	?appendTo	optional, the element (HTML DOM in js, Sprite in Flash) to which append the SLPlayer application to.
-	 * @param	?args		optional, args of any nature from outside the SLPlayer application.
-	 */
-	static public function init(?appendTo:Dynamic, ?args:Dynamic )
-	{
-		#if slpdebug
-			trace("SLPlayer init() called with appendTo="+appendTo+" and args="+args);
-		#end
-		
-		//generate a new SLPlayerInstance id
-		var newId = generateUniqueId();
-		
-		#if slpdebug
-			trace("New SLPlayer id created : "+newId);
-		#end
-		
-		//the new SLPlayer instance
-		var newInstance = new Application(newId, args);
-		#if slpdebug
-			trace("setting ref to SLPlayer instance "+newId);
-		#end
-		instances.set(newId, newInstance);
-	}
-	
-	/**
-	 * The main entry point in autoStart mode. This function is implemented by the AppBuilder macro.
-	 */
-	static public function main()
-	{
-		#if !noAutoStart
-		
-			#if slpdebug
-				trace("noAutoStart not defined: calling init()...");
-			#end
-			
-			init();
-		#end
 	}
 	
 	/**
@@ -380,7 +374,7 @@ import org.slplayer.component.ISLPlayerComponent;
 			#end
 			
 			//if the component is an SLPlayer cmp (and it should be), then try to give him its SLPlayer instance id
-			if (cmpInstance != null && Std.is(cmpInstance, ISLPlayerComponent))
+			if (cmpInstance != null && Std.is(cmpInstance, org.slplayer.component.ISLPlayerComponent))
 			{
 				cmpInstance.initSLPlayerComponent(id);
 			}
