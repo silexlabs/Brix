@@ -9,7 +9,7 @@ import org.slplayer.component.transition.TransitionData;
 /**
  * Does a transition between two states of an object
  */
-class TransitionLeftToRight extends TransitionBase
+class TransitionHorizontal extends TransitionBase
 {
 	/**
 	 * Value of position in the style attribute of the DOM element
