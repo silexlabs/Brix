@@ -10,13 +10,15 @@ import org.slplayer.component.transition.TransitionData;
 /**
  * Does a transition between two states of an object
  */
-class TransitionVertical extends TransitionHorizontal {
+class TransitionVertical extends TransitionHorizontal
+{
 	/**
 	 * Start the transition
 	 * This is a virtual method which has to be implemented
 	 * You are expected to call applyTransitionParams with your transition params
 	 */
-	override public function start(transitionData:TransitionData){
+	override public function start(transitionData:TransitionData)
+	{
 		// prevent horizontal behavior
 		//super.start(transitionData);
 
@@ -34,11 +36,10 @@ class TransitionVertical extends TransitionHorizontal {
 			top = -top;
 
 		// start transition
-		applyTransitionParams(
-			"top", 
-			top+"px",
-			transitionData.duration, 
-			transitionData.timingFunction, 
-			transitionData.delay);
+		applyTransitionParams(	"top", 
+								top+"px",
+								transitionData.duration, 
+								transitionData.timingFunction, 
+								transitionData.delay );
 	}
 }
