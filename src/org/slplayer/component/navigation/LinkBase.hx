@@ -1,4 +1,4 @@
-package org.slplayer.component.layer;
+package org.slplayer.component.navigation;
 
 import js.Lib;
 import js.Dom;
@@ -60,6 +60,7 @@ class LinkBase extends DisplayObject
 		super(rootElement, SLPId);
 		rootElement.onclick = onClick;
 	}
+
 	/**
 	 * user clicked the link
 	 * do an action to the pages corresponding to our link
@@ -79,7 +80,7 @@ class LinkBase extends DisplayObject
 		trace("LinkBase onClick "+linkName+" - "+CONFIG_TRANSITION_IS_REVERSED+ " -- "+rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED));
 
 		// retrieve the target attr of our link 
-		var targetAttr:Null<String> = null;
+		var targetAttr:Null<String> = null; trace(CONFIG_TARGET_ATTR+" = "+rootElement.getAttribute(CONFIG_TARGET_ATTR));
 		if (rootElement.getAttribute(CONFIG_TARGET_ATTR) != null && rootElement.getAttribute(CONFIG_TARGET_ATTR).trim() != "")
 		{
 			targetAttr = rootElement.getAttribute(CONFIG_TARGET_ATTR).trim();
@@ -88,10 +89,10 @@ class LinkBase extends DisplayObject
 		// values for the transition
 		transitionData = new TransitionData(
 			null, 
-			rootElement.getAttribute(CONFIG_TRANSITION_DURATION).trim(),
-			rootElement.getAttribute(CONFIG_TRANSITION_TIMING_FUNCTION).trim(),
-			rootElement.getAttribute(CONFIG_TRANSITION_DELAY).trim(),
-			rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED).toLowerCase().trim() == "true"
+			rootElement.getAttribute(CONFIG_TRANSITION_DURATION),
+			rootElement.getAttribute(CONFIG_TRANSITION_TIMING_FUNCTION),
+			rootElement.getAttribute(CONFIG_TRANSITION_DELAY),
+			rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED) == "true"
 		);
 
 		// show the page with this name

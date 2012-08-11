@@ -1,4 +1,4 @@
-package org.slplayer.component.layer;
+package org.slplayer.component.navigation;
 
 import js.Lib;
 import js.Dom;
