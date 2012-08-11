@@ -6,6 +6,7 @@ import js.Dom;
 import org.slplayer.core.Application;
 import org.slplayer.component.ui.DisplayObject;
 import org.slplayer.component.transition.TransitionData;
+import org.slplayer.util.DomTools;
 
 using StringTools;
 
@@ -47,6 +48,14 @@ class LinkBase extends DisplayObject
 	 */
 	public static inline var CONFIG_TRANSITION_IS_REVERSED:String = "data-transition-is-reversed";
 	/**
+	 * value of the href attribute without the #
+	 */
+	public var linkName:String;
+	/**
+	 * value of the target attribute 
+	 */
+	public var targetAttr:Null<String>;
+	/**
 	 * store the html attribute value
 	 * determines which transition to apply 
 	 */
@@ -58,41 +67,38 @@ class LinkBase extends DisplayObject
 	public function new(rootElement:HtmlDom, SLPId:String)
 	{
 		super(rootElement, SLPId);
-		rootElement.onclick = onClick;
-	}
 
+		rootElement.addEventListener("click", onClick, false);
+
+		// retrieve the name of our link 
+		if (rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR) != null){
+			linkName = rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR).trim();
+			// removes the URL before the deep link
+			linkName = linkName.substr(linkName.indexOf("#")+1);
+		}
+		else {
+			trace("Warning: the link has no href atribute ("+rootElement+")");
+		}
+		// retrieve the target attr of our link 
+
+		if (rootElement.getAttribute(CONFIG_TARGET_ATTR) != null && rootElement.getAttribute(CONFIG_TARGET_ATTR).trim() != "")
+		{
+			targetAttr = rootElement.getAttribute(CONFIG_TARGET_ATTR).trim();
+		}
+	}
 	/**
 	 * user clicked the link
 	 * do an action to the pages corresponding to our link
 	 */
 	private function onClick(e:Event)
 	{
-		// retrieve the name of our link 
-		var linkName : String;
-		if ( rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR) != null && rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR).trim() != "" )
-		{
-			linkName = rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR).trim();
-			// removes the URL before the deep link
-			linkName = linkName.substr(linkName.indexOf("#")+1);
-		}
-		else throw("error, the link has no href atribute ("+rootElement+")");
-
-		trace("LinkBase onClick "+linkName+" - "+CONFIG_TRANSITION_IS_REVERSED+ " -- "+rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED));
-
-		// retrieve the target attr of our link 
-		var targetAttr:Null<String> = null; trace(CONFIG_TARGET_ATTR+" = "+rootElement.getAttribute(CONFIG_TARGET_ATTR));
-		if (rootElement.getAttribute(CONFIG_TARGET_ATTR) != null && rootElement.getAttribute(CONFIG_TARGET_ATTR).trim() != "")
-		{
-			targetAttr = rootElement.getAttribute(CONFIG_TARGET_ATTR).trim();
-		}
-
 		// values for the transition
 		transitionData = new TransitionData(
-			null, 
+			null,
 			rootElement.getAttribute(CONFIG_TRANSITION_DURATION),
 			rootElement.getAttribute(CONFIG_TRANSITION_TIMING_FUNCTION),
 			rootElement.getAttribute(CONFIG_TRANSITION_DELAY),
-			rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED) == "true"
+			rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED) == null
 		);
 
 		// show the page with this name
