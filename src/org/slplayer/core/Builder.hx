@@ -66,6 +66,10 @@ class Builder
 	 */
 	static private var sourceFilePath : String;
 	/**
+	 * Keep a reference to the path of the HTML output file.
+	 */
+	static private var outputFilePath : String;
+	/**
 	 * Keep a copy of the original HTML Source.
 	 */
 	static private var sourceHTMLDocument : Document;
@@ -113,13 +117,16 @@ class Builder
 	 * checking on the HTML document content, the use of the components...
 	 * 
 	 * @param	htmlSourcePath	The path to the application HTML source page. By default "./index.html".
+	 * @param	htmlOutputPath	The path to the generated output HTML file when using the disableEmbedHtml 
+	 * option. By default, will be the same as the js/swf/... output file but with the .html extension.
 	 */
-	@:macro static public function create(?htmlSourcePath:String="index.html") : Void
+	@:macro static public function create(?htmlSourcePath:String="index.html", ?htmlOutputPath:Null<String>) : Void
 	{
 		//try
 		//{
 		//TODO debug error catching: why some errors in component are catch and other not ?
 			sourceFilePath = htmlSourcePath;
+			outputFilePath = htmlOutputPath;
 			
 			//Initial check
 			if (!sys.FileSystem.exists(sourceFilePath))
@@ -752,24 +759,29 @@ class Builder
 			#if slpdebug
 				neko.Lib.println("Setting @:expose("+jsExposedName+") meta tag on SLPlayer class.");
 			#end
-			
+
 			Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
 		}
-		
-		
+
 		if (Context.defined('disableEmbedHtml'))
 		{
 			//generates the "compiled" HTML file if not embed
-			var outputDirectory = "./";
-			
-			if (output.lastIndexOf('/') != null)
-				outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
-			
+
+			if (outputFilePath == null)
+			{
+				var outputDirectory = "./";
+
+				if (output.lastIndexOf('/') != null)
+					outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
+
+				outputFilePath = outputDirectory + outputFileName + ".html";
+			}
+
 			#if slpdebug
-				neko.Lib.println("Saving "+outputDirectory + outputFileName+".html");
+				neko.Lib.println("Saving "+outputFilePath);
 			#end
-			
-			sys.io.File.saveContent( outputDirectory + outputFileName + ".html" , cocktail.Lib.document.documentElement.innerHTML );
+
+			sys.io.File.saveContent( outputFilePath , cocktail.Lib.document.documentElement.innerHTML );
 		}
 	}
 	
