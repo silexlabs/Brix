@@ -38,6 +38,7 @@ class LinkBase extends DisplayObject
 	/**
 	 * constant, name of attribute
 	 * defines the param for the transition
+	 * @example	 &lt;a href=&quot;#page2&quot; class=&quot;LinkToPage next&quot; data-transition-delay = &quot;2s&quot; &gt;Test link&lt;/a&gt;
 	 */
 	public static inline var CONFIG_TRANSITION_DELAY:String = "data-transition-delay";
 	/**
@@ -92,9 +93,9 @@ class LinkBase extends DisplayObject
 		// values for the transition
 		transitionData = new TransitionData(
 			null, 
-			rootElement.getAttribute(CONFIG_TRANSITION_DURATION).trim(),
-			rootElement.getAttribute(CONFIG_TRANSITION_TIMING_FUNCTION).trim(),
-			rootElement.getAttribute(CONFIG_TRANSITION_DELAY).trim(),
+			rootElement.getAttribute(CONFIG_TRANSITION_DURATION),
+			rootElement.getAttribute(CONFIG_TRANSITION_TIMING_FUNCTION),
+			rootElement.getAttribute(CONFIG_TRANSITION_DELAY),
 			rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED) == null
 		);
 

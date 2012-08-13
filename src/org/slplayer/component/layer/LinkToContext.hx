@@ -4,7 +4,7 @@ import js.Lib;
 import js.Dom;
 
 import org.slplayer.component.layer.LinkBase;
-import org.silex.core.DomTools;
+import org.slplayer.util.DomTools;
 
 /**
  * Let you specify a context to display when the user clicks on the component's node
