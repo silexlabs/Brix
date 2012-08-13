@@ -1,4 +1,19 @@
-package org.slplayer.component.layer;
+/*
+ * This file is part of SLPlayer http://www.silexlabs.org/groups/labs/slplayer/
+ * 
+ * This project is © 2011-2012 Silex Labs and is released under the GPL License:
+ * 
+ * This program is free software; you can redistribute it and/or modify it under the terms 
+ * of the GNU General Public License (GPL) as published by the Free Software Foundation; 
+ * either version 2 of the License, or (at your option) any later version. 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * See the GNU General Public License for more details.
+ * 
+ * To read the license please visit http://www.gnu.org/copyleft/gpl.html
+ */
+package org.slplayer.component.navigation;
 
 import js.Lib;
 import js.Dom;
@@ -68,6 +83,7 @@ class LinkBase extends DisplayObject
 	public function new(rootElement:HtmlDom, SLPId:String)
 	{
 		super(rootElement, SLPId);
+
 		rootElement.addEventListener("click", onClick, false);
 
 		// retrieve the name of our link 
@@ -80,7 +96,9 @@ class LinkBase extends DisplayObject
 			trace("Warning: the link has no href atribute ("+rootElement+")");
 		}
 		// retrieve the target attr of our link 
-		if (rootElement.getAttribute(CONFIG_TARGET_ATTR) != null){
+
+		if (rootElement.getAttribute(CONFIG_TARGET_ATTR) != null && rootElement.getAttribute(CONFIG_TARGET_ATTR).trim() != "")
+		{
 			targetAttr = rootElement.getAttribute(CONFIG_TARGET_ATTR).trim();
 		}
 	}
@@ -92,7 +110,7 @@ class LinkBase extends DisplayObject
 	{
 		// values for the transition
 		transitionData = new TransitionData(
-			null, 
+			null,
 			rootElement.getAttribute(CONFIG_TRANSITION_DURATION),
 			rootElement.getAttribute(CONFIG_TRANSITION_TIMING_FUNCTION),
 			rootElement.getAttribute(CONFIG_TRANSITION_DELAY),

@@ -52,13 +52,13 @@ class TransitionBase extends DisplayObject
 	 * Dispatch a transitionEventTypeStarted to notify the transitioned object
 	 * Starts the transition
 	 */
-	private function onTransitionEventTypeRequest(event:CustomEvent)
+	private function onTransitionEventTypeRequest(event:Event)
 	{
 		// add transition events for all browsers, to detect transition end
 		addEvents();
 
 		// retrieve the transition event data
-		var transitionData:TransitionData = event.detail;
+		var transitionData:TransitionData = cast(event).detail;
 
 		// start the transition
 		start(transitionData);
@@ -66,7 +66,7 @@ class TransitionBase extends DisplayObject
 		// dispatch the transition start event to notify the Layer class
 		var event:Event = Lib.document.createEvent("Event");
 		event.initEvent(TransitionData.EVENT_TYPE_STARTED, true, true);
-		rootElement.dispatchEvent(event);
+		rootElement.dispatchEvent(cast(event));
 	}
 
 	/**
@@ -114,7 +114,7 @@ class TransitionBase extends DisplayObject
 			// dispatch the transition end event
 			var event:Event = cast Lib.document.createEvent("Event");
 			event.initEvent(TransitionData.EVENT_TYPE_ENDED, true, true);
-			rootElement.dispatchEvent(event);
+			rootElement.dispatchEvent(cast(event));
 		}
 		// remove transition events for all browsers
 		removeEvents();
