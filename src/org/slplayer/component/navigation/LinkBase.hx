@@ -53,6 +53,7 @@ class LinkBase extends DisplayObject
 	/**
 	 * constant, name of attribute
 	 * defines the param for the transition
+	 * @example	 &lt;a href=&quot;#page2&quot; class=&quot;LinkToPage next&quot; data-transition-delay = &quot;2s&quot; &gt;Test link&lt;/a&gt;
 	 */
 	public static inline var CONFIG_TRANSITION_DELAY:String = "data-transition-delay";
 	/**

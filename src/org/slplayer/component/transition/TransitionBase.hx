@@ -1,18 +1,3 @@
-/*
- * This file is part of SLPlayer http://www.silexlabs.org/groups/labs/slplayer/
- * 
- * This project is © 2011-2012 Silex Labs and is released under the GPL License:
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms 
- * of the GNU General Public License (GPL) as published by the Free Software Foundation; 
- * either version 2 of the License, or (at your option) any later version. 
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
- * See the GNU General Public License for more details.
- * 
- * To read the license please visit http://www.gnu.org/copyleft/gpl.html
- */
 package org.slplayer.component.transition;
 
 import js.Lib;
@@ -67,13 +52,13 @@ class TransitionBase extends DisplayObject
 	 * Dispatch a transitionEventTypeStarted to notify the transitioned object
 	 * Starts the transition
 	 */
-	private function onTransitionEventTypeRequest(event:CustomEvent)
+	private function onTransitionEventTypeRequest(event:Event)
 	{
 		// add transition events for all browsers, to detect transition end
 		addEvents();
 
 		// retrieve the transition event data
-		var transitionData:TransitionData = event.detail;
+		var transitionData:TransitionData = cast(event).detail;
 
 		// start the transition
 		start(transitionData);
@@ -81,7 +66,7 @@ class TransitionBase extends DisplayObject
 		// dispatch the transition start event to notify the Layer class
 		var event:Event = Lib.document.createEvent("Event");
 		event.initEvent(TransitionData.EVENT_TYPE_STARTED, true, true);
-		rootElement.dispatchEvent(event);
+		rootElement.dispatchEvent(cast(event));
 	}
 
 	/**
@@ -114,6 +99,12 @@ class TransitionBase extends DisplayObject
 		untyped rootElement.style.oTransitionTimingFunction = transitionTimingFunction;
 		untyped rootElement.style.oTransitionDelay = transitionDelay;
 
+		haxe.Timer.delay(callback(doInNextFrame, transitionProperty, newPropertyValue), 10);
+	}
+
+	private function doInNextFrame(transitionProperty:String, newPropertyValue:String)
+	{
+
 		// set the final value to start the transition
 		Reflect.setField(rootElement.style, transitionProperty, newPropertyValue);
 	}
@@ -129,7 +120,7 @@ class TransitionBase extends DisplayObject
 			// dispatch the transition end event
 			var event:Event = cast Lib.document.createEvent("Event");
 			event.initEvent(TransitionData.EVENT_TYPE_ENDED, true, true);
-			rootElement.dispatchEvent(event);
+			rootElement.dispatchEvent(cast(event));
 		}
 		// remove transition events for all browsers
 		removeEvents();
