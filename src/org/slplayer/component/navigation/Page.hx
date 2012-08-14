@@ -41,7 +41,7 @@ class Page extends DisplayObject
 	/**
 	 * constant, initial page's name
 	 */
-	public static inline var CONFIG_INITIAL_PAGE_NAME:String = "InitialPageName";
+	public static inline var CONFIG_INITIAL_PAGE_NAME:String = "initialPageName";
 	
 	/**
 	 * Display name of the page.
@@ -71,14 +71,15 @@ class Page extends DisplayObject
 
 	override public function init()
 	{
+/*
 		//TODO find something better
 		haxe.Timer.delay(doAfterDomInit, 10);
 	}
 
 	private function doAfterDomInit()
 	{
-		// close if it is not the default page
-		if ( getSLPlayer().getMetaParameter(CONFIG_INITIAL_PAGE_NAME) == name)
+/**/		// close if it is not the default page
+		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name)
 		{
 			trace ("Open home page '"+name+"'");
 			var transitionData = new TransitionData(show, "0.01s"); 

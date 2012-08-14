@@ -117,4 +117,68 @@ class DomTools
 	{
 		return element.className.indexOf(className) > -1;
 	}
+	/**
+	 * Set the value of a given HTML head/meta tags
+	 * @param	name 			the value of the name attribute of the desired meta tag
+	 * @param	metaValue 			the value to apply to the meta tag
+	 * @param	attributeName 	the name of the attribute, of which to return the value
+	 * @example	DomTools.setMeta("description", "A 1st test of Silex publication"); // set the description of the HTML page found in the head tag, i.e. <META name="description" content="A 1st test of Silex publication"></META>
+	 */
+	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content"):Hash<String>{
+		var res:Hash<String> = new Hash();
+		//trace("setConfig META TAG "+metaName+" = " +metaValue);
+
+		// retrieve all config tags (the meta tags)
+		var metaTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("META");
+
+		// flag to check if metaName exists
+		var found = false;
+
+		// for each config element, store the name/value pair
+		for (idxNode in 0...metaTags.length){
+			var node = metaTags[idxNode];
+			var configName = node.getAttribute("name");
+			var configValue = node.getAttribute(attributeName);
+			if (configName!=null && configValue!=null){
+				if(configName == metaName){
+					configValue = metaValue;
+					node.setAttribute(attributeName, metaValue);
+					found = true;
+				}
+				res.set(configName, configValue);
+			}
+		}
+		// add the meta if needed
+		if (!found){
+			var node = Lib.document.createElement("meta");
+			node.setAttribute("name", metaName);
+			node.setAttribute("content", metaValue);
+			var head = Lib.document.getElementsByTagName("head")[0];
+			head.appendChild(node);
+			// update config
+			res.set(metaName, metaValue);
+		}
+
+		return res;
+	}
+	/**
+	 * Get the value of a given HTML head/meta tags
+	 * @param	name 			the value of the name attribute of the desired meta tag
+	 * @param	attributeName 	the name of the attribute, of which to return the value
+	 * @example	DomTools.getMeta("description", "content"); // returns the description of the HTML page found in the head tag, e.g. <META name="description" content="A 1st test of Silex publication"></META>
+	 */
+	static public function getMeta(name:String, attributeName:String="content"):Null<String>{
+		// retrieve all config tags (the meta tags)
+		var metaTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("meta");
+
+		// for each config element, store the name/value pair
+		for (idxNode in 0...metaTags.length){
+			var node = metaTags[idxNode];
+			var configName = node.getAttribute("name");
+			var configValue = node.getAttribute(attributeName);
+			if (configName==name)
+				return configValue;
+		}
+		return null;
+	}
 }
