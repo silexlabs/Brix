@@ -15,14 +15,24 @@ ul.menu
 }
 ul.sub
 {
-	position:absolute;
 	background-color: #FFFFFF;
+    float: left;
+    position: relative;
+}
+ul.sub-of-sub
+{
+	position:relative;
+}
+.container-sub
+{
+	margin: 0;
+	position: absolute;
 }
 li.main
 {
 	float: left;
 }
-li a
+li>a
 {
 	color: #000000;
 	text-decoration: none;

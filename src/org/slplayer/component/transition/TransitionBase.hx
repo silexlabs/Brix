@@ -99,6 +99,12 @@ class TransitionBase extends DisplayObject
 		untyped rootElement.style.oTransitionTimingFunction = transitionTimingFunction;
 		untyped rootElement.style.oTransitionDelay = transitionDelay;
 
+		haxe.Timer.delay(callback(doInNextFrame, transitionProperty, newPropertyValue), 10);
+	}
+
+	private function doInNextFrame(transitionProperty:String, newPropertyValue:String)
+	{
+
 		// set the final value to start the transition
 		Reflect.setField(rootElement.style, transitionProperty, newPropertyValue);
 	}
