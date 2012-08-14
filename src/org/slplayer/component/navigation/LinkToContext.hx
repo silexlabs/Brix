@@ -18,7 +18,7 @@ package org.slplayer.component.navigation;
 import js.Lib;
 import js.Dom;
 
-import org.slplayer.component.layer.LinkBase;
+import org.slplayer.component.navigation.LinkBase;
 
 /**
  * Let you specify a context to display when the user clicks on the component's node
@@ -65,7 +65,8 @@ class LinkToContext extends LinkBase
 		var node = Lib.document.createElement('style');
 		node.setAttribute('type', 'text/css');
 
-		var cssText = "."+linkName+" {visibility : visible; }";
+		//var cssText = "."+linkName+" { visibility : visible; }";
+		var cssText = "."+linkName+" { display : inline; visibility : visible; }";
 		node.appendChild(Lib.document.createTextNode(cssText));
 		
 		Lib.document.getElementsByTagName("head")[0].appendChild(node);
