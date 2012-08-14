@@ -7,46 +7,61 @@
 	<script data-slp-use="org.slplayer.component.navigation.Page"></script>
 	<script data-slp-use="org.slplayer.component.navigation.Layer"></script>
 	<script data-slp-use="org.slplayer.component.navigation.LinkToPage"></script>
-	<meta name="InitialPageName" content="welcome"></meta>
+	<meta name="initialPageName" content="welcome"></meta>
 </head>
 <body>
 
 	<ul class="menu">
-	   <li class="main"><a href="#sub-menu1" target="_top" class="LinkToPage">File</a><a name="sub-menu1" class="Page"></a>
-			<ul class="Layer sub-menu1 sub">
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Save</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Save As</a></li>
-			</ul>
+	   <li class="main"><a href="#sub-menu1" class="LinkToPage">File</a><a name="sub-menu1" class="Page"></a>
+			<div class="container-sub">
+				<ul class="Layer sub-menu1 sub">
+					<li><a href="#toolbox" class="LinkToPage">Save</a></li>
+					<li><a href="#toolbox" class="LinkToPage">Save As</a></li>
+				</ul>
+			</div>
 	   </li>
-	   <li class="main"><a href="#sub-menu2" target="_top" class="LinkToPage">Edit</a><a name="sub-menu2" class="Page"></a>
-			<ul class="Layer sub-menu2 sub">
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Cut</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Copy</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Paste</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Select All</a></li>
-			</ul>
+	   <li class="main"><a href="#sub-menu2" class="LinkToPage">Edit</a><a name="sub-menu2" class="Page"></a>
+			<div class="container-sub">
+				<ul class="Layer sub-menu2 sub">
+					<li><a href="#toolbox" class="LinkToPage">Cut</a></li>
+					<li><a href="#toolbox" class="LinkToPage">Copy</a></li>
+					<li><a href="#toolbox" class="LinkToPage">Paste</a></li>
+					<li><a href="#toolbox" class="LinkToPage">Select All</a></li>
+				</ul>
+			</div>
 	   </li>
-	   <li class="main"><a href="#sub-menu3" target="_top" class="LinkToPage">Search</a><a name="sub-menu3" class="Page"></a>
-			<ul class="Layer sub-menu3 sub">
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Quick Find</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Quick Find Next</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Quick Find Previous</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Find And Replace</a></li>
-			</ul>
+	   <li class="main"><a href="#sub-menu3" class="LinkToPage">Search</a><a name="sub-menu3" class="Page"></a>
+			<div class="container-sub">
+				<ul class="Layer sub-menu3 sub">
+					<li><a href="#toolbox" class="LinkToPage">Quick Find</a></li>
+					<li><a href="#toolbox" class="LinkToPage">Quick Find Next</a></li>
+					<li><a href="#toolbox" class="LinkToPage">Quick Find Previous</a></li>
+					<li><a href="#toolbox" class="LinkToPage">Find And Replace</a></li>
+				</ul>
+			</div>
 	   </li>
-	   <li class="main"><a href="#sub-menu4" target="_top" class="LinkToPage">Insert</a><a name="sub-menu4" class="Page"></a>
-			<ul class="Layer sub-menu4 sub">
-				<li><a target="_top" href="#toolbox" class="LinkToPage">From File</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Snippet</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Image</a></li>
-				<li><a target="_top" href="#toolbox" class="LinkToPage">Table</a></li>
-			</ul>
+	   <li class="main"><a href="#sub-menu4" class="LinkToPage">Insert</a><a name="sub-menu4" class="Page"></a>
+			<div class="container-sub">
+				<ul class="Layer sub-menu4 sub-menu4-1 sub">
+					<li><a href="#toolbox" class="LinkToPage">Snippet</a></li>
+					<li><a href="#sub-menu4-1" class="LinkToPage">Image &gt;</a></li>
+					<li><a href="#toolbox" class="LinkToPage">Table</a></li>
+				</ul>
+				<a name="sub-menu4-1" class="Page"></a>
+				<ul class="Layer sub-menu4-1 sub sub-of-sub">
+					<li><a href="#toolbox" class="LinkToPage">From File</a></li>
+					<li><a href="#toolbox" class="LinkToPage">From URL</a></li>
+					<li><a href="#toolbox" class="LinkToPage">From Picassa</a></li>
+				</ul>
+			</div>
 	   </li>
-	   <li class="main"><a href="#sub-menu5" target="_top" class="LinkToPage">Help</a><a name="sub-menu5" class="Page"></a>
-			<ul class="Layer sub-menu5 sub">
-				<li><a href="#welcome" class="LinkToPage">Welcome page</a></li>
-				<li><a href="#about" class="LinkToPage">About</a></li>
-			</ul>
+	   <li class="main"><a href="#sub-menu5" class="LinkToPage">Help</a><a name="sub-menu5" class="Page"></a>
+			<div class="container-sub">
+				<ul class="Layer sub-menu5 sub">
+					<li><a href="#welcome" class="LinkToPage">Welcome page</a></li>
+					<li><a href="#about" class="LinkToPage">About</a></li>
+				</ul>
+			</div>
 	   </li>
 	</ul>
 	<a name="welcome" class="Page"></a>
