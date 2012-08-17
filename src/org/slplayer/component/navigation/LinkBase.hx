@@ -84,6 +84,13 @@ class LinkBase extends DisplayObject
 	{
 		super(rootElement, SLPId);
 
+		/// init transition data
+		transitionData = new TransitionData(
+			null,
+			"0"
+		);
+
+		// catch the click
 		rootElement.addEventListener("click", onClick, false);
 
 		// retrieve the name of our link 
