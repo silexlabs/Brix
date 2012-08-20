@@ -1,6 +1,6 @@
 -js ./bin/toolbar.js
 -cp ../../src/
--cp ../../../Cocktail_sl/src/
+-cp ../../../Cocktail/src/
 -debug
 -main org.slplayer.core.Application
 --macro org.slplayer.core.Builder.create('./src/toolbar.html')

@@ -1,5 +1,13 @@
 package org.slplayer.component.navigation;
 
+typedef StyleSheet = {
+var type : String;
+var disabled : Bool;
+var href : String;
+var title : String;
+// ??? more ???
+}
+
 /*
  * This file is part of SLPlayer http://www.silexlabs.org/groups/labs/slplayer/
  * 

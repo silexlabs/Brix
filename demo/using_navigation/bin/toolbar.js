@@ -1005,106 +1005,6 @@ haxe.Md5.prototype = {
 	}
 	,__class__: haxe.Md5
 }
-haxe.StackItem = $hxClasses["haxe.StackItem"] = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
-haxe.StackItem.CFunction = ["CFunction",0];
-haxe.StackItem.CFunction.toString = $estr;
-haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
-haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Lambda = function(v) { var $x = ["Lambda",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.Stack = function() { }
-$hxClasses["haxe.Stack"] = haxe.Stack;
-haxe.Stack.__name__ = ["haxe","Stack"];
-haxe.Stack.callStack = function() {
-	var oldValue = Error.prepareStackTrace;
-	Error.prepareStackTrace = function(error,callsites) {
-		var stack = [];
-		var _g = 0;
-		while(_g < callsites.length) {
-			var site = callsites[_g];
-			++_g;
-			var method = null;
-			var fullName = site.getFunctionName();
-			if(fullName != null) {
-				var idx = fullName.lastIndexOf(".");
-				if(idx >= 0) {
-					var className = HxOverrides.substr(fullName,0,idx);
-					var methodName = HxOverrides.substr(fullName,idx + 1,null);
-					method = haxe.StackItem.Method(className,methodName);
-				}
-			}
-			stack.push(haxe.StackItem.FilePos(method,site.getFileName(),site.getLineNumber()));
-		}
-		return stack;
-	};
-	var a = haxe.Stack.makeStack(new Error().stack);
-	a.shift();
-	Error.prepareStackTrace = oldValue;
-	return a;
-}
-haxe.Stack.exceptionStack = function() {
-	return [];
-}
-haxe.Stack.toString = function(stack) {
-	var b = new StringBuf();
-	var _g = 0;
-	while(_g < stack.length) {
-		var s = stack[_g];
-		++_g;
-		b.b += Std.string("\nCalled from ");
-		haxe.Stack.itemToString(b,s);
-	}
-	return b.b;
-}
-haxe.Stack.itemToString = function(b,s) {
-	var $e = (s);
-	switch( $e[1] ) {
-	case 0:
-		b.b += Std.string("a C function");
-		break;
-	case 1:
-		var m = $e[2];
-		b.b += Std.string("module ");
-		b.b += Std.string(m);
-		break;
-	case 2:
-		var line = $e[4], file = $e[3], s1 = $e[2];
-		if(s1 != null) {
-			haxe.Stack.itemToString(b,s1);
-			b.b += Std.string(" (");
-		}
-		b.b += Std.string(file);
-		b.b += Std.string(" line ");
-		b.b += Std.string(line);
-		if(s1 != null) b.b += Std.string(")");
-		break;
-	case 3:
-		var meth = $e[3], cname = $e[2];
-		b.b += Std.string(cname);
-		b.b += Std.string(".");
-		b.b += Std.string(meth);
-		break;
-	case 4:
-		var n = $e[2];
-		b.b += Std.string("local function #");
-		b.b += Std.string(n);
-		break;
-	}
-}
-haxe.Stack.makeStack = function(s) {
-	if(typeof(s) == "string") {
-		var stack = s.split("\n");
-		var m = [];
-		var _g = 0;
-		while(_g < stack.length) {
-			var line = stack[_g];
-			++_g;
-			m.push(haxe.StackItem.Module(line));
-		}
-		return m;
-	} else return s;
-}
 haxe._Template = {}
 haxe._Template.TemplateExpr = $hxClasses["haxe._Template.TemplateExpr"] = { __ename__ : ["haxe","_Template","TemplateExpr"], __constructs__ : ["OpVar","OpExpr","OpIf","OpStr","OpBlock","OpForeach","OpMacro"] }
 haxe._Template.TemplateExpr.OpVar = function(v) { var $x = ["OpVar",0,v]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
@@ -1661,51 +1561,456 @@ js.Lib["eval"] = function(code) {
 js.Lib.setErrorHandler = function(f) {
 	js.Lib.onerror = f;
 }
-var slplayer = {}
-slplayer.core = {}
-slplayer.core.Application = function(id,args) {
+var org = {}
+org.slplayer = {}
+org.slplayer.component = {}
+org.slplayer.component.ISLPlayerComponent = function() { }
+$hxClasses["org.slplayer.component.ISLPlayerComponent"] = org.slplayer.component.ISLPlayerComponent;
+org.slplayer.component.ISLPlayerComponent.__name__ = ["org","slplayer","component","ISLPlayerComponent"];
+org.slplayer.component.ISLPlayerComponent.prototype = {
+	getSLPlayer: null
+	,SLPlayerInstanceId: null
+	,__class__: org.slplayer.component.ISLPlayerComponent
+}
+org.slplayer.component.SLPlayerComponent = function() { }
+$hxClasses["org.slplayer.component.SLPlayerComponent"] = org.slplayer.component.SLPlayerComponent;
+org.slplayer.component.SLPlayerComponent.__name__ = ["org","slplayer","component","SLPlayerComponent"];
+org.slplayer.component.SLPlayerComponent.initSLPlayerComponent = function(component,SLPlayerInstanceId) {
+	component.SLPlayerInstanceId = SLPlayerInstanceId;
+}
+org.slplayer.component.SLPlayerComponent.getSLPlayer = function(component) {
+	return org.slplayer.core.Application.get(component.SLPlayerInstanceId);
+}
+org.slplayer.component.SLPlayerComponent.checkRequiredParameters = function(cmpClass,elt) {
+	var requires = haxe.rtti.Meta.getType(cmpClass).requires;
+	if(requires == null) return;
+	var _g = 0;
+	while(_g < requires.length) {
+		var r = requires[_g];
+		++_g;
+		if(elt.getAttribute(Std.string(r)) == null || StringTools.trim(elt.getAttribute(Std.string(r))) == "") throw Std.string(r) + " parameter is required for " + Type.getClassName(cmpClass);
+	}
+}
+org.slplayer.component.navigation = {}
+org.slplayer.component.navigation.LayerStatus = $hxClasses["org.slplayer.component.navigation.LayerStatus"] = { __ename__ : ["org","slplayer","component","navigation","LayerStatus"], __constructs__ : ["visible","hidden","notInitialized"] }
+org.slplayer.component.navigation.LayerStatus.visible = ["visible",0];
+org.slplayer.component.navigation.LayerStatus.visible.toString = $estr;
+org.slplayer.component.navigation.LayerStatus.visible.__enum__ = org.slplayer.component.navigation.LayerStatus;
+org.slplayer.component.navigation.LayerStatus.hidden = ["hidden",1];
+org.slplayer.component.navigation.LayerStatus.hidden.toString = $estr;
+org.slplayer.component.navigation.LayerStatus.hidden.__enum__ = org.slplayer.component.navigation.LayerStatus;
+org.slplayer.component.navigation.LayerStatus.notInitialized = ["notInitialized",2];
+org.slplayer.component.navigation.LayerStatus.notInitialized.toString = $estr;
+org.slplayer.component.navigation.LayerStatus.notInitialized.__enum__ = org.slplayer.component.navigation.LayerStatus;
+org.slplayer.component.ui = {}
+org.slplayer.component.ui.IDisplayObject = function() { }
+$hxClasses["org.slplayer.component.ui.IDisplayObject"] = org.slplayer.component.ui.IDisplayObject;
+org.slplayer.component.ui.IDisplayObject.__name__ = ["org","slplayer","component","ui","IDisplayObject"];
+org.slplayer.component.ui.IDisplayObject.__interfaces__ = [org.slplayer.component.ISLPlayerComponent];
+org.slplayer.component.ui.IDisplayObject.prototype = {
+	rootElement: null
+	,__class__: org.slplayer.component.ui.IDisplayObject
+}
+org.slplayer.component.ui.DisplayObject = function(rootElement,SLPId) {
+	this.rootElement = rootElement;
+	org.slplayer.component.SLPlayerComponent.initSLPlayerComponent(this,SLPId);
+	org.slplayer.core.Application.get(this.SLPlayerInstanceId).addAssociatedComponent(rootElement,this);
+};
+$hxClasses["org.slplayer.component.ui.DisplayObject"] = org.slplayer.component.ui.DisplayObject;
+org.slplayer.component.ui.DisplayObject.__name__ = ["org","slplayer","component","ui","DisplayObject"];
+org.slplayer.component.ui.DisplayObject.__interfaces__ = [org.slplayer.component.ui.IDisplayObject];
+org.slplayer.component.ui.DisplayObject.isDisplayObject = function(cmpClass) {
+	if(cmpClass == Type.resolveClass("org.slplayer.component.ui.DisplayObject")) return true;
+	if(Type.getSuperClass(cmpClass) != null) return org.slplayer.component.ui.DisplayObject.isDisplayObject(Type.getSuperClass(cmpClass));
+	return false;
+}
+org.slplayer.component.ui.DisplayObject.checkFilterOnElt = function(cmpClass,elt) {
+	if(elt.nodeType != js.Lib.document.body.nodeType) throw "cannot instantiate " + Type.getClassName(cmpClass) + " on a non element node.";
+	var tagFilter = haxe.rtti.Meta.getType(cmpClass) != null?haxe.rtti.Meta.getType(cmpClass).tagNameFilter:null;
+	if(tagFilter == null) return;
+	if(Lambda.exists(tagFilter,function(s) {
+		return elt.nodeName.toLowerCase() == Std.string(s).toLowerCase();
+	})) return;
+	throw "cannot instantiate " + Type.getClassName(cmpClass) + " on this type of HTML element: " + elt.nodeName.toLowerCase();
+}
+org.slplayer.component.ui.DisplayObject.prototype = {
+	init: function() {
+	}
+	,getSLPlayer: function() {
+		return org.slplayer.component.SLPlayerComponent.getSLPlayer(this);
+	}
+	,rootElement: null
+	,SLPlayerInstanceId: null
+	,__class__: org.slplayer.component.ui.DisplayObject
+}
+org.slplayer.component.navigation.Layer = function(rootElement,SLPId) {
+	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
+	this.isListeningHide = false;
+	this.isListeningShow = false;
+	this.status = org.slplayer.component.navigation.LayerStatus.notInitialized;
+	this.childrenArray = new Array();
+	this.styleAttrDisplay = rootElement.style.display;
+};
+$hxClasses["org.slplayer.component.navigation.Layer"] = org.slplayer.component.navigation.Layer;
+org.slplayer.component.navigation.Layer.__name__ = ["org","slplayer","component","navigation","Layer"];
+org.slplayer.component.navigation.Layer.__super__ = org.slplayer.component.ui.DisplayObject;
+org.slplayer.component.navigation.Layer.prototype = $extend(org.slplayer.component.ui.DisplayObject.prototype,{
+	doShow: function(nullIfCalledDirectly) {
+		if(this.isListeningShow == false) return;
+		this.isListeningShow = false;
+		console.log("doShow " + this.rootElement.className);
+		if(nullIfCalledDirectly != null) this.rootElement.removeEventListener("transitionEventTypeEnded",$bind(this,this.doShow),false);
+	}
+	,show: function(transitionData) {
+		if(this.status != org.slplayer.component.navigation.LayerStatus.visible) {
+			this.status = org.slplayer.component.navigation.LayerStatus.visible;
+			this.rootElement.style.display = this.styleAttrDisplay;
+			console.log("Transition started SHOW " + this.rootElement.className);
+			while(this.childrenArray.length > 0) {
+				var element = this.childrenArray.shift();
+				this.rootElement.appendChild(element);
+				if(element.tagName != null && (element.tagName.toLowerCase() == "audio" || element.tagName.toLowerCase() == "video")) try {
+					if(element.autoplay == true) element.play();
+					element.muted = org.slplayer.component.sound.SoundOn.isMuted;
+				} catch( e ) {
+					console.log("Layer error: could not access audio or video element");
+				}
+			}
+			this.isListeningShow = true;
+			if(this.detectTransition(transitionData)) this.rootElement.addEventListener("transitionEventTypeEnded",$bind(this,this.doShow),false); else this.doShow(null);
+		} else console.log("Transition - Already visible " + this.rootElement.className);
+	}
+	,doHide: function(nullIfCalledDirectly) {
+		if(this.isListeningHide == false) return;
+		this.isListeningHide = false;
+		if(nullIfCalledDirectly != null) this.rootElement.removeEventListener("transitionEventTypeEnded",$bind(this,this.doHide),false);
+		console.log("doHide " + this.rootElement.className);
+		while(this.rootElement.childNodes.length > 0) {
+			var element = this.rootElement.childNodes[0];
+			this.rootElement.removeChild(element);
+			this.childrenArray.push(element);
+			if(element.tagName != null && (element.tagName.toLowerCase() == "audio" || element.tagName.toLowerCase() == "video")) try {
+				element.pause();
+				element.currentTime = 0;
+			} catch( e ) {
+				console.log("Layer error: could not access audio or video element");
+			}
+		}
+		this.rootElement.style.display = "none";
+	}
+	,hide: function(transitionData) {
+		if(this.status != org.slplayer.component.navigation.LayerStatus.hidden) {
+			console.log("Transition started HIDE " + this.rootElement.className);
+			this.status = org.slplayer.component.navigation.LayerStatus.hidden;
+			this.isListeningHide = true;
+			if(this.detectTransition(transitionData)) this.rootElement.addEventListener("transitionEventTypeEnded",$bind(this,this.doHide),false); else this.doHide(null);
+		} else console.log("Transition - Already hidden " + this.rootElement.className);
+	}
+	,onTransitionStarted: function(event) {
+		console.log("Layer - detected transition " + Std.string(event));
+		this.hasTransitionStarted = true;
+	}
+	,detectTransition: function(transitionData) {
+		this.rootElement.addEventListener("transitionEventTypeStarted",$bind(this,this.onTransitionStarted),false);
+		this.hasTransitionStarted = false;
+		var event = js.Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent("transitionEventTypeRequest",true,true,transitionData);
+		this.rootElement.dispatchEvent(event);
+		this.rootElement.removeEventListener("transitionEventTypeStarted",$bind(this,this.onTransitionStarted),false);
+		return this.hasTransitionStarted;
+	}
+	,styleAttrDisplay: null
+	,hasTransitionStarted: null
+	,status: null
+	,childrenArray: null
+	,isListeningShow: null
+	,isListeningHide: null
+	,__class__: org.slplayer.component.navigation.Layer
+});
+org.slplayer.component.navigation.LinkBase = function(rootElement,SLPId) {
+	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
+	rootElement.addEventListener("click",$bind(this,this.onClick),false);
+	if(rootElement.getAttribute("href") != null) {
+		this.linkName = StringTools.trim(rootElement.getAttribute("href"));
+		this.linkName = HxOverrides.substr(this.linkName,this.linkName.indexOf("#") + 1,null);
+	} else console.log("Warning: the link has no href atribute (" + Std.string(rootElement) + ")");
+	if(rootElement.getAttribute("target") != null && StringTools.trim(rootElement.getAttribute("target")) != "") this.targetAttr = StringTools.trim(rootElement.getAttribute("target"));
+};
+$hxClasses["org.slplayer.component.navigation.LinkBase"] = org.slplayer.component.navigation.LinkBase;
+org.slplayer.component.navigation.LinkBase.__name__ = ["org","slplayer","component","navigation","LinkBase"];
+org.slplayer.component.navigation.LinkBase.__super__ = org.slplayer.component.ui.DisplayObject;
+org.slplayer.component.navigation.LinkBase.prototype = $extend(org.slplayer.component.ui.DisplayObject.prototype,{
+	linkToPage: function(page,targetAttr) {
+	}
+	,linkToPagesWithName: function(linkName,targetAttr) {
+		var pages = js.Lib.document.getElementsByClassName("Page");
+		var _g1 = 0, _g = pages.length;
+		while(_g1 < _g) {
+			var pageIdx = _g1++;
+			if(pages[pageIdx].getAttribute("name") == linkName) {
+				var pageInstances = this.getSLPlayer().getAssociatedComponents(pages[pageIdx],org.slplayer.component.navigation.Page);
+				var $it0 = pageInstances.iterator();
+				while( $it0.hasNext() ) {
+					var page = $it0.next();
+					this.linkToPage(page,targetAttr);
+				}
+				return;
+			}
+		}
+	}
+	,onClick: function(e) {
+		this.transitionData = new org.slplayer.component.transition.TransitionData(null,this.rootElement.getAttribute("data-transition-duration"),this.rootElement.getAttribute("data-transition-timing-function"),this.rootElement.getAttribute("data-transition-delay"),this.rootElement.getAttribute("data-transition-is-reversed") == null);
+		this.linkToPagesWithName(this.linkName,this.targetAttr);
+	}
+	,transitionData: null
+	,targetAttr: null
+	,linkName: null
+	,__class__: org.slplayer.component.navigation.LinkBase
+});
+org.slplayer.component.navigation.LinkToPage = function(rootElement,SLPId) {
+	org.slplayer.component.navigation.LinkBase.call(this,rootElement,SLPId);
+};
+$hxClasses["org.slplayer.component.navigation.LinkToPage"] = org.slplayer.component.navigation.LinkToPage;
+org.slplayer.component.navigation.LinkToPage.__name__ = ["org","slplayer","component","navigation","LinkToPage"];
+org.slplayer.component.navigation.LinkToPage.__super__ = org.slplayer.component.navigation.LinkBase;
+org.slplayer.component.navigation.LinkToPage.prototype = $extend(org.slplayer.component.navigation.LinkBase.prototype,{
+	linkToPage: function(page,targetAttr) {
+		page.open(this.transitionData,targetAttr != "_top");
+	}
+	,__class__: org.slplayer.component.navigation.LinkToPage
+});
+org.slplayer.component.navigation.Page = function(rootElement,SLPId) {
+	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
+	this.name = rootElement.getAttribute("name");
+	if(this.name == null || this.name == "") throw "Pages have to have a 'name' attribute";
+};
+$hxClasses["org.slplayer.component.navigation.Page"] = org.slplayer.component.navigation.Page;
+org.slplayer.component.navigation.Page.__name__ = ["org","slplayer","component","navigation","Page"];
+org.slplayer.component.navigation.Page.__super__ = org.slplayer.component.ui.DisplayObject;
+org.slplayer.component.navigation.Page.prototype = $extend(org.slplayer.component.ui.DisplayObject.prototype,{
+	close: function(transitionData,preventCloseByClassName) {
+		transitionData.type = org.slplayer.component.transition.TransitionType.hide;
+		if(preventCloseByClassName == null) preventCloseByClassName = new Array();
+		var nodes = js.Lib.document.getElementsByClassName(this.name);
+		var _g1 = 0, _g = nodes.length;
+		while(_g1 < _g) {
+			var idxLayerNode = _g1++;
+			var layerNode = nodes[idxLayerNode];
+			var hasForbiddenClass = false;
+			var _g2 = 0;
+			while(_g2 < preventCloseByClassName.length) {
+				var className = preventCloseByClassName[_g2];
+				++_g2;
+				if(org.slplayer.util.DomTools.hasClass(layerNode,className)) {
+					hasForbiddenClass = true;
+					break;
+				}
+			}
+			if(!hasForbiddenClass) {
+				var layerInstances = this.getSLPlayer().getAssociatedComponents(layerNode,org.slplayer.component.navigation.Layer);
+				var $it0 = layerInstances.iterator();
+				while( $it0.hasNext() ) {
+					var layerInstance = $it0.next();
+					(js.Boot.__cast(layerInstance , org.slplayer.component.navigation.Layer)).hide(transitionData);
+				}
+			}
+		}
+	}
+	,doOpen: function(transitionData) {
+		transitionData.type = org.slplayer.component.transition.TransitionType.show;
+		var nodes = js.Lib.document.getElementsByClassName(this.name);
+		var _g1 = 0, _g = nodes.length;
+		while(_g1 < _g) {
+			var idxLayerNode = _g1++;
+			var layerNode = nodes[idxLayerNode];
+			var layerInstances = this.getSLPlayer().getAssociatedComponents(layerNode,org.slplayer.component.navigation.Layer);
+			var $it0 = layerInstances.iterator();
+			while( $it0.hasNext() ) {
+				var layerInstance = $it0.next();
+				layerInstance.show(transitionData);
+			}
+		}
+	}
+	,closeOthers: function(transitionData) {
+		var nodes = js.Lib.document.getElementsByClassName("Page");
+		var _g1 = 0, _g = nodes.length;
+		while(_g1 < _g) {
+			var idxPageNode = _g1++;
+			var pageNode = nodes[idxPageNode];
+			var pageInstances = this.getSLPlayer().getAssociatedComponents(pageNode,org.slplayer.component.navigation.Page);
+			var $it0 = pageInstances.iterator();
+			while( $it0.hasNext() ) {
+				var pageInstance = $it0.next();
+				if(pageInstance != this) pageInstance.close(transitionData,[this.name]);
+			}
+		}
+	}
+	,open: function(transitionData,doCloseOthers) {
+		if(doCloseOthers == null) doCloseOthers = true;
+		if(doCloseOthers) this.closeOthers(transitionData);
+		this.doOpen(transitionData);
+	}
+	,init: function() {
+		if(org.slplayer.util.DomTools.getMeta("initialPageName") == this.name) {
+			console.log("Open home page '" + this.name + "'");
+			var transitionData = new org.slplayer.component.transition.TransitionData(org.slplayer.component.transition.TransitionType.show,"0.01s");
+			this.open(transitionData);
+		}
+	}
+	,name: null
+	,displayName: null
+	,__class__: org.slplayer.component.navigation.Page
+});
+org.slplayer.component.sound = {}
+org.slplayer.component.sound.SoundOn = function(rootElement,SLPId) {
+	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
+	rootElement.onclick = $bind(this,this.onClick);
+};
+$hxClasses["org.slplayer.component.sound.SoundOn"] = org.slplayer.component.sound.SoundOn;
+org.slplayer.component.sound.SoundOn.__name__ = ["org","slplayer","component","sound","SoundOn"];
+org.slplayer.component.sound.SoundOn.mute = function(doMute) {
+	console.log("Sound mute " + Std.string(doMute));
+	var audioTags = js.Lib.document.getElementsByTagName("audio");
+	var _g1 = 0, _g = audioTags.length;
+	while(_g1 < _g) {
+		var idx = _g1++;
+		audioTags[idx].muted = doMute;
+	}
+	org.slplayer.component.sound.SoundOn.isMuted = doMute;
+	var soundOffButtons = js.Lib.document.getElementsByClassName("SoundOff");
+	var soundOnButtons = js.Lib.document.getElementsByClassName("SoundOn");
+	var _g1 = 0, _g = soundOffButtons.length;
+	while(_g1 < _g) {
+		var idx = _g1++;
+		if(doMute) soundOffButtons[idx].style.visibility = "hidden"; else soundOffButtons[idx].style.visibility = "visible";
+	}
+	var _g1 = 0, _g = soundOnButtons.length;
+	while(_g1 < _g) {
+		var idx = _g1++;
+		if(!doMute) soundOnButtons[idx].style.visibility = "hidden"; else soundOnButtons[idx].style.visibility = "visible";
+	}
+}
+org.slplayer.component.sound.SoundOn.__super__ = org.slplayer.component.ui.DisplayObject;
+org.slplayer.component.sound.SoundOn.prototype = $extend(org.slplayer.component.ui.DisplayObject.prototype,{
+	onClick: function(e) {
+		org.slplayer.component.sound.SoundOn.mute(false);
+	}
+	,init: function() {
+		org.slplayer.component.sound.SoundOn.mute(false);
+	}
+	,__class__: org.slplayer.component.sound.SoundOn
+});
+org.slplayer.component.sound.SoundOff = function(rootElement,SLPId) {
+	org.slplayer.component.sound.SoundOn.call(this,rootElement,SLPId);
+};
+$hxClasses["org.slplayer.component.sound.SoundOff"] = org.slplayer.component.sound.SoundOff;
+org.slplayer.component.sound.SoundOff.__name__ = ["org","slplayer","component","sound","SoundOff"];
+org.slplayer.component.sound.SoundOff.__super__ = org.slplayer.component.sound.SoundOn;
+org.slplayer.component.sound.SoundOff.prototype = $extend(org.slplayer.component.sound.SoundOn.prototype,{
+	onClick: function(e) {
+		console.log("Sound onClick");
+		org.slplayer.component.sound.SoundOn.mute(true);
+	}
+	,__class__: org.slplayer.component.sound.SoundOff
+});
+org.slplayer.component.transition = {}
+org.slplayer.component.transition.TransitionType = $hxClasses["org.slplayer.component.transition.TransitionType"] = { __ename__ : ["org","slplayer","component","transition","TransitionType"], __constructs__ : ["show","hide"] }
+org.slplayer.component.transition.TransitionType.show = ["show",0];
+org.slplayer.component.transition.TransitionType.show.toString = $estr;
+org.slplayer.component.transition.TransitionType.show.__enum__ = org.slplayer.component.transition.TransitionType;
+org.slplayer.component.transition.TransitionType.hide = ["hide",1];
+org.slplayer.component.transition.TransitionType.hide.toString = $estr;
+org.slplayer.component.transition.TransitionType.hide.__enum__ = org.slplayer.component.transition.TransitionType;
+org.slplayer.component.transition.TransitionData = function(transitionType,transitionDuration,transitionTimingFunction,transitionDelay,transitionIsReversed) {
+	if(transitionIsReversed == null) transitionIsReversed = false;
+	if(transitionDelay == null) transitionDelay = "0";
+	if(transitionTimingFunction == null) transitionTimingFunction = "linear";
+	if(transitionDuration == null) transitionDuration = ".5s";
+	this.type = transitionType;
+	this.duration = transitionDuration;
+	this.timingFunction = transitionTimingFunction;
+	this.delay = transitionDelay;
+	this.isReversed = transitionIsReversed;
+};
+$hxClasses["org.slplayer.component.transition.TransitionData"] = org.slplayer.component.transition.TransitionData;
+org.slplayer.component.transition.TransitionData.__name__ = ["org","slplayer","component","transition","TransitionData"];
+org.slplayer.component.transition.TransitionData.prototype = {
+	isReversed: null
+	,type: null
+	,delay: null
+	,timingFunction: null
+	,duration: null
+	,__class__: org.slplayer.component.transition.TransitionData
+}
+org.slplayer.core = {}
+org.slplayer.core.Application = function(id,args) {
 	this.dataObject = args;
 	this.id = id;
-	this.registeredComponents = new Hash();
+	this.nodesIdSequence = 0;
+	this.registeredComponents = new Array();
 	this.nodeToCmpInstances = new Hash();
 	this.metaParameters = new Hash();
 	console.log("new SLPlayer instance built");
 };
-$hxClasses["slplayer.core.Application"] = slplayer.core.Application;
-$hxExpose(slplayer.core.Application, "dragDrop");
-slplayer.core.Application.__name__ = ["slplayer","core","Application"];
-slplayer.core.Application.get = function(SLPId) {
-	return slplayer.core.Application.instances.get(SLPId);
+$hxClasses["org.slplayer.core.Application"] = org.slplayer.core.Application;
+$hxExpose(org.slplayer.core.Application, "toolbar");
+org.slplayer.core.Application.__name__ = ["org","slplayer","core","Application"];
+org.slplayer.core.Application.get = function(SLPId) {
+	return org.slplayer.core.Application.instances.get(SLPId);
 }
-slplayer.core.Application.generateUniqueId = function() {
-	return haxe.Md5.encode(HxOverrides.dateStr(new Date()) + Std.string(Std.random(new Date().getTime() | 0)));
-}
-slplayer.core.Application.init = function(appendTo,args) {
-	console.log("SLPlayer init() called with appendTo=" + Std.string(appendTo) + " and args=" + Std.string(args));
-	var newId = slplayer.core.Application.generateUniqueId();
-	console.log("New SLPlayer id created : " + newId);
-	var newInstance = new slplayer.core.Application(newId,args);
-	console.log("setting ref to SLPlayer instance " + newId);
-	slplayer.core.Application.instances.set(newId,newInstance);
+org.slplayer.core.Application.main = function() {
+	console.log("noAutoStart not defined: calling init()...");
+	var newApp = org.slplayer.core.Application.createApplication();
 	js.Lib.window.onload = function(e) {
-		newInstance.launch(appendTo);
+		newApp.init();
 	};
 }
-slplayer.core.Application.main = function() {
-	console.log("noAutoStart not defined: calling init()...");
-	slplayer.core.Application.init();
+org.slplayer.core.Application.createApplication = function(args) {
+	console.log("SLPlayer createApplication() called with args=" + Std.string(args));
+	var newId = org.slplayer.core.Application.generateUniqueId();
+	console.log("New SLPlayer id created : " + newId);
+	var newInstance = new org.slplayer.core.Application(newId,args);
+	console.log("setting ref to SLPlayer instance " + newId);
+	org.slplayer.core.Application.instances.set(newId,newInstance);
+	return newInstance;
 }
-slplayer.core.Application.prototype = {
-	getAssociatedComponents: function(node) {
+org.slplayer.core.Application.generateUniqueId = function() {
+	return haxe.Md5.encode(HxOverrides.dateStr(new Date()) + Std.string(Std.random(new Date().getTime() | 0)));
+}
+org.slplayer.core.Application.prototype = {
+	getUnconflictedClassTag: function(displayObjectClassName) {
+		var classTag = displayObjectClassName;
+		if(classTag.indexOf(".") != -1) classTag = HxOverrides.substr(classTag,classTag.lastIndexOf(".") + 1,null);
+		var _g = 0, _g1 = this.registeredComponents;
+		while(_g < _g1.length) {
+			var rc = _g1[_g];
+			++_g;
+			if(rc.classname != displayObjectClassName && classTag == HxOverrides.substr(rc.classname,classTag.lastIndexOf(".") + 1,null)) return displayObjectClassName;
+		}
+		return classTag;
+	}
+	,getAssociatedComponents: function(node,typeFilter) {
 		var nodeId = node.getAttribute("data-" + "slpid");
-		if(nodeId != null) return this.nodeToCmpInstances.get(nodeId);
+		if(nodeId != null) {
+			var l = new List();
+			var $it0 = this.nodeToCmpInstances.get(nodeId).iterator();
+			while( $it0.hasNext() ) {
+				var i = $it0.next();
+				if(js.Boot.__instanceof(i,typeFilter)) {
+					var inst = i;
+					l.add(inst);
+				}
+			}
+			return l;
+		}
 		return new List();
 	}
 	,addAssociatedComponent: function(node,cmp) {
 		var nodeId = node.getAttribute("data-" + "slpid");
 		var associatedCmps;
 		if(nodeId != null) associatedCmps = this.nodeToCmpInstances.get(nodeId); else {
-			nodeId = slplayer.core.Application.generateUniqueId();
+			this.nodesIdSequence++;
+			nodeId = Std.string(this.nodesIdSequence);
 			node.setAttribute("data-" + "slpid",nodeId);
 			associatedCmps = new List();
 		}
@@ -1720,12 +2025,7 @@ slplayer.core.Application.prototype = {
 			var $it1 = l.iterator();
 			while( $it1.hasNext() ) {
 				var c = $it1.next();
-				try {
-					c.init();
-				} catch( unknown ) {
-					console.log("ERROR while trying to call init() on a " + Type.getClassName(Type.getClass(c)) + ": " + Std.string(unknown));
-					console.log(haxe.Stack.toString(haxe.Stack.exceptionStack()));
-				}
+				c.init();
 			}
 		}
 	}
@@ -1733,12 +2033,13 @@ slplayer.core.Application.prototype = {
 		console.log("Creating " + componentClassName + "...");
 		var componentClass = Type.resolveClass(componentClassName);
 		if(componentClass == null) {
-			console.log("ERROR cannot resolve " + componentClassName);
+			var rslErrMsg = "ERROR cannot resolve " + componentClassName;
+			throw rslErrMsg;
 			return;
 		}
 		console.log(componentClassName + " class resolved ");
-		if(slplayer.ui.DisplayObject.isDisplayObject(componentClass)) {
-			var classTag = slplayer.core.SLPlayerComponentTools.getUnconflictedClassTag(componentClassName,this.registeredComponents.keys());
+		if(org.slplayer.component.ui.DisplayObject.isDisplayObject(componentClass)) {
+			var classTag = this.getUnconflictedClassTag(componentClassName);
 			console.log("searching now for class tag = " + classTag);
 			var taggedNodes = new Array();
 			var taggedNodesCollection = this.htmlRootElement.getElementsByClassName(classTag);
@@ -1762,59 +2063,52 @@ slplayer.core.Application.prototype = {
 				var node = taggedNodes[_g];
 				++_g;
 				var newDisplayObject;
-				try {
-					newDisplayObject = Type.createInstance(componentClass,[node,this.id]);
-				} catch( unknown ) {
-					console.log("ERROR while creating " + componentClassName + ": " + Std.string(unknown));
-					console.log(haxe.Stack.toString(haxe.Stack.exceptionStack()));
-				}
+				newDisplayObject = Type.createInstance(componentClass,[node,this.id]);
+				console.log("Successfuly created instance of " + componentClassName);
 			}
 		} else {
 			console.log("Try to create an instance of " + componentClassName + " non visual component");
 			var cmpInstance = null;
-			try {
-				if(args != null) cmpInstance = Type.createInstance(componentClass,[args]); else cmpInstance = Type.createInstance(componentClass,[]);
-			} catch( unknown ) {
-				console.log("ERROR while creating " + componentClassName + ": " + Std.string(unknown));
-				console.log(haxe.Stack.toString(haxe.Stack.exceptionStack()));
-			}
-			if(cmpInstance != null && js.Boot.__instanceof(cmpInstance,slplayer.core.ISLPlayerComponent)) cmpInstance.initSLPlayerComponent(this.id);
+			if(args != null) cmpInstance = Type.createInstance(componentClass,[args]); else cmpInstance = Type.createInstance(componentClass,[]);
+			console.log("Successfuly created instance of " + componentClassName);
+			if(cmpInstance != null && js.Boot.__instanceof(cmpInstance,org.slplayer.component.ISLPlayerComponent)) cmpInstance.initSLPlayerComponent(this.id);
 		}
 	}
 	,initComponents: function() {
-		var registeredComponentsClassNames = this.registeredComponents.keys();
-		while(registeredComponentsClassNames.hasNext()) {
-			var registeredComponentsClassName = registeredComponentsClassNames.next();
-			this.createComponentsOfType(registeredComponentsClassName,this.registeredComponents.get(registeredComponentsClassName));
+		var _g = 0, _g1 = this.registeredComponents;
+		while(_g < _g1.length) {
+			var rc = _g1[_g];
+			++_g;
+			this.createComponentsOfType(rc.classname,rc.args);
 		}
 		this.callInitOnComponents();
 	}
 	,registerComponent: function(componentClassName,args) {
-		this.registeredComponents.set(componentClassName,args);
+		this.registeredComponents.push({ classname : componentClassName, args : args});
 	}
 	,registerComponentsforInit: function() {
-		slplayer.ui.interaction.Draggable;
-		this.registerComponent("slplayer.ui.interaction.Draggable");
+		org.slplayer.component.navigation.Page;
+		this.registerComponent("org.slplayer.component.navigation.Page");
+		org.slplayer.component.navigation.Layer;
+		this.registerComponent("org.slplayer.component.navigation.Layer");
+		org.slplayer.component.navigation.LinkToPage;
+		this.registerComponent("org.slplayer.component.navigation.LinkToPage");
 	}
 	,initMetaParameters: function() {
+		this.metaParameters.set("initialPageName","welcome");
 	}
-	,initHtmlRootElementContent: function() {
-	}
-	,launch: function(appendTo) {
-		console.log("Launching SLPlayer id " + this.id + " on " + Std.string(appendTo));
-		if(appendTo != null) {
-			console.log("setting htmlRootElement to " + Std.string(appendTo));
-			this.htmlRootElement = appendTo;
-		}
+	,init: function(appendTo) {
+		console.log("Initializing SLPlayer id " + this.id + " on " + Std.string(appendTo));
+		console.log("setting htmlRootElement to " + Std.string(appendTo));
+		this.htmlRootElement = appendTo;
 		if(this.htmlRootElement == null || this.htmlRootElement.nodeType != js.Lib.document.body.nodeType) {
 			console.log("setting htmlRootElement to Lib.document.body");
 			this.htmlRootElement = js.Lib.document.body;
 		}
 		if(this.htmlRootElement == null) {
-			console.log("ERROR windows.document.body is null => You are trying to start your application while the document loading is probably not complete yet." + " To fix that, add the noAutoStart option to your slplayer application and control the application startup with: window.onload = function() { myApplication.init() };");
+			console.log("ERROR Lib.document.body is null => You are trying to start your application while the document loading is probably not complete yet." + " To fix that, add the noAutoStart option to your slplayer application and control the application startup with: window.onload = function() { myApplication.init() };");
 			return;
 		}
-		this.initHtmlRootElementContent();
 		this.initMetaParameters();
 		this.registerComponentsforInit();
 		this.initComponents();
@@ -1828,247 +2122,15 @@ slplayer.core.Application.prototype = {
 	,dataObject: null
 	,htmlRootElement: null
 	,nodeToCmpInstances: null
+	,nodesIdSequence: null
 	,id: null
-	,__class__: slplayer.core.Application
+	,__class__: org.slplayer.core.Application
 }
-slplayer.core.ISLPlayerComponent = function() { }
-$hxClasses["slplayer.core.ISLPlayerComponent"] = slplayer.core.ISLPlayerComponent;
-slplayer.core.ISLPlayerComponent.__name__ = ["slplayer","core","ISLPlayerComponent"];
-slplayer.core.ISLPlayerComponent.prototype = {
-	getSLPlayer: null
-	,SLPlayerInstanceId: null
-	,__class__: slplayer.core.ISLPlayerComponent
-}
-slplayer.core.SLPlayerComponent = function() { }
-$hxClasses["slplayer.core.SLPlayerComponent"] = slplayer.core.SLPlayerComponent;
-slplayer.core.SLPlayerComponent.__name__ = ["slplayer","core","SLPlayerComponent"];
-slplayer.core.SLPlayerComponent.initSLPlayerComponent = function(component,SLPlayerInstanceId) {
-	component.SLPlayerInstanceId = SLPlayerInstanceId;
-}
-slplayer.core.SLPlayerComponent.getSLPlayer = function(component) {
-	return slplayer.core.Application.get(component.SLPlayerInstanceId);
-}
-slplayer.core.SLPlayerComponentTools = function() { }
-$hxClasses["slplayer.core.SLPlayerComponentTools"] = slplayer.core.SLPlayerComponentTools;
-slplayer.core.SLPlayerComponentTools.__name__ = ["slplayer","core","SLPlayerComponentTools"];
-slplayer.core.SLPlayerComponentTools.checkRequiredParameters = function(cmpClass,elt) {
-	var requires = haxe.rtti.Meta.getType(cmpClass).requires;
-	if(requires == null) return;
-	var _g = 0;
-	while(_g < requires.length) {
-		var r = requires[_g];
-		++_g;
-		if(elt.getAttribute(Std.string(r)) == null || StringTools.trim(elt.getAttribute(Std.string(r))) == "") throw Std.string(r) + " parameter is required for " + Type.getClassName(cmpClass);
-	}
-}
-slplayer.core.SLPlayerComponentTools.getUnconflictedClassTag = function(displayObjectClassName,registeredComponentsClassNames) {
-	var classTag = displayObjectClassName;
-	if(classTag.indexOf(".") != -1) classTag = HxOverrides.substr(classTag,classTag.lastIndexOf(".") + 1,null);
-	while(registeredComponentsClassNames.hasNext()) {
-		var registeredComponentClassName = registeredComponentsClassNames.next();
-		if(registeredComponentClassName != displayObjectClassName && classTag == HxOverrides.substr(registeredComponentClassName,classTag.lastIndexOf(".") + 1,null)) return displayObjectClassName;
-	}
-	return classTag;
-}
-slplayer.ui = {}
-slplayer.ui.IDisplayObject = function() { }
-$hxClasses["slplayer.ui.IDisplayObject"] = slplayer.ui.IDisplayObject;
-slplayer.ui.IDisplayObject.__name__ = ["slplayer","ui","IDisplayObject"];
-slplayer.ui.IDisplayObject.__interfaces__ = [slplayer.core.ISLPlayerComponent];
-slplayer.ui.IDisplayObject.prototype = {
-	rootElement: null
-	,__class__: slplayer.ui.IDisplayObject
-}
-slplayer.ui.DisplayObject = function(rootElement,SLPId) {
-	this.rootElement = rootElement;
-	slplayer.core.SLPlayerComponent.initSLPlayerComponent(this,SLPId);
-	slplayer.core.Application.get(this.SLPlayerInstanceId).addAssociatedComponent(rootElement,this);
-	console.log("Successfuly created instance of " + Type.getClassName(Type.getClass(this)));
-};
-$hxClasses["slplayer.ui.DisplayObject"] = slplayer.ui.DisplayObject;
-slplayer.ui.DisplayObject.__name__ = ["slplayer","ui","DisplayObject"];
-slplayer.ui.DisplayObject.__interfaces__ = [slplayer.ui.IDisplayObject];
-slplayer.ui.DisplayObject.isDisplayObject = function(cmpClass) {
-	if(cmpClass == Type.resolveClass("slplayer.ui.DisplayObject")) return true;
-	if(Type.getSuperClass(cmpClass) != null) return slplayer.ui.DisplayObject.isDisplayObject(Type.getSuperClass(cmpClass));
-	return false;
-}
-slplayer.ui.DisplayObject.checkFilterOnElt = function(cmpClass,elt) {
-	if(elt.nodeType != js.Lib.document.body.nodeType) throw "cannot instantiate " + Type.getClassName(cmpClass) + " on a non element node.";
-	var tagFilter = haxe.rtti.Meta.getType(cmpClass) != null?haxe.rtti.Meta.getType(cmpClass).tagNameFilter:null;
-	if(tagFilter == null) return;
-	if(Lambda.exists(tagFilter,function(s) {
-		return elt.nodeName.toLowerCase() == Std.string(s).toLowerCase();
-	})) return;
-	throw "cannot instantiate " + Type.getClassName(cmpClass) + " on this type of HTML element: " + elt.nodeName.toLowerCase();
-}
-slplayer.ui.DisplayObject.prototype = {
-	init: function() {
-	}
-	,getSLPlayer: function() {
-		return slplayer.core.SLPlayerComponent.getSLPlayer(this);
-	}
-	,rootElement: null
-	,SLPlayerInstanceId: null
-	,__class__: slplayer.ui.DisplayObject
-}
-slplayer.ui.interaction = {}
-slplayer.ui.interaction.DraggableState = $hxClasses["slplayer.ui.interaction.DraggableState"] = { __ename__ : ["slplayer","ui","interaction","DraggableState"], __constructs__ : ["none","dragging"] }
-slplayer.ui.interaction.DraggableState.none = ["none",0];
-slplayer.ui.interaction.DraggableState.none.toString = $estr;
-slplayer.ui.interaction.DraggableState.none.__enum__ = slplayer.ui.interaction.DraggableState;
-slplayer.ui.interaction.DraggableState.dragging = ["dragging",1];
-slplayer.ui.interaction.DraggableState.dragging.toString = $estr;
-slplayer.ui.interaction.DraggableState.dragging.__enum__ = slplayer.ui.interaction.DraggableState;
-slplayer.ui.interaction.Draggable = function(rootElement,SLPId) {
-	slplayer.ui.DisplayObject.call(this,rootElement,SLPId);
-	this.state = slplayer.ui.interaction.DraggableState.none;
-	this.dropZonesClassName = rootElement.getAttribute("data-dropzones-class-name");
-	if(this.dropZonesClassName == null || this.dropZonesClassName == "") this.dropZonesClassName = "draggable-dropzone";
-};
-$hxClasses["slplayer.ui.interaction.Draggable"] = slplayer.ui.interaction.Draggable;
-slplayer.ui.interaction.Draggable.__name__ = ["slplayer","ui","interaction","Draggable"];
-slplayer.ui.interaction.Draggable.__super__ = slplayer.ui.DisplayObject;
-slplayer.ui.interaction.Draggable.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
-	setAsBestDropZone: function(zone) {
-		if(zone == this.bestDropZone) return;
-		if(this.bestDropZone != null) this.bestDropZone.parent.removeChild(this.phantom);
-		if(zone != null) zone.parent.insertBefore(this.phantom,zone.parent.childNodes[zone.position]);
-		this.bestDropZone = zone;
-	}
-	,getBestDropZone: function(mouseX,mouseY) {
-		var _g1 = 0, _g = this.dropZones.length;
-		while(_g1 < _g) {
-			var zoneIdx = _g1++;
-			var zone = this.dropZones[zoneIdx];
-			if(mouseX > zone.offsetLeft && mouseX < zone.offsetLeft + zone.offsetWidth && mouseY > zone.offsetTop && mouseY < zone.offsetTop + zone.offsetHeight) {
-				var lastChildIdx = 0;
-				var _g3 = 0, _g2 = zone.childNodes.length;
-				while(_g3 < _g2) {
-					var childIdx = _g3++;
-					var child = zone.childNodes[childIdx];
-					if(mouseX > child.offsetLeft + Math.round(child.offsetWidth / 2)) lastChildIdx = childIdx;
-				}
-				return { parent : zone, position : lastChildIdx};
-			}
-		}
-		return null;
-	}
-	,move: function(e) {
-		if(this.state == slplayer.ui.interaction.DraggableState.dragging) {
-			var x = e.clientX - this.initialMouseX + this.initialX;
-			var y = e.clientY - this.initialMouseY + this.initialY;
-			this.rootElement.style.left = x + "px";
-			this.rootElement.style.top = y + "px";
-			this.setAsBestDropZone(this.getBestDropZone(e.clientX,e.clientY));
-		}
-	}
-	,stopDrag: function(e) {
-		console.log("Draggable stopDrag droped! " + Std.string(this.state));
-		if(this.state == slplayer.ui.interaction.DraggableState.dragging) {
-			console.log("Draggable stopDrag droped! " + Std.string(this.bestDropZone));
-			if(this.bestDropZone != null) {
-				this.rootElement.parentNode.removeChild(this.rootElement);
-				this.bestDropZone.parent.insertBefore(this.rootElement,this.bestDropZone.parent.childNodes[this.bestDropZone.position]);
-				console.log("Draggable stopDrag droped! " + Std.string(this.state));
-				var event = js.Lib.document.createEvent("CustomEvent");
-				event.initCustomEvent("dragEventDropped",false,false,this.bestDropZone.parent);
-				this.bestDropZone.parent.dispatchEvent(event);
-				event = js.Lib.document.createEvent("CustomEvent");
-				event.initCustomEvent("dragEventDropped",false,false,this.rootElement);
-				this.rootElement.dispatchEvent(event);
-			}
-			this.state = slplayer.ui.interaction.DraggableState.none;
-			this.resetRootElementStyle();
-			js.Lib.document.body.onmousemove = null;
-			this.setAsBestDropZone(null);
-			return false;;
-		}
-		return true;;
-	}
-	,startDrag: function(e) {
-		var _g = this;
-		console.log("Draggable startDrag " + Std.string(this.state));
-		if(this.state == slplayer.ui.interaction.DraggableState.none) {
-			this.state = slplayer.ui.interaction.DraggableState.dragging;
-			this.initialX = this.rootElement.offsetLeft;
-			this.initialY = this.rootElement.offsetTop;
-			this.initialMouseX = e.clientX;
-			this.initialMouseY = e.clientY;
-			this.initPhantomStyle();
-			this.initRootElementStyle();
-			js.Lib.document.onmousemove = function(e1) {
-				_g.move(e1);
-			};
-			this.move(e);
-			var event = js.Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent("dragEventDrag",false,false,this.rootElement);
-			this.rootElement.dispatchEvent(event);
-		}
-		return false;;
-	}
-	,resetRootElementStyle: function() {
-		var _g = 0, _g1 = Reflect.fields(this.initialStyle);
-		while(_g < _g1.length) {
-			var styleName = _g1[_g];
-			++_g;
-			var val = Reflect.field(this.initialStyle,styleName);
-			this.rootElement.style[styleName] = val;
-		}
-	}
-	,initPhantomStyle: function() {
-		var computedStyle = window.getComputedStyle(this.rootElement, null);
-		console.log("initPhantomStyle " + Std.string(computedStyle));
-		var _g = 0, _g1 = Reflect.fields(computedStyle);
-		while(_g < _g1.length) {
-			var styleName = _g1[_g];
-			++_g;
-			var val = Reflect.field(computedStyle,styleName);
-			var mozzVal = computedStyle.getPropertyValue(val);
-			if(mozzVal != null) val = mozzVal;
-			this.phantom.style[styleName] = val;
-		}
-		this.phantom.className = this.rootElement.className + " " + "draggable-phantom";
-	}
-	,initRootElementStyle: function() {
-		this.initialStyle = { };
-		this.initialStyle.width = this.rootElement.style.width;
-		this.rootElement.style.width = this.rootElement.clientWidth + "px";
-		this.initialStyle.height = this.rootElement.style.height;
-		this.rootElement.style.height = this.rootElement.clientHeight + "px";
-		this.initialStyle.position = this.rootElement.style.position;
-		this.rootElement.style.position = "absolute";
-	}
-	,init: function() {
-		slplayer.ui.DisplayObject.prototype.init.call(this);
-		console.log("Draggable init");
-		this.phantom = js.Lib.document.createElement("div");
-		this.dragZone = slplayer.util.DomTools.getSingleElement(this.rootElement,"draggable-dragzone",false);
-		if(this.dragZone == null) this.dragZone = this.rootElement;
-		this.dropZones = slplayer.util.DomTools.getElementsByClassName(js.Lib.document.body,this.dropZonesClassName);
-		if(this.dropZones.length == 0) this.dropZones[0] = this.rootElement.parentNode;
-		this.dragZone.onmousedown = $bind(this,this.startDrag);
-		this.dragZone.onmouseup = $bind(this,this.stopDrag);
-		this.dragZone.style.cursor = "move";
-	}
-	,initialY: null
-	,initialX: null
-	,initialMouseY: null
-	,initialMouseX: null
-	,initialStyle: null
-	,bestDropZone: null
-	,dropZonesClassName: null
-	,dropZones: null
-	,dragZone: null
-	,state: null
-	,phantom: null
-	,__class__: slplayer.ui.interaction.Draggable
-});
-slplayer.util = {}
-slplayer.util.DomTools = function() { }
-$hxClasses["slplayer.util.DomTools"] = slplayer.util.DomTools;
-slplayer.util.DomTools.__name__ = ["slplayer","util","DomTools"];
-slplayer.util.DomTools.getElementsByAttribute = function(elt,attr,value) {
+org.slplayer.util = {}
+org.slplayer.util.DomTools = function() { }
+$hxClasses["org.slplayer.util.DomTools"] = org.slplayer.util.DomTools;
+org.slplayer.util.DomTools.__name__ = ["org","slplayer","util","DomTools"];
+org.slplayer.util.DomTools.getElementsByAttribute = function(elt,attr,value) {
 	var childElts = elt.getElementsByTagName("*");
 	var filteredChildElts = new Array();
 	var _g1 = 0, _g = childElts.length;
@@ -2078,24 +2140,76 @@ slplayer.util.DomTools.getElementsByAttribute = function(elt,attr,value) {
 	}
 	return filteredChildElts;
 }
-slplayer.util.DomTools.getElementsByClassName = function(rootElement,className) {
-	return rootElement.getElementsByClassName(className);
-}
-slplayer.util.DomTools.getSingleElement = function(rootElement,className,required) {
+org.slplayer.util.DomTools.getSingleElement = function(rootElement,className,required) {
 	if(required == null) required = true;
-	var domElements = slplayer.util.DomTools.getElementsByClassName(rootElement,className);
+	var domElements = rootElement.getElementsByClassName(className);
 	if(domElements != null && domElements.length == 1) return domElements[0]; else {
 		if(required) throw "Error: search for the element with class name \"" + className + "\" gave " + domElements.length + " results";
 		return null;
 	}
 }
-slplayer.util.DomTools.inspectTrace = function(obj) {
+org.slplayer.util.DomTools.inspectTrace = function(obj) {
 	var _g = 0, _g1 = Reflect.fields(obj);
 	while(_g < _g1.length) {
 		var prop = _g1[_g];
 		++_g;
 		console.log("- " + prop + " = " + Std.string(Reflect.field(obj,prop)));
 	}
+}
+org.slplayer.util.DomTools.toggleClass = function(element,className) {
+	if(org.slplayer.util.DomTools.hasClass(element,className)) org.slplayer.util.DomTools.removeClass(element,className); else org.slplayer.util.DomTools.addClass(element,className);
+}
+org.slplayer.util.DomTools.addClass = function(element,className) {
+	if(!org.slplayer.util.DomTools.hasClass(element,className)) element.className += " " + className;
+}
+org.slplayer.util.DomTools.removeClass = function(element,className) {
+	if(org.slplayer.util.DomTools.hasClass(element,className)) element.className = StringTools.replace(element.className,className,"");
+}
+org.slplayer.util.DomTools.hasClass = function(element,className) {
+	return element.className.indexOf(className) > -1;
+}
+org.slplayer.util.DomTools.setMeta = function(metaName,metaValue,attributeName) {
+	if(attributeName == null) attributeName = "content";
+	var res = new Hash();
+	var metaTags = js.Lib.document.getElementsByTagName("META");
+	var found = false;
+	var _g1 = 0, _g = metaTags.length;
+	while(_g1 < _g) {
+		var idxNode = _g1++;
+		var node = metaTags[idxNode];
+		var configName = node.getAttribute("name");
+		var configValue = node.getAttribute(attributeName);
+		if(configName != null && configValue != null) {
+			if(configName == metaName) {
+				configValue = metaValue;
+				node.setAttribute(attributeName,metaValue);
+				found = true;
+			}
+			res.set(configName,configValue);
+		}
+	}
+	if(!found) {
+		var node = js.Lib.document.createElement("meta");
+		node.setAttribute("name",metaName);
+		node.setAttribute("content",metaValue);
+		var head = js.Lib.document.getElementsByTagName("head")[0];
+		head.appendChild(node);
+		res.set(metaName,metaValue);
+	}
+	return res;
+}
+org.slplayer.util.DomTools.getMeta = function(name,attributeName) {
+	if(attributeName == null) attributeName = "content";
+	var metaTags = js.Lib.document.getElementsByTagName("meta");
+	var _g1 = 0, _g = metaTags.length;
+	while(_g1 < _g) {
+		var idxNode = _g1++;
+		var node = metaTags[idxNode];
+		var configName = node.getAttribute("name");
+		var configValue = node.getAttribute(attributeName);
+		if(configName == name) return configValue;
+	}
+	return null;
 }
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; };
 var $_;
@@ -2148,15 +2262,35 @@ haxe.Template.expr_int = new EReg("^[0-9]+$","");
 haxe.Template.expr_float = new EReg("^([+-]?)(?=\\d|,\\d)\\d*(,\\d*)?([Ee]([+-]?\\d+))?$","");
 haxe.Template.globals = { };
 js.Lib.onerror = null;
-slplayer.core.Application.SLPID_ATTR_NAME = "slpid";
-slplayer.core.Application.instances = new Hash();
-slplayer.ui.interaction.Draggable.CSS_CLASS_DRAGZONE = "draggable-dragzone";
-slplayer.ui.interaction.Draggable.CSS_CLASS_DROPZONE = "draggable-dropzone";
-slplayer.ui.interaction.Draggable.CSS_CLASS_PHANTOM = "draggable-phantom";
-slplayer.ui.interaction.Draggable.ATTR_DROPZONE = "data-dropzones-class-name";
-slplayer.ui.interaction.Draggable.EVENT_DRAG = "dragEventDrag";
-slplayer.ui.interaction.Draggable.EVENT_DROPPED = "dragEventDropped";
-slplayer.core.Application.main();
+org.slplayer.component.navigation.LinkBase.__meta__ = { obj : { tagNameFilter : ["a"]}};
+org.slplayer.component.navigation.LinkBase.CONFIG_PAGE_NAME_ATTR = "href";
+org.slplayer.component.navigation.LinkBase.CONFIG_TARGET_ATTR = "target";
+org.slplayer.component.navigation.LinkBase.CONFIG_TRANSITION_DURATION = "data-transition-duration";
+org.slplayer.component.navigation.LinkBase.CONFIG_TRANSITION_TIMING_FUNCTION = "data-transition-timing-function";
+org.slplayer.component.navigation.LinkBase.CONFIG_TRANSITION_DELAY = "data-transition-delay";
+org.slplayer.component.navigation.LinkBase.CONFIG_TRANSITION_IS_REVERSED = "data-transition-is-reversed";
+org.slplayer.component.navigation.LinkToPage.__meta__ = { obj : { tagNameFilter : ["a"]}};
+org.slplayer.component.navigation.LinkToPage.CONFIG_TARGET_IS_POPUP = "_top";
+org.slplayer.component.navigation.Page.__meta__ = { obj : { tagNameFilter : ["a"]}};
+org.slplayer.component.navigation.Page.CLASS_NAME = "Page";
+org.slplayer.component.navigation.Page.CONFIG_NAME_ATTR = "name";
+org.slplayer.component.navigation.Page.CONFIG_INITIAL_PAGE_NAME = "initialPageName";
+org.slplayer.component.sound.SoundOn.__meta__ = { obj : { tagNameFilter : ["a"]}};
+org.slplayer.component.sound.SoundOn.CLASS_NAME = "SoundOn";
+org.slplayer.component.sound.SoundOn.isMuted = false;
+org.slplayer.component.sound.SoundOff.__meta__ = { obj : { tagNameFilter : ["a"]}};
+org.slplayer.component.sound.SoundOff.CLASS_NAME = "SoundOff";
+org.slplayer.component.transition.TransitionData.EVENT_TYPE_REQUEST = "transitionEventTypeRequest";
+org.slplayer.component.transition.TransitionData.EVENT_TYPE_STARTED = "transitionEventTypeStarted";
+org.slplayer.component.transition.TransitionData.EVENT_TYPE_ENDED = "transitionEventTypeEnded";
+org.slplayer.component.transition.TransitionData.LINEAR = "linear";
+org.slplayer.component.transition.TransitionData.EASE = "ease";
+org.slplayer.component.transition.TransitionData.EASE_IN = "ease-in";
+org.slplayer.component.transition.TransitionData.EASE_OUT = "ease-out";
+org.slplayer.component.transition.TransitionData.EASE_IN_OUT = "ease-in-out";
+org.slplayer.core.Application.SLPID_ATTR_NAME = "slpid";
+org.slplayer.core.Application.instances = new Hash();
+org.slplayer.core.Application.main();
 function $hxExpose(src, path) {
 	var o = window;
 	var parts = path.split(".");
@@ -2168,3 +2302,5 @@ function $hxExpose(src, path) {
 	o[parts[parts.length-1]] = src;
 }
 })();
+
+//@ sourceMappingURL=toolbar.js.map
