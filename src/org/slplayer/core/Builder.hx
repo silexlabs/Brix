@@ -685,16 +685,16 @@ class Builder
 				//FIXME use constants
 				case 3:		//Node.TEXT_NODE
 					
-					switch (elt.coreStyle.whiteSpace)
+					switch (elt.style.whiteSpace)
 					{
-						case normal, nowrap: // both lines and spaces
+						case "normal", "nowrap": // both lines and spaces
 							
 							var er1 : EReg = ~/[ \t]+/;
 							var er2 : EReg = ~/  +/;
 							
 							nc.nodeValue = er2.replace( er1.replace( nc.nodeValue , " " ) , " " );
 						
-						case preLine: // spaces
+						case "pre-line": // spaces
 							
 							var er1 : EReg = ~/ *$^ */m;
 							var er2 : EReg = ~/[ \t]+/;
