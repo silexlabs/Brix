@@ -1,12 +1,7 @@
 package org.slplayer.component.navigation;
 
-typedef StyleSheet = {
-var type : String;
-var disabled : Bool;
-var href : String;
-var title : String;
-// ??? more ???
-}
+
+import org.slplayer.util.DomTools;
 
 /*
  * This file is part of SLPlayer http://www.silexlabs.org/groups/labs/slplayer/
@@ -70,17 +65,9 @@ class LinkToContext extends LinkBase
 			Lib.document.getElementsByTagName("head")[0].removeChild(cast(styleSheet));	
 		}
 
-		var node = Lib.document.createElement('style');
-		node.setAttribute('type', 'text/css');
-
 		//var cssText = "."+linkName+" { visibility : visible; }";
 		var cssText = "."+linkName+" { display : inline; visibility : visible; }";
-		node.appendChild(Lib.document.createTextNode(cssText));
-		
-		Lib.document.getElementsByTagName("head")[0].appendChild(node);
 
-		trace("LinkToContext added "+cssText);
-
-		styleSheet = cast(node);
+		styleSheet = DomTools.addCssRules(cssText);
 	}
 }

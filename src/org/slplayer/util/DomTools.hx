@@ -181,4 +181,30 @@ class DomTools
 		}
 		return null;
 	}
+	/**
+	 * Add a css tag with the given CSS rules in it
+	 * @param	css 			String containing the CSS rules
+	 */
+	static public function addCssRules(css:String):StyleSheet{
+		var node = Lib.document.createElement('style');
+		node.setAttribute('type', 'text/css');
+		node.appendChild(Lib.document.createTextNode(css));
+
+		Lib.document.getElementsByTagName("head")[0].appendChild(node);
+
+		return cast(node);
+	}
+	/**
+	 * Add a script tag with the given src param
+	 * @param	src 			String containing the URL of the script to embed
+	 */
+	static public function embedScript(src:String):HtmlDom{
+		var node = Lib.document.createElement("script");
+		node.setAttribute("src", src);
+		
+		var head = Lib.document.getElementsByTagName("head")[0];
+		head.appendChild(node);
+
+		return cast(node);
+	}
 }
