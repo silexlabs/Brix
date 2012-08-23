@@ -364,6 +364,7 @@ var appVersion : String;
 var cookieEnabled : Bool;
 var platform : String;
 var userAgent : String;
+var language : String;
 
 /* IE only ?
 var appMinorVersion : String
