@@ -20,6 +20,7 @@ import js.Dom;
 import org.slplayer.util.DomTools;
 
 import org.slplayer.component.ui.DisplayObject;
+import org.slplayer.component.template.TemplateMacros;
 
 /**
  * list component
@@ -99,7 +100,7 @@ class List<ElementClass> extends DisplayObject
 		var t = new haxe.Template(listTemplate);
 		for (elem in dataProvider)
 		{
-			listInnerHtml += t.execute(elem);
+			listInnerHtml += t.execute(elem, TemplateMacros);
 		}
 		rootElement.innerHTML = listInnerHtml;
 

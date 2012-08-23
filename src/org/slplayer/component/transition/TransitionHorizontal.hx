@@ -64,7 +64,6 @@ class TransitionHorizontal extends TransitionBase
 		if (transitionData.isReversed)
 			left = -left;
 
-		trace("Start transition left2right "+transitionData+ " => "+left);
 		// start transition
 		applyTransitionParams( 	"left", 
 								left+"px",

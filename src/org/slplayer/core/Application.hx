@@ -100,7 +100,7 @@ import js.Dom;
 				//we need to ensure first that the parent document is ready
 				Lib.window.onload = function(e:Event) { newApp.init(); };
 			#else
-				newApp.init(appendTo);
+				newApp.init();
 			#end
 
 		#end

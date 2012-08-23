@@ -183,15 +183,20 @@ class DomTools
 	}
 	/**
 	 * Add a css tag with the given CSS rules in it
-	 * @param	css 			String containing the CSS rules
+	 * @param	css 		String containing the CSS rules
+	 * @param	head 		An optional HtmlDom which is the <head> tag of the document. Default: use Lib.document.getElementsByTagName("head") to retrieve it
+	 * @returns the created node for the css style tag
 	 */
-	static public function addCssRules(css:String):StyleSheet{
+	static public function addCssRules(css:String, head:HtmlDom=null):HtmlDom{
+		// default value for document
+		if (head == null) 
+			head = Lib.document.getElementsByTagName("head")[0]; 
+		
 		var node = Lib.document.createElement('style');
 		node.setAttribute('type', 'text/css');
 		node.appendChild(Lib.document.createTextNode(css));
 
-		Lib.document.getElementsByTagName("head")[0].appendChild(node);
-
+		head.appendChild(node);
 		return cast(node);
 	}
 	/**

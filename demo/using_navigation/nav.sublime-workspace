@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"ma",
+				"margin	margin: all"
+			],
+			[
+				"a",
+				"absolute"
+			],
+			[
+				"re",
+				"relative"
+			],
+			[
+				"dis",
+				"display	display: common-types"
+			],
+			[
+				"u",
+				"ul	Tag"
+			],
+			[
 				"String",
 				"StringTools"
 			],
@@ -26,10 +46,6 @@
 			[
 				"publica",
 				"publicationName"
-			],
-			[
-				"a",
-				"appendChild( child : js.HtmlDom )	Void"
 			],
 			[
 				"get",
@@ -176,6 +192,9 @@
 	},
 	"file_history":
 	[
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/using_navigation/src/toolbar.html",
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/using_navigation/build.hxml",
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/using_navigation/bin/toolbar.css",
 		"/usr/lib/haxe/std/haxe/macro/Context.hx",
 		"/home/lexa/Documents/repositories/Dropbox/fdt-workspace/Silex/readme.txt",
 		"/home/lexa/Documents/repositories/Dropbox/fdt-workspace/Silex/src/org/silex/config/ServerConfig.hx",
@@ -234,6 +253,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"target=\"_top\" ",
 			"setConfig",
 			"inner",
 			"setConfig",
@@ -362,10 +382,6 @@
 		]
 	},
 	"menu_visible": true,
-	"output.exec":
-	{
-		"height": 374.0
-	},
 	"replace":
 	{
 		"height": 64.0

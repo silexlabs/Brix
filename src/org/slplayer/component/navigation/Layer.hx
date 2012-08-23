@@ -110,7 +110,6 @@ class Layer extends DisplayObject
 	 */
 	private function onTransitionStarted(event:Event)
 	{
-		trace("Layer - detected transition "+event);
 		// set the flag
 		hasTransitionStarted = true;
 	}
@@ -122,8 +121,6 @@ class Layer extends DisplayObject
 	{
 		if (status != hidden)
 		{
-			trace("Transition started HIDE "+rootElement.className);
-
 			// update status 
 			status = hidden;
 
@@ -141,7 +138,7 @@ class Layer extends DisplayObject
 		}
 		else
 		{
-			trace("Transition - Already hidden "+rootElement.className);
+			//trace("Layer - Already hidden "+rootElement.className);
 		}
 	}
 
@@ -159,12 +156,10 @@ class Layer extends DisplayObject
 			rootElement.removeEventListener(TransitionData.EVENT_TYPE_ENDED, doHide, false);
 		}
 
-		trace("doHide "+rootElement.className);
 		// remove children 
 		while (rootElement.childNodes.length > 0)
 		{
 			var element:HtmlDom = rootElement.childNodes[0];
-			//trace("-- "+rootElement.childNodes.length+" - "+element);
 			rootElement.removeChild(element);
 			childrenArray.push(element);
 			// stop the videos/sounds when leaving the page
@@ -202,7 +197,6 @@ class Layer extends DisplayObject
 			// set or reset style.display
 			rootElement.style.display=styleAttrDisplay;
 
-			trace("Transition started SHOW "+rootElement.className);
 			// put the children back in place
 			while (childrenArray.length > 0)
 			{
@@ -215,7 +209,7 @@ class Layer extends DisplayObject
 					{				
 						if (cast(element).autoplay == true)
 						{
-							//trace("play element "+element);
+							cast(element).currentTime = 0;
 							cast(element).play();
 						}
 						cast(element).muted = SoundOn.isMuted;
@@ -243,7 +237,7 @@ class Layer extends DisplayObject
 		}
 		else
 		{
-			trace("Transition - Already visible "+rootElement.className);
+			//trace("Layer - Already visible "+rootElement.className);
 		}
 	}
 	/**
@@ -253,7 +247,7 @@ class Layer extends DisplayObject
 	{
 		if (isListeningShow == false) return;
 		isListeningShow = false;
-		trace("doShow "+rootElement.className);
+
 		// remove listener
 		if (nullIfCalledDirectly != null)
 			rootElement.removeEventListener(TransitionData.EVENT_TYPE_ENDED, doShow, false);
