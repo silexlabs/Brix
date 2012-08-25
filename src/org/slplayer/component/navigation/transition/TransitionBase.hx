@@ -1,4 +1,4 @@
-package org.slplayer.component.transition;
+package org.slplayer.component.navigation.transition;
 
 import js.Lib;
 import js.Dom;

@@ -90,7 +90,7 @@ class List<ElementClass> extends DisplayObject
 	 */
 	public function redraw()
 	{
-		trace("redraw "+" - "+Type.getClassName(Type.getClass(this)));
+		//trace("redraw "+" - "+Type.getClassName(Type.getClass(this)));
 
 		// refreh list data
 		reloadData();
@@ -110,7 +110,7 @@ class List<ElementClass> extends DisplayObject
 	/**
 	 * refreh list data, but do not redraw display
 	 * to be overriden to handle the model 
-	 * or do nothing if you manipulate the list and dataProvider y composition
+	 * or do nothing if you manipulate the list and dataProvider by composition
 	 */
 	public function reloadData()
 	{
@@ -156,7 +156,7 @@ class List<ElementClass> extends DisplayObject
 	 */
 	private function updateSelectionDisplay(selection:Array<ElementClass>)
 	{
-		trace("updateSelectionDisplay "+selection+" - "+Type.getClassName(Type.getClass(this)));
+		//trace("updateSelectionDisplay "+selection+" - "+Type.getClassName(Type.getClass(this)));
 
 		// handle the selected style 
 		var children = rootElement.getElementsByTagName("li");
@@ -224,8 +224,8 @@ class List<ElementClass> extends DisplayObject
 	 */
 	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> 
 	{
-		trace("setSelectedItem "+selected+" - "+Type.getClassName(Type.getClass(this)));
-		DomTools.inspectTrace(selected); 
+		//trace("setSelectedItem "+selected+" - "+Type.getClassName(Type.getClass(this)));
+		//DomTools.inspectTrace(selected, "org.slplayer.component.list.List"); 
 		if (selected != selectedItem)
 		{
 			if (selected != null)
@@ -260,7 +260,7 @@ class List<ElementClass> extends DisplayObject
 	 */
 	function setSelectedIndex(idx:Int):Int 
 	{
-		trace("setSelectedIndex "+idx+" - "+Type.getClassName(Type.getClass(this)));
+		//trace("setSelectedIndex "+idx+" - "+Type.getClassName(Type.getClass(this)));
 		if (idx != _selectedIndex)
 		{
 			if (idx >= 0 && dataProvider.length > idx && dataProvider[idx] != null)

@@ -13,7 +13,7 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.component.transition;
+package org.slplayer.component.navigation.transition;
 
 import js.Lib;
 import js.Dom;

@@ -19,12 +19,15 @@ import js.Lib;
 import js.Dom;
 
 import org.slplayer.component.ui.DisplayObject;
-import org.slplayer.component.transition.TransitionData;
+import org.slplayer.component.navigation.transition.TransitionData;
 import org.slplayer.util.DomTools;
+import org.slplayer.core.Application;
 
 /**
- * This component is linked to a DOM element, which is a link to the page,
+ * This component is linked to a DOM element, which is an anchor
  * with the page name/deeplink in the name attribute and the page "displayed name"/description as a child of the node.
+ * 
+ * This class offers static methods to manipulate pages. Todo: decide wether the static methods should go in org.silex.util.PageTools .
  * When the page is to be opened/closed, then all the layers which have the page deeplink as a class name are shown/hidden
  */
 @tagNameFilter("a")
@@ -54,6 +57,56 @@ class Page extends DisplayObject
 	 */
 	private var name:String;
 
+	/** 
+	 * Open the page with the given "name" attribute
+	 * This will close other pages
+	 */
+	static public function openPage(pageName:String, isPopup:Bool, transitionData:TransitionData, slPlayerId:String)
+	{trace("openPage "+pageName);
+		// find the pages to open
+		var page = getPageByName(pageName, slPlayerId);
+		if (page == null)
+			throw("Error, could not find a page with name "+pageName);
+		// open the page as a page or a popup
+		page.open(transitionData, isPopup);
+	}
+	/** 
+	 * Close the page with the given "name" attribute
+	 * This will close only this page
+	 */
+	static public function closePage(pageName:String, transitionData:TransitionData, slPlayerId:String)
+	{trace("closePage "+pageName);
+		// find the pages to open
+		var page = getPageByName(pageName, slPlayerId);
+		if (page == null)
+			throw("Error, could not find a page with name "+pageName);
+		// close the page
+		page.close(transitionData);
+	}
+	/** 
+	 * Retrieve the page whose "name" attribute is pageName
+	 */
+	static public function getPageByName(pageName:String, slPlayerId:String):Null<Page>
+	{
+		// get all pages, i.e. all element with class name "page"
+		var pages:HtmlCollection<HtmlDom> = Lib.document.getElementsByClassName(Page.CLASS_NAME);
+		// browse all pages
+		for (pageIdx in 0...pages.length)
+		{
+			// check if it has the desired name
+			if (pages[pageIdx].getAttribute(Page.CONFIG_NAME_ATTR) == pageName)
+			{
+				// retrieve the Page class instance associated with this node
+				var pageInstances:List<Page> = Application.get(slPlayerId).getAssociatedComponents(pages[pageIdx], Page);
+				for (page in pageInstances)
+				{
+					return page;
+				}
+				return null;
+			}
+		}
+		return null;
+	}
 	/**
 	 * constructor
 	 * Init the attributes
@@ -71,17 +124,9 @@ class Page extends DisplayObject
 
 	override public function init()
 	{
-/*
-		//TODO find something better
-		haxe.Timer.delay(doAfterDomInit, 10);
-	}
-
-	private function doAfterDomInit()
-	{
-/**/		// close if it is not the default page
+		// close if it is not the default page
 		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name)
 		{
-			trace ("Open home page '"+name+"'");
 			var transitionData = new TransitionData(show, "0.01s"); 
 			open(transitionData);
 		}
@@ -91,8 +136,8 @@ class Page extends DisplayObject
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 * Also close the other pages if doCloseOthers is true
 	 */
-	public function open(transitionData:TransitionData, doCloseOthers:Bool = true) 
-	{
+	public function open(transitionData:TransitionData = null, doCloseOthers:Bool = true) 
+	{trace("open "+transitionData+" - "+name+" - "+doCloseOthers);
 		if (doCloseOthers)
 			closeOthers(transitionData);
 
@@ -102,7 +147,7 @@ class Page extends DisplayObject
 	/**
 	 * Close all other pages
 	 */
-	public function closeOthers(transitionData:TransitionData)
+	public function closeOthers(transitionData:TransitionData = null)
 	{
 		// find all the pages in this application and close them
 		var nodes = Lib.document.getElementsByClassName(CLASS_NAME);
@@ -121,8 +166,12 @@ class Page extends DisplayObject
 	/**
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 */
-	public function doOpen(transitionData:TransitionData)
-	{
+	public function doOpen(transitionData:TransitionData = null)
+	{trace("doOpen "+transitionData+" - "+name);
+		// by default no transition
+		if (transitionData == null)
+			transitionData = new TransitionData(show, "2s");
+
 		// update transition type
 		transitionData.type = TransitionType.show;
 
@@ -146,8 +195,12 @@ class Page extends DisplayObject
 	 * Close this page, i.e. hide its content
 	 * Remove the children from the DOM
 	 */
-	public function close(transitionData:TransitionData, preventCloseByClassName:Null<Array<String>> = null) 
-	{
+	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null) 
+	{trace("close "+transitionData+" - "+name);
+		// default transition is the one of the layer
+		if (transitionData == null)
+			transitionData = new TransitionData(hide, "2s");
+
 		// update transition type
 		transitionData.type = TransitionType.hide;
 

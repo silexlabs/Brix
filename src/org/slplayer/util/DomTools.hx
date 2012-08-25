@@ -73,12 +73,14 @@ class DomTools
 	 * for debug purpose
 	 * trace the properties of an object
 	 */
-	public static function inspectTrace(obj:Dynamic):Void
+	public static function inspectTrace(obj:Dynamic, callingClass:String):Void
 	{
+		trace("-- "+callingClass+" inspecting element --");
 		for (prop in Reflect.fields(obj))
 		{
 			trace("- "+prop+" = "+Reflect.field(obj, prop));
 		}
+		trace("-- --");
 	}
 	
 	/**

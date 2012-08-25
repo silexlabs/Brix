@@ -19,7 +19,7 @@ import js.Lib;
 import js.Dom;
 
 import org.slplayer.component.ui.DisplayObject;
-import org.slplayer.component.transition.TransitionData;
+import org.slplayer.component.navigation.transition.TransitionData;
 
 import org.slplayer.component.sound.SoundOn;
 
@@ -118,7 +118,7 @@ class Layer extends DisplayObject
 	 * start the transition and then hide
 	 */
 	public function hide(transitionData:TransitionData) : Void
-	{
+	{trace("hide "+transitionData);
 		if (status != hidden)
 		{
 			// update status 
@@ -188,7 +188,7 @@ class Layer extends DisplayObject
 	 * Start the transition and then show
 	 */
 	public function show(transitionData:TransitionData) : Void
-	{
+	{trace("show "+transitionData);
 		if (status != visible)
 		{
 			// update status 

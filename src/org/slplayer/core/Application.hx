@@ -47,7 +47,7 @@ import js.Dom;
 	/**
 	 * The SLPlayer instance id.
 	 */
-	private var id : String;
+	public var id(default, null) : String;
 	/**
 	 * The node ID sequence ( data-slpid="..." ).
 	 */

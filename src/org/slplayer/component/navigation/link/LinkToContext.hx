@@ -1,8 +1,3 @@
-package org.slplayer.component.navigation;
-
-
-import org.slplayer.util.DomTools;
-
 /*
  * This file is part of SLPlayer http://www.silexlabs.org/groups/labs/slplayer/
  * 
@@ -18,10 +13,13 @@ import org.slplayer.util.DomTools;
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
+package org.slplayer.component.navigation.link;
+
 import js.Lib;
 import js.Dom;
 
 import org.slplayer.component.navigation.LinkBase;
+import org.slplayer.util.DomTools;
 
 /**
  * Let you specify a context to display when the user clicks on the component's node
@@ -38,7 +36,7 @@ class LinkToContext extends LinkBase
 	/**
 	 * Stores the style node with the current context as visible 
 	 */
-	private static var styleSheet:StyleSheet;
+	private static var styleSheet:HtmlDom;
 
 	/**
 	 * constructor
@@ -60,6 +58,8 @@ class LinkToContext extends LinkBase
 	 */
 	override private function onClick(e:Event)
 	{
+		super.onClick(e);
+		
 		if (styleSheet != null)
 		{
 			Lib.document.getElementsByTagName("head")[0].removeChild(cast(styleSheet));	
