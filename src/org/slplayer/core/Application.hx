@@ -458,11 +458,17 @@ import js.Dom;
 		if (nodeId != null)
 		{
 			var l = new List<TypeFilter>();
-			for (i in nodeToCmpInstances.get(nodeId))
-			{
-				if (Std.is(i, typeFilter)){
-					var inst:TypeFilter = cast(i);
-					l.add(inst);
+			// if nodeToCmpInstances.exists(nodeId) is false, 
+			// this is because we are on the wrong application instance
+			// which means that we are looking for instances on a node which has been initialized 
+			// by another instance of the SLPlayer
+			if (nodeToCmpInstances.exists(nodeId)){
+				for (i in nodeToCmpInstances.get(nodeId))
+				{
+					if (Std.is(i, typeFilter)){
+						var inst:TypeFilter = cast(i);
+						l.add(inst);
+					}
 				}
 			}
 			return l;

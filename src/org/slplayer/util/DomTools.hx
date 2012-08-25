@@ -169,9 +169,13 @@ class DomTools
 	 * @param	attributeName 	the name of the attribute, of which to return the value
 	 * @example	DomTools.getMeta("description", "content"); // returns the description of the HTML page found in the head tag, e.g. <META name="description" content="A 1st test of Silex publication"></META>
 	 */
-	static public function getMeta(name:String, attributeName:String="content"):Null<String>{
+	static public function getMeta(name:String, attributeName:String="content", head:HtmlDom=null):Null<String>{
+		// default value for document
+		if (head == null) 
+			head = Lib.document.getElementsByTagName("head")[0]; 
+
 		// retrieve all config tags (the meta tags)
-		var metaTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("meta");
+		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("meta");
 
 		// for each config element, store the name/value pair
 		for (idxNode in 0...metaTags.length){
