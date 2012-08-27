@@ -13,36 +13,20 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.component.transition;
+package org.slplayer.component.navigation.transition;
 
 import js.Lib;
 import js.Dom;
 
-import org.slplayer.component.transition.TransitionBase;
-import org.slplayer.component.transition.TransitionData;
+import org.slplayer.component.transition.navigation.TransitionBase;
+import org.slplayer.component.transition.navigation.TransitionData;
+
 
 /**
  * Does a transition between two states of an object
  */
-class TransitionHorizontal extends TransitionBase
+class TransitionVertical extends TransitionHorizontal
 {
-	/**
-	 * Value of position in the style attribute of the DOM element
-	 * This is stored because it is changed during the transition
-	 */
-	private var styleAttrPosition:String;
-
-	/**
-	 * constructor
-	 * init the property so that it can be tweened with css transitions
-	 */
-	public function new(rootElement:HtmlDom, SLPId:String)
-	{
-		super(rootElement, SLPId);
-		styleAttrPosition = rootElement.style.position;
-		rootElement.style.left = "0px";
-	}
-
 	/**
 	 * Start the transition
 	 * This is a virtual method which has to be implemented
@@ -50,35 +34,27 @@ class TransitionHorizontal extends TransitionBase
 	 */
 	override public function start(transitionData:TransitionData)
 	{
-		super.start(transitionData);
+		// prevent horizontal behavior
+		//super.start(transitionData);
+
 		// position absolute
 		rootElement.style.position="absolute";
 
 		// show or hide
-		var left:Int;
+		var top:Int;
 		if (transitionData.type == show)
-			left = 0;
+			top = 0;
 		else
-			left = Lib.window.innerWidth;
+			top = Lib.window.innerHeight;
 
 		if (transitionData.isReversed)
-			left = -left;
+			top = -top;
 
-		trace("Start transition left2right "+transitionData+ " => "+left);
 		// start transition
-		applyTransitionParams( 	"left", 
-								left+"px",
+		applyTransitionParams(	"top", 
+								top+"px",
 								transitionData.duration, 
 								transitionData.timingFunction, 
 								transitionData.delay );
-	}
-
-	/**
-	 * reset style.position
-	 */
-	override private function onEnd(e:Event)
-	{
-		super.onEnd(e);
-		rootElement.style.position=styleAttrPosition;
 	}
 }

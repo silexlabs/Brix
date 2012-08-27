@@ -13,25 +13,28 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.component.navigation;
+package org.slplayer.component.navigation.link;
 
 import js.Lib;
 import js.Dom;
 
 /**
- * Close the nodes which have a targetted class name, when the user clicks on the component's node
- * Closing a node is done by calling close() on the Page class(es) associated with the node
+ * Let you specify a page to display when the user clicks on the component's node
  */
 @tagNameFilter("a")
-class LinkClosePage extends LinkBase
+class LinkToPage extends LinkBase
 {
 	/**
+	 * user clicked the link
+	 * do an action to the pages corresponding to our link
+	 *
 	 * open the pages with linkname in their css style class name
 	 * this will close other pages
 	 */
-	override private function linkToPage(page:Page, targetAttr:Null<String> = null)
-	{
-		// open the page
-		page.close(transitionData);
+	override private function onClick(e:Event)
+	{trace("LinkToPage "+targetAttr+" - "+(targetAttr!=LinkBase.CONFIG_TARGET_IS_POPUP));
+		super.onClick(e);
+		// show the page with this name
+		Page.openPage(linkName, targetAttr!=LinkBase.CONFIG_TARGET_IS_POPUP, transitionData, SLPlayerInstanceId);
 	}
 }

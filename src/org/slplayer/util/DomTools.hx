@@ -73,12 +73,14 @@ class DomTools
 	 * for debug purpose
 	 * trace the properties of an object
 	 */
-	public static function inspectTrace(obj:Dynamic):Void
+	public static function inspectTrace(obj:Dynamic, callingClass:String):Void
 	{
+		trace("-- "+callingClass+" inspecting element --");
 		for (prop in Reflect.fields(obj))
 		{
 			trace("- "+prop+" = "+Reflect.field(obj, prop));
 		}
+		trace("-- --");
 	}
 	
 	/**
@@ -167,9 +169,13 @@ class DomTools
 	 * @param	attributeName 	the name of the attribute, of which to return the value
 	 * @example	DomTools.getMeta("description", "content"); // returns the description of the HTML page found in the head tag, e.g. <META name="description" content="A 1st test of Silex publication"></META>
 	 */
-	static public function getMeta(name:String, attributeName:String="content"):Null<String>{
+	static public function getMeta(name:String, attributeName:String="content", head:HtmlDom=null):Null<String>{
+		// default value for document
+		if (head == null) 
+			head = Lib.document.getElementsByTagName("head")[0]; 
+
 		// retrieve all config tags (the meta tags)
-		var metaTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("meta");
+		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("meta");
 
 		// for each config element, store the name/value pair
 		for (idxNode in 0...metaTags.length){
@@ -180,5 +186,36 @@ class DomTools
 				return configValue;
 		}
 		return null;
+	}
+	/**
+	 * Add a css tag with the given CSS rules in it
+	 * @param	css 		String containing the CSS rules
+	 * @param	head 		An optional HtmlDom which is the <head> tag of the document. Default: use Lib.document.getElementsByTagName("head") to retrieve it
+	 * @returns the created node for the css style tag
+	 */
+	static public function addCssRules(css:String, head:HtmlDom=null):HtmlDom{
+		// default value for document
+		if (head == null) 
+			head = Lib.document.getElementsByTagName("head")[0]; 
+		
+		var node = Lib.document.createElement('style');
+		node.setAttribute('type', 'text/css');
+		node.appendChild(Lib.document.createTextNode(css));
+
+		head.appendChild(node);
+		return cast(node);
+	}
+	/**
+	 * Add a script tag with the given src param
+	 * @param	src 			String containing the URL of the script to embed
+	 */
+	static public function embedScript(src:String):HtmlDom{
+		var node = Lib.document.createElement("script");
+		node.setAttribute("src", src);
+		
+		var head = Lib.document.getElementsByTagName("head")[0];
+		head.appendChild(node);
+
+		return cast(node);
 	}
 }

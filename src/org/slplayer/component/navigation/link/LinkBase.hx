@@ -13,14 +13,14 @@
  * 
  * To read the license please visit http://www.gnu.org/copyleft/gpl.html
  */
-package org.slplayer.component.navigation;
+package org.slplayer.component.navigation.link;
 
 import js.Lib;
 import js.Dom;
 
 import org.slplayer.core.Application;
 import org.slplayer.component.ui.DisplayObject;
-import org.slplayer.component.transition.TransitionData;
+import org.slplayer.component.navigation.transition.TransitionData;
 import org.slplayer.util.DomTools;
 
 using StringTools;
@@ -28,6 +28,7 @@ using StringTools;
 /**
  * Base class for the links components
  * Retrieve the href attribute and make an action on the pages which node has the targetted class name
+ * Virtual class, it is supposed to be overriden to implement a behavior on click (override the onClick method)
  */
 @tagNameFilter("a")
 class LinkBase extends DisplayObject
@@ -42,6 +43,11 @@ class LinkBase extends DisplayObject
 	public static inline var CONFIG_TARGET_ATTR:String = "target";
 	/**
 	 * constant, name of attribute
+	 * if this the target attribute has this value, then it is a link to open a popup
+	 */
+	public static inline var CONFIG_TARGET_IS_POPUP:String = "_top";
+	/**
+	 * constant, name of attribute
 	 * defines the param for the transition
 	 */
 	public static inline var CONFIG_TRANSITION_DURATION:String = "data-transition-duration";
@@ -53,7 +59,7 @@ class LinkBase extends DisplayObject
 	/**
 	 * constant, name of attribute
 	 * defines the param for the transition
-	 * @example	 &lt;a href=&quot;#page2&quot; class=&quot;LinkToPage next&quot; data-transition-delay = &quot;2s&quot; &gt;Test link&lt;/a&gt;
+	 * @example	 &lt;a href=&quot;#page2&quot; class=&quot;Link next&quot; data-transition-delay = &quot;2s&quot; &gt;Test link&lt;/a&gt;
 	 */
 	public static inline var CONFIG_TRANSITION_DELAY:String = "data-transition-delay";
 	/**
@@ -84,6 +90,13 @@ class LinkBase extends DisplayObject
 	{
 		super(rootElement, SLPId);
 
+		/// init transition data
+		transitionData = new TransitionData(
+			null,
+			"0"
+		);
+
+		// catch the click
 		rootElement.addEventListener("click", onClick, false);
 
 		// retrieve the name of our link 
@@ -105,6 +118,7 @@ class LinkBase extends DisplayObject
 	/**
 	 * user clicked the link
 	 * do an action to the pages corresponding to our link
+	 * overide this method in order to open or close pages, or anything you want to do when the user clicks on the link
 	 */
 	private function onClick(e:Event)
 	{
@@ -114,40 +128,7 @@ class LinkBase extends DisplayObject
 			rootElement.getAttribute(CONFIG_TRANSITION_DURATION),
 			rootElement.getAttribute(CONFIG_TRANSITION_TIMING_FUNCTION),
 			rootElement.getAttribute(CONFIG_TRANSITION_DELAY),
-			rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED) == null
+			rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED) != null
 		);
-
-		// show the page with this name
-		linkToPagesWithName(linkName, targetAttr);
 	}
-
-	/** 
-	 * retrieve the pages with linkName in their css style class name
-	 */
-	private function linkToPagesWithName(linkName:String, targetAttr:Null<String> = null)
-	{
-		// get all pages, i.e. all element with class name "page"
-		var pages:HtmlCollection<HtmlDom> = Lib.document.getElementsByClassName(Page.CLASS_NAME);
-		// browse all pages
-		for (pageIdx in 0...pages.length)
-		{
-			// check if it has the desired name
-			if (pages[pageIdx].getAttribute(Page.CONFIG_NAME_ATTR) == linkName)
-			{
-				// retrieve the Page class instance associated with this node
-				var pageInstances:List<Page> = getSLPlayer().getAssociatedComponents(pages[pageIdx], Page);
-				for (page in pageInstances)
-				{
-					// link to the page
-					linkToPage(page, targetAttr);
-				}
-				return;
-			}
-		}
-	}
-
-	/**
-	 * virtual method, to be implemented in the derived classes
-	 */
-	private function linkToPage(page:Page, targetAttr:Null<String> = null) { }
 }
