@@ -83,25 +83,34 @@ class TransitionBase extends DisplayObject
 		rootElement.style.transitionDuration = transitionDuration;
 		rootElement.style.transitionTimingFunction = transitionTimingFunction;
 		rootElement.style.transitionDelay = transitionDelay;
-		// idem for Firefox
-		untyped rootElement.style.MozTransitionProperty = transitionProperty;
-		untyped rootElement.style.MozTransitionDuration = transitionDuration;
-		untyped rootElement.style.MozTransitionTimingFunction = transitionTimingFunction;
-		untyped rootElement.style.MozTransitionDelay = transitionDelay;
-		// idem for Safari and Chrome
-		untyped rootElement.style.webkitTransitionProperty = transitionProperty;
-		untyped rootElement.style.webkitTransitionDuration = transitionDuration;
-		untyped rootElement.style.webkitTransitionTimingFunction = transitionTimingFunction;
-		untyped rootElement.style.webkitTransitionDelay = transitionDelay;
-		// idem for Opera
-		untyped rootElement.style.oTransitionProperty = transitionProperty;
-		untyped rootElement.style.oTransitionDuration = transitionDuration;
-		untyped rootElement.style.oTransitionTimingFunction = transitionTimingFunction;
-		untyped rootElement.style.oTransitionDelay = transitionDelay;
+		#if js
+			// idem for Firefox
+			untyped rootElement.style.MozTransitionProperty = transitionProperty;
+			untyped rootElement.style.MozTransitionDuration = transitionDuration;
+			untyped rootElement.style.MozTransitionTimingFunction = transitionTimingFunction;
+			untyped rootElement.style.MozTransitionDelay = transitionDelay;
+			// idem for Safari and Chrome
+			untyped rootElement.style.webkitTransitionProperty = transitionProperty;
+			untyped rootElement.style.webkitTransitionDuration = transitionDuration;
+			untyped rootElement.style.webkitTransitionTimingFunction = transitionTimingFunction;
+			untyped rootElement.style.webkitTransitionDelay = transitionDelay;
+			// idem for Opera
+			untyped rootElement.style.oTransitionProperty = transitionProperty;
+			untyped rootElement.style.oTransitionDuration = transitionDuration;
+			untyped rootElement.style.oTransitionTimingFunction = transitionTimingFunction;
+			untyped rootElement.style.oTransitionDelay = transitionDelay;
+			
+			// workaround, in some cases the DOM is not updated right away, so we wait the nex frame
+			haxe.Timer.delay(callback(doInNextFrame, transitionProperty, newPropertyValue), 10);
+		#else
+			// with cocktail, no need to wait the next frame
+			doInNextFrame(transitionProperty, newPropertyValue);
+		#end
 
-		haxe.Timer.delay(callback(doInNextFrame, transitionProperty, newPropertyValue), 10);
 	}
-
+	/**
+	 * workaround, in some cases the DOM is not updated right away, so we wait the nex frame
+	 */
 	private function doInNextFrame(transitionProperty:String, newPropertyValue:String)
 	{
 
