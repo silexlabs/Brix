@@ -18,7 +18,6 @@ package org.slplayer.component.navigation.link;
 import js.Lib;
 import js.Dom;
 
-import org.slplayer.component.navigation.LinkBase;
 import org.slplayer.util.DomTools;
 
 /**
