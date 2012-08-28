@@ -1,4 +1,4 @@
-package slplayer.prototype.data;
+package org.slplayer.component.data;
 
 import org.slplayer.component.ui.DisplayObject;
 
@@ -22,9 +22,9 @@ using org.slplayer.component.data.IDataProvider.DataProvider;
  * @author Thomas Fétiveau
  */
 @requires("data-src-rss")
-class RssConnector extends DisplayObject, implements IDataProvider, implements IGroupable
+class ConnectorBase<DataType> extends DisplayObject, implements IDataProvider, implements IGroupable
 {
-	static public inline var SRC_TAG = "src-rss";
+	static public inline var SRC_TAG = "src";
 	
 	public var groupElement:HtmlDom;
 	
