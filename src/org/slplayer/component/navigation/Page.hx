@@ -23,6 +23,9 @@ import org.slplayer.component.navigation.transition.TransitionData;
 import org.slplayer.util.DomTools;
 import org.slplayer.core.Application;
 
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
+
 /**
  * This component is linked to a DOM element, which is an anchor
  * with the page name/deeplink in the name attribute and the page "displayed name"/description as a child of the node.
@@ -30,8 +33,7 @@ import org.slplayer.core.Application;
  * This class offers static methods to manipulate pages. Todo: decide wether the static methods should go in org.silex.util.PageTools .
  * When the page is to be opened/closed, then all the layers which have the page deeplink as a class name are shown/hidden
  */
-@tagNameFilter("a")
-class Page extends DisplayObject
+class Page extends DisplayObject, implements IGroupable
 {
 	/**
 	 * constant, name of this class
@@ -56,15 +58,20 @@ class Page extends DisplayObject
 	 * This is the anchor name to be used as a link/deeplink
 	 */
 	private var name:String;
+	/**
+	 * the group element set by the Group class
+	 * implementation of IGroupable
+	 */
+	public var groupElement:HtmlDom;
 
 	/** 
 	 * Open the page with the given "name" attribute
 	 * This will close other pages
 	 */
-	static public function openPage(pageName:String, isPopup:Bool, transitionData:TransitionData, slPlayerId:String)
-	{trace("openPage "+pageName);
+	static public function openPage(pageName:String, isPopup:Bool, transitionData:TransitionData, slPlayerId:String, root:HtmlDom)
+	{trace("openPage "+pageName+" root="+root);
 		// find the pages to open
-		var page = getPageByName(pageName, slPlayerId);
+		var page = getPageByName(pageName, slPlayerId, root);
 		if (page == null)
 			throw("Error, could not find a page with name "+pageName);
 		// open the page as a page or a popup
@@ -74,22 +81,44 @@ class Page extends DisplayObject
 	 * Close the page with the given "name" attribute
 	 * This will close only this page
 	 */
-	static public function closePage(pageName:String, transitionData:TransitionData, slPlayerId:String)
-	{trace("closePage "+pageName);
+	static public function closePage(pageName:String, transitionData:TransitionData, slPlayerId:String, root:HtmlDom)
+	{trace("closePage "+pageName+" root="+root);
 		// find the pages to open
-		var page = getPageByName(pageName, slPlayerId);
+		var page = getPageByName(pageName, slPlayerId, root);
 		if (page == null)
 			throw("Error, could not find a page with name "+pageName);
 		// close the page
 		page.close(transitionData);
 	}
 	/** 
+	 * Retrieve all the pages of this application or group
+	 */
+	static public function getPageNodes(slPlayerId:String, root:HtmlDom):HtmlCollection<HtmlDom>
+	{
+		if (root == null)
+			root = Lib.document;
+
+		// get all pages, i.e. all element with class name "page"
+		return root.getElementsByClassName(Page.CLASS_NAME);
+	}
+	/** 
+	 * Retrieve the given layer of this application or group
+	 */
+	static public function getLayerNodes(pageName:String, slPlayerId:String, root:HtmlDom):HtmlCollection<HtmlDom>
+	{
+		if (root == null)
+			root = Lib.document;
+
+		// get the desired layers, i.e. the elements with the page name as class name
+		return root.getElementsByClassName(pageName);
+	}
+	/** 
 	 * Retrieve the page whose "name" attribute is pageName
 	 */
-	static public function getPageByName(pageName:String, slPlayerId:String):Null<Page>
+	static public function getPageByName(pageName:String, slPlayerId:String, root:HtmlDom):Null<Page>
 	{
 		// get all pages, i.e. all element with class name "page"
-		var pages:HtmlCollection<HtmlDom> = Lib.document.getElementsByClassName(Page.CLASS_NAME);
+		var pages:HtmlCollection<HtmlDom> = getPageNodes(slPlayerId, root);
 		// browse all pages
 		for (pageIdx in 0...pages.length)
 		{
@@ -115,21 +144,28 @@ class Page extends DisplayObject
 	public function new(rootElement:HtmlDom, SLPId:String) 
 	{
 		super(rootElement, SLPId);
+
+		// implementation of IGroupable
+		startGroupable();
+		
 		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
 		if (name == null || name == "")
 		{
 			throw("Pages have to have a 'name' attribute");
 		}
+		trace("Page group XXXXXXXXXXXXXXXXXXXX "+name+" - "+groupElement);
 	}
 
 	override public function init()
 	{
+		super.init();
 		// close if it is not the default page
 		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name)
 		{
 			var transitionData = new TransitionData(show, "0.01s"); 
 			open(transitionData);
 		}
+		trace("Page group "+groupElement);
 	}
 
 	/**
@@ -150,7 +186,7 @@ class Page extends DisplayObject
 	public function closeOthers(transitionData:TransitionData = null)
 	{
 		// find all the pages in this application and close them
-		var nodes = Lib.document.getElementsByClassName(CLASS_NAME);
+		var nodes = getPageNodes(SLPlayerInstanceId, groupElement);
 		for (idxPageNode in 0...nodes.length)
 		{
 			var pageNode = nodes[idxPageNode];
@@ -176,7 +212,7 @@ class Page extends DisplayObject
 		transitionData.type = TransitionType.show;
 
 		// find all the layers which have the page name in their css class attribute
-		var nodes = Lib.document.getElementsByClassName(name);
+		var nodes = getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
 		// show the layers
 		for (idxLayerNode in 0...nodes.length)
@@ -209,7 +245,7 @@ class Page extends DisplayObject
 			preventCloseByClassName = new Array();
 
 		// find all the layers which have the page name in their css class attribute
-		var nodes = Lib.document.getElementsByClassName(name);
+		var nodes = getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
 		// browse the layers
 		for (idxLayerNode in 0...nodes.length)

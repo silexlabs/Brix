@@ -23,6 +23,9 @@ import org.slplayer.component.ui.DisplayObject;
 import org.slplayer.component.navigation.transition.TransitionData;
 import org.slplayer.util.DomTools;
 
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
+
 using StringTools;
 
 /**
@@ -31,7 +34,7 @@ using StringTools;
  * Virtual class, it is supposed to be overriden to implement a behavior on click (override the onClick method)
  */
 @tagNameFilter("a")
-class LinkBase extends DisplayObject
+class LinkBase extends DisplayObject, implements IGroupable
 {
 	/**
 	 * constant, name of attribute href
@@ -70,6 +73,11 @@ class LinkBase extends DisplayObject
 	 */
 	public static inline var CONFIG_TRANSITION_IS_REVERSED:String = "data-transition-is-reversed";
 	/**
+	 * the group element set by the Group class
+	 * implementation of IGroupable
+	 */
+	public var groupElement:HtmlDom;
+	/**
 	 * value of the href attribute without the #
 	 */
 	public var linkName:String;
@@ -90,6 +98,10 @@ class LinkBase extends DisplayObject
 	{
 		super(rootElement, SLPId);
 
+		// implementation of IGroupable
+		startGroupable();
+		trace("LinkBase group "+groupElement+" - "+rootElement.className+" - "+rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR));
+		
 		/// init transition data
 		transitionData = new TransitionData(
 			null,
@@ -122,6 +134,8 @@ class LinkBase extends DisplayObject
 	 */
 	private function onClick(e:Event)
 	{
+		// prevent the hash tag to change the scroll position as an HTML anchor would
+		e.preventDefault();
 		// values for the transition
 		transitionData = new TransitionData(
 			null,

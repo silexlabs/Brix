@@ -4,7 +4,7 @@ import js.Lib;
 import js.Dom;
 
 import org.slplayer.component.ui.DisplayObject;
-import org.slplayer.component.transition.TransitionData;
+import org.slplayer.component.navigation.transition.TransitionData;
 
 /**
  * Does a transition between two states of an object

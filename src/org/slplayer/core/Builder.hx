@@ -868,7 +868,8 @@ class Builder
 		
 		for ( className in { iterator : declaredComponents.keys } )
 		{
-			if ( className.endsWith( classTag ) )
+			var a = className.split(".");
+			if (a[a.length-1] == classTag)
 				classNames.add( className );
 		}
 		

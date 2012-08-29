@@ -114,6 +114,7 @@ class DomTools
 	
 	/**
 	 * check if the node has a given css class
+	 * TODO: this is not good since hasClass(element, "Page") would return true for element with className set to "LinkToPage", so split in array and use Lambda 
 	 */
 	static public function hasClass(element:HtmlDom, className:String)
 	{
