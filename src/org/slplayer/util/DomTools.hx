@@ -68,6 +68,21 @@ class DomTools
 			return null;
 		}
 	}
+	/**
+	 * Compute the htmlDom element size and position, taking margins, paddings and borders into account, and also the parents ones
+	 * @param	htmlDom 	HtmlDom element of which we want to know the size 
+	 * @return 	the width in pixels
+	 */
+	static public function getElementBoundingBox(htmlDom:HtmlDom):{x:Int, y:Int, w:Int, h:Int}{
+		var halfBorderH = 0;//(htmlDom.offsetWidth - htmlDom.clientWidth)/2.0;
+		var halfBorderV = 0;//(htmlDom.offsetHeight - htmlDom.clientHeight)/2.0;
+		return {
+			x:Math.floor(htmlDom.offsetLeft - halfBorderH),
+			y:Math.floor(htmlDom.offsetTop - halfBorderV),
+			w:Math.floor(htmlDom.offsetWidth - halfBorderH),
+			h:Math.floor(htmlDom.offsetHeight - halfBorderV)
+		};
+	}
 	
 	/**
 	 * for debug purpose

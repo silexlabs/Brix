@@ -83,27 +83,42 @@ class Panel extends DisplayObject
 	 * computes the size of each element
 	 */
 	public function redraw(dummy=null){
-		trace("Panel redraw");
+		trace("Panel redraw "+rootElement.clientHeight+" - "+rootElement.offsetHeight+" - "+body.offsetTop);
 		var bodySize:Int;
+		var boundingBox = DomTools.getElementBoundingBox(rootElement);
 		if (isHorizontal){
-			bodySize = rootElement.clientWidth;
-			if (header != null){
-				bodySize -= header.clientWidth;
-			}
+			var margin = (rootElement.offsetWidth - rootElement.clientWidth);
+			var bodyMargin = (body.offsetWidth - body.clientWidth);
+
+			bodySize = boundingBox.w;
+			bodySize -= bodyMargin;
+			bodySize -= margin;
+			bodySize -= body.offsetLeft;
+
 			if (footer != null){
-				bodySize -= footer.clientWidth;
+				var footerMargin = (footer.offsetWidth - footer.clientWidth);
+				var boundingBox = DomTools.getElementBoundingBox(footer);
+				bodySize -= boundingBox.w;
+				bodySize -= footerMargin;
 			}
-			body.style.width = (bodySize-1)+"px";
+			body.style.width = bodySize+"px";
 		}
 		else{
-			bodySize = rootElement.clientHeight;
-			if (header != null){
-				bodySize -= header.clientHeight;
-			}
+			var margin = (rootElement.offsetHeight - rootElement.clientHeight);
+			var bodyMargin = (body.offsetHeight - body.clientHeight);
+
+			bodySize = boundingBox.h;
+			bodySize -= bodyMargin;
+			bodySize -= margin;
+			bodySize -= body.offsetTop;
+
 			if (footer != null){
-				bodySize -= footer.clientHeight;
+				var footerMargin = (footer.offsetHeight - footer.clientHeight);
+				var boundingBox = DomTools.getElementBoundingBox(footer);
+				bodySize -= boundingBox.h;
+				bodySize -= footerMargin;
 			}
-			body.style.height = (bodySize-1)+"px";
+			body.style.height = bodySize+"px";
 		}
 	}
 }

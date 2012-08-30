@@ -64,7 +64,6 @@ class LinkToContext extends LinkBase
 			Lib.document.getElementsByTagName("head")[0].removeChild(cast(styleSheet));	
 		}
 
-		//var cssText = "."+linkName+" { visibility : visible; }";
 		var cssText = "."+linkName+" { display : inline; visibility : visible; }";
 
 		styleSheet = DomTools.addCssRules(cssText);

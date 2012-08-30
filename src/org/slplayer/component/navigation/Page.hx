@@ -44,9 +44,13 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	public static inline var CONFIG_NAME_ATTR:String = "name";
 	/**
-	 * constant, initial page's name
+	 * constant, initial page name, meta tag, name attribute
 	 */
 	public static inline var CONFIG_INITIAL_PAGE_NAME:String = "initialPageName";
+	/**
+	 * constant, initial page's name data tag, on the group node
+	 */
+	public static inline var ATTRIBUTE_INITIAL_PAGE_NAME:String = "data-initial-page-name";
 	
 	/**
 	 * Display name of the page.
@@ -68,10 +72,15 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open the page with the given "name" attribute
 	 * This will close other pages
 	 */
-	static public function openPage(pageName:String, isPopup:Bool, transitionData:TransitionData, slPlayerId:String, root:HtmlDom)
-	{trace("openPage "+pageName+" root="+root);
+	static public function openPage(pageName:String, isPopup:Bool, transitionData:TransitionData, slPlayerId:String, root:HtmlDom = null)
+	{//trace("openPage "+pageName+" root="+root);
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document;
+
 		// find the pages to open
-		var page = getPageByName(pageName, slPlayerId, root);
+		var page = getPageByName(pageName, slPlayerId, document);
 		if (page == null)
 			throw("Error, could not find a page with name "+pageName);
 		// open the page as a page or a popup
@@ -81,10 +90,15 @@ class Page extends DisplayObject, implements IGroupable
 	 * Close the page with the given "name" attribute
 	 * This will close only this page
 	 */
-	static public function closePage(pageName:String, transitionData:TransitionData, slPlayerId:String, root:HtmlDom)
-	{trace("closePage "+pageName+" root="+root);
+	static public function closePage(pageName:String, transitionData:TransitionData, slPlayerId:String, root:HtmlDom = null)
+	{//trace("closePage "+pageName+" root="+root);
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document;
+
 		// find the pages to open
-		var page = getPageByName(pageName, slPlayerId, root);
+		var page = getPageByName(pageName, slPlayerId, document);
 		if (page == null)
 			throw("Error, could not find a page with name "+pageName);
 		// close the page
@@ -93,32 +107,41 @@ class Page extends DisplayObject, implements IGroupable
 	/** 
 	 * Retrieve all the pages of this application or group
 	 */
-	static public function getPageNodes(slPlayerId:String, root:HtmlDom):HtmlCollection<HtmlDom>
+	static public function getPageNodes(slPlayerId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
 	{
+		// default is the hole document
+		var document:Dynamic = root;
 		if (root == null)
-			root = Lib.document;
+			document = Lib.document;
 
 		// get all pages, i.e. all element with class name "page"
-		return root.getElementsByClassName(Page.CLASS_NAME);
+		return document.getElementsByClassName(Page.CLASS_NAME);
 	}
 	/** 
 	 * Retrieve the given layer of this application or group
 	 */
-	static public function getLayerNodes(pageName:String, slPlayerId:String, root:HtmlDom):HtmlCollection<HtmlDom>
+	static public function getLayerNodes(pageName:String, slPlayerId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
 	{
+		// default is the hole document
+		var document:Dynamic = root;
 		if (root == null)
-			root = Lib.document;
+			document = Lib.document;
 
 		// get the desired layers, i.e. the elements with the page name as class name
-		return root.getElementsByClassName(pageName);
+		return document.getElementsByClassName(pageName);
 	}
 	/** 
 	 * Retrieve the page whose "name" attribute is pageName
 	 */
-	static public function getPageByName(pageName:String, slPlayerId:String, root:HtmlDom):Null<Page>
+	static public function getPageByName(pageName:String, slPlayerId:String, root:HtmlDom = null):Null<Page>
 	{
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document;
+
 		// get all pages, i.e. all element with class name "page"
-		var pages:HtmlCollection<HtmlDom> = getPageNodes(slPlayerId, root);
+		var pages:HtmlCollection<HtmlDom> = getPageNodes(slPlayerId, document);
 		// browse all pages
 		for (pageIdx in 0...pages.length)
 		{
@@ -153,19 +176,19 @@ class Page extends DisplayObject, implements IGroupable
 		{
 			throw("Pages have to have a 'name' attribute");
 		}
-		trace("Page group XXXXXXXXXXXXXXXXXXXX "+name+" - "+groupElement);
 	}
 
 	override public function init()
 	{
 		super.init();
 		// close if it is not the default page
-		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name)
+		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
+			|| (groupElement != null && groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name)
+		)
 		{
-			var transitionData = new TransitionData(show, "0.01s"); 
+			var transitionData = new TransitionData(show, "0s"); 
 			open(transitionData);
 		}
-		trace("Page group "+groupElement);
 	}
 
 	/**
@@ -173,7 +196,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Also close the other pages if doCloseOthers is true
 	 */
 	public function open(transitionData:TransitionData = null, doCloseOthers:Bool = true) 
-	{trace("open "+transitionData+" - "+name+" - "+doCloseOthers);
+	{//trace("open "+transitionData+" - "+name+" - "+doCloseOthers);
 		if (doCloseOthers)
 			closeOthers(transitionData);
 
@@ -203,7 +226,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 */
 	public function doOpen(transitionData:TransitionData = null)
-	{trace("doOpen "+transitionData+" - "+name);
+	{//trace("doOpen "+transitionData+" - "+name);
 		// by default no transition
 		if (transitionData == null)
 			transitionData = new TransitionData(show, "2s");
@@ -232,7 +255,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Remove the children from the DOM
 	 */
 	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null) 
-	{trace("close "+transitionData+" - "+name);
+	{//trace("close "+transitionData+" - "+name);
 		// default transition is the one of the layer
 		if (transitionData == null)
 			transitionData = new TransitionData(hide, "2s");
