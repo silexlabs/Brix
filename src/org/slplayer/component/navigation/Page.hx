@@ -51,17 +51,11 @@ class Page extends DisplayObject, implements IGroupable
 	 * constant, initial page's name data tag, on the group node
 	 */
 	public static inline var ATTRIBUTE_INITIAL_PAGE_NAME:String = "data-initial-page-name";
-	
-	/**
-	 * Display name of the page.
-	 * This is a name to be displayed, not used as the deeplink/anchor name
-	 */
-	private var displayName:String;
 	/**
 	 * Name of the page.
 	 * This is the anchor name to be used as a link/deeplink
 	 */
-	private var name:String;
+	public var name(default, null):String;
 	/**
 	 * the group element set by the Group class
 	 * implementation of IGroupable
@@ -73,7 +67,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * This will close other pages
 	 */
 	static public function openPage(pageName:String, isPopup:Bool, transitionData:TransitionData, slPlayerId:String, root:HtmlDom = null)
-	{//trace("openPage "+pageName+" root="+root);
+	{//trace("openPage ("+pageName+", "+isPopup+", "+transitionData+", "+slPlayerId+", "+root+")");
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
@@ -84,7 +78,7 @@ class Page extends DisplayObject, implements IGroupable
 		if (page == null)
 			throw("Error, could not find a page with name "+pageName);
 		// open the page as a page or a popup
-		page.open(transitionData, isPopup);
+		page.open(transitionData, !isPopup);
 	}
 	/** 
 	 * Close the page with the given "name" attribute
@@ -170,7 +164,7 @@ class Page extends DisplayObject, implements IGroupable
 
 		// implementation of IGroupable
 		startGroupable();
-		
+
 		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
 		if (name == null || name == "")
 		{
@@ -186,8 +180,7 @@ class Page extends DisplayObject, implements IGroupable
 			|| (groupElement != null && groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name)
 		)
 		{
-			var transitionData = new TransitionData(show, "0s"); 
-			open(transitionData);
+			open();
 		}
 	}
 
@@ -196,7 +189,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Also close the other pages if doCloseOthers is true
 	 */
 	public function open(transitionData:TransitionData = null, doCloseOthers:Bool = true) 
-	{//trace("open "+transitionData+" - "+name+" - "+doCloseOthers);
+	{//trace("open ("+transitionData+", "+doCloseOthers+") - name="+name+" - "+groupElement+" - "+rootElement.getAttribute("data-group-id"));
 		if (doCloseOthers)
 			closeOthers(transitionData);
 
@@ -207,7 +200,9 @@ class Page extends DisplayObject, implements IGroupable
 	 * Close all other pages
 	 */
 	public function closeOthers(transitionData:TransitionData = null)
-	{
+	{//trace("closeOthers("+transitionData+") - groupElement: "+groupElement);
+	if (groupElement!=null) trace("groupElement: "+groupElement.className);
+
 		// find all the pages in this application and close them
 		var nodes = getPageNodes(SLPlayerInstanceId, groupElement);
 		for (idxPageNode in 0...nodes.length)
@@ -226,7 +221,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 */
 	public function doOpen(transitionData:TransitionData = null)
-	{//trace("doOpen "+transitionData+" - "+name);
+	{//trace("doOpen "+transitionData+", "+name);
 		// by default no transition
 		if (transitionData == null)
 			transitionData = new TransitionData(show, "2s");
@@ -255,7 +250,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Remove the children from the DOM
 	 */
 	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null) 
-	{//trace("close "+transitionData+" - "+name);
+	{//trace("close "+transitionData+", "+name);
 		// default transition is the one of the layer
 		if (transitionData == null)
 			transitionData = new TransitionData(hide, "2s");

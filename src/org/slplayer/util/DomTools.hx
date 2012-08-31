@@ -114,6 +114,7 @@ class DomTools
 	 */
 	static public function addClass(element:HtmlDom, className:String)
 	{
+		if (element.className == null) element.className = "";
 		if(!hasClass(element, className))
 			element.className += " "+ className;
 	}
@@ -123,6 +124,7 @@ class DomTools
 	 */
 	static public function removeClass(element:HtmlDom, className:String)
 	{
+		if (element.className == null) return;
 		if(hasClass(element, className))
 			element.className = StringTools.replace(element.className, className, "");
 	}
@@ -133,6 +135,7 @@ class DomTools
 	 */
 	static public function hasClass(element:HtmlDom, className:String)
 	{
+		if (element.className == null) return false;
 		return element.className.indexOf(className) > -1;
 	}
 	/**
