@@ -109,12 +109,12 @@ class Panel extends DisplayObject
 			isHorizontal = false;
 
 		// redraw
-		redraw();
+		DomTools.doLater(redraw);
 	}
 	/**
 	 * computes the size of each element
 	 */
-	public function redraw(dummy=null){
+	public function redraw(){
 		var bodySize:Int;
 		var boundingBox = DomTools.getElementBoundingBox(rootElement);
 		if (isHorizontal){

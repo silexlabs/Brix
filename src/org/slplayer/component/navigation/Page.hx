@@ -201,7 +201,6 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	public function closeOthers(transitionData:TransitionData = null)
 	{//trace("closeOthers("+transitionData+") - groupElement: "+groupElement);
-	if (groupElement!=null) trace("groupElement: "+groupElement.className);
 
 		// find all the pages in this application and close them
 		var nodes = getPageNodes(SLPlayerInstanceId, groupElement);

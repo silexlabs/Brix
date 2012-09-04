@@ -21,10 +21,17 @@ import js.Dom;
 /**
  * Some additional DOM functions extending the standard ones.
  * 
- * @author Thomas Fétiveau
  */
 class DomTools 
 {
+	/**
+	 * Call a calback later. This is useful sometimes when dealing with layout, because it needs time to be redrawn
+	 * @param 	callbackFunction	The callback function to be called in the next frame
+	 */
+	static public function doLater(callbackFunction:Void->Void)
+	{
+		haxe.Timer.delay(callbackFunction, 10);
+	}
 	/**
 	 * Search for all children elements of the given element that have the given attribute with the given value. Note that you should
 	 * avoid to use any non standard methods like this one to select elements as it's much less efficient than the standard ones 
@@ -229,12 +236,54 @@ class DomTools
 	 * @param	src 			String containing the URL of the script to embed
 	 */
 	static public function embedScript(src:String):HtmlDom{
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var scriptNodes = Lib.document.getElementsByTagName("script");
+		for (idxNode in 0...scriptNodes.length){
+			var node = scriptNodes[idxNode];
+			if(node.getAttribute("src") == src){
+				return node;
+			}
+		}
 		var node = Lib.document.createElement("script");
 		node.setAttribute("src", src);
-		
-		var head = Lib.document.getElementsByTagName("head")[0];
 		head.appendChild(node);
 
 		return cast(node);
 	}
+	/**
+	 * Get the html page base tag
+	 */
+	public static function getBaseTag():Null<String>{
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var baseNodes = Lib.document.getElementsByTagName("base");
+		if (baseNodes.length > 0){
+			return baseNodes[0].getAttribute("href");
+		}
+		else{
+			return null;
+		}
+	}
+	/**
+	 * Add a base tag with the given href param
+	 * @param	href 			String containing the URL of the base for the html page
+	 */
+	public static function setBaseTag(href:String){
+		// browse all tags in the head section and check if it a base tag is already set
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var baseNodes = Lib.document.getElementsByTagName("base");
+		if (baseNodes.length > 0){
+			trace("Warning: base tag already set in the head section. Current value (\""+baseNodes[0].getAttribute("href")+"\") will be replaced by \""+href+"\"");
+			baseNodes[0].setAttribute("href", href);
+		}
+		else{
+			var node = Lib.document.createElement("base");
+			node.setAttribute("href", href);
+			node.setAttribute("target", "_self");
+			if (head.childNodes.length>0)
+				head.insertBefore(node, head.childNodes[0]);
+			else
+				head.appendChild(node);
+		}
+	}
+
 }

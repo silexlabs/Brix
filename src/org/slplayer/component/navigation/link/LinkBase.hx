@@ -100,7 +100,6 @@ class LinkBase extends DisplayObject, implements IGroupable
 
 		// implementation of IGroupable
 		startGroupable();
-		trace("LinkBase group "+groupElement+" - "+rootElement.className+" - "+rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR));
 		
 		/// init transition data
 		transitionData = new TransitionData(
