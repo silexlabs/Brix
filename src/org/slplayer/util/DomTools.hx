@@ -30,7 +30,11 @@ class DomTools
 	 */
 	static public function doLater(callbackFunction:Void->Void)
 	{
+#if php
+		callbackFunction();
+#else
 		haxe.Timer.delay(callbackFunction, 10);
+#end
 	}
 	/**
 	 * Search for all children elements of the given element that have the given attribute with the given value. Note that you should
