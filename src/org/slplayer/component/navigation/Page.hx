@@ -66,7 +66,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open the page with the given "name" attribute
 	 * This will close other pages
 	 */
-	static public function openPage(pageName:String, isPopup:Bool, transitionData:TransitionData, slPlayerId:String, root:HtmlDom = null)
+	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, slPlayerId:String, root:HtmlDom = null)
 	{//trace("openPage ("+pageName+", "+isPopup+", "+transitionData+", "+slPlayerId+", "+root+")");
 		// default is the hole document
 		var document:Dynamic = root;
@@ -78,7 +78,7 @@ class Page extends DisplayObject, implements IGroupable
 		if (page == null)
 			throw("Error, could not find a page with name "+pageName);
 		// open the page as a page or a popup
-		page.open(transitionData, !isPopup);
+		page.open(transitionDataShow, transitionDataHide, !isPopup);
 	}
 	/** 
 	 * Close the page with the given "name" attribute
@@ -188,12 +188,12 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 * Also close the other pages if doCloseOthers is true
 	 */
-	public function open(transitionData:TransitionData = null, doCloseOthers:Bool = true) 
+	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true) 
 	{//trace("open ("+transitionData+", "+doCloseOthers+") - name="+name+" - "+groupElement+" - "+rootElement.getAttribute("data-group-id"));
 		if (doCloseOthers)
-			closeOthers(transitionData);
+			closeOthers(transitionDataHide);
 
-		doOpen(transitionData);
+		doOpen(transitionDataShow);
 	}
 
 	/**
@@ -221,13 +221,6 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	public function doOpen(transitionData:TransitionData = null)
 	{//trace("doOpen "+transitionData+", "+name);
-		// by default no transition
-		if (transitionData == null)
-			transitionData = new TransitionData(show, "2s");
-
-		// update transition type
-		transitionData.type = TransitionType.show;
-
 		// find all the layers which have the page name in their css class attribute
 		var nodes = getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
@@ -250,13 +243,6 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null) 
 	{//trace("close "+transitionData+", "+name);
-		// default transition is the one of the layer
-		if (transitionData == null)
-			transitionData = new TransitionData(hide, "2s");
-
-		// update transition type
-		transitionData.type = TransitionType.hide;
-
 		// default value
 		if (preventCloseByClassName==null)
 			preventCloseByClassName = new Array();

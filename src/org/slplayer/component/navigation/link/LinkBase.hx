@@ -21,6 +21,7 @@ import js.Dom;
 import org.slplayer.core.Application;
 import org.slplayer.component.ui.DisplayObject;
 import org.slplayer.component.navigation.transition.TransitionData;
+import org.slplayer.component.navigation.transition.TransitionTools;
 import org.slplayer.util.DomTools;
 
 import org.slplayer.component.group.IGroupable;
@@ -50,29 +51,6 @@ class LinkBase extends DisplayObject, implements IGroupable
 	 */
 	public static inline var CONFIG_TARGET_IS_POPUP:String = "_top";
 	/**
-	 * constant, name of attribute
-	 * defines the param for the transition
-	 */
-	public static inline var CONFIG_TRANSITION_DURATION:String = "data-transition-duration";
-	/**
-	 * constant, name of attribute
-	 * defines the param for the transition
-	 */
-	public static inline var CONFIG_TRANSITION_TIMING_FUNCTION:String = "data-transition-timing-function";
-	/**
-	 * constant, name of attribute
-	 * defines the param for the transition
-	 * @example	 &lt;a href=&quot;#page2&quot; class=&quot;Link next&quot; data-transition-delay = &quot;2s&quot; &gt;Test link&lt;/a&gt;
-	 */
-	public static inline var CONFIG_TRANSITION_DELAY:String = "data-transition-delay";
-	/**
-	 * constant, name of attribute
-	 * defines the param for the transition
-	 * @example 	true
-	 * @example 	false
-	 */
-	public static inline var CONFIG_TRANSITION_IS_REVERSED:String = "data-transition-is-reversed";
-	/**
 	 * the group element set by the Group class
 	 * implementation of IGroupable
 	 */
@@ -89,7 +67,8 @@ class LinkBase extends DisplayObject, implements IGroupable
 	 * store the html attribute value
 	 * determines which transition to apply 
 	 */
-	public var transitionData:TransitionData;
+	public var transitionDataShow:TransitionData;
+	public var transitionDataHide:TransitionData;
 
 	/**
 	 * constructor
@@ -101,12 +80,6 @@ class LinkBase extends DisplayObject, implements IGroupable
 		// implementation of IGroupable
 		startGroupable();
 		
-		/// init transition data
-		transitionData = new TransitionData(
-			null,
-			"0"
-		);
-
 		// catch the click
 		rootElement.addEventListener("click", onClick, false);
 
@@ -136,12 +109,7 @@ class LinkBase extends DisplayObject, implements IGroupable
 		// prevent the hash tag to change the scroll position as an HTML anchor would
 		e.preventDefault();
 		// values for the transition
-		transitionData = new TransitionData(
-			null,
-			rootElement.getAttribute(CONFIG_TRANSITION_DURATION),
-			rootElement.getAttribute(CONFIG_TRANSITION_TIMING_FUNCTION),
-			rootElement.getAttribute(CONFIG_TRANSITION_DELAY),
-			rootElement.getAttribute(CONFIG_TRANSITION_IS_REVERSED) != null
-		);
+		transitionDataShow = TransitionTools.getTransitionData(rootElement, TransitionType.show);
+		transitionDataHide = TransitionTools.getTransitionData(rootElement, TransitionType.hide);
 	}
 }

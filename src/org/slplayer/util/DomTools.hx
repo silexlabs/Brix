@@ -33,7 +33,7 @@ class DomTools
 #if php
 		callbackFunction();
 #else
-		haxe.Timer.delay(callbackFunction, 10);
+		haxe.Timer.delay(callbackFunction, 200);
 #end
 	}
 	/**
