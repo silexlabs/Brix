@@ -42,6 +42,16 @@ enum LayerStatus
 class Layer extends DisplayObject
 {
 	/**
+	 * constant for the show event, dispatched on the rootElement node when the layer is shown
+	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 */
+	public static inline var EVENT_TYPE_SHOW:String = "onLayerShow";
+	/**
+	 * constant for the hide event, dispatched on the rootElement node when the layer is hided
+	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 */
+	public static inline var EVENT_TYPE_HIDE:String = "onLayerHide";
+	/**
 	 * array used to store all the children while the layer is hided
 	 */
 	private var childrenArray:Array<HtmlDom>;
@@ -98,20 +108,20 @@ class Layer extends DisplayObject
 		else{
 			// set the flag
 			hasTransitionStarted = true;
-			// listen for the transition end event
-			if (onComplete != null){
-				addTransitionEvent(onComplete);
-			}
 			// set the css style
 			DomTools.addClass(rootElement, transitionData.startStyleName);
 			// continue later
-			DomTools.doLater(callback(doStartTransition2, transitionData));
+			DomTools.doLater(callback(doStartTransition, transitionData, onComplete));
 		}
 	}
-	private function doStartTransition2(transitionData:TransitionData) 
+	private function doStartTransition(transitionData:TransitionData, onComplete:Null<Event->Void>=null) 
 	{
 		// set the css style
 		DomTools.removeClass(rootElement, transitionData.startStyleName);
+		// listen for the transition end event
+		if (onComplete != null){
+			addTransitionEvent(onComplete);
+		}
 		DomTools.addClass(rootElement, transitionData.endStyleName);
 	}
 
@@ -119,7 +129,7 @@ class Layer extends DisplayObject
 	 * add transition events for all browsers
 	 */
 	private function addTransitionEvent(onEndCallback:Event->Void)
-	{
+	{trace("EVENTS SET");
 		rootElement.addEventListener("transitionend", onEndCallback, false);
 	#if js
 		rootElement.addEventListener("transitionEnd", onEndCallback, false);
@@ -133,7 +143,7 @@ class Layer extends DisplayObject
 	 * Remove events for all browsers
 	 */
 	private function removeTransitionEvent(onEndCallback:Event->Void)
-	{
+	{trace("EVENTS RESET");
 		rootElement.removeEventListener("transitionend", onEndCallback, false);
 	#if js
 		rootElement.removeEventListener("transitionEnd", onEndCallback, false);
@@ -159,10 +169,14 @@ class Layer extends DisplayObject
 		}
 		// reset transition if it is pending
 		if (status == hideTransition){
+			trace("Warning: hide break previous transition hide");
+			doHideCallback(null);
 			removeTransitionEvent(doHideCallback);
 		}
 		// reset transition if it is pending
 		else if (status == showTransition){
+			trace("Warning: hide break previous transition show");
+			doShowCallback(null);
 			removeTransitionEvent(doShowCallback);
 		}
 		// update status 
@@ -196,18 +210,36 @@ class Layer extends DisplayObject
 				}
 			}
 		}
+		// dispatch a custom event on the root element
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_TYPE_SHOW, false, false, {
+			transitionData : transitionData,
+			target: rootElement,
+			layer: this,
+		});
+		rootElement.dispatchEvent(event);
+
 		// do the transition
-		doShowCallback = function(e){doShow(transitionData);};
+		doShowCallback = callback(doShow, transitionData);
 		startTransition(TransitionType.show, transitionData, doShowCallback);
 	}
 	/**
 	 * transition is over
 	 */
-	public function doShow(transitionData:Null<TransitionData>) : Void
-	{
+	public function doShow(transitionData:Null<TransitionData>, e:Null<Event>) : Void
+	{trace("doShow");
+		if (doShowCallback == null){
+			trace("Warning: end transition callback already called");
+			return;
+		}
+		if (e!=null && e.target != rootElement){
+			trace("End transition event from another html element");
+			return;
+		}
 		if (transitionData != null)
 			DomTools.removeClass(rootElement, transitionData.endStyleName);
 		removeTransitionEvent(doShowCallback);
+		doShowCallback=null;
 		// update status 
 		status = visible;
 	}
@@ -221,35 +253,57 @@ class Layer extends DisplayObject
 	public function hide(transitionData:Null<TransitionData> = null) : Void
 	{
 		if (status != visible && status != notInit){
-			trace("Warning, can not hide the layer, since it is "+status);
+			//trace("Warning, can not hide the layer, since it is "+status);
 			return;
 		}
 		// reset transition if it is pending
 		if (status == hideTransition){
+			trace("Warning: hide break previous transition hide");
+			doHideCallback(null);
 			removeTransitionEvent(doHideCallback);
 		}
 		// reset transition if it is pending
 		else if (status == showTransition){
+			trace("Warning: hide break previous transition show");
+			doShowCallback(null);
 			removeTransitionEvent(doShowCallback);
 		}
 		// update status 
 		status = hideTransition;
 
 		// do the transition
-		doHideCallback = function(e){doHide(transitionData);};
+		doHideCallback = callback(doHide, transitionData);
 		startTransition(TransitionType.hide, transitionData, doHideCallback);
 	}
 
 	/**
 	 * remove children from the DOM and store it in childrenArray
 	 */
-	public function doHide(transitionData:Null<TransitionData>) : Void
-	{
+	public function doHide(transitionData:Null<TransitionData>, e:Null<Event>) : Void
+	{trace("doHide");
+		if (doHideCallback == null){
+			trace("Warning: end transition callback already called");
+			return;
+		}
+		if (e!=null && e.target != rootElement){
+			trace("End transition event from another html element");
+			return;
+		}
 		removeTransitionEvent(doHideCallback);
+		doHideCallback = null;
 		if (transitionData != null)
 			DomTools.removeClass(rootElement, transitionData.endStyleName);
 		// update status 
 		status = hidden;
+
+		// dispatch a custom event on the root element
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_TYPE_HIDE, false, false, {
+			transitionData : transitionData,
+			target: rootElement,
+			layer: this,
+		});
+		rootElement.dispatchEvent(event);
 
 		// remove children 
 		while (rootElement.childNodes.length > 0)
