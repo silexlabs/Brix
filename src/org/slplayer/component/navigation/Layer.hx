@@ -92,10 +92,8 @@ class Layer extends DisplayObject
 	//////////////////////////////////////////////////////
 	// Transitions
 	//////////////////////////////////////////////////////
-	/**
-	 * set the property hasTransitionStarted 
-	 * for the method detectTransition to be aware of this event
-	 */
+/*
+with priority to the css classes of the link over the one of the layer
 	private function startTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
 	{
 		if (transitionData == null)
@@ -124,14 +122,75 @@ class Layer extends DisplayObject
 		}
 		DomTools.addClass(rootElement, transitionData.endStyleName);
 	}
+/*
+with sum of the css classes
+*/	private function startTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
+	{
+		// retrieve transition data from the root node
+		var transitionData2 = TransitionTools.getTransitionData(rootElement, type);
 
+		// add the transition data from the link
+		var sumOfTransitions:Array<TransitionData> = new Array();
+		if (transitionData != null){
+			sumOfTransitions.push(transitionData);
+		}
+		if (transitionData2 != null){
+			sumOfTransitions.push(transitionData2);
+		}
+		// apply the initial transition params
+		if (sumOfTransitions.length==0){
+			// no transition
+			if(onComplete != null)
+				onComplete(null);
+		}
+		else{
+			// set the fla
+			hasTransitionStarted = true;
+			// prevent anim at this stage
+			TransitionTools.setTransitionProperty(rootElement, "transitionDuration", "0");
+			// set the css style
+			for (transition in sumOfTransitions)
+				DomTools.addClass(rootElement, transition.startStyleName);//
+			// continue later
+			DomTools.doLater(callback(doStartTransition, sumOfTransitions, onComplete));
+		}
+	}
+	private function doStartTransition(sumOfTransitions:Array<TransitionData>, onComplete:Null<Event->Void>=null) 
+	{
+		// reset the css style
+		for (transition in sumOfTransitions)
+			DomTools.removeClass(rootElement, transition.startStyleName);
+		// listen for the transition end event
+		if (onComplete != null){
+			addTransitionEvent(onComplete);
+		}
+		// allow anim at this stage
+		TransitionTools.setTransitionProperty(rootElement, "transitionDuration", null);
+		// set the css style again
+		for (transition in sumOfTransitions)
+			DomTools.addClass(rootElement, transition.endStyleName);
+	}
+	private function endTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
+	{
+		removeTransitionEvent(onComplete);
+		if (transitionData != null){
+			DomTools.removeClass(rootElement, transitionData.endStyleName);
+		}
+		var transitionData2 = TransitionTools.getTransitionData(rootElement, type);
+		if (transitionData2 != null){
+			DomTools.removeClass(rootElement, transitionData2.endStyleName);
+		}
+	}
+
+/**/
 	/**
 	 * add transition events for all browsers
 	 */
 	private function addTransitionEvent(onEndCallback:Event->Void)
-	{trace("EVENTS SET");
+	{// trace("EVENTS SET");
 		rootElement.addEventListener("transitionend", onEndCallback, false);
 	#if js
+		// only for pure js, not for cocktail compilation
 		rootElement.addEventListener("transitionEnd", onEndCallback, false);
 		rootElement.addEventListener("webkitTransitionEnd", onEndCallback, false);
 		rootElement.addEventListener("oTransitionEnd", onEndCallback, false);
@@ -143,9 +202,10 @@ class Layer extends DisplayObject
 	 * Remove events for all browsers
 	 */
 	private function removeTransitionEvent(onEndCallback:Event->Void)
-	{trace("EVENTS RESET");
+	{// trace("EVENTS RESET");
 		rootElement.removeEventListener("transitionend", onEndCallback, false);
 	#if js
+		// only for pure js, not for cocktail compilation
 		rootElement.removeEventListener("transitionEnd", onEndCallback, false);
 		rootElement.removeEventListener("webkitTransitionEnd", onEndCallback, false);
 		rootElement.removeEventListener("oTransitionEnd", onEndCallback, false);
@@ -161,7 +221,7 @@ class Layer extends DisplayObject
 	 * This will empty childrenArray
 	 * Start the transition and then show
 	 */
-	public function show(transitionData:Null<TransitionData> = null) : Void
+	public function show(transitionData:Null<TransitionData> = null, preventTransitions:Bool = false) : Void
 	{
 		if (status != hidden && status != notInit){
 			trace("Warning: can not show the layer, since it is "+status);
@@ -181,9 +241,6 @@ class Layer extends DisplayObject
 		}
 		// update status 
 		status = showTransition;
-
-		// set or reset style.display
-		rootElement.style.display=styleAttrDisplay;
 
 		// put the children back in place
 		while (childrenArray.length > 0)
@@ -220,25 +277,36 @@ class Layer extends DisplayObject
 		rootElement.dispatchEvent(event);
 
 		// do the transition
-		doShowCallback = callback(doShow, transitionData);
-		startTransition(TransitionType.show, transitionData, doShowCallback);
+		if (preventTransitions == false)
+		{
+			doShowCallback = callback(doShow, transitionData, preventTransitions);
+			startTransition(TransitionType.show, transitionData, doShowCallback);
+		}
+		else
+		{
+			doShow(transitionData, preventTransitions, null);
+		}
+		// set or reset style.display
+		rootElement.style.display=styleAttrDisplay;
+
 	}
 	/**
 	 * transition is over
 	 */
-	public function doShow(transitionData:Null<TransitionData>, e:Null<Event>) : Void
+	public function doShow(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
 	{trace("doShow");
-		if (doShowCallback == null){
-			trace("Warning: end transition callback already called");
-			return;
-		}
 		if (e!=null && e.target != rootElement){
 			trace("End transition event from another html element");
 			return;
 		}
-		if (transitionData != null)
-			DomTools.removeClass(rootElement, transitionData.endStyleName);
-		removeTransitionEvent(doShowCallback);
+		if (preventTransitions == false && doShowCallback == null){
+			trace("Warning: end transition callback already called");
+			return;
+		}
+		if (preventTransitions == false)
+		{
+			endTransition(TransitionType.show,transitionData, doShowCallback);
+		}
 		doShowCallback=null;
 		// update status 
 		status = visible;
@@ -250,8 +318,8 @@ class Layer extends DisplayObject
 	/**
 	 * start the transition and then hide
 	 */
-	public function hide(transitionData:Null<TransitionData> = null) : Void
-	{
+	public function hide(transitionData:Null<TransitionData> = null, preventTransitions:Bool) : Void
+	{// trace("hide "+preventTransitions);
 		if (status != visible && status != notInit){
 			//trace("Warning, can not hide the layer, since it is "+status);
 			return;
@@ -272,27 +340,35 @@ class Layer extends DisplayObject
 		status = hideTransition;
 
 		// do the transition
-		doHideCallback = callback(doHide, transitionData);
-		startTransition(TransitionType.hide, transitionData, doHideCallback);
+		if (preventTransitions == false)
+		{
+			doHideCallback = callback(doHide, transitionData, preventTransitions);
+			startTransition(TransitionType.hide, transitionData, doHideCallback);
+		}
+		else
+		{
+			doHide(transitionData, preventTransitions, null);
+		}
 	}
 
 	/**
 	 * remove children from the DOM and store it in childrenArray
 	 */
-	public function doHide(transitionData:Null<TransitionData>, e:Null<Event>) : Void
-	{trace("doHide");
-		if (doHideCallback == null){
-			trace("Warning: end transition callback already called");
-			return;
-		}
+	public function doHide(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
+	{// trace("doHide "+preventTransitions);
 		if (e!=null && e.target != rootElement){
 			trace("End transition event from another html element");
 			return;
 		}
-		removeTransitionEvent(doHideCallback);
-		doHideCallback = null;
-		if (transitionData != null)
-			DomTools.removeClass(rootElement, transitionData.endStyleName);
+		if (preventTransitions == false && doHideCallback == null){
+			trace("Warning: end transition callback already called");
+			return;
+		}
+		if (preventTransitions == false)
+		{
+			endTransition(TransitionType.hide, transitionData, doHideCallback);
+			doHideCallback = null;
+		}
 		// update status 
 		status = hidden;
 

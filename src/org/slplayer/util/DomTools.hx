@@ -28,12 +28,12 @@ class DomTools
 	 * Call a calback later. This is useful sometimes when dealing with layout, because it needs time to be redrawn
 	 * @param 	callbackFunction	The callback function to be called in the next frame
 	 */
-	static public function doLater(callbackFunction:Void->Void)
+	static public function doLater(callbackFunction:Void->Void, nFrames:Float=1)
 	{
 #if php
 		callbackFunction();
 #else
-		haxe.Timer.delay(callbackFunction, 200);
+		haxe.Timer.delay(callbackFunction, Math.round(200*nFrames));
 #end
 	}
 	/**

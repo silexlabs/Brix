@@ -180,7 +180,7 @@ class Page extends DisplayObject, implements IGroupable
 			|| (groupElement != null && groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name)
 		)
 		{
-			open();
+			open(null, null, true, true);
 		}
 	}
 
@@ -188,19 +188,19 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 * Also close the other pages if doCloseOthers is true
 	 */
-	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true) 
-	{//trace("open ("+transitionData+", "+doCloseOthers+") - name="+name+" - "+groupElement+" - "+rootElement.getAttribute("data-group-id"));
+	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true, preventTransitions:Bool = false) 
+	{trace("open - "+doCloseOthers+" - name="+name+" - "+preventTransitions);
 		if (doCloseOthers)
-			closeOthers(transitionDataHide);
+			closeOthers(transitionDataHide, preventTransitions);
 
-		doOpen(transitionDataShow);
+		doOpen(transitionDataShow, preventTransitions);
 	}
 
 	/**
 	 * Close all other pages
 	 */
-	public function closeOthers(transitionData:TransitionData = null)
-	{//trace("closeOthers("+transitionData+") - groupElement: "+groupElement);
+	public function closeOthers(transitionData:TransitionData = null, preventTransitions:Bool = false)
+	{trace("closeOthers("+transitionData+") - "+preventTransitions);
 
 		// find all the pages in this application and close them
 		var nodes = getPageNodes(SLPlayerInstanceId, groupElement);
@@ -211,7 +211,7 @@ class Page extends DisplayObject, implements IGroupable
 			for (pageInstance in pageInstances)
 			{
 				if (pageInstance != this)
-					pageInstance.close(transitionData, [name]);
+					pageInstance.close(transitionData, [name], preventTransitions);
 			}
 		}
 	}
@@ -219,8 +219,8 @@ class Page extends DisplayObject, implements IGroupable
 	/**
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 */
-	public function doOpen(transitionData:TransitionData = null)
-	{//trace("doOpen "+transitionData+", "+name);
+	public function doOpen(transitionData:TransitionData = null, preventTransitions:Bool = false)
+	{trace("doOpen "+transitionData+", "+name+" - "+preventTransitions);
 		// find all the layers which have the page name in their css class attribute
 		var nodes = getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
@@ -231,7 +231,7 @@ class Page extends DisplayObject, implements IGroupable
 			var layerInstances:List<Layer> = getSLPlayer().getAssociatedComponents(layerNode, Layer);
 			for (layerInstance in layerInstances)
 			{
-					layerInstance.show(transitionData);
+					layerInstance.show(transitionData, preventTransitions);
 			}
 		}
 
@@ -241,8 +241,8 @@ class Page extends DisplayObject, implements IGroupable
 	 * Close this page, i.e. hide its content
 	 * Remove the children from the DOM
 	 */
-	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null) 
-	{//trace("close "+transitionData+", "+name);
+	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null, preventTransitions:Bool = false) 
+	{trace("close "+transitionData+", "+name+" - "+preventTransitions);
 		// default value
 		if (preventCloseByClassName==null)
 			preventCloseByClassName = new Array();
@@ -269,7 +269,7 @@ class Page extends DisplayObject, implements IGroupable
 				var layerInstances:List<Layer> = getSLPlayer().getAssociatedComponents(layerNode, Layer);
 				for (layerInstance in layerInstances)
 				{
-					cast(layerInstance, Layer).hide(transitionData);
+					cast(layerInstance, Layer).hide(transitionData, preventTransitions);
 				}
 			}
 		}
