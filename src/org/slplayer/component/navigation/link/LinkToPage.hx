@@ -32,9 +32,9 @@ class LinkToPage extends LinkBase
 	 * this will close other pages
 	 */
 	override private function onClick(e:Event)
-	{trace("LinkToPage "+targetAttr+" - "+(targetAttr!=LinkBase.CONFIG_TARGET_IS_POPUP));
+	{
 		super.onClick(e);
 		// show the page with this name
-		Page.openPage(linkName, targetAttr!=LinkBase.CONFIG_TARGET_IS_POPUP, transitionData, SLPlayerInstanceId);
+		Page.openPage(linkName, targetAttr==LinkBase.CONFIG_TARGET_IS_POPUP, transitionDataShow, transitionDataHide, SLPlayerInstanceId, groupElement);
 	}
 }

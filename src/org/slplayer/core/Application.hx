@@ -215,7 +215,9 @@ import js.Dom;
 	 */
 	static private function generateUniqueId():String
 	{
-		return haxe.Md5.encode(Date.now().toString()+Std.string(Std.random(Std.int(Date.now().getTime()))));
+		// MD lex: this generates this php error sometimes: uncaught exception: mt_rand() [function.mt-rand]: max(-1959838343) is smaller than min(0)
+		// return haxe.Md5.encode(Date.now().toString()+Std.string(Std.random(Std.int(Date.now().getTime()))));
+		return Std.string(Math.round(Math.random()*10000));
 	}
 	
 	/**

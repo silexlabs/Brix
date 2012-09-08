@@ -1,0 +1,81 @@
+<HTML lang="en">
+<HEAD>
+	<META charset="utf-8"></META>
+	<TITLE>Menu example</TITLE>
+	<LINK href="toolbar.css" rel="stylesheet"></LINK>
+	
+	
+	
+	
+	
+	<META name="initialPageName" content="welcome"></META>
+<SCRIPT src="multiple-toolbars.js"></SCRIPT></HEAD>
+
+</HTML><BODY>
+	<DIV class="Group1 group-container">
+		<UL class="menu">
+		   <LI class="main"><A href="#sub-menu4" class="LinkToPage" data-group-id="Group1">Insert</A><A class="Page" name="sub-menu4" data-group-id="Group1"></A>
+				<DIV class="container-sub">
+					<UL class="Layer sub-menu4 sub-menu4-1 sub">
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group1">Snippet</A></LI>
+						<LI><A href="#sub-menu4-1" class="LinkToPage" data-group-id="Group1">Image &gt;</A></LI>
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group1">Table</A></LI>
+					</UL>
+					<A class="Page" name="sub-menu4-1" data-group-id="Group1"></A>
+					<UL class="Layer sub-menu4-1 sub sub-of-sub">
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group1">From File</A></LI>
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group1">From URL</A></LI>
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group1">From Picassa</A></LI>
+					</UL>
+				</DIV>
+		   </LI>
+		   <LI class="main"><A href="#sub-menu5" class="LinkToPage" data-group-id="Group1">Help</A><A class="Page" name="sub-menu5" data-group-id="Group1"></A>
+				<DIV class="container-sub">
+					<UL class="Layer sub-menu5 sub">
+						<LI><A href="#welcome" class="LinkToPage" data-group-id="Group1">Welcome page</A></LI>
+						<LI><A href="#about" class="LinkToPage" data-group-id="Group1">About</A></LI>
+					</UL>
+				</DIV>
+		   </LI>
+		</UL>
+		<A class="Page" name="welcome" data-group-id="Group1"></A>
+		<DIV class="Layer welcome"><BR></BR>Welcome to the Toolbar demo !<BR></BR><BR></BR>Please navigate through the toolbar menus and click on the menu items.<BR></BR></DIV>
+		<A class="Page" name="about" data-group-id="Group1"></A>
+		<DIV class="Layer about"><BR></BR>SLPlayer is © 2011-2012 Silex Labs and is released under the GPL License.<BR></BR><BR></BR></DIV>
+		<A class="Page" name="toolbox" data-group-id="Group1"></A>
+		<DIV class="Layer toolbox">Toolbox popup<HR></HR>Example of tool box (popup)<BR></BR>Save as: <INPUT type="file"/><BR></BR><INPUT type="button" value="Save"/><INPUT type="button" value="Cancel"/></DIV>
+	</DIV>
+	<DIV class="Group2 group-container">
+		<UL class="menu">
+		   <LI class="main"><A href="#sub-menu4" class="LinkToPage" data-group-id="Group2">Insert</A><A class="Page" name="sub-menu4" data-group-id="Group2"></A>
+				<DIV class="container-sub">
+					<UL class="Layer sub-menu4 sub-menu4-1 sub">
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group2">Snippet</A></LI>
+						<LI><A href="#sub-menu4-1" class="LinkToPage" data-group-id="Group2">Image &gt;</A></LI>
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group2">Table</A></LI>
+					</UL>
+					<A class="Page" name="sub-menu4-1" data-group-id="Group2"></A>
+					<UL class="Layer sub-menu4-1 sub sub-of-sub">
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group2">From File</A></LI>
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group2">From URL</A></LI>
+						<LI><A href="#toolbox" class="LinkToPage" data-group-id="Group2">From Picassa</A></LI>
+					</UL>
+				</DIV>
+		   </LI>
+		   <LI class="main"><A href="#sub-menu5" class="LinkToPage" data-group-id="Group2">Help</A><A class="Page" name="sub-menu5" data-group-id="Group2"></A>
+				<DIV class="container-sub">
+					<UL class="Layer sub-menu5 sub">
+						<LI><A href="#welcome" class="LinkToPage" data-group-id="Group2">Welcome page</A></LI>
+						<LI><A href="#about" class="LinkToPage" data-group-id="Group2">About</A></LI>
+					</UL>
+				</DIV>
+		   </LI>
+		</UL>
+		<A class="Page" name="welcome" data-group-id="Group2"></A>
+		<DIV class="Layer welcome"><BR></BR>Welcome to the Toolbar demo !<BR></BR><BR></BR>Please navigate through the toolbar menus and click on the menu items.<BR></BR></DIV>
+		<A class="Page" name="about" data-group-id="Group2"></A>
+		<DIV class="Layer about"><BR></BR>SLPlayer is © 2011-2012 Silex Labs and is released under the GPL License.<BR></BR><BR></BR></DIV>
+		<A class="Page" name="toolbox" data-group-id="Group2"></A>
+		<DIV class="Layer toolbox">Toolbox popup<HR></HR>Example of tool box (popup)<BR></BR>Save as: <INPUT type="file"/><BR></BR><INPUT type="button" value="Save"/><INPUT type="button" value="Cancel"/></DIV>
+	</DIV>
+</BODY>

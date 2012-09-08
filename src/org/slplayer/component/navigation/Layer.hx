@@ -20,14 +20,17 @@ import js.Dom;
 
 import org.slplayer.component.ui.DisplayObject;
 import org.slplayer.component.navigation.transition.TransitionData;
-
+import org.slplayer.component.navigation.transition.TransitionTools;
 import org.slplayer.component.sound.SoundOn;
+import org.slplayer.util.DomTools;
 
 enum LayerStatus
 {
+	showTransition;
+	hideTransition;
 	visible;
 	hidden;
-	notInitialized;
+	notInit;
 }
 
 /**
@@ -39,10 +42,15 @@ enum LayerStatus
 class Layer extends DisplayObject
 {
 	/**
-	 * workaround bug removeEventListener 
+	 * constant for the show event, dispatched on the rootElement node when the layer is shown
+	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
 	 */
-	public var isListeningHide:Bool;
-	public var isListeningShow:Bool;
+	public static inline var EVENT_TYPE_SHOW:String = "onLayerShow";
+	/**
+	 * constant for the hide event, dispatched on the rootElement node when the layer is hided
+	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 */
+	public static inline var EVENT_TYPE_HIDE:String = "onLayerHide";
 	/**
 	 * array used to store all the children while the layer is hided
 	 */
@@ -54,12 +62,20 @@ class Layer extends DisplayObject
 	/**
 	 * Flag used to detect if a transition has started
 	 */
-	private var hasTransitionStarted:Bool;
+	private var hasTransitionStarted:Bool = false;
 	/**
 	 * Value of display in the style attribute of the DOM element
 	 * This is stored because it is changed during the transition
 	 */
 	private var styleAttrDisplay:String;
+	/**
+	 * Callback used to add/remove events
+	 */
+	private var doShowCallback:Event->Void;
+	/**
+	 * Callback used to add/remove events
+	 */
+	private var doHideCallback:Event->Void;
 
 	/**
 	 * constructor
@@ -68,93 +84,302 @@ class Layer extends DisplayObject
 	public function new(rootElement:HtmlDom, SLPId:String)
 	{
 		super(rootElement, SLPId);
-		isListeningHide = false;
-		isListeningShow = false;
-		status = notInitialized;
 		childrenArray = new Array();
+		status = notInit;
 		// Store the transition data for use in onEnd
 		styleAttrDisplay = rootElement.style.display;
 	}
+	//////////////////////////////////////////////////////
+	// Transitions
+	//////////////////////////////////////////////////////
+/*
+with priority to the css classes of the link over the one of the layer
+	private function startTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
+	{
+		if (transitionData == null)
+			transitionData = TransitionTools.getTransitionData(rootElement, type);
+
+		if (transitionData == null){
+			if(onComplete != null)
+				onComplete(null);
+		}
+		else{
+			// set the flag
+			hasTransitionStarted = true;
+			// set the css style
+			DomTools.addClass(rootElement, transitionData.startStyleName);
+			// continue later
+			DomTools.doLater(callback(doStartTransition, transitionData, onComplete));
+		}
+	}
+	private function doStartTransition(transitionData:TransitionData, onComplete:Null<Event->Void>=null) 
+	{
+		// set the css style
+		DomTools.removeClass(rootElement, transitionData.startStyleName);
+		// listen for the transition end event
+		if (onComplete != null){
+			addTransitionEvent(onComplete);
+		}
+		DomTools.addClass(rootElement, transitionData.endStyleName);
+	}
+/*
+with sum of the css classes
+*/	private function startTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
+	{
+		// retrieve transition data from the root node
+		var transitionData2 = TransitionTools.getTransitionData(rootElement, type);
+
+		// add the transition data from the link
+		var sumOfTransitions:Array<TransitionData> = new Array();
+		if (transitionData != null){
+			sumOfTransitions.push(transitionData);
+		}
+		if (transitionData2 != null){
+			sumOfTransitions.push(transitionData2);
+		}
+		// apply the initial transition params
+		if (sumOfTransitions.length==0){
+			// no transition
+			if(onComplete != null)
+				onComplete(null);
+		}
+		else{
+			// set the fla
+			hasTransitionStarted = true;
+			// prevent anim at this stage
+			TransitionTools.setTransitionProperty(rootElement, "transitionDuration", "0");
+			// set the css style
+			for (transition in sumOfTransitions)
+				DomTools.addClass(rootElement, transition.startStyleName);//
+			// continue later
+			DomTools.doLater(callback(doStartTransition, sumOfTransitions, onComplete));
+		}
+	}
+	private function doStartTransition(sumOfTransitions:Array<TransitionData>, onComplete:Null<Event->Void>=null) 
+	{
+		// reset the css style
+		for (transition in sumOfTransitions)
+			DomTools.removeClass(rootElement, transition.startStyleName);
+		// listen for the transition end event
+		if (onComplete != null){
+			addTransitionEvent(onComplete);
+		}
+		// allow anim at this stage
+		TransitionTools.setTransitionProperty(rootElement, "transitionDuration", null);
+		// set the css style again
+		for (transition in sumOfTransitions)
+			DomTools.addClass(rootElement, transition.endStyleName);
+	}
+	private function endTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
+	{
+		removeTransitionEvent(onComplete);
+		if (transitionData != null){
+			DomTools.removeClass(rootElement, transitionData.endStyleName);
+		}
+		var transitionData2 = TransitionTools.getTransitionData(rootElement, type);
+		if (transitionData2 != null){
+			DomTools.removeClass(rootElement, transitionData2.endStyleName);
+		}
+	}
+
+/**/
+	/**
+	 * add transition events for all browsers
+	 */
+	private function addTransitionEvent(onEndCallback:Event->Void)
+	{// trace("EVENTS SET");
+		rootElement.addEventListener("transitionend", onEndCallback, false);
+	#if js
+		// only for pure js, not for cocktail compilation
+		rootElement.addEventListener("transitionEnd", onEndCallback, false);
+		rootElement.addEventListener("webkitTransitionEnd", onEndCallback, false);
+		rootElement.addEventListener("oTransitionEnd", onEndCallback, false);
+		rootElement.addEventListener("MSTransitionEnd", onEndCallback, false);
+	#end
+	}
 
 	/**
-	 * dispatch a transition request event, 
-	 * and listen to the transition start event to detect that a transition is taking place
-	 * 
-	 * TODO find a better way than using events in a synchrone way here
-	 * 
-	 * @return true if there is a transition
+	 * Remove events for all browsers
 	 */
-	public function detectTransition(transitionData:TransitionData) : Bool
+	private function removeTransitionEvent(onEndCallback:Event->Void)
+	{// trace("EVENTS RESET");
+		rootElement.removeEventListener("transitionend", onEndCallback, false);
+	#if js
+		// only for pure js, not for cocktail compilation
+		rootElement.removeEventListener("transitionEnd", onEndCallback, false);
+		rootElement.removeEventListener("webkitTransitionEnd", onEndCallback, false);
+		rootElement.removeEventListener("oTransitionEnd", onEndCallback, false);
+		rootElement.removeEventListener("MSTransitionEnd", onEndCallback, false);
+	#end
+	}
+
+	//////////////////////////////////////////////////////
+	// Show
+	//////////////////////////////////////////////////////
+	/**
+	 * Add all children from childrenArray back to the DOM
+	 * This will empty childrenArray
+	 * Start the transition and then show
+	 */
+	public function show(transitionData:Null<TransitionData> = null, preventTransitions:Bool = false) : Void
 	{
-		//listen to the transition start event to detect that a transition is taking place
-		rootElement.addEventListener(TransitionData.EVENT_TYPE_STARTED, onTransitionStarted, false);
+		if (status != hidden && status != notInit){
+			trace("Warning: can not show the layer, since it is "+status);
+			return;
+		}
+		// reset transition if it is pending
+		if (status == hideTransition){
+			trace("Warning: hide break previous transition hide");
+			doHideCallback(null);
+			removeTransitionEvent(doHideCallback);
+		}
+		// reset transition if it is pending
+		else if (status == showTransition){
+			trace("Warning: hide break previous transition show");
+			doShowCallback(null);
+			removeTransitionEvent(doShowCallback);
+		}
+		// update status 
+		status = showTransition;
 
-		// unset the flag
-		hasTransitionStarted = false;
-
-		// dispatch the transition request event to check if a transition component is listening
-		var event:CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(TransitionData.EVENT_TYPE_REQUEST, true, true, transitionData);
+		// put the children back in place
+		while (childrenArray.length > 0)
+		{
+			var element = childrenArray.shift();
+			rootElement.appendChild(element);
+			// play the videos/sounds when entering the page
+			if (element.tagName != null && (element.tagName.toLowerCase() == "audio" || element.tagName.toLowerCase() == "video"))
+			{
+				try
+				{				
+					if (cast(element).autoplay == true)
+					{
+						cast(element).currentTime = 0;
+						cast(element).play();
+					}
+					cast(element).muted = SoundOn.isMuted;
+				}
+				catch (e:Dynamic)
+				{
+					// this happens when the element was removed from the dom for example
+					// it is the case when transition is immediate
+					trace("Layer error: could not access audio or video element");
+				}
+			}
+		}
+		// dispatch a custom event on the root element
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_TYPE_SHOW, false, false, {
+			transitionData : transitionData,
+			target: rootElement,
+			layer: this,
+		});
 		rootElement.dispatchEvent(event);
 
-		// remove the listener
-		rootElement.removeEventListener(TransitionData.EVENT_TYPE_STARTED, onTransitionStarted, false);
-
-		// returns true if the flag has changed 
-		return hasTransitionStarted;
-	}
-
-	/**
-	 * set the property hasTransitionStarted 
-	 * for the method detectTransition to be aware of this event
-	 */
-	private function onTransitionStarted(event:Event)
-	{
-		// set the flag
-		hasTransitionStarted = true;
-	}
-
-	/**
-	 * start the transition and then hide
-	 */
-	public function hide(transitionData:TransitionData) : Void
-	{
-		if (status != hidden)
+		// do the transition
+		if (preventTransitions == false)
 		{
-			// update status 
-			status = hidden;
-
-			isListeningHide = true;
-			if (detectTransition(transitionData))
-			{
-				// listen for the transition end event
-				rootElement.addEventListener(TransitionData.EVENT_TYPE_ENDED, doHide, false);
-			}
-			else
-			{
-				// no transition
-				doHide(null);
-			}
+			doShowCallback = callback(doShow, transitionData, preventTransitions);
+			startTransition(TransitionType.show, transitionData, doShowCallback);
 		}
 		else
 		{
-			//trace("Layer - Already hidden "+rootElement.className);
+			doShow(transitionData, preventTransitions, null);
+		}
+		// set or reset style.display
+		rootElement.style.display=styleAttrDisplay;
+
+	}
+	/**
+	 * transition is over
+	 */
+	public function doShow(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
+	{trace("doShow");
+		if (e!=null && e.target != rootElement){
+			trace("End transition event from another html element");
+			return;
+		}
+		if (preventTransitions == false && doShowCallback == null){
+			trace("Warning: end transition callback already called");
+			return;
+		}
+		if (preventTransitions == false)
+		{
+			endTransition(TransitionType.show,transitionData, doShowCallback);
+		}
+		doShowCallback=null;
+		// update status 
+		status = visible;
+	}
+
+	//////////////////////////////////////////////////////
+	// Hide
+	//////////////////////////////////////////////////////
+	/**
+	 * start the transition and then hide
+	 */
+	public function hide(transitionData:Null<TransitionData> = null, preventTransitions:Bool) : Void
+	{// trace("hide "+preventTransitions);
+		if (status != visible && status != notInit){
+			//trace("Warning, can not hide the layer, since it is "+status);
+			return;
+		}
+		// reset transition if it is pending
+		if (status == hideTransition){
+			trace("Warning: hide break previous transition hide");
+			doHideCallback(null);
+			removeTransitionEvent(doHideCallback);
+		}
+		// reset transition if it is pending
+		else if (status == showTransition){
+			trace("Warning: hide break previous transition show");
+			doShowCallback(null);
+			removeTransitionEvent(doShowCallback);
+		}
+		// update status 
+		status = hideTransition;
+
+		// do the transition
+		if (preventTransitions == false)
+		{
+			doHideCallback = callback(doHide, transitionData, preventTransitions);
+			startTransition(TransitionType.hide, transitionData, doHideCallback);
+		}
+		else
+		{
+			doHide(transitionData, preventTransitions, null);
 		}
 	}
 
 	/**
 	 * remove children from the DOM and store it in childrenArray
 	 */
-	public function doHide(nullIfCalledDirectly:Dynamic = null) : Void
-	{
-		if (isListeningHide == false) return;
-		isListeningHide = false;
-
-		// remove listener
-		if (nullIfCalledDirectly != null)
-		{
-			rootElement.removeEventListener(TransitionData.EVENT_TYPE_ENDED, doHide, false);
+	public function doHide(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
+	{// trace("doHide "+preventTransitions);
+		if (e!=null && e.target != rootElement){
+			trace("End transition event from another html element");
+			return;
 		}
+		if (preventTransitions == false && doHideCallback == null){
+			trace("Warning: end transition callback already called");
+			return;
+		}
+		if (preventTransitions == false)
+		{
+			endTransition(TransitionType.hide, transitionData, doHideCallback);
+			doHideCallback = null;
+		}
+		// update status 
+		status = hidden;
+
+		// dispatch a custom event on the root element
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_TYPE_HIDE, false, false, {
+			transitionData : transitionData,
+			target: rootElement,
+			layer: this,
+		});
+		rootElement.dispatchEvent(event);
 
 		// remove children 
 		while (rootElement.childNodes.length > 0)
@@ -173,6 +398,7 @@ class Layer extends DisplayObject
 				catch (e:Dynamic)
 				{
 					// this happens when the element was removed from the dom for example
+					// or when the video or audio format is not supported (e.g. mp3 in firefox)
 					// it is the case when transition is immediate
 					trace("Layer error: could not access audio or video element");
 				}
@@ -180,76 +406,5 @@ class Layer extends DisplayObject
 		}
 		// set or reset style.display
 		rootElement.style.display="none";
-	}
-
-	/**
-	 * Add all children from childrenArray back to the DOM
-	 * This will empty childrenArray
-	 * Start the transition and then show
-	 */
-	public function show(transitionData:TransitionData) : Void
-	{
-		if (status != visible)
-		{
-			// update status 
-			status = visible;
-
-			// set or reset style.display
-			rootElement.style.display=styleAttrDisplay;
-
-			// put the children back in place
-			while (childrenArray.length > 0)
-			{
-				var element = childrenArray.shift();
-				rootElement.appendChild(element);
-				// play the videos/sounds when entering the page
-				if (element.tagName != null && (element.tagName.toLowerCase() == "audio" || element.tagName.toLowerCase() == "video"))
-				{
-					try
-					{				
-						if (cast(element).autoplay == true)
-						{
-							cast(element).currentTime = 0;
-							cast(element).play();
-						}
-						cast(element).muted = SoundOn.isMuted;
-					}
-					catch (e:Dynamic)
-					{
-						// this happens when the element was removed from the dom for example
-						// it is the case when transition is immediate
-						trace("Layer error: could not access audio or video element");
-					}
-				}
-			}
-			isListeningShow = true;
-			// start transition
-			if (detectTransition(transitionData))
-			{
-				// listen for the transition end event
-				rootElement.addEventListener(TransitionData.EVENT_TYPE_ENDED, doShow, false);
-			}
-			else
-			{
-				// no transition
-				doShow(null);
-			}
-		}
-		else
-		{
-			//trace("Layer - Already visible "+rootElement.className);
-		}
-	}
-	/**
-	 * transition is over
-	 */
-	public function doShow(nullIfCalledDirectly:Dynamic = null) : Void
-	{
-		if (isListeningShow == false) return;
-		isListeningShow = false;
-
-		// remove listener
-		if (nullIfCalledDirectly != null)
-			rootElement.removeEventListener(TransitionData.EVENT_TYPE_ENDED, doShow, false);
 	}
 }

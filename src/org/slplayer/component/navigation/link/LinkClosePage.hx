@@ -36,6 +36,6 @@ class LinkClosePage extends LinkBase
 	{
 		super.onClick(e);
 		// close the page with this name
-		Page.closePage(linkName, transitionData, SLPlayerInstanceId);
+		Page.closePage(linkName, transitionDataHide, SLPlayerInstanceId);
 	}
 }

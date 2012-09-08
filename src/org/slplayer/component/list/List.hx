@@ -74,27 +74,31 @@ class List<ElementClass> extends DisplayObject
 	/**
 	 * init the component
 	 * get elements by class names 
-	 * initializes the process of refreshing the list
+	 * you can now initialize the process of refreshing the list by calling redraw()
 	 */
 	override public function init() : Void
 	{ 
+		// init the parent class
 		super.init();
-
+		// store the template
 		listTemplate = rootElement.innerHTML;
-
-		// end init
-		redraw();
 	}
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
-	 */
+	 * this method calls reloadData which then calls doRedraw
+	 */ 
 	public function redraw()
 	{
 		//trace("redraw "+" - "+Type.getClassName(Type.getClass(this)));
 
-		// refreh list data
+		// refresh list data
 		reloadData();
-
+	}
+	/**
+	 * redraw the list without calling reloadData
+	 */
+	public function doRedraw()
+	{
 		// redraw list content
 		var listInnerHtml:String = "";
 		var t = new haxe.Template(listTemplate);
@@ -108,13 +112,13 @@ class List<ElementClass> extends DisplayObject
 		updateSelectionDisplay([selectedItem]);
 	}
 	/**
-	 * refreh list data, but do not redraw display
-	 * to be overriden to handle the model 
-	 * or do nothing if you manipulate the list and dataProvider by composition
+	 * refreh list data, and then redraw the display by calling doRedraw
+	 * to be overriden to handle the model or do nothing if you manipulate the list and dataProvider by composition
+	 * if you override this, either call super.reloadData() to redraw immediately, or call doRedraw() when the data is ready
 	 */
 	public function reloadData()
 	{
-		
+		doRedraw();
 	}
 	/**
 	 * attach mouse events to the list and the items

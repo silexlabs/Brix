@@ -21,10 +21,21 @@ import js.Dom;
 /**
  * Some additional DOM functions extending the standard ones.
  * 
- * @author Thomas Fétiveau
  */
 class DomTools 
 {
+	/**
+	 * Call a calback later. This is useful sometimes when dealing with layout, because it needs time to be redrawn
+	 * @param 	callbackFunction	The callback function to be called in the next frame
+	 */
+	static public function doLater(callbackFunction:Void->Void, nFrames:Float=1)
+	{
+#if php
+		callbackFunction();
+#else
+		haxe.Timer.delay(callbackFunction, Math.round(200*nFrames));
+#end
+	}
 	/**
 	 * Search for all children elements of the given element that have the given attribute with the given value. Note that you should
 	 * avoid to use any non standard methods like this one to select elements as it's much less efficient than the standard ones 
@@ -68,6 +79,21 @@ class DomTools
 			return null;
 		}
 	}
+	/**
+	 * Compute the htmlDom element size and position, taking margins, paddings and borders into account, and also the parents ones
+	 * @param	htmlDom 	HtmlDom element of which we want to know the size 
+	 * @return 	the width in pixels
+	 */
+	static public function getElementBoundingBox(htmlDom:HtmlDom):{x:Int, y:Int, w:Int, h:Int}{
+		var halfBorderH = 0;//(htmlDom.offsetWidth - htmlDom.clientWidth)/2.0;
+		var halfBorderV = 0;//(htmlDom.offsetHeight - htmlDom.clientHeight)/2.0;
+		return {
+			x:Math.floor(htmlDom.offsetLeft - halfBorderH),
+			y:Math.floor(htmlDom.offsetTop - halfBorderV),
+			w:Math.floor(htmlDom.offsetWidth - halfBorderH),
+			h:Math.floor(htmlDom.offsetHeight - halfBorderV)
+		};
+	}
 	
 	/**
 	 * for debug purpose
@@ -99,6 +125,7 @@ class DomTools
 	 */
 	static public function addClass(element:HtmlDom, className:String)
 	{
+		if (element.className == null) element.className = "";
 		if(!hasClass(element, className))
 			element.className += " "+ className;
 	}
@@ -108,15 +135,18 @@ class DomTools
 	 */
 	static public function removeClass(element:HtmlDom, className:String)
 	{
+		if (element.className == null) return;
 		if(hasClass(element, className))
 			element.className = StringTools.replace(element.className, className, "");
 	}
 	
 	/**
 	 * check if the node has a given css class
+	 * TODO: this is not good since hasClass(element, "Page") would return true for element with className set to "LinkToPage", so split in array and use Lambda 
 	 */
 	static public function hasClass(element:HtmlDom, className:String)
 	{
+		if (element.className == null) return false;
 		return element.className.indexOf(className) > -1;
 	}
 	/**
@@ -210,12 +240,54 @@ class DomTools
 	 * @param	src 			String containing the URL of the script to embed
 	 */
 	static public function embedScript(src:String):HtmlDom{
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var scriptNodes = Lib.document.getElementsByTagName("script");
+		for (idxNode in 0...scriptNodes.length){
+			var node = scriptNodes[idxNode];
+			if(node.getAttribute("src") == src){
+				return node;
+			}
+		}
 		var node = Lib.document.createElement("script");
 		node.setAttribute("src", src);
-		
-		var head = Lib.document.getElementsByTagName("head")[0];
 		head.appendChild(node);
 
 		return cast(node);
 	}
+	/**
+	 * Get the html page base tag
+	 */
+	public static function getBaseTag():Null<String>{
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var baseNodes = Lib.document.getElementsByTagName("base");
+		if (baseNodes.length > 0){
+			return baseNodes[0].getAttribute("href");
+		}
+		else{
+			return null;
+		}
+	}
+	/**
+	 * Add a base tag with the given href param
+	 * @param	href 			String containing the URL of the base for the html page
+	 */
+	public static function setBaseTag(href:String){
+		// browse all tags in the head section and check if it a base tag is already set
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var baseNodes = Lib.document.getElementsByTagName("base");
+		if (baseNodes.length > 0){
+			trace("Warning: base tag already set in the head section. Current value (\""+baseNodes[0].getAttribute("href")+"\") will be replaced by \""+href+"\"");
+			baseNodes[0].setAttribute("href", href);
+		}
+		else{
+			var node = Lib.document.createElement("base");
+			node.setAttribute("href", href);
+			node.setAttribute("target", "_self");
+			if (head.childNodes.length>0)
+				head.insertBefore(node, head.childNodes[0]);
+			else
+				head.appendChild(node);
+		}
+	}
+
 }
