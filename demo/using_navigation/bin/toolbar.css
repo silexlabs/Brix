@@ -1,7 +1,17 @@
+*{
+	margin: 0;
+	padding: 0;
+}
 body
 {
 	width: 1024px;
 	position: relative;
+}
+.group-container{
+	margin: 0;
+	padding: 0;
+	border-width: 1;
+	height: 250px;
 }
 ul
 {

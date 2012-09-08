@@ -44,17 +44,24 @@ class Groupable
 	 */ 
 	static public function startGroupable( groupable : IGroupable ) : Void
 	{
-		var groupElements : Array<HtmlDom> = untyped groupable.getSLPlayer().htmlRootElement.getElementsByClassName(groupable.rootElement.getAttribute("data-group-id"));
-		
+		// retrieve the group ID in the node's attributes
+		var groupId = groupable.rootElement.getAttribute("data-group-id");
+		if (groupId == null)
+			return ;
+
+		// get the group elements corresponding to this ID
+		var groupElements = Lib.document.getElementsByClassName(groupId);
+		// check if we have one and only one group for this ID
 		if ( groupElements.length < 1 )
 		{
+			trace("WARNING: could not find the group component "+groupId);
 			return;
 		}
 		if ( groupElements.length > 1 )
 		{
-			throw "ERROR "+groupElements.length+" Group components are declared with the same group id "+groupable.rootElement.getAttribute("data-group-id");
+			throw "ERROR "+groupElements.length+" Group components are declared with the same group id "+groupId;
 		}
-		
+		// set the reference to the group node on the element
 		groupable.groupElement = groupElements[0];
 	}
 }

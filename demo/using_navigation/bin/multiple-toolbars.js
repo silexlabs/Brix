@@ -1591,17 +1591,6 @@ org.slplayer.component.SLPlayerComponent.checkRequiredParameters = function(cmpC
 		if(elt.getAttribute(Std.string(r)) == null || StringTools.trim(elt.getAttribute(Std.string(r))) == "") throw Std.string(r) + " parameter is required for " + Type.getClassName(cmpClass);
 	}
 }
-org.slplayer.component.navigation = {}
-org.slplayer.component.navigation.LayerStatus = $hxClasses["org.slplayer.component.navigation.LayerStatus"] = { __ename__ : ["org","slplayer","component","navigation","LayerStatus"], __constructs__ : ["visible","hidden","notInitialized"] }
-org.slplayer.component.navigation.LayerStatus.visible = ["visible",0];
-org.slplayer.component.navigation.LayerStatus.visible.toString = $estr;
-org.slplayer.component.navigation.LayerStatus.visible.__enum__ = org.slplayer.component.navigation.LayerStatus;
-org.slplayer.component.navigation.LayerStatus.hidden = ["hidden",1];
-org.slplayer.component.navigation.LayerStatus.hidden.toString = $estr;
-org.slplayer.component.navigation.LayerStatus.hidden.__enum__ = org.slplayer.component.navigation.LayerStatus;
-org.slplayer.component.navigation.LayerStatus.notInitialized = ["notInitialized",2];
-org.slplayer.component.navigation.LayerStatus.notInitialized.toString = $estr;
-org.slplayer.component.navigation.LayerStatus.notInitialized.__enum__ = org.slplayer.component.navigation.LayerStatus;
 org.slplayer.component.ui = {}
 org.slplayer.component.ui.IDisplayObject = function() { }
 $hxClasses["org.slplayer.component.ui.IDisplayObject"] = org.slplayer.component.ui.IDisplayObject;
@@ -1643,6 +1632,44 @@ org.slplayer.component.ui.DisplayObject.prototype = {
 	,SLPlayerInstanceId: null
 	,__class__: org.slplayer.component.ui.DisplayObject
 }
+org.slplayer.component.group = {}
+org.slplayer.component.group.Group = function(rootElement,SLPId) {
+	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
+};
+$hxClasses["org.slplayer.component.group.Group"] = org.slplayer.component.group.Group;
+org.slplayer.component.group.Group.__name__ = ["org","slplayer","component","group","Group"];
+org.slplayer.component.group.Group.__super__ = org.slplayer.component.ui.DisplayObject;
+org.slplayer.component.group.Group.prototype = $extend(org.slplayer.component.ui.DisplayObject.prototype,{
+	__class__: org.slplayer.component.group.Group
+});
+org.slplayer.component.group.IGroupable = function() { }
+$hxClasses["org.slplayer.component.group.IGroupable"] = org.slplayer.component.group.IGroupable;
+org.slplayer.component.group.IGroupable.__name__ = ["org","slplayer","component","group","IGroupable"];
+org.slplayer.component.group.IGroupable.__interfaces__ = [org.slplayer.component.ui.IDisplayObject];
+org.slplayer.component.group.IGroupable.prototype = {
+	groupElement: null
+	,__class__: org.slplayer.component.group.IGroupable
+}
+org.slplayer.component.group.Groupable = function() { }
+$hxClasses["org.slplayer.component.group.Groupable"] = org.slplayer.component.group.Groupable;
+org.slplayer.component.group.Groupable.__name__ = ["org","slplayer","component","group","Groupable"];
+org.slplayer.component.group.Groupable.startGroupable = function(groupable) {
+	var groupElements = groupable.getSLPlayer().htmlRootElement.getElementsByClassName(groupable.rootElement.getAttribute("data-group-id"));
+	if(groupElements.length < 1) return;
+	if(groupElements.length > 1) throw "ERROR " + groupElements.length + " Group components are declared with the same group id " + groupable.rootElement.getAttribute("data-group-id");
+	groupable.groupElement = groupElements[0];
+}
+org.slplayer.component.navigation = {}
+org.slplayer.component.navigation.LayerStatus = $hxClasses["org.slplayer.component.navigation.LayerStatus"] = { __ename__ : ["org","slplayer","component","navigation","LayerStatus"], __constructs__ : ["visible","hidden","notInitialized"] }
+org.slplayer.component.navigation.LayerStatus.visible = ["visible",0];
+org.slplayer.component.navigation.LayerStatus.visible.toString = $estr;
+org.slplayer.component.navigation.LayerStatus.visible.__enum__ = org.slplayer.component.navigation.LayerStatus;
+org.slplayer.component.navigation.LayerStatus.hidden = ["hidden",1];
+org.slplayer.component.navigation.LayerStatus.hidden.toString = $estr;
+org.slplayer.component.navigation.LayerStatus.hidden.__enum__ = org.slplayer.component.navigation.LayerStatus;
+org.slplayer.component.navigation.LayerStatus.notInitialized = ["notInitialized",2];
+org.slplayer.component.navigation.LayerStatus.notInitialized.toString = $estr;
+org.slplayer.component.navigation.LayerStatus.notInitialized.__enum__ = org.slplayer.component.navigation.LayerStatus;
 org.slplayer.component.navigation.Layer = function(rootElement,SLPId) {
 	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
 	this.isListeningHide = false;
@@ -1729,25 +1756,36 @@ org.slplayer.component.navigation.Layer.prototype = $extend(org.slplayer.compone
 });
 org.slplayer.component.navigation.Page = function(rootElement,SLPId) {
 	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
+	org.slplayer.component.group.Groupable.startGroupable(this);
 	this.name = rootElement.getAttribute("name");
 	if(this.name == null || this.name == "") throw "Pages have to have a 'name' attribute";
+	console.log("Page group XXXXXXXXXXXXXXXXXXXX " + this.name + " - " + Std.string(this.groupElement));
 };
 $hxClasses["org.slplayer.component.navigation.Page"] = org.slplayer.component.navigation.Page;
 org.slplayer.component.navigation.Page.__name__ = ["org","slplayer","component","navigation","Page"];
-org.slplayer.component.navigation.Page.openPage = function(pageName,isPopup,transitionData,slPlayerId) {
-	console.log("openPage " + pageName);
-	var page = org.slplayer.component.navigation.Page.getPageByName(pageName,slPlayerId);
+org.slplayer.component.navigation.Page.__interfaces__ = [org.slplayer.component.group.IGroupable];
+org.slplayer.component.navigation.Page.openPage = function(pageName,isPopup,transitionData,slPlayerId,root) {
+	console.log("openPage " + pageName + " root=" + Std.string(root));
+	var page = org.slplayer.component.navigation.Page.getPageByName(pageName,slPlayerId,root);
 	if(page == null) throw "Error, could not find a page with name " + pageName;
 	page.open(transitionData,isPopup);
 }
-org.slplayer.component.navigation.Page.closePage = function(pageName,transitionData,slPlayerId) {
-	console.log("closePage " + pageName);
-	var page = org.slplayer.component.navigation.Page.getPageByName(pageName,slPlayerId);
+org.slplayer.component.navigation.Page.closePage = function(pageName,transitionData,slPlayerId,root) {
+	console.log("closePage " + pageName + " root=" + Std.string(root));
+	var page = org.slplayer.component.navigation.Page.getPageByName(pageName,slPlayerId,root);
 	if(page == null) throw "Error, could not find a page with name " + pageName;
 	page.close(transitionData);
 }
-org.slplayer.component.navigation.Page.getPageByName = function(pageName,slPlayerId) {
-	var pages = js.Lib.document.getElementsByClassName("Page");
+org.slplayer.component.navigation.Page.getPageNodes = function(slPlayerId,root) {
+	if(root == null) root = js.Lib.document;
+	return root.getElementsByClassName("Page");
+}
+org.slplayer.component.navigation.Page.getLayerNodes = function(pageName,slPlayerId,root) {
+	if(root == null) root = js.Lib.document;
+	return root.getElementsByClassName(pageName);
+}
+org.slplayer.component.navigation.Page.getPageByName = function(pageName,slPlayerId,root) {
+	var pages = org.slplayer.component.navigation.Page.getPageNodes(slPlayerId,root);
 	var _g1 = 0, _g = pages.length;
 	while(_g1 < _g) {
 		var pageIdx = _g1++;
@@ -1770,7 +1808,7 @@ org.slplayer.component.navigation.Page.prototype = $extend(org.slplayer.componen
 		if(transitionData == null) transitionData = new org.slplayer.component.navigation.transition.TransitionData(org.slplayer.component.navigation.transition.TransitionType.hide,"2s");
 		transitionData.type = org.slplayer.component.navigation.transition.TransitionType.hide;
 		if(preventCloseByClassName == null) preventCloseByClassName = new Array();
-		var nodes = js.Lib.document.getElementsByClassName(this.name);
+		var nodes = org.slplayer.component.navigation.Page.getLayerNodes(this.name,this.SLPlayerInstanceId,this.groupElement);
 		var _g1 = 0, _g = nodes.length;
 		while(_g1 < _g) {
 			var idxLayerNode = _g1++;
@@ -1799,7 +1837,7 @@ org.slplayer.component.navigation.Page.prototype = $extend(org.slplayer.componen
 		console.log("doOpen " + Std.string(transitionData) + " - " + this.name);
 		if(transitionData == null) transitionData = new org.slplayer.component.navigation.transition.TransitionData(org.slplayer.component.navigation.transition.TransitionType.show,"2s");
 		transitionData.type = org.slplayer.component.navigation.transition.TransitionType.show;
-		var nodes = js.Lib.document.getElementsByClassName(this.name);
+		var nodes = org.slplayer.component.navigation.Page.getLayerNodes(this.name,this.SLPlayerInstanceId,this.groupElement);
 		var _g1 = 0, _g = nodes.length;
 		while(_g1 < _g) {
 			var idxLayerNode = _g1++;
@@ -1813,7 +1851,7 @@ org.slplayer.component.navigation.Page.prototype = $extend(org.slplayer.componen
 		}
 	}
 	,closeOthers: function(transitionData) {
-		var nodes = js.Lib.document.getElementsByClassName("Page");
+		var nodes = org.slplayer.component.navigation.Page.getPageNodes(this.SLPlayerInstanceId,this.groupElement);
 		var _g1 = 0, _g = nodes.length;
 		while(_g1 < _g) {
 			var idxPageNode = _g1++;
@@ -1833,11 +1871,14 @@ org.slplayer.component.navigation.Page.prototype = $extend(org.slplayer.componen
 		this.doOpen(transitionData);
 	}
 	,init: function() {
+		org.slplayer.component.ui.DisplayObject.prototype.init.call(this);
 		if(org.slplayer.util.DomTools.getMeta("initialPageName") == this.name) {
 			var transitionData = new org.slplayer.component.navigation.transition.TransitionData(org.slplayer.component.navigation.transition.TransitionType.show,"0.01s");
 			this.open(transitionData);
 		}
+		console.log("Page group " + Std.string(this.groupElement));
 	}
+	,groupElement: null
 	,name: null
 	,displayName: null
 	,__class__: org.slplayer.component.navigation.Page
@@ -1845,6 +1886,8 @@ org.slplayer.component.navigation.Page.prototype = $extend(org.slplayer.componen
 org.slplayer.component.navigation.link = {}
 org.slplayer.component.navigation.link.LinkBase = function(rootElement,SLPId) {
 	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
+	org.slplayer.component.group.Groupable.startGroupable(this);
+	console.log("LinkBase group " + Std.string(this.groupElement) + " - " + rootElement.className + " - " + rootElement.getAttribute("href"));
 	this.transitionData = new org.slplayer.component.navigation.transition.TransitionData(null,"0");
 	rootElement.addEventListener("click",$bind(this,this.onClick),false);
 	if(rootElement.getAttribute("href") != null) {
@@ -1855,14 +1898,17 @@ org.slplayer.component.navigation.link.LinkBase = function(rootElement,SLPId) {
 };
 $hxClasses["org.slplayer.component.navigation.link.LinkBase"] = org.slplayer.component.navigation.link.LinkBase;
 org.slplayer.component.navigation.link.LinkBase.__name__ = ["org","slplayer","component","navigation","link","LinkBase"];
+org.slplayer.component.navigation.link.LinkBase.__interfaces__ = [org.slplayer.component.group.IGroupable];
 org.slplayer.component.navigation.link.LinkBase.__super__ = org.slplayer.component.ui.DisplayObject;
 org.slplayer.component.navigation.link.LinkBase.prototype = $extend(org.slplayer.component.ui.DisplayObject.prototype,{
 	onClick: function(e) {
+		e.preventDefault();
 		this.transitionData = new org.slplayer.component.navigation.transition.TransitionData(null,this.rootElement.getAttribute("data-transition-duration"),this.rootElement.getAttribute("data-transition-timing-function"),this.rootElement.getAttribute("data-transition-delay"),this.rootElement.getAttribute("data-transition-is-reversed") != null);
 	}
 	,transitionData: null
 	,targetAttr: null
 	,linkName: null
+	,groupElement: null
 	,__class__: org.slplayer.component.navigation.link.LinkBase
 });
 org.slplayer.component.navigation.link.LinkToPage = function(rootElement,SLPId) {
@@ -1873,9 +1919,9 @@ org.slplayer.component.navigation.link.LinkToPage.__name__ = ["org","slplayer","
 org.slplayer.component.navigation.link.LinkToPage.__super__ = org.slplayer.component.navigation.link.LinkBase;
 org.slplayer.component.navigation.link.LinkToPage.prototype = $extend(org.slplayer.component.navigation.link.LinkBase.prototype,{
 	onClick: function(e) {
-		console.log("LinkToPage " + this.targetAttr + " - " + Std.string(this.targetAttr != "_top"));
+		console.log("LinkToPage " + this.targetAttr + " - " + Std.string(this.targetAttr != "_top") + " root=" + Std.string(this.groupElement));
 		org.slplayer.component.navigation.link.LinkBase.prototype.onClick.call(this,e);
-		org.slplayer.component.navigation.Page.openPage(this.linkName,this.targetAttr != "_top",this.transitionData,this.SLPlayerInstanceId);
+		org.slplayer.component.navigation.Page.openPage(this.linkName,this.targetAttr != "_top",this.transitionData,this.SLPlayerInstanceId,this.groupElement);
 	}
 	,__class__: org.slplayer.component.navigation.link.LinkToPage
 });
@@ -1971,7 +2017,7 @@ org.slplayer.core.Application = function(id,args) {
 	console.log("new SLPlayer instance built");
 };
 $hxClasses["org.slplayer.core.Application"] = org.slplayer.core.Application;
-$hxExpose(org.slplayer.core.Application, "toolbar");
+$hxExpose(org.slplayer.core.Application, "multiple-toolbars");
 org.slplayer.core.Application.__name__ = ["org","slplayer","core","Application"];
 org.slplayer.core.Application.get = function(SLPId) {
 	return org.slplayer.core.Application.instances.get(SLPId);
@@ -2107,6 +2153,8 @@ org.slplayer.core.Application.prototype = {
 		this.registeredComponents.push({ classname : componentClassName, args : args});
 	}
 	,registerComponentsforInit: function() {
+		org.slplayer.component.group.Group;
+		this.registerComponent("org.slplayer.component.group.Group");
 		org.slplayer.component.navigation.Page;
 		this.registerComponent("org.slplayer.component.navigation.Page");
 		org.slplayer.component.navigation.Layer;
@@ -2300,7 +2348,6 @@ haxe.Template.expr_int = new EReg("^[0-9]+$","");
 haxe.Template.expr_float = new EReg("^([+-]?)(?=\\d|,\\d)\\d*(,\\d*)?([Ee]([+-]?\\d+))?$","");
 haxe.Template.globals = { };
 js.Lib.onerror = null;
-org.slplayer.component.navigation.Page.__meta__ = { obj : { tagNameFilter : ["a"]}};
 org.slplayer.component.navigation.Page.CLASS_NAME = "Page";
 org.slplayer.component.navigation.Page.CONFIG_NAME_ATTR = "name";
 org.slplayer.component.navigation.Page.CONFIG_INITIAL_PAGE_NAME = "initialPageName";
@@ -2341,4 +2388,4 @@ function $hxExpose(src, path) {
 }
 })();
 
-//@ sourceMappingURL=toolbar.js.map
+//@ sourceMappingURL=multiple-toolbars.js.map

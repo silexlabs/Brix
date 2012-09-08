@@ -23,6 +23,9 @@ import org.slplayer.component.navigation.transition.TransitionData;
 import org.slplayer.util.DomTools;
 import org.slplayer.core.Application;
 
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
+
 /**
  * This component is linked to a DOM element, which is an anchor
  * with the page name/deeplink in the name attribute and the page "displayed name"/description as a child of the node.
@@ -30,8 +33,7 @@ import org.slplayer.core.Application;
  * This class offers static methods to manipulate pages. Todo: decide wether the static methods should go in org.silex.util.PageTools .
  * When the page is to be opened/closed, then all the layers which have the page deeplink as a class name are shown/hidden
  */
-@tagNameFilter("a")
-class Page extends DisplayObject
+class Page extends DisplayObject, implements IGroupable
 {
 	/**
 	 * constant, name of this class
@@ -42,54 +44,98 @@ class Page extends DisplayObject
 	 */
 	public static inline var CONFIG_NAME_ATTR:String = "name";
 	/**
-	 * constant, initial page's name
+	 * constant, initial page name, meta tag, name attribute
 	 */
 	public static inline var CONFIG_INITIAL_PAGE_NAME:String = "initialPageName";
-	
 	/**
-	 * Display name of the page.
-	 * This is a name to be displayed, not used as the deeplink/anchor name
+	 * constant, initial page's name data tag, on the group node
 	 */
-	private var displayName:String;
+	public static inline var ATTRIBUTE_INITIAL_PAGE_NAME:String = "data-initial-page-name";
 	/**
 	 * Name of the page.
 	 * This is the anchor name to be used as a link/deeplink
 	 */
-	private var name:String;
+	public var name(default, null):String;
+	/**
+	 * the group element set by the Group class
+	 * implementation of IGroupable
+	 */
+	public var groupElement:HtmlDom;
 
 	/** 
 	 * Open the page with the given "name" attribute
 	 * This will close other pages
 	 */
-	static public function openPage(pageName:String, isPopup:Bool, transitionData:TransitionData, slPlayerId:String)
-	{trace("openPage "+pageName);
+	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, slPlayerId:String, root:HtmlDom = null)
+	{//trace("openPage ("+pageName+", "+isPopup+", "+transitionData+", "+slPlayerId+", "+root+")");
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document;
+
 		// find the pages to open
-		var page = getPageByName(pageName, slPlayerId);
+		var page = getPageByName(pageName, slPlayerId, document);
 		if (page == null)
 			throw("Error, could not find a page with name "+pageName);
 		// open the page as a page or a popup
-		page.open(transitionData, isPopup);
+		page.open(transitionDataShow, transitionDataHide, !isPopup);
 	}
 	/** 
 	 * Close the page with the given "name" attribute
 	 * This will close only this page
 	 */
-	static public function closePage(pageName:String, transitionData:TransitionData, slPlayerId:String)
-	{trace("closePage "+pageName);
+	static public function closePage(pageName:String, transitionData:TransitionData, slPlayerId:String, root:HtmlDom = null)
+	{//trace("closePage "+pageName+" root="+root);
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document;
+
 		// find the pages to open
-		var page = getPageByName(pageName, slPlayerId);
+		var page = getPageByName(pageName, slPlayerId, document);
 		if (page == null)
 			throw("Error, could not find a page with name "+pageName);
 		// close the page
 		page.close(transitionData);
 	}
 	/** 
+	 * Retrieve all the pages of this application or group
+	 */
+	static public function getPageNodes(slPlayerId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	{
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document;
+
+		// get all pages, i.e. all element with class name "page"
+		return document.getElementsByClassName(Page.CLASS_NAME);
+	}
+	/** 
+	 * Retrieve the given layer of this application or group
+	 */
+	static public function getLayerNodes(pageName:String, slPlayerId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	{
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document;
+
+		// get the desired layers, i.e. the elements with the page name as class name
+		return document.getElementsByClassName(pageName);
+	}
+	/** 
 	 * Retrieve the page whose "name" attribute is pageName
 	 */
-	static public function getPageByName(pageName:String, slPlayerId:String):Null<Page>
+	static public function getPageByName(pageName:String, slPlayerId:String, root:HtmlDom = null):Null<Page>
 	{
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document;
+
 		// get all pages, i.e. all element with class name "page"
-		var pages:HtmlCollection<HtmlDom> = Lib.document.getElementsByClassName(Page.CLASS_NAME);
+		var pages:HtmlCollection<HtmlDom> = getPageNodes(slPlayerId, document);
 		// browse all pages
 		for (pageIdx in 0...pages.length)
 		{
@@ -115,6 +161,10 @@ class Page extends DisplayObject
 	public function new(rootElement:HtmlDom, SLPId:String) 
 	{
 		super(rootElement, SLPId);
+
+		// implementation of IGroupable
+		startGroupable();
+
 		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
 		if (name == null || name == "")
 		{
@@ -124,11 +174,13 @@ class Page extends DisplayObject
 
 	override public function init()
 	{
+		super.init();
 		// close if it is not the default page
-		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name)
+		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
+			|| (groupElement != null && groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name)
+		)
 		{
-			var transitionData = new TransitionData(show, "0.01s"); 
-			open(transitionData);
+			open(null, null, true, true);
 		}
 	}
 
@@ -136,21 +188,22 @@ class Page extends DisplayObject
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 * Also close the other pages if doCloseOthers is true
 	 */
-	public function open(transitionData:TransitionData = null, doCloseOthers:Bool = true) 
-	{trace("open "+transitionData+" - "+name+" - "+doCloseOthers);
+	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true, preventTransitions:Bool = false) 
+	{trace("open - "+doCloseOthers+" - name="+name+" - "+preventTransitions);
 		if (doCloseOthers)
-			closeOthers(transitionData);
+			closeOthers(transitionDataHide, preventTransitions);
 
-		doOpen(transitionData);
+		doOpen(transitionDataShow, preventTransitions);
 	}
 
 	/**
 	 * Close all other pages
 	 */
-	public function closeOthers(transitionData:TransitionData = null)
-	{
+	public function closeOthers(transitionData:TransitionData = null, preventTransitions:Bool = false)
+	{trace("closeOthers("+transitionData+") - "+preventTransitions);
+
 		// find all the pages in this application and close them
-		var nodes = Lib.document.getElementsByClassName(CLASS_NAME);
+		var nodes = getPageNodes(SLPlayerInstanceId, groupElement);
 		for (idxPageNode in 0...nodes.length)
 		{
 			var pageNode = nodes[idxPageNode];
@@ -158,7 +211,7 @@ class Page extends DisplayObject
 			for (pageInstance in pageInstances)
 			{
 				if (pageInstance != this)
-					pageInstance.close(transitionData, [name]);
+					pageInstance.close(transitionData, [name], preventTransitions);
 			}
 		}
 	}
@@ -166,17 +219,10 @@ class Page extends DisplayObject
 	/**
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 */
-	public function doOpen(transitionData:TransitionData = null)
-	{trace("doOpen "+transitionData+" - "+name);
-		// by default no transition
-		if (transitionData == null)
-			transitionData = new TransitionData(show, "2s");
-
-		// update transition type
-		transitionData.type = TransitionType.show;
-
+	public function doOpen(transitionData:TransitionData = null, preventTransitions:Bool = false)
+	{trace("doOpen "+transitionData+", "+name+" - "+preventTransitions);
 		// find all the layers which have the page name in their css class attribute
-		var nodes = Lib.document.getElementsByClassName(name);
+		var nodes = getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
 		// show the layers
 		for (idxLayerNode in 0...nodes.length)
@@ -185,7 +231,7 @@ class Page extends DisplayObject
 			var layerInstances:List<Layer> = getSLPlayer().getAssociatedComponents(layerNode, Layer);
 			for (layerInstance in layerInstances)
 			{
-					layerInstance.show(transitionData);
+					layerInstance.show(transitionData, preventTransitions);
 			}
 		}
 
@@ -195,21 +241,14 @@ class Page extends DisplayObject
 	 * Close this page, i.e. hide its content
 	 * Remove the children from the DOM
 	 */
-	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null) 
-	{trace("close "+transitionData+" - "+name);
-		// default transition is the one of the layer
-		if (transitionData == null)
-			transitionData = new TransitionData(hide, "2s");
-
-		// update transition type
-		transitionData.type = TransitionType.hide;
-
+	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null, preventTransitions:Bool = false) 
+	{trace("close "+transitionData+", "+name+" - "+preventTransitions);
 		// default value
 		if (preventCloseByClassName==null)
 			preventCloseByClassName = new Array();
 
 		// find all the layers which have the page name in their css class attribute
-		var nodes = Lib.document.getElementsByClassName(name);
+		var nodes = getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
 		// browse the layers
 		for (idxLayerNode in 0...nodes.length)
@@ -230,7 +269,7 @@ class Page extends DisplayObject
 				var layerInstances:List<Layer> = getSLPlayer().getAssociatedComponents(layerNode, Layer);
 				for (layerInstance in layerInstances)
 				{
-					cast(layerInstance, Layer).hide(transitionData);
+					cast(layerInstance, Layer).hide(transitionData, preventTransitions);
 				}
 			}
 		}

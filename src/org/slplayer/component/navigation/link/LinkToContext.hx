@@ -18,7 +18,6 @@ package org.slplayer.component.navigation.link;
 import js.Lib;
 import js.Dom;
 
-import org.slplayer.component.navigation.LinkBase;
 import org.slplayer.util.DomTools;
 
 /**
@@ -65,7 +64,6 @@ class LinkToContext extends LinkBase
 			Lib.document.getElementsByTagName("head")[0].removeChild(cast(styleSheet));	
 		}
 
-		//var cssText = "."+linkName+" { visibility : visible; }";
 		var cssText = "."+linkName+" { display : inline; visibility : visible; }";
 
 		styleSheet = DomTools.addCssRules(cssText);

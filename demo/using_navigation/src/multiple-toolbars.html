@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8"></meta>
+	<title>Menu example</title>
+	<link rel="stylesheet" href="toolbar.css"></link>
+	
+	<script data-slp-use="org.slplayer.component.group.Group"></script>
+	<script data-slp-use="org.slplayer.component.navigation.Page"></script>
+	<script data-slp-use="org.slplayer.component.navigation.Layer"></script>
+	<script data-slp-use="org.slplayer.component.navigation.link.LinkToPage"></script>
+	<meta name="initialPageName" content="welcome"></meta>
+</head>
+<body>
+	<div class="Group group-container">
+		<ul class="menu">
+		   <li class="main"><a href="#sub-menu4" class="LinkToPage">Insert</a><a name="sub-menu4" class="Page"></a>
+				<div class="container-sub">
+					<ul class="Layer sub-menu4 sub-menu4-1 sub">
+						<li><a href="#toolbox" class="LinkToPage">Snippet</a></li>
+						<li><a href="#sub-menu4-1" class="LinkToPage">Image &gt;</a></li>
+						<li><a href="#toolbox" class="LinkToPage">Table</a></li>
+					</ul>
+					<a name="sub-menu4-1" class="Page"></a>
+					<ul class="Layer sub-menu4-1 sub sub-of-sub">
+						<li><a href="#toolbox" class="LinkToPage">From File</a></li>
+						<li><a href="#toolbox" class="LinkToPage">From URL</a></li>
+						<li><a href="#toolbox" class="LinkToPage">From Picassa</a></li>
+					</ul>
+				</div>
+		   </li>
+		   <li class="main"><a href="#sub-menu5" class="LinkToPage">Help</a><a name="sub-menu5" class="Page"></a>
+				<div class="container-sub">
+					<ul class="Layer sub-menu5 sub">
+						<li><a href="#welcome" class="LinkToPage">Welcome page</a></li>
+						<li><a href="#about" class="LinkToPage">About</a></li>
+					</ul>
+				</div>
+		   </li>
+		</ul>
+		<a name="welcome" class="Page"></a>
+		<div class="Layer welcome"><br/>Welcome to the Toolbar demo !<br/><br/>Please navigate through the toolbar menus and click on the menu items.<br/></div>
+		<a name="about" class="Page"></a>
+		<div class="Layer about"><br/>SLPlayer is © 2011-2012 Silex Labs and is released under the GPL License.<br/><br/></div>
+		<a name="toolbox" class="Page"></a>
+		<div class="Layer toolbox">Toolbox popup<hr/>Example of tool box (popup)<br/>Save as: <input type="file" /><br/><input type="button" value="Save"/><input type="button" value="Cancel"/></div>
+	</div>
+	<div class="Group group-container">
+		<ul class="menu">
+		   <li class="main"><a href="#sub-menu4" class="LinkToPage">Insert</a><a name="sub-menu4" class="Page"></a>
+				<div class="container-sub">
+					<ul class="Layer sub-menu4 sub-menu4-1 sub">
+						<li><a href="#toolbox" class="LinkToPage">Snippet</a></li>
+						<li><a href="#sub-menu4-1" class="LinkToPage">Image &gt;</a></li>
+						<li><a href="#toolbox" class="LinkToPage">Table</a></li>
+					</ul>
+					<a name="sub-menu4-1" class="Page"></a>
+					<ul class="Layer sub-menu4-1 sub sub-of-sub">
+						<li><a href="#toolbox" class="LinkToPage">From File</a></li>
+						<li><a href="#toolbox" class="LinkToPage">From URL</a></li>
+						<li><a href="#toolbox" class="LinkToPage">From Picassa</a></li>
+					</ul>
+				</div>
+		   </li>
+		   <li class="main"><a href="#sub-menu5" class="LinkToPage">Help</a><a name="sub-menu5" class="Page"></a>
+				<div class="container-sub">
+					<ul class="Layer sub-menu5 sub">
+						<li><a href="#welcome" class="LinkToPage">Welcome page</a></li>
+						<li><a href="#about" class="LinkToPage">About</a></li>
+					</ul>
+				</div>
+		   </li>
+		</ul>
+		<a name="welcome" class="Page"></a>
+		<div class="Layer welcome"><br/>Welcome to the Toolbar demo !<br/><br/>Please navigate through the toolbar menus and click on the menu items.<br/></div>
+		<a name="about" class="Page"></a>
+		<div class="Layer about"><br/>SLPlayer is © 2011-2012 Silex Labs and is released under the GPL License.<br/><br/></div>
+		<a name="toolbox" class="Page"></a>
+		<div class="Layer toolbox">Toolbox popup<hr/>Example of tool box (popup)<br/>Save as: <input type="file" /><br/><input type="button" value="Save"/><input type="button" value="Cancel"/></div>
+	</div>
+</body>
+</html>
