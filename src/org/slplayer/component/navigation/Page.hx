@@ -68,10 +68,10 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, slPlayerId:String, root:HtmlDom = null)
 	{//trace("openPage ("+pageName+", "+isPopup+", "+transitionData+", "+slPlayerId+", "+root+")");
-		// default is the hole document
+		// default is the whole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document;
+			document = Lib.document.documentElement;
 
 		// find the pages to open
 		var page = getPageByName(pageName, slPlayerId, document);
@@ -86,10 +86,10 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	static public function closePage(pageName:String, transitionData:TransitionData, slPlayerId:String, root:HtmlDom = null)
 	{//trace("closePage "+pageName+" root="+root);
-		// default is the hole document
+		// default is the whole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document;
+			document = Lib.document.documentElement;
 
 		// find the pages to open
 		var page = getPageByName(pageName, slPlayerId, document);
