@@ -58,7 +58,7 @@ import js.Dom;
 	private var nodeToCmpInstances : Hash<List<org.slplayer.component.ui.DisplayObject>>;
 	/**
 	 * The SLPlayer root application node. Usually, any class used in a SLPlayer application shouldn't use 
-	 * Lib.document.body directly but this variable instead.
+	 * Lib.document.documentElement directly but this variable instead.
 	 */
 	public var htmlRootElement(default,null) : HtmlDom;
 	/**
@@ -155,7 +155,7 @@ import js.Dom;
 	/**
 	 * Initialize the application on a given node.
 	 * @param	?appendTo	optional, the parent application's node to which to hook this SLplayer application. By default or if
-	 * the given node is invalid, it's the document's body element (or equivalent if not js) that is used for that.
+	 * the given node is invalid, it's the document's document element (or equivalent if not js) that is used for that.
 	 */
 	public function init(?appendTo:Null<HtmlDom>) : Void
 	{
@@ -170,18 +170,18 @@ import js.Dom;
 		htmlRootElement = appendTo;
 
 		//it can't be a non element node
-		if (htmlRootElement == null || htmlRootElement.nodeType != Lib.document.body.nodeType)
+		if (htmlRootElement == null || htmlRootElement.nodeType != Lib.document.documentElement.nodeType)
 		{
 			#if slpdebug
-				trace("setting htmlRootElement to Lib.document.body");
+				trace("setting htmlRootElement to Lib.document.documentElement");
 			#end
-			htmlRootElement = Lib.document.body;
+			htmlRootElement = Lib.document.documentElement;
 		}
 		
 		if ( htmlRootElement == null )
 		{
 			#if js
-			trace("ERROR Lib.document.body is null => You are trying to start your application while the document loading is probably not complete yet." +
+			trace("ERROR Lib.document.documentElement is null => You are trying to start your application while the document loading is probably not complete yet." +
 			" To fix that, add the noAutoStart option to your slplayer application and control the application startup with: window.onload = function() { myApplication.init() };");
 			#else
 			trace("ERROR could not set Application's root element.");
@@ -191,7 +191,7 @@ import js.Dom;
 		}
 		
 		#if !disableEmbedHtml
-			htmlRootElement.innerHTML = _htmlBody;
+			htmlRootElement.innerHTML = _htmlDocumentElement;
 		#end
 		
 		//build the SLPlayer instance meta parameters Hash

@@ -550,20 +550,20 @@ class Builder
 		
 		if (!Context.defined('disableEmbedHtml'))
 		{
-			//add the _htmlBody static var to the SLPlayer class
-			var bodyInnerHtml = haxe.Serializer.run("");
+			//add the _htmlDocumentElement static var to the SLPlayer class
+			var documentInnerHtml = haxe.Serializer.run("");
 			
-			if (cocktail.Lib.document.body.innerHTML != null)
+			if (cocktail.Lib.document.documentElement.innerHTML != null)
 			{
-				bodyInnerHtml = haxe.Serializer.run(cocktail.Lib.document.body.innerHTML);
+				documentInnerHtml = haxe.Serializer.run(cocktail.Lib.document.documentElement.innerHTML);
 			}
 			
-			var htmlBodyFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(bodyInnerHtml)), pos : pos }]), pos : pos };
+			var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
 			
-			fields.push( { name : "_htmlBody", doc : null, meta : [], access : [APrivate, AStatic], kind : FVar(null, htmlBodyFieldValue), pos : pos } );
+			fields.push( { name : "_htmlDocumentElement", doc : null, meta : [], access : [APrivate, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
 				
 			#if slpdebug
-				neko.Lib.println("bodyInnerHtml extracted and set on SLPlayer with a size of "+bodyInnerHtml.length);
+				neko.Lib.println("documentInnerHtml extracted and set on SLPlayer with a size of "+documentInnerHtml.length);
 			#end
 		}
 	}
