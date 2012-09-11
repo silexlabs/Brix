@@ -202,7 +202,7 @@ class DomTools
 	static public function getMeta(name:String, attributeName:String="content", head:HtmlDom=null):Null<String>{
 		// default value for document
 		if (head == null) 
-			head = Lib.document.getElementsByTagName("head")[0]; 
+			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
 
 		// retrieve all config tags (the meta tags)
 		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("meta");
@@ -226,7 +226,7 @@ class DomTools
 	static public function addCssRules(css:String, head:HtmlDom=null):HtmlDom{
 		// default value for document
 		if (head == null) 
-			head = Lib.document.getElementsByTagName("head")[0]; 
+			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
 		
 		var node = Lib.document.createElement('style');
 		node.setAttribute('type', 'text/css');
