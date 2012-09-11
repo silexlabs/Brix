@@ -53,7 +53,7 @@ class TransitionTools
 	}
 	public static function setTransitionProperty(rootElement:HtmlDom, name, value) 
 	{
-		Reflect.setField(rootElement.style, name, value);
+		Reflect.setProperty(rootElement.style, name, value);
 	// only for pure js, not for cocktail compilation
 	#if js
 		// idem for Firefox
