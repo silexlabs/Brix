@@ -40,6 +40,7 @@ typedef DraggableEvent = {
  * Attach mouse events to a "drag zone" and make it drag/drop the "Draggable" node
  * If drop zones are provided, display the best drop zone found and enable only these zones to be parents
  * define the drop zones with a "drop-zone" class name on the elements, or by setting the dropZones attribute
+ * FIXME: Not compatible with android native browser because of custom events
  */
 class Draggable extends DisplayObject
 {

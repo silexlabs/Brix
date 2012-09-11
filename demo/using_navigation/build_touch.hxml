@@ -8,7 +8,7 @@
 -debug
 -main org.slplayer.core.Application
 --macro org.slplayer.core.Builder.create('./src/touch.html')
-#-D slpdebug
+-D slpdebug
 -D disableEmbedHtml
 -D stopOnError
 

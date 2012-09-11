@@ -67,7 +67,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * This will close other pages
 	 */
 	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, slPlayerId:String, root:HtmlDom = null)
-	{//trace("openPage ("+pageName+", "+isPopup+", "+transitionData+", "+slPlayerId+", "+root+")");
+	{//trace("openPage ("+pageName+", "+isPopup+", "+slPlayerId+", "+root+")");
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
@@ -75,8 +75,12 @@ class Page extends DisplayObject, implements IGroupable
 
 		// find the pages to open
 		var page = getPageByName(pageName, slPlayerId, document);
-		if (page == null)
-			throw("Error, could not find a page with name "+pageName);
+		if (page == null){
+			// look in the main application
+			page = getPageByName(pageName, slPlayerId);
+			if (page == null)
+				throw("Error, could not find a page with name "+pageName);
+		}
 		// open the page as a page or a popup
 		page.open(transitionDataShow, transitionDataHide, !isPopup);
 	}
@@ -93,8 +97,12 @@ class Page extends DisplayObject, implements IGroupable
 
 		// find the pages to open
 		var page = getPageByName(pageName, slPlayerId, document);
-		if (page == null)
-			throw("Error, could not find a page with name "+pageName);
+		if (page == null){
+			// look in the main application
+			page = getPageByName(pageName, slPlayerId);
+			if (page == null)
+				throw("Error, could not find a page with name "+pageName);
+		}
 		// close the page
 		page.close(transitionData);
 	}
