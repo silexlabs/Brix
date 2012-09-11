@@ -58,7 +58,7 @@ import js.Dom;
 	private var nodeToCmpInstances : Hash<List<org.slplayer.component.ui.DisplayObject>>;
 	/**
 	 * The SLPlayer root application node. Usually, any class used in a SLPlayer application shouldn't use 
-	 * Lib.document.body directly but this variable instead.
+	 * Lib.document.documentElement directly but this variable instead.
 	 */
 	public var htmlRootElement(default,null) : HtmlDom;
 	/**
@@ -98,9 +98,13 @@ import js.Dom;
 			#if (js && disableEmbedHtml)
 				//special case in js when auto starting the application, 
 				//we need to ensure first that the parent document is ready
-				Lib.window.onload = function(e:Event) { newApp.init(); };
+				Lib.window.onload = function(e:Event) { 
+					newApp.initDom(); 
+					newApp.initComponents(); 
+				};
 			#else
-				newApp.init();
+				newApp.initDom(); 
+				newApp.initComponents(); 
 			#end
 
 		#end
@@ -155,9 +159,9 @@ import js.Dom;
 	/**
 	 * Initialize the application on a given node.
 	 * @param	?appendTo	optional, the parent application's node to which to hook this SLplayer application. By default or if
-	 * the given node is invalid, it's the document's body element (or equivalent if not js) that is used for that.
+	 * the given node is invalid, it's the document's document element (or equivalent if not js) that is used for that.
 	 */
-	public function init(?appendTo:Null<HtmlDom>) : Void
+	public function initDom(?appendTo:Null<HtmlDom>) : Void
 	{
 		#if slpdebug
 			trace("Initializing SLPlayer id "+id+" on "+appendTo);
@@ -170,18 +174,18 @@ import js.Dom;
 		htmlRootElement = appendTo;
 
 		//it can't be a non element node
-		if (htmlRootElement == null || htmlRootElement.nodeType != Lib.document.body.nodeType)
+		if (htmlRootElement == null || htmlRootElement.nodeType != Lib.document.documentElement.nodeType)
 		{
 			#if slpdebug
-				trace("setting htmlRootElement to Lib.document.body");
+				trace("setting htmlRootElement to Lib.document.documentElement");
 			#end
-			htmlRootElement = Lib.document.body;
+			htmlRootElement = Lib.document.documentElement;
 		}
 		
 		if ( htmlRootElement == null )
 		{
 			#if js
-			trace("ERROR Lib.document.body is null => You are trying to start your application while the document loading is probably not complete yet." +
+			trace("ERROR Lib.document.documentElement is null => You are trying to start your application while the document loading is probably not complete yet." +
 			" To fix that, add the noAutoStart option to your slplayer application and control the application startup with: window.onload = function() { myApplication.init() };");
 			#else
 			trace("ERROR could not set Application's root element.");
@@ -191,20 +195,7 @@ import js.Dom;
 		}
 		
 		#if !disableEmbedHtml
-			htmlRootElement.innerHTML = _htmlBody;
-		#end
-		
-		//build the SLPlayer instance meta parameters Hash
-		initMetaParameters();
-		
-		//register the application components for initialization
-		registerComponentsforInit();
-		
-		//call the UI components init() method
-		initComponents();
-		
-		#if slpdebug
-			trace("SLPlayer id "+id+" launched !");
+			htmlRootElement.innerHTML = _htmlDocumentElement;
 		#end
 	}
 	
@@ -239,8 +230,18 @@ import js.Dom;
 	 * Initialize the application's components in 2 stages : first create the instances and then call init()
 	 * on each DisplayObject component.
 	 */
-	private function initComponents()
+	public function initComponents()
 	{
+		//build the SLPlayer instance meta parameters Hash
+		initMetaParameters();
+		
+		//register the application components for initialization
+		registerComponentsforInit();
+		
+		#if slpdebug
+			trace("SLPlayer id "+id+" launched !");
+		#end
+
 		//Create the components instances
 		for (rc in registeredComponents)
 		{
