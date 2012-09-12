@@ -78,7 +78,11 @@ class Panel extends DisplayObject
 	public function new(rootElement:HtmlDom, SLPId:String){
 		super(rootElement, SLPId);
 		var _this_ = this;
-		untyped __js__("window.addEventListener('resize', function(e){_this_.redraw()});");
+#if js
+		untyped __js__("window.addEventListener('resize', function(e){_this_.redraw();});");
+#else
+		Lib.window.addEventListener('resize', function(e){redraw();});
+#end
 		// do not work: Lib.document.addEventListener("resize", redraw, false);
 		// do not compile: Lib.window.addEventListener("resize", redraw, false);
 		// yes but only 1 instance can listen: Lib.window.onresize = redraw;

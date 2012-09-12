@@ -65,6 +65,7 @@ interface IPlayable
 
 /**
  * Mixin methods for Playable components.
+ * FIXME: Not compatible with android native browser because of custom events
  * 
  * @author Thomas Fétiveau
  */

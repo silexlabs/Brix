@@ -40,6 +40,7 @@ typedef DraggableEvent = {
  * Attach mouse events to a "drag zone" and make it drag/drop the "Draggable" node
  * If drop zones are provided, display the best drop zone found and enable only these zones to be parents
  * define the drop zones with a "drop-zone" class name on the elements, or by setting the dropZones attribute
+ * FIXME: Not compatible with android native browser because of custom events
  */
 class Draggable extends DisplayObject
 {
@@ -86,11 +87,11 @@ class Draggable extends DisplayObject
 	/**
 	 * callback used to add/remove events to the html body
 	 */
-	private var moveCallback:Event->Void;
+	private var moveCallback:MouseEvent->Void;
 	/**
 	 * callback used to add/remove events to the html body
 	 */
-	private var mouseUpCallback:Event->Void;
+	private var mouseUpCallback:MouseEvent->Void;
 	/**
 	 * div element used to show where the element is about to be dropped
 	 */
@@ -106,7 +107,7 @@ class Draggable extends DisplayObject
 	/**
 	 * html elment instances
 	 */
-	public var dropZones:HtmlCollection<js.HtmlDom>;
+	public var dropZones:HtmlCollection<HtmlDom>;
 	/**
 	 * class name to select drop zones 
 	 * @default	dropzone 
@@ -194,7 +195,7 @@ class Draggable extends DisplayObject
 		dragZone.onmousedown = startDrag;
 		//dragZone.onmouseup = stopDrag;
 		mouseUpCallback = callback(stopDrag);
-		Lib.document.body.addEventListener("mouseup", mouseUpCallback, false);
+		Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
 		dragZone.style.cursor = "move";
 	}
 	/**
@@ -225,7 +226,7 @@ class Draggable extends DisplayObject
 	 */
 	private function initPhantomStyle()
 	{
-
+#if js
 		var computedStyle:Style = untyped __js__("window.getComputedStyle(this.rootElement, null)");
 
 		for (styleName in Reflect.fields(computedStyle)){
@@ -241,6 +242,7 @@ class Draggable extends DisplayObject
 			//DomTools.inspectTrace(val);
 			Reflect.setField(phantom.style, styleName, val);
 		}
+#end
 		//trace("initPhantomStyle "+computedStyle.position+" - "+phantom.style.position);
 		phantom.className = rootElement.className + " " + phantomClassName;
 	}
@@ -260,7 +262,7 @@ class Draggable extends DisplayObject
 	 * attach an onmousemove event to the body
 	 * memorize the rootElement style values and prepare it to be moved
 	 */
-	private function startDrag(e:js.Event)
+	private function startDrag(e:MouseEvent)
 	{
 		if (state == none)
 		{
@@ -275,7 +277,7 @@ class Draggable extends DisplayObject
 
 			//Lib.document.onmousemove = function(e){move(e);};
 			moveCallback = callback(move);
-			Lib.document.body.addEventListener("mousemove", moveCallback, false);
+			Lib.document.body.addEventListener("mousemove", cast(moveCallback), false);
 
 			//rootElement.style.position = "absolute";
 			move(e);
@@ -298,7 +300,7 @@ class Draggable extends DisplayObject
 	 * if there is a best drop zone, set it as the parent of the component
 	 * reset the rootElement.style.position value to initial position
 	 */
-	public function stopDrag(e:js.Event)
+	public function stopDrag(e:MouseEvent)
 	{
 		if (state == dragging)
 		{
@@ -330,7 +332,7 @@ class Draggable extends DisplayObject
 			state = none;
 			//rootElement.style.position = initialStylePosition;
 			resetRootElementStyle();
-			Lib.document.body.removeEventListener("mousemove", moveCallback, false);
+			Lib.document.body.removeEventListener("mousemove", cast(moveCallback), false);
 			// Leave the event, in case we miss the mouseup event (happens when the mouse leave the browser window while down)
 			// Lib.document.body.removeEventListener("mouseup", mouseUpCallback, false);
 			setAsBestDropZone(null);
@@ -343,7 +345,7 @@ class Draggable extends DisplayObject
 	 * move the root element
 	 * look for closest drop zone if there are some
 	 */
-	public function move(e:js.Event)
+	public function move(e:MouseEvent)
 	{
 		if (state == dragging)
 		{

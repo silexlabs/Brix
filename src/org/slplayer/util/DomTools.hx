@@ -108,7 +108,7 @@ class DomTools
 		}
 		trace("-- --");
 	}
-	
+
 	/**
 	 * add a css class to a node if it is not already in the class name
 	 */

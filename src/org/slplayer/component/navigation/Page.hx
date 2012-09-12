@@ -67,7 +67,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * This will close other pages
 	 */
 	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, slPlayerId:String, root:HtmlDom = null)
-	{//trace("openPage ("+pageName+", "+isPopup+", "+transitionData+", "+slPlayerId+", "+root+")");
+	{//trace("openPage ("+pageName+", "+isPopup+", "+slPlayerId+", "+root+")");
 		// default is the whole document
 		var document:Dynamic = root;
 		if (root == null)
@@ -75,8 +75,12 @@ class Page extends DisplayObject, implements IGroupable
 
 		// find the pages to open
 		var page = getPageByName(pageName, slPlayerId, document);
-		if (page == null)
-			throw("Error, could not find a page with name "+pageName);
+		if (page == null){
+			// look in the main application
+			page = getPageByName(pageName, slPlayerId);
+			if (page == null)
+				throw("Error, could not find a page with name "+pageName);
+		}
 		// open the page as a page or a popup
 		page.open(transitionDataShow, transitionDataHide, !isPopup);
 	}
@@ -93,8 +97,12 @@ class Page extends DisplayObject, implements IGroupable
 
 		// find the pages to open
 		var page = getPageByName(pageName, slPlayerId, document);
-		if (page == null)
-			throw("Error, could not find a page with name "+pageName);
+		if (page == null){
+			// look in the main application
+			page = getPageByName(pageName, slPlayerId);
+			if (page == null)
+				throw("Error, could not find a page with name "+pageName);
+		}
 		// close the page
 		page.close(transitionData);
 	}
@@ -106,7 +114,7 @@ class Page extends DisplayObject, implements IGroupable
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document;
+			document = Lib.document.documentElement;
 
 		// get all pages, i.e. all element with class name "page"
 		return document.getElementsByClassName(Page.CLASS_NAME);
@@ -119,7 +127,7 @@ class Page extends DisplayObject, implements IGroupable
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document;
+			document = Lib.document.documentElement;
 
 		// get the desired layers, i.e. the elements with the page name as class name
 		return document.getElementsByClassName(pageName);
@@ -132,7 +140,7 @@ class Page extends DisplayObject, implements IGroupable
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document;
+			document = Lib.document.documentElement;
 
 		// get all pages, i.e. all element with class name "page"
 		var pages:HtmlCollection<HtmlDom> = getPageNodes(slPlayerId, document);

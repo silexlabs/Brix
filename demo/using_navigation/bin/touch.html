@@ -1,0 +1,44 @@
+<HTML lang="en">
+<HEAD>
+	<META charset="utf-8"></META>
+	<TITLE>Menu example</TITLE>
+	
+	
+	
+	
+	
+	<META name="initialPageName" content="welcome"></META>
+	<STYLE type="text/css">
+		.container{
+		}
+		.Page{
+			display: none;
+		}
+		.traces{
+			width: 80%;
+			min-width: 0;
+			border: 2px solid;
+		}
+	</STYLE>
+<SCRIPT src="touch.js"></SCRIPT></HEAD>
+
+</HTML><BODY>
+	<DIV class="Group1 container">
+		<H2>Navigation</H2>
+		<A href="#welcome" class="LinkToPage TouchLink" data-group-id="Group1" data-touch-type="left">Welcome</A>
+		<A href="#about" class="LinkToPage TouchLink" data-group-id="Group1" data-touch-type="right">About</A>
+		<A href="#test" class="LinkToPage TouchLink" data-group-id="Group1" data-touch-type="up">Test</A>
+		<H2>Pages</H2>
+		<A class="Page" name="welcome" data-group-id="Group1"></A>
+		<DIV class="Layer welcome"><BR></BR>Welcome to the touch demo !<BR></BR><BR></BR>Please swipe left/right to test.<BR></BR></DIV>
+
+		<A class="Page" name="about" data-group-id="Group1"></A>
+		<DIV class="Layer about"><BR></BR>SLPlayer is © 2011-2012 Silex Labs and is released under the GPL License.<BR></BR><BR></BR></DIV>
+
+		<A class="Page" name="test" data-group-id="Group1"></A>
+		<DIV class="Layer test">SLPlayer touch demo<HR></HR>This is a test<BR></BR>Here is a browse button <INPUT type="file"></INPUT><BR></BR><INPUT type="button" value="Save"></INPUT><INPUT type="button" value="Cancel"></INPUT></DIV>
+	</DIV>
+	<H2>Traces</H2>
+	<DIV class="traces" id="haxe:trace">
+	</DIV>
+</BODY>
