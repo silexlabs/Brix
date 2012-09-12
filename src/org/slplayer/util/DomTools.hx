@@ -126,8 +126,10 @@ class DomTools
 	static public function addClass(element:HtmlDom, className:String)
 	{
 		if (element.className == null) element.className = "";
-		if(!hasClass(element, className))
-			element.className += " "+ className;
+		if(!hasClass(element, className)){
+			if (element.className != "") element.className += " ";
+			element.className += className;
+		}
 	}
 	
 	/**
@@ -136,8 +138,14 @@ class DomTools
 	static public function removeClass(element:HtmlDom, className:String)
 	{
 		if (element.className == null) return;
-		if(hasClass(element, className))
-			element.className = StringTools.replace(element.className, className, "");
+		if(hasClass(element, className)){
+			var arr = element.className.split(" ");
+			for (idx in 0...arr.length)
+				if (arr[idx] == className)
+					arr[idx] = "";
+			element.className = arr.join(" ");
+		}
+		//	element.className = StringTools.replace(element.className, className, "");
 	}
 	
 	/**
@@ -147,7 +155,8 @@ class DomTools
 	static public function hasClass(element:HtmlDom, className:String)
 	{
 		if (element.className == null) return false;
-		return element.className.indexOf(className) > -1;
+		//return element.className.indexOf(className) > -1;
+		return Lambda.has(element.className.split(" "), className);
 	}
 	/**
 	 * Set the value of a given HTML head/meta tags
