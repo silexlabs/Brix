@@ -224,7 +224,7 @@ with sum of the css classes
 	public function show(transitionData:Null<TransitionData> = null, preventTransitions:Bool = false) : Void
 	{
 		if (status != hidden && status != notInit){
-			trace("Warning: can not show the layer, since it is "+status);
+			trace("Warning: can not show the layer, since it has the status '"+status+"'");
 			return;
 		}
 		// reset transition if it is pending
@@ -268,13 +268,19 @@ with sum of the css classes
 			}
 		}
 		// dispatch a custom event on the root element
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(EVENT_TYPE_SHOW, false, false, {
-			transitionData : transitionData,
-			target: rootElement,
-			layer: this,
-		});
-		rootElement.dispatchEvent(event);
+		try{
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_TYPE_SHOW, false, false, {
+				transitionData : transitionData,
+				target: rootElement,
+				layer: this,
+			});
+			rootElement.dispatchEvent(event);
+		}
+		catch(e:Dynamic){
+			// android browsers
+			trace("Error: could not dispatch event "+e);
+		}
 
 		// do the transition
 		if (preventTransitions == false)
@@ -321,7 +327,7 @@ with sum of the css classes
 	public function hide(transitionData:Null<TransitionData> = null, preventTransitions:Bool) : Void
 	{// trace("hide "+preventTransitions);
 		if (status != visible && status != notInit){
-			//trace("Warning, can not hide the layer, since it is "+status);
+			//trace("Warning, can not hide the layer, since it has the status '"+status+"'");
 			return;
 		}
 		// reset transition if it is pending
@@ -355,7 +361,8 @@ with sum of the css classes
 	 * remove children from the DOM and store it in childrenArray
 	 */
 	public function doHide(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
-	{// trace("doHide "+preventTransitions);
+	{ trace("doHide "+preventTransitions);
+trace("remove "+rootElement.childNodes.length+" children ---" );
 		if (e!=null && e.target != rootElement){
 			trace("End transition event from another html element");
 			return;
@@ -373,14 +380,19 @@ with sum of the css classes
 		status = hidden;
 
 		// dispatch a custom event on the root element
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(EVENT_TYPE_HIDE, false, false, {
-			transitionData : transitionData,
-			target: rootElement,
-			layer: this,
-		});
-		rootElement.dispatchEvent(event);
-
+		try{
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_TYPE_HIDE, false, false, {
+				transitionData : transitionData,
+				target: rootElement,
+				layer: this,
+			});
+			rootElement.dispatchEvent(event);
+		}
+		catch(e:Dynamic){
+			// android browsers
+			trace("Error: could not dispatch event "+e);
+		}
 		// remove children 
 		while (rootElement.childNodes.length > 0)
 		{

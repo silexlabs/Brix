@@ -33,6 +33,7 @@ import js.Lib;
  * Playable part while the control bar the PlayerControl part.
  * 
  * This contract is for the moment a draft as no Player components has been released yet in the slplayer distribution.
+ * FIXME: Not compatible with android native browser because of custom events
  */
 interface IPlayerControl
 {

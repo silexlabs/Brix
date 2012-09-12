@@ -51,6 +51,7 @@ interface IDataProvider
 
 /**
  * Mixin methods for DataProvider components.
+ * FIXME: Not compatible with android native browser because of custom events
  */
 class DataProvider 
 {

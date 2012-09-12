@@ -98,9 +98,13 @@ import js.Dom;
 			#if (js && disableEmbedHtml)
 				//special case in js when auto starting the application, 
 				//we need to ensure first that the parent document is ready
-				Lib.window.onload = function(e:Event) { newApp.init(); };
+				Lib.window.onload = function(e:Event) { 
+					newApp.initDom(); 
+					newApp.initComponents(); 
+				};
 			#else
-				newApp.init();
+				newApp.initDom(); 
+				newApp.initComponents(); 
 			#end
 
 		#end
@@ -157,7 +161,7 @@ import js.Dom;
 	 * @param	?appendTo	optional, the parent application's node to which to hook this SLplayer application. By default or if
 	 * the given node is invalid, it's the document's document element (or equivalent if not js) that is used for that.
 	 */
-	public function init(?appendTo:Null<HtmlDom>) : Void
+	public function initDom(?appendTo:Null<HtmlDom>) : Void
 	{
 		#if slpdebug
 			trace("Initializing SLPlayer id "+id+" on "+appendTo);
@@ -193,19 +197,6 @@ import js.Dom;
 		#if !disableEmbedHtml
 			htmlRootElement.innerHTML = _htmlDocumentElement;
 		#end
-		
-		//build the SLPlayer instance meta parameters Hash
-		initMetaParameters();
-		
-		//register the application components for initialization
-		registerComponentsforInit();
-		
-		//call the UI components init() method
-		initComponents();
-		
-		#if slpdebug
-			trace("SLPlayer id "+id+" launched !");
-		#end
 	}
 	
 	/**
@@ -239,8 +230,18 @@ import js.Dom;
 	 * Initialize the application's components in 2 stages : first create the instances and then call init()
 	 * on each DisplayObject component.
 	 */
-	private function initComponents()
+	public function initComponents()
 	{
+		//build the SLPlayer instance meta parameters Hash
+		initMetaParameters();
+		
+		//register the application components for initialization
+		registerComponentsforInit();
+		
+		#if slpdebug
+			trace("SLPlayer id "+id+" launched !");
+		#end
+
 		//Create the components instances
 		for (rc in registeredComponents)
 		{
