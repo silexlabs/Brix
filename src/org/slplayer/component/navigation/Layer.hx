@@ -252,12 +252,13 @@ with sum of the css classes
 			{
 				try
 				{				
-					if (cast(element).autoplay == true)
+					var audioElement:Audio = cast(element);
+					if (audioElement.autoplay == true)
 					{
-						cast(element).currentTime = 0;
-						cast(element).play();
+						audioElement.currentTime = 0;
+						audioElement.play();
 					}
-					cast(element).muted = SoundOn.isMuted;
+					audioElement.muted = SoundOn.isMuted;
 				}
 				catch (e:Dynamic)
 				{
@@ -404,8 +405,9 @@ trace("remove "+rootElement.childNodes.length+" children ---" );
 			{
 				try
 				{				
-					cast(element).pause();
-					cast(element).currentTime = 0;
+					var audioElement:Audio = cast(element);
+					audioElement.pause();
+					audioElement.currentTime = 0;
 				}
 				catch (e:Dynamic)
 				{
