@@ -32,6 +32,7 @@ import org.slplayer.component.template.TemplateMacros;
  * 	selected index/item
  * 	selected indexes / items
  */
+@tagNameFilter("ul")
 class List<ElementClass> extends DisplayObject
 {
 	public static inline var LIST_SELECTED_ITEM_CSS_CLASS:String = "listSelectedItem";
@@ -104,7 +105,12 @@ class List<ElementClass> extends DisplayObject
 		var t = new haxe.Template(listTemplate);
 		for (elem in dataProvider)
 		{
-			listInnerHtml += t.execute(elem, TemplateMacros);
+			try{
+				listInnerHtml += t.execute(elem, TemplateMacros);
+			}
+			catch(e:Dynamic){
+				throw("Error: an error occured while interpreting the template - "+listTemplate+" - for the element "+elem);
+			}
 		}
 		rootElement.innerHTML = listInnerHtml;
 
