@@ -39,6 +39,7 @@ enum LayerStatus
  * The DOM element is first made empty by removing all its children from the DOM.
  * When a page is to be displayed, the content of the corresponding layers are attached back to the DOM.
  */
+@tagNameFilter("div")
 class Layer extends DisplayObject
 {
 	/**
@@ -88,6 +89,19 @@ class Layer extends DisplayObject
 		status = notInit;
 		// Store the transition data for use in onEnd
 		styleAttrDisplay = rootElement.style.display;
+	}
+	/** 
+	 * Retrieve the given layer of this application or group
+	 */
+	static public function getLayerNodes(pageName:String, slPlayerId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	{
+		// default is the hole document
+		var document:Dynamic = root;
+		if (root == null)
+			document = Lib.document.documentElement;
+
+		// get the desired layers, i.e. the elements with the page name as class name
+		return document.getElementsByClassName(pageName);
 	}
 	//////////////////////////////////////////////////////
 	// Transitions

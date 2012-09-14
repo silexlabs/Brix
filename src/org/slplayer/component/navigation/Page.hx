@@ -33,6 +33,7 @@ using org.slplayer.component.group.IGroupable.Groupable;
  * This class offers static methods to manipulate pages. Todo: decide wether the static methods should go in org.silex.util.PageTools .
  * When the page is to be opened/closed, then all the layers which have the page deeplink as a class name are shown/hidden
  */
+@tagNameFilter("a")
 class Page extends DisplayObject, implements IGroupable
 {
 	/**
@@ -118,19 +119,6 @@ class Page extends DisplayObject, implements IGroupable
 
 		// get all pages, i.e. all element with class name "page"
 		return document.getElementsByClassName(Page.CLASS_NAME);
-	}
-	/** 
-	 * Retrieve the given layer of this application or group
-	 */
-	static public function getLayerNodes(pageName:String, slPlayerId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
-	{
-		// default is the hole document
-		var document:Dynamic = root;
-		if (root == null)
-			document = Lib.document.documentElement;
-
-		// get the desired layers, i.e. the elements with the page name as class name
-		return document.getElementsByClassName(pageName);
 	}
 	/** 
 	 * Retrieve the page whose "name" attribute is pageName
@@ -230,7 +218,7 @@ class Page extends DisplayObject, implements IGroupable
 	public function doOpen(transitionData:TransitionData = null, preventTransitions:Bool = false)
 	{trace("doOpen "+transitionData+", "+name+" - "+preventTransitions);
 		// find all the layers which have the page name in their css class attribute
-		var nodes = getLayerNodes(name, SLPlayerInstanceId, groupElement);
+		var nodes = Layer.getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
 		// show the layers
 		for (idxLayerNode in 0...nodes.length)
@@ -256,7 +244,7 @@ class Page extends DisplayObject, implements IGroupable
 			preventCloseByClassName = new Array();
 
 		// find all the layers which have the page name in their css class attribute
-		var nodes = getLayerNodes(name, SLPlayerInstanceId, groupElement);
+		var nodes = Layer.getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
 		// browse the layers
 		for (idxLayerNode in 0...nodes.length)
