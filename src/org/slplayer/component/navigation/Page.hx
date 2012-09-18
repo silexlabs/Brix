@@ -185,7 +185,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Also close the other pages if doCloseOthers is true
 	 */
 	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true, preventTransitions:Bool = false) 
-	{trace("open - "+doCloseOthers+" - name="+name+" - "+preventTransitions);
+	{// trace("open - "+doCloseOthers+" - name="+name+" - "+preventTransitions);
 		if (doCloseOthers)
 			closeOthers(transitionDataHide, preventTransitions);
 
@@ -196,7 +196,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Close all other pages
 	 */
 	public function closeOthers(transitionData:TransitionData = null, preventTransitions:Bool = false)
-	{trace("closeOthers("+transitionData+") - "+preventTransitions);
+	{// trace("closeOthers("+transitionData+") - "+preventTransitions);
 
 		// find all the pages in this application and close them
 		var nodes = getPageNodes(SLPlayerInstanceId, groupElement);
@@ -216,7 +216,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 */
 	public function doOpen(transitionData:TransitionData = null, preventTransitions:Bool = false)
-	{trace("doOpen "+transitionData+", "+name+" - "+preventTransitions);
+	{// trace("doOpen "+transitionData+", "+name+" - "+preventTransitions);
 		// find all the layers which have the page name in their css class attribute
 		var nodes = Layer.getLayerNodes(name, SLPlayerInstanceId, groupElement);
 
@@ -238,7 +238,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Remove the children from the DOM
 	 */
 	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null, preventTransitions:Bool = false) 
-	{trace("close "+transitionData+", "+name+" - "+preventTransitions);
+	{// trace("close "+transitionData+", "+name+" - "+preventTransitions);
 		// default value
 		if (preventCloseByClassName==null)
 			preventCloseByClassName = new Array();

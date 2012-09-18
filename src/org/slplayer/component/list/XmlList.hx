@@ -40,8 +40,18 @@ class XmlList extends List<Xml>
 		for (item in xmlData.elements())
 		{
 			dataProvider.push(xmlToObj(item));
-			DomTools.inspectTrace(xmlToObj(item));
 		}
+	}
+	/**
+	 * init the component
+	 * get elements by class names 
+	 * you can now initialize the process of refreshing the list by calling redraw()
+	 */
+	override public function init() : Void
+	{ 
+		// init the parent class
+		super.init();
+		redraw();
 	}
 	private function xmlToObj(xml:Xml):Dynamic
 	{
