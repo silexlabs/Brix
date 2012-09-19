@@ -21,6 +21,9 @@ import js.Dom;
 import org.slplayer.util.DomTools;
 import org.slplayer.component.ui.DisplayObject;
 
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
+
 enum DraggableState {
 	none;
 	dragging;
@@ -42,8 +45,14 @@ typedef DraggableEvent = {
  * define the drop zones with a "drop-zone" class name on the elements, or by setting the dropZones attribute
  * FIXME: Not compatible with android native browser because of custom events
  */
-class Draggable extends DisplayObject
+class Draggable extends DisplayObject, implements IGroupable
 {
+	/**
+	 * the group element set by the Group class
+	 * implementation of IGroupable
+	 */
+	public var groupElement:HtmlDom;
+
 	////////////////////////////////////
 	// events
 	////////////////////////////////////
@@ -96,6 +105,10 @@ class Draggable extends DisplayObject
 	 * div element used to show where the element is about to be dropped
 	 */
 	private var phantom:HtmlDom;
+	/**
+	 * div element used to compute the best drop zone
+	 * it is placed at every position and its distance to mouse cursor is measured
+	 */
 	private var miniPhantom:HtmlDom;
 	/**
 	 * state of the draggable element (none, dragging)
@@ -154,6 +167,12 @@ class Draggable extends DisplayObject
 	{
 		super(rootElement, SLPId);
 
+		// implementation of IGroupable
+		startGroupable();
+		if (groupElement == null){
+			groupElement = Lib.document.body;
+		}
+
 		// init
 		state = none;
 
@@ -189,7 +208,7 @@ class Draggable extends DisplayObject
 			dragZone = rootElement;
 
 		// retrieve references to the elements
-		dropZones = Lib.document.body.getElementsByClassName(dropZonesClassName);
+		dropZones = groupElement.getElementsByClassName(dropZonesClassName);
 		if (dropZones.length == 0)
 			dropZones[0] = rootElement.parentNode;
 
@@ -406,7 +425,7 @@ class Draggable extends DisplayObject
 				if (dist < nearestDistance)
 				{
 					nearestDistance = dist;
-					lastChildIdx = -1;
+					lastChildIdx = zone.childNodes.length + 1;
 				}
 				zone.removeChild(miniPhantom);
 				return { parent: zone, position: lastChildIdx }
