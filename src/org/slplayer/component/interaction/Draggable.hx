@@ -213,7 +213,7 @@ class Draggable extends DisplayObject, implements IGroupable
 			dropZones[0] = rootElement.parentNode;
 
 		// attach the events
-		dragZone.onmousedown = startDrag;
+		dragZone.addEventListener("mousedown", startDrag, false);
 		//dragZone.onmouseup = stopDrag;
 		mouseUpCallback = callback(stopDrag);
 		Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
