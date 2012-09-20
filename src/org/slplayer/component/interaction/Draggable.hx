@@ -21,6 +21,9 @@ import js.Dom;
 import org.slplayer.util.DomTools;
 import org.slplayer.component.ui.DisplayObject;
 
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
+
 enum DraggableState {
 	none;
 	dragging;
@@ -42,8 +45,14 @@ typedef DraggableEvent = {
  * define the drop zones with a "drop-zone" class name on the elements, or by setting the dropZones attribute
  * FIXME: Not compatible with android native browser because of custom events
  */
-class Draggable extends DisplayObject
+class Draggable extends DisplayObject, implements IGroupable
 {
+	/**
+	 * the group element set by the Group class
+	 * implementation of IGroupable
+	 */
+	public var groupElement:HtmlDom;
+
 	////////////////////////////////////
 	// events
 	////////////////////////////////////
@@ -96,6 +105,11 @@ class Draggable extends DisplayObject
 	 * div element used to show where the element is about to be dropped
 	 */
 	private var phantom:HtmlDom;
+	/**
+	 * div element used to compute the best drop zone
+	 * it is placed at every position and its distance to mouse cursor is measured
+	 */
+	private var miniPhantom:HtmlDom;
 	/**
 	 * state of the draggable element (none, dragging)
 	 */
@@ -153,6 +167,12 @@ class Draggable extends DisplayObject
 	{
 		super(rootElement, SLPId);
 
+		// implementation of IGroupable
+		startGroupable();
+		if (groupElement == null){
+			groupElement = Lib.document.body;
+		}
+
 		// init
 		state = none;
 
@@ -180,6 +200,7 @@ class Draggable extends DisplayObject
 
 		// create the phantom
 		phantom = Lib.document.createElement("div");
+		miniPhantom = Lib.document.createElement("div");
 
 		// retrieve references to the elements
 		dragZone = DomTools.getSingleElement(rootElement, CSS_CLASS_DRAGZONE, false);
@@ -187,12 +208,12 @@ class Draggable extends DisplayObject
 			dragZone = rootElement;
 
 		// retrieve references to the elements
-		dropZones = Lib.document.body.getElementsByClassName(dropZonesClassName);
+		dropZones = groupElement.getElementsByClassName(dropZonesClassName);
 		if (dropZones.length == 0)
 			dropZones[0] = rootElement.parentNode;
 
 		// attach the events
-		dragZone.onmousedown = startDrag;
+		dragZone.addEventListener("mousedown", startDrag, false);
 		//dragZone.onmouseup = stopDrag;
 		mouseUpCallback = callback(stopDrag);
 		Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
@@ -224,7 +245,7 @@ class Draggable extends DisplayObject
 	/**
 	 * init phantom according to root element properties
 	 */
-	private function initPhantomStyle()
+	private function initPhantomStyle(phantom:HtmlDom)
 	{
 #if js
 		var computedStyle:Style = untyped __js__("window.getComputedStyle(this.rootElement, null)");
@@ -271,7 +292,8 @@ class Draggable extends DisplayObject
 			initialY = rootElement.offsetTop;
 			initialMouseX = e.clientX;
 			initialMouseY = e.clientY;
-			initPhantomStyle();
+			initPhantomStyle(phantom);
+			initPhantomStyle(miniPhantom);
 			initRootElementStyle();
 			//initialStylePosition = rootElement.style.position;
 
@@ -314,7 +336,8 @@ class Draggable extends DisplayObject
 				var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 				event.initCustomEvent(EVENT_DROPPED, false, false, {
 					dropZone : bestDropZone,
-					target: bestDropZone.parent
+					target: bestDropZone.parent,
+					draggable: this,
 				});
 				bestDropZone.parent.dispatchEvent(event);
 				
@@ -380,24 +403,42 @@ class Draggable extends DisplayObject
 				&& mouseY > zone.offsetTop && mouseY < zone.offsetTop + zone.offsetHeight )
 			{
 				var lastChildIdx:Int = 0;
+				var nearestDistance:Float = 999999999999;
 				// browse all children to see which one is after the desired zone
 				for (childIdx in 0...zone.childNodes.length){
 					var child = zone.childNodes[childIdx];
-
-					// do not take the phantom into account
-					//if (child.className == PHANTOM_CLASS_NAME)
-					//	continue;
-
-					// get the child which is after the mouse
-					if (mouseX > child.offsetLeft + Math.round(child.offsetWidth / 2))
+					// test the case before this child
+					zone.insertBefore(miniPhantom, child);
+					var bb = DomTools.getElementBoundingBox(miniPhantom);
+					var dist = computeDistance(bb, mouseX, mouseY);
+					if (dist < nearestDistance)
 					{
+						// new closest position
+						nearestDistance = dist;
 						lastChildIdx = childIdx;
 					}
 				}
+				// test the case of the last child
+				zone.appendChild(miniPhantom);
+				var bb = DomTools.getElementBoundingBox(miniPhantom);
+				var dist = computeDistance(bb, mouseX, mouseY);
+				if (dist < nearestDistance)
+				{
+					nearestDistance = dist;
+					lastChildIdx = zone.childNodes.length + 1;
+				}
+				zone.removeChild(miniPhantom);
 				return { parent: zone, position: lastChildIdx }
 			}
 		}
 		return null;
+	}
+	private function computeDistance(bb:{x:Int, y:Int, w:Int, h:Int},mouseX:Int, mouseY:Int) :Float
+	{
+		return Math.sqrt(
+			Math.pow((bb.x+bb.w/2.0)-mouseX, 2)
+			+ Math.pow((bb.y+bb.h/2.0)-mouseY, 2)
+		);
 	}
 	/**
 	 * keep a reference to closest drop zone

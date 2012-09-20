@@ -114,6 +114,7 @@ class List<ElementClass> extends DisplayObject
 		}
 		rootElement.innerHTML = listInnerHtml;
 
+		
 		attachListEvents();
 		updateSelectionDisplay([selectedItem]);
 	}

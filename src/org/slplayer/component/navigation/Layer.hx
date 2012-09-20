@@ -315,7 +315,7 @@ with sum of the css classes
 	 * transition is over
 	 */
 	public function doShow(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
-	{trace("doShow");
+	{// trace("doShow");
 		if (e!=null && e.target != rootElement){
 			trace("End transition event from another html element");
 			return;
@@ -376,8 +376,8 @@ with sum of the css classes
 	 * remove children from the DOM and store it in childrenArray
 	 */
 	public function doHide(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
-	{ trace("doHide "+preventTransitions);
-trace("remove "+rootElement.childNodes.length+" children ---" );
+	{ // trace("doHide "+preventTransitions);
+
 		if (e!=null && e.target != rootElement){
 			trace("End transition event from another html element");
 			return;

@@ -4,12 +4,32 @@
 		"selected_items":
 		[
 			[
-				"CSS",
-				"CSS_CLASS_PHANTOM	var"
+				"border-",
+				"border-width"
+			],
+			[
+				"bo",
+				"border"
+			],
+			[
+				"remov",
+				"removeChild"
+			],
+			[
+				"min",
+				"miniPhantom"
+			],
+			[
+				"Html",
+				"HtmlDom	js.Dom"
 			],
 			[
 				"Dom",
-				"DomTools	class"
+				"DomTools"
+			],
+			[
+				"CSS",
+				"CSS_CLASS_PHANTOM	var"
 			],
 			[
 				"u",
@@ -200,10 +220,6 @@
 				"clientWidth	Int"
 			],
 			[
-				"bo",
-				"bodySize	var"
-			],
-			[
 				"is",
 				"isHorizontal	var"
 			],
@@ -278,10 +294,6 @@
 			[
 				"components",
 				"componentsWidget	var"
-			],
-			[
-				"Html",
-				"HtmlDom"
 			],
 			[
 				"tr",
@@ -428,6 +440,11 @@
 	},
 	"file_history":
 	[
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/component/interaction/Draggable.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/bin/lists.css",
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/bin/pannel.css",
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/bin/toolBox.css",
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/bin/dragDrop.css",
 		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/slplayer/ui/interaction/Draggable.hx",
 		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/build.hxml",
 		"/home/lexa/Dropbox/silex-v2/generated/edit/Publication.java",
@@ -538,6 +555,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"phantom",
+			"initPhantomStyle",
+			"phantom",
+			"getBestDropZone",
 			"onmouseup\n",
 			"initialStylePosition",
 			"initialStylePosition\n",
@@ -661,10 +682,6 @@
 			"parentId",
 			"root",
 			"NAME_COLUMN_TITLE",
-			"Layer",
-			"layers",
-			"NAME_COLUMN_TITLE",
-			"layer",
 			"Layer"
 		],
 		"highlight": true,
@@ -722,6 +739,10 @@
 		]
 	},
 	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 213.0
+	},
 	"replace":
 	{
 		"height": 64.0
