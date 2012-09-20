@@ -250,6 +250,9 @@ import js.Dom;
 		
 		//call init on each component instances
 		callInitOnComponents();
+
+		// reset the registered components
+		registeredComponents = new Array();
 	}
 	
 	/**
@@ -446,6 +449,56 @@ import js.Dom;
 		associatedCmps.add(cmp);
 		
 		nodeToCmpInstances.set( nodeId, associatedCmps );
+	}
+	/**
+	 * Remove a component instance from the list of associated component instances of a given node.
+	 * @param	node	the node associated with the component instance.
+	 * @param	cmp		the component instance to remove.
+	 */
+	public function removeAssociatedComponent(node : HtmlDom, cmp : org.slplayer.component.ui.DisplayObject) : Void
+	{
+		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
+		
+		var associatedCmps : List<org.slplayer.component.ui.DisplayObject>;
+		
+		if (nodeId != null)
+		{
+			// remove the component instance
+			associatedCmps = nodeToCmpInstances.get(nodeId);
+			var isError = !associatedCmps.remove(cmp);
+			if(isError){
+				throw("Could not find the component in the node's associated components list.");
+			}
+		}
+		else
+		{
+			trace("Warning: there are no components associated with this node");
+			//throw("Could not remove the components associated with this node. The node has not an ID as an attribute");
+		}
+	}
+	/**
+	 * Remove all component instances associated with a given node.
+	 * @param	node	the node.
+	 */
+	public function removeAllAssociatedComponent(node : HtmlDom) : Void
+	{
+		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
+
+		if (nodeId != null)
+		{
+			// remove the ID
+			node.removeAttribute("data-" + SLPID_ATTR_NAME);
+			// remove all component instances
+			var isError = !nodeToCmpInstances.remove(nodeId);
+			if(isError){
+				throw("Could not find the node in the associated components list.");
+			}
+		}
+		else
+		{
+			trace("Warning: there are no components associated with this node");
+			//throw("Could not remove the components associated with this node. The node has not an ID as an attribute");
+		}
 	}
 	
 	/**

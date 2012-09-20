@@ -56,6 +56,11 @@ class Panel extends DisplayObject
 	 */
 	public static inline var ATTR_CSS_CLASS_FOOTER = "data-panel-footer-class-name";
 	/**
+	 * name of the attribute to configure if the panel is horizontal or vertical
+	 * value can be "true" or "false", default is "false"
+	 */
+	public static inline var ATTR_IS_HORIZONTAL = "data-panel-is-horizontal";
+	/**
 	 * is the layer vertical or horizontal
 	 * default is vertical
 	 */
@@ -107,7 +112,7 @@ class Panel extends DisplayObject
 		footer = DomTools.getSingleElement(rootElement, cssClassName, false);
 
 		// attributes
-		if (rootElement.getAttribute("data-is-horizontal") == "true")
+		if (rootElement.getAttribute(ATTR_IS_HORIZONTAL) == "true")
 			isHorizontal = true;
 		else
 			isHorizontal = false;
@@ -119,6 +124,7 @@ class Panel extends DisplayObject
 	 * computes the size of each element
 	 */
 	public function redraw(){
+		trace("redraw ");
 		var bodySize:Int;
 		var boundingBox = DomTools.getElementBoundingBox(rootElement);
 		if (isHorizontal){
@@ -146,6 +152,8 @@ class Panel extends DisplayObject
 			bodySize += bodyMargin;
 			bodySize -= margin;
 			bodySize -= body.offsetTop;
+			// case of a pannel which parent is not positioned in absolute, does not initiate the flow 
+			bodySize += boundingBox.y;
 
 			if (footer != null){
 				var footerMargin = (footer.offsetHeight - footer.clientHeight);
@@ -153,7 +161,7 @@ class Panel extends DisplayObject
 				bodySize -= boundingBox.h;
 				bodySize -= footerMargin;
 			}
-			bodySize++;
+			bodySize--;
 			body.style.height = bodySize+"px";
 		}
 	}
