@@ -21,10 +21,21 @@ import js.Dom;
 /**
  * Some additional DOM functions extending the standard ones.
  * 
- * @author Thomas Fétiveau
  */
 class DomTools 
 {
+	/**
+	 * Call a calback later. This is useful sometimes when dealing with layout, because it needs time to be redrawn
+	 * @param 	callbackFunction	The callback function to be called in the next frame
+	 */
+	static public function doLater(callbackFunction:Void->Void, nFrames:Float=1)
+	{
+#if php
+		callbackFunction();
+#else
+		haxe.Timer.delay(callbackFunction, Math.round(200*nFrames));
+#end
+	}
 	/**
 	 * Search for all children elements of the given element that have the given attribute with the given value. Note that you should
 	 * avoid to use any non standard methods like this one to select elements as it's much less efficient than the standard ones 
@@ -68,16 +79,224 @@ class DomTools
 			return null;
 		}
 	}
+	/**
+	 * Compute the htmlDom element size and position, taking margins, paddings and borders into account, and also the parents ones
+	 * @param	htmlDom 	HtmlDom element of which we want to know the size 
+	 * @return 	the width in pixels
+	 */
+	static public function getElementBoundingBox(htmlDom:HtmlDom):{x:Int, y:Int, w:Int, h:Int}{
+		var halfBorderH = 0;//(htmlDom.offsetWidth - htmlDom.clientWidth)/2.0;
+		var halfBorderV = 0;//(htmlDom.offsetHeight - htmlDom.clientHeight)/2.0;
+		return {
+			x:Math.floor(htmlDom.offsetLeft - halfBorderH),
+			y:Math.floor(htmlDom.offsetTop - halfBorderV),
+			w:Math.floor(htmlDom.offsetWidth - halfBorderH),
+			h:Math.floor(htmlDom.offsetHeight - halfBorderV)
+		};
+	}
 	
 	/**
 	 * for debug purpose
 	 * trace the properties of an object
 	 */
-	public static function inspectTrace(obj:Dynamic):Void
+	public static function inspectTrace(obj:Dynamic, callingClass:String):Void
 	{
+		trace("-- "+callingClass+" inspecting element --");
 		for (prop in Reflect.fields(obj))
 		{
 			trace("- "+prop+" = "+Reflect.field(obj, prop));
 		}
+		trace("-- --");
 	}
+
+	/**
+	 * add a css class to a node if it is not already in the class name
+	 */
+	static public function toggleClass(element:HtmlDom, className:String) 
+	{
+		if(hasClass(element, className))
+			removeClass(element, className);
+		else
+			addClass(element, className);
+	}
+	
+	/**
+	 * add a css class to a node if it is not already in the class name
+	 */
+	static public function addClass(element:HtmlDom, className:String)
+	{
+		if (element.className == null) element.className = "";
+		if(!hasClass(element, className)){
+			if (element.className != "") element.className += " ";
+			element.className += className;
+		}
+	}
+	
+	/**
+	 * remove a css class from a node 
+	 */
+	static public function removeClass(element:HtmlDom, className:String)
+	{
+		if (element.className == null) return;
+		if(hasClass(element, className)){
+			var arr = element.className.split(" ");
+			for (idx in 0...arr.length)
+				if (arr[idx] == className)
+					arr[idx] = "";
+			element.className = arr.join(" ");
+		}
+		//	element.className = StringTools.replace(element.className, className, "");
+	}
+	
+	/**
+	 * check if the node has a given css class
+	 * TODO: this is not good since hasClass(element, "Page") would return true for element with className set to "LinkToPage", so split in array and use Lambda 
+	 */
+	static public function hasClass(element:HtmlDom, className:String)
+	{
+		if (element.className == null) return false;
+		//return element.className.indexOf(className) > -1;
+		return Lambda.has(element.className.split(" "), className);
+	}
+	/**
+	 * Set the value of a given HTML head/meta tags
+	 * @param	name 			the value of the name attribute of the desired meta tag
+	 * @param	metaValue 			the value to apply to the meta tag
+	 * @param	attributeName 	the name of the attribute, of which to return the value
+	 * @example	DomTools.setMeta("description", "A 1st test of Silex publication"); // set the description of the HTML page found in the head tag, i.e. <META name="description" content="A 1st test of Silex publication"></META>
+	 */
+	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content"):Hash<String>{
+		var res:Hash<String> = new Hash();
+		//trace("setConfig META TAG "+metaName+" = " +metaValue);
+
+		// retrieve all config tags (the meta tags)
+		var metaTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("META");
+
+		// flag to check if metaName exists
+		var found = false;
+
+		// for each config element, store the name/value pair
+		for (idxNode in 0...metaTags.length){
+			var node = metaTags[idxNode];
+			var configName = node.getAttribute("name");
+			var configValue = node.getAttribute(attributeName);
+			if (configName!=null && configValue!=null){
+				if(configName == metaName){
+					configValue = metaValue;
+					node.setAttribute(attributeName, metaValue);
+					found = true;
+				}
+				res.set(configName, configValue);
+			}
+		}
+		// add the meta if needed
+		if (!found){
+			var node = Lib.document.createElement("meta");
+			node.setAttribute("name", metaName);
+			node.setAttribute("content", metaValue);
+			var head = Lib.document.getElementsByTagName("head")[0];
+			head.appendChild(node);
+			// update config
+			res.set(metaName, metaValue);
+		}
+
+		return res;
+	}
+	/**
+	 * Get the value of a given HTML head/meta tags
+	 * @param	name 			the value of the name attribute of the desired meta tag
+	 * @param	attributeName 	the name of the attribute, of which to return the value
+	 * @example	DomTools.getMeta("description", "content"); // returns the description of the HTML page found in the head tag, e.g. <META name="description" content="A 1st test of Silex publication"></META>
+	 */
+	static public function getMeta(name:String, attributeName:String="content", head:HtmlDom=null):Null<String>{
+		// default value for document
+		if (head == null) 
+			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
+
+		// retrieve all config tags (the meta tags)
+		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("meta");
+
+		// for each config element, store the name/value pair
+		for (idxNode in 0...metaTags.length){
+			var node = metaTags[idxNode];
+			var configName = node.getAttribute("name");
+			var configValue = node.getAttribute(attributeName);
+			if (configName==name)
+				return configValue;
+		}
+		return null;
+	}
+	/**
+	 * Add a css tag with the given CSS rules in it
+	 * @param	css 		String containing the CSS rules
+	 * @param	head 		An optional HtmlDom which is the <head> tag of the document. Default: use Lib.document.getElementsByTagName("head") to retrieve it
+	 * @returns the created node for the css style tag
+	 */
+	static public function addCssRules(css:String, head:HtmlDom=null):HtmlDom{
+		// default value for document
+		if (head == null) 
+			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
+		
+		var node = Lib.document.createElement('style');
+		node.setAttribute('type', 'text/css');
+		node.appendChild(Lib.document.createTextNode(css));
+
+		head.appendChild(node);
+		return cast(node);
+	}
+	/**
+	 * Add a script tag with the given src param
+	 * @param	src 			String containing the URL of the script to embed
+	 */
+	static public function embedScript(src:String):HtmlDom{
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var scriptNodes = Lib.document.getElementsByTagName("script");
+		for (idxNode in 0...scriptNodes.length){
+			var node = scriptNodes[idxNode];
+			if(node.getAttribute("src") == src){
+				return node;
+			}
+		}
+		var node = Lib.document.createElement("script");
+		node.setAttribute("src", src);
+		head.appendChild(node);
+
+		return cast(node);
+	}
+	/**
+	 * Get the html page base tag
+	 */
+	public static function getBaseTag():Null<String>{
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var baseNodes = Lib.document.getElementsByTagName("base");
+		if (baseNodes.length > 0){
+			return baseNodes[0].getAttribute("href");
+		}
+		else{
+			return null;
+		}
+	}
+	/**
+	 * Add a base tag with the given href param
+	 * @param	href 			String containing the URL of the base for the html page
+	 */
+	public static function setBaseTag(href:String){
+		// browse all tags in the head section and check if it a base tag is already set
+		var head = Lib.document.getElementsByTagName("head")[0];
+		var baseNodes = Lib.document.getElementsByTagName("base");
+		if (baseNodes.length > 0){
+			trace("Warning: base tag already set in the head section. Current value (\""+baseNodes[0].getAttribute("href")+"\") will be replaced by \""+href+"\"");
+			baseNodes[0].setAttribute("href", href);
+		}
+		else{
+			var node = Lib.document.createElement("base");
+			node.setAttribute("href", href);
+			node.setAttribute("target", "_self");
+			if (head.childNodes.length>0)
+				head.insertBefore(node, head.childNodes[0]);
+			else
+				head.appendChild(node);
+		}
+	}
+
 }

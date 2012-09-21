@@ -28,10 +28,38 @@ import org.slplayer.component.ui.DisplayObject;
  */
 class Panel extends DisplayObject
 {
-	static inline var CSS_CLASS_HEADER:String = "panel-header";
-	static inline var CSS_CLASS_BODY:String = "panel-body";
-	static inline var CSS_CLASS_FOOTER:String = "panel-footer";
-
+	/**
+	 * default class name for the header
+	 * it will be used if you do not specify a data-panel-header-class-name attribute
+	 */
+	public static inline var DEFAULT_CSS_CLASS_HEADER = "panel-header";
+	/**
+	 * default class name for the body
+	 * it will be used if you do not specify a data-panel-body-class-name attribute
+	 */
+	public static inline var DEFAULT_CSS_CLASS_BODY = "panel-body";
+	/**
+	 * default class name for the footer
+	 * it will be used if you do not specify a data-panel-footer-class-name attribute
+	 */
+	public static inline var DEFAULT_CSS_CLASS_FOOTER = "panel-footer";
+	/**
+	 * name of the attribute to pass the header css class name as a param 
+	 */
+	public static inline var ATTR_CSS_CLASS_HEADER = "data-panel-header-class-name";
+	/**
+	 * name of the attribute to pass the body css class name as a param 
+	 */
+	public static inline var ATTR_CSS_CLASS_BODY = "data-panel-body-class-name";
+	/**
+	 * name of the attribute to pass the footer css class name as a param 
+	 */
+	public static inline var ATTR_CSS_CLASS_FOOTER = "data-panel-footer-class-name";
+	/**
+	 * name of the attribute to configure if the panel is horizontal or vertical
+	 * value can be "true" or "false", default is "false"
+	 */
+	public static inline var ATTR_IS_HORIZONTAL = "data-panel-is-horizontal";
 	/**
 	 * is the layer vertical or horizontal
 	 * default is vertical
@@ -54,56 +82,87 @@ class Panel extends DisplayObject
 	 */
 	public function new(rootElement:HtmlDom, SLPId:String){
 		super(rootElement, SLPId);
-		haxe.Firebug.redirectTraces();
 		var _this_ = this;
-		untyped __js__("window.addEventListener('resize', function(e){_this_.redraw()});");
+#if js
+		untyped __js__("window.addEventListener('resize', function(e){_this_.redraw();});");
+#else
+		Lib.window.addEventListener('resize', function(e){redraw();});
+#end
+		// do not work: Lib.document.addEventListener("resize", redraw, false);
+		// do not compile: Lib.window.addEventListener("resize", redraw, false);
+		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
 	}
 	/**
 	 * init the component
 	 */
 	override public function init() : Void { 
 		super.init();
-		trace("Panel init");
 
 		// retrieve references to the elements
-		header = DomTools.getSingleElement(rootElement, CSS_CLASS_HEADER, false);
-		body = DomTools.getSingleElement(rootElement, CSS_CLASS_BODY, true);
-		footer = DomTools.getSingleElement(rootElement, CSS_CLASS_FOOTER, false);
+		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_HEADER);
+		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_HEADER;
+		header = DomTools.getSingleElement(rootElement, cssClassName, false);
+		
+		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_BODY);
+		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_BODY;
+		body = DomTools.getSingleElement(rootElement, cssClassName, true);
+		
+		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_FOOTER);
+		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_FOOTER;
+		footer = DomTools.getSingleElement(rootElement, cssClassName, false);
 
 		// attributes
-		if (rootElement.getAttribute("data-is-horizontal") == "true")
+		if (rootElement.getAttribute(ATTR_IS_HORIZONTAL) == "true")
 			isHorizontal = true;
 		else
 			isHorizontal = false;
 
 		// redraw
-		redraw();
+		DomTools.doLater(redraw);
 	}
 	/**
 	 * computes the size of each element
 	 */
-	public function redraw(dummy=null){
-		trace("Panel redraw");
+	public function redraw(){
+		trace("redraw ");
 		var bodySize:Int;
+		var boundingBox = DomTools.getElementBoundingBox(rootElement);
 		if (isHorizontal){
-			bodySize = rootElement.clientWidth;
-			if (header != null){
-				bodySize -= header.clientWidth;
-			}
+			var margin = (rootElement.offsetWidth - rootElement.clientWidth);
+			var bodyMargin = (body.offsetWidth - body.clientWidth);
+
+			bodySize = boundingBox.w;
+			bodySize += bodyMargin;
+			bodySize -= margin;
+			bodySize -= body.offsetLeft;
+
 			if (footer != null){
-				bodySize -= footer.clientWidth;
+				var footerMargin = (footer.offsetWidth - footer.clientWidth);
+				var boundingBox = DomTools.getElementBoundingBox(footer);
+				bodySize -= boundingBox.w;
+				bodySize -= footerMargin;
 			}
-			body.style.width = (bodySize-1)+"px";
+			body.style.width = bodySize+"px";
 		}
 		else{
-			bodySize = rootElement.clientHeight;
-			if (header != null){
-				bodySize -= header.clientHeight;
-			}
+			var margin = (rootElement.offsetHeight - rootElement.clientHeight);
+			var bodyMargin = (body.offsetHeight - body.clientHeight);
+
+			bodySize = boundingBox.h;
+			bodySize += bodyMargin;
+			bodySize -= margin;
+			bodySize -= body.offsetTop;
+			// case of a pannel which parent is not positioned in absolute, does not initiate the flow 
+			bodySize += boundingBox.y;
+
 			if (footer != null){
-				bodySize -= footer.clientHeight;
+				var footerMargin = (footer.offsetHeight - footer.clientHeight);
+				var boundingBox = DomTools.getElementBoundingBox(footer);
+				bodySize -= boundingBox.h;
+				bodySize -= footerMargin;
 			}
-			body.style.height = (bodySize-1)+"px";
+			bodySize--;
+			body.style.height = bodySize+"px";
 		}
 	}
 }

@@ -1,4 +1,4 @@
-.body{
+body{
 	font-family: Verdana, Arial;
 	font-size: 14pt;
 }
@@ -41,6 +41,12 @@ h1{
     overflow: auto;
 }
 .draggable-phantom{
-//    border: 1px solid red !important;
+/*
+    border: 1px solid red !important;
     background-color: DarkRed !important;
+    width: 2px;
+    height: 2px;
+    border-width: 0px;
+*/
+    opacity: .5 !important;
 }

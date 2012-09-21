@@ -66,6 +66,10 @@ class Builder
 	 */
 	static private var sourceFilePath : String;
 	/**
+	 * Keep a reference to the path of the HTML output file.
+	 */
+	static private var outputFilePath : String;
+	/**
 	 * Keep a copy of the original HTML Source.
 	 */
 	static private var sourceHTMLDocument : Document;
@@ -102,15 +106,6 @@ class Builder
 	 * The expressions array of the main() method.
 	 */
 	static private var mainExprs : Array<haxe.macro.Expr>;
-	/**
-	 * The expressions array of the init() method.
-	 */
-	static private var initExprs : Array<haxe.macro.Expr>;
-	/**
-	 * The expressions array of the initHtmlRootElementContent() method.
-	 */
-	static private var initHtmlRootElementContentExprs : Array<haxe.macro.Expr>;
-	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// MACROS
@@ -122,19 +117,23 @@ class Builder
 	 * checking on the HTML document content, the use of the components...
 	 * 
 	 * @param	htmlSourcePath	The path to the application HTML source page. By default "./index.html".
+	 * @param	htmlOutputPath	The path to the generated output HTML file when using the disableEmbedHtml 
+	 * option. By default, will be the same as the js/swf/... output file but with the .html extension.
 	 */
-	@:macro static public function create(?htmlSourcePath:String="index.html") : Void
+	@:macro static public function create(?htmlSourcePath:String="index.html", ?htmlOutputPath:Null<String>) : Void
 	{
 		//try
 		//{
 		//TODO debug error catching: why some errors in component are catch and other not ?
 			sourceFilePath = htmlSourcePath;
+			outputFilePath = htmlOutputPath;
 			
 			//Initial check
 			if (!sys.FileSystem.exists(sourceFilePath))
 				throw sourceFilePath + " not found !";
 			
 			var htmlSource : String = sys.io.File.getContent(sourceFilePath);
+			//var htmlSource : String = '<html>	<head>		<script data-slp-use="org.silex.components.Page"></script>		<script data-slp-use="org.silex.components.Layer"></script>		<script data-slp-use="org.silex.components.LinkToPage"></script>		<script data-slp-use="org.silex.components.LinkClosePage"></script>		<script data-slp-use="org.silex.components.SoundOn"></script>		<script data-slp-use="org.silex.components.SoundOff"></script>		<script data-slp-use="org.silex.components.EmailForm"></script>		<script data-slp-use="org.silex.components.SWFImport"></script>		<link rel="stylesheet" type="text/css" href="app.css" />		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 		<meta name="HomePage" content="page1"/>	</head>	<body>		<div class="main-container">			<!-- POP UPs -->			<div class="popup-container">				<a name="popup1" class="Page">Popup 1</a>				<div class="Layer popup1">					<p>Test of a popup. <br/><a href="http://itunes.apple.com/fr/artist/europa-apps/id481656283?uo=4" target="_blank">Voir les applis sur l app store</a>					</p>					<a href="#popup1" class="LinkClosePage">						<img src="assets/close.png" class="illustration" />					</a>					<div class="EmailForm" data-service-url="http://www.europa-apps.com/wpsb-opt-in.webservice.php">						<input type="text" class="email-form-text-input" />						<input type="submit" value="Submit" class="email-form-submit-button" />						<p class="email-form-messages-zone email-form-error-message email-form-success-message" />					</div>				</div>			</div>			<!-- PAGES -->			<div class="pages-container">				<!-- INTERFACE -->				<img src="assets/son-on-off.png" class="SoundOn" />				<img src="assets/son-on-off.png" class="SoundOff" />				<a href="#popup1" target="_top" class="LinkToPage">					<img src="assets/open_pop-up01.png" />				</a>				<!-- SEQ 1 -->				<a name="page1" class="Page">Page 1</a>				<div class="Layer page1">					<!-- PERSO -->					<!-- BACKGROUND -->					<object class="SWFImport" 						data="illustrations/seq1.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page1-txt.mp3" type="audio/mp3" />					</audio>					<audio autoplay="autoplay" loop="loop">						<source src="sounds/page1-bg.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page2" class="LinkToPage next">						<img src="assets/next.png" />					</a>				</div>				<!-- SEQ 2 -->				<a name="page2" class="Page">Page 2</a>				<div class="Layer page2">					<!-- BACKGROUND -->					<object class="SWFImport"						data="illustrations/seq2.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page2-txt.mp3" type="audio/mp3" />					</audio>					<audio autoplay="autoplay" loop="loop">						<source src="sounds/page2-bg.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page1" class="LinkToPage previous">						<img src="assets/previous.png" />					</a>					<a href="#page3" class="LinkToPage next">						<img src="assets/next.png" />					</a>				</div>				<!-- PAGE 3 -->				<a name="page3" class="Page">Page 3</a>				<div class="Layer page3">					<!-- BACKGROUND -->					<object class="SWFImport"						data="illustrations/seq3.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page3-txt.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page2" class="LinkToPage previous">						<img src="assets/previous.png" />					</a>				</div>				<div class="Layer page2 page3 page2-3">					<p>TEST SUR 2 PAGES, PAGE 2 et 3</p>				</div>			</div>		</div>	</body></html>';
 			
 			//init the DOM tree from source HTML file content
 			cocktail.Lib.document.documentElement.innerHTML = htmlSource;
@@ -237,13 +236,13 @@ class Builder
 			var metaValue = metaElt.getAttribute("content");
 			
 			#if slpdebug
-				trace("Found meta parameter "+metaKey+" => "+metaValue);
+				neko.Lib.println("Found meta parameter "+metaKey+" => "+metaValue);
 			#end
 			
 			if ( Lambda.exists( SLP_COMPILER_FLAGS , function(s:String) { return s == metaKey; } ) && metaValue == "true" || metaValue == CUSTOM_COMPILER_FLAG_VALUE )
 			{
 				#if slpdebug
-					trace("Setting flag " + metaKey);
+					neko.Lib.println("Setting flag " + metaKey);
 				#end
 				
 				//define the tag for the compilation
@@ -316,7 +315,7 @@ class Builder
 				for (cmpClassName in cmpClassNames)
 				{
 					#if slpdebug
-						trace("component found => "+cmpClassName);
+						neko.Lib.println("component found => "+cmpClassName);
 					#end
 					
 					declaredComponents.set( cmpClassName, scriptEltAttrs);
@@ -337,7 +336,7 @@ class Builder
 					appScriptInclusionFound = true;
 					
 					#if slpdebug
-						trace("Found application script inclusion ");
+						neko.Lib.println("Found application script inclusion ");
 					#end
 				}
 				
@@ -356,7 +355,7 @@ class Builder
 			cocktail.Lib.document.getElementsByTagName("head")[0].appendChild(appScriptInclusionTag);
 			
 			#if slpdebug
-				trace("Adding <script src='"+applicationFileName+"'></script>");
+				neko.Lib.println("Adding <script src='"+applicationFileName+"'></script>");
 			#end
 		}
 	}
@@ -533,12 +532,6 @@ class Builder
 							
 							if (fields[fc].name == "main")
 								mainExprs = exprs;
-							
-							if (fields[fc].name == "init")
-								initExprs = exprs;
-							
-							if (fields[fc].name == "initHtmlRootElementContent")
-								initHtmlRootElementContentExprs = exprs;
 						
 						default : 
 					}
@@ -557,24 +550,21 @@ class Builder
 		
 		if (!Context.defined('disableEmbedHtml'))
 		{
-			//add the _htmlBody static var to the SLPlayer class
-			var bodyInnerHtml = haxe.Serializer.run("");
+			//add the _htmlDocumentElement static var to the SLPlayer class
+			var documentInnerHtml = haxe.Serializer.run("");
 			
-			if (cocktail.Lib.document.body.innerHTML != null)
+			if (cocktail.Lib.document.documentElement.innerHTML != null)
 			{
-				bodyInnerHtml = haxe.Serializer.run(cocktail.Lib.document.body.innerHTML);
+				documentInnerHtml = haxe.Serializer.run(cocktail.Lib.document.documentElement.innerHTML);
 			}
 			
-			var htmlBodyFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(bodyInnerHtml)), pos : pos }]), pos : pos };
+			var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
 			
-			fields.push( { name : "_htmlBody", doc : null, meta : [], access : [APrivate, AStatic], kind : FVar(null, htmlBodyFieldValue), pos : pos } );
+			fields.push( { name : "_htmlDocumentElement", doc : null, meta : [], access : [APrivate, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
 				
 			#if slpdebug
-				trace("bodyInnerHtml extracted and set on SLPlayer with a size of "+bodyInnerHtml.length);
+				neko.Lib.println("documentInnerHtml extracted and set on SLPlayer with a size of "+documentInnerHtml.length);
 			#end
-			
-			//add initalization expr of htmlRootElement.innerHTML to _htmlBody
-			initHtmlRootElementContentExprs.push({ expr : EBinop(OpAssign, { expr : EField( { expr : EConst(CIdent("htmlRootElement")), pos : pos }, "innerHTML"), pos : pos }, { expr : EConst(CIdent("_htmlBody")), pos : pos } ), pos : pos });
 		}
 	}
 	
@@ -617,7 +607,7 @@ class Builder
 			}
 			
 			#if slpdebug
-				trace("added call to registerComponent("+cmpClassName+")");
+				neko.Lib.println("added call to registerComponent("+cmpClassName+")");
 			#end
 		}
 	}
@@ -657,23 +647,6 @@ class Builder
 		{
 			packForJs();
 		}
-		
-		//launch method call
-		//FIXME should this really be managed by SLPLayer ? we could also do if Lib.document.body != null => start, else on Load...
-		if (Context.defined('js') && Context.defined('disableEmbedHtml')) //the application is included in an existing HTML page
-		{
-			pos = Context.currentPos();
-			
-			//add this call in init() method :  Lib.window.onload = function (e:Event) 	{ newInstance.launch(appendTo); };
-			initExprs.push( { expr : EBinop(OpAssign, { expr : EField( { expr : EField( { expr : EConst(CType("Lib")), pos : pos }, "window"), pos : pos }, "onload"), pos : pos }, { expr : EFunction(null, { args : [ { name : "e", type : TPath( { name: "Event", pack : [], params : [], sub : null } ), opt : false, value : null } ], expr : { expr : EBlock([ { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } ]), pos : pos }, params : [], ret : null } ), pos : pos } ), pos : pos } );
-		}
-		else
-		{
-			pos = Context.currentPos();
-			
-			//add this call in init method : newInstance.launch(appendTo);
-			initExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent("newInstance")), pos : pos }, "launch"), pos : pos }, [ { expr : EConst(CIdent("appendTo")), pos : pos } ]), pos : pos } );
-		}
 	}
 	
 	/**
@@ -712,16 +685,16 @@ class Builder
 				//FIXME use constants
 				case 3:		//Node.TEXT_NODE
 					
-					switch (elt.coreStyle.whiteSpace)
+					switch (elt.style.whiteSpace)
 					{
-						case normal, nowrap: // both lines and spaces
+						case "normal", "nowrap": // both lines and spaces
 							
 							var er1 : EReg = ~/[ \t]+/;
 							var er2 : EReg = ~/  +/;
 							
 							nc.nodeValue = er2.replace( er1.replace( nc.nodeValue , " " ) , " " );
 						
-						case preLine: // spaces
+						case "pre-line": // spaces
 							
 							var er1 : EReg = ~/ *$^ */m;
 							var er2 : EReg = ~/[ \t]+/;
@@ -766,7 +739,7 @@ class Builder
 		if (!Context.defined('js-modern'))
 		{
 			#if slpdebug
-				trace("Setting js-modern mode.");
+				neko.Lib.println("Setting js-modern mode.");
 			#end
 			haxe.macro.Compiler.define("js-modern");
 		}
@@ -784,26 +757,31 @@ class Builder
 			}
 			
 			#if slpdebug
-				trace("Setting @:expose("+jsExposedName+") meta tag on SLPlayer class.");
+				neko.Lib.println("Setting @:expose("+jsExposedName+") meta tag on SLPlayer class.");
 			#end
-			
+
 			Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
 		}
-		
-		
+
 		if (Context.defined('disableEmbedHtml'))
 		{
 			//generates the "compiled" HTML file if not embed
-			var outputDirectory = "./";
-			
-			if (output.lastIndexOf('/') != null)
-				outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
-			
+
+			if (outputFilePath == null)
+			{
+				var outputDirectory = "./";
+
+				if (output.lastIndexOf('/') != null)
+					outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
+
+				outputFilePath = outputDirectory + outputFileName + ".html";
+			}
+
 			#if slpdebug
-				trace("Saving "+outputDirectory + outputFileName+".html");
+				neko.Lib.println("Saving "+outputFilePath);
 			#end
-			
-			sys.io.File.saveContent( outputDirectory + outputFileName + ".html" , cocktail.Lib.document.documentElement.innerHTML );
+
+			sys.io.File.saveContent( outputFilePath , cocktail.Lib.document.documentElement.innerHTML );
 		}
 	}
 	
@@ -890,7 +868,8 @@ class Builder
 		
 		for ( className in { iterator : declaredComponents.keys } )
 		{
-			if ( className.endsWith( classTag ) )
+			var a = className.split(".");
+			if (a[a.length-1] == classTag)
 				classNames.add( className );
 		}
 		

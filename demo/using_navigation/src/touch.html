@@ -1,0 +1,44 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8"></meta>
+	<title>Menu example</title>
+	<script data-slp-use="org.slplayer.component.group.Group"></script>
+	<script data-slp-use="org.slplayer.component.navigation.Page"></script>
+	<script data-slp-use="org.slplayer.component.navigation.Layer"></script>
+	<script data-slp-use="org.slplayer.component.navigation.link.LinkToPage"></script>
+	<script data-slp-use="org.slplayer.component.navigation.link.TouchLink"></script>
+	<meta name="initialPageName" content="welcome"></meta>
+	<style type="text/css">
+		.container{
+		}
+		.Page{
+			display: none;
+		}
+		.traces{
+			width: 80%;
+			min-width: 0;
+			border: 2px solid;
+		}
+	</style>
+</head>
+<body>
+	<div class="Group container">
+		<h2>Navigation</h2>
+		<a href="#welcome" class="LinkToPage TouchLink" data-touch-type="left">Welcome</a>
+		<a href="#about" class="LinkToPage TouchLink" data-touch-type="right">About</a>
+		<a href="#test" class="LinkToPage TouchLink" data-touch-type="up">Test</a>
+		<h2>Pages</h2>
+		<a name="welcome" class="Page"></a>
+		<div class="Layer welcome"><br/>Welcome to the touch demo !<br/><br/>Please swipe left/right to test.<br/></div>
+
+		<a name="about" class="Page"></a>
+		<div class="Layer about"><br/>SLPlayer is © 2011-2012 Silex Labs and is released under the GPL License.<br/><br/></div>
+
+		<a name="test" class="Page"></a>
+		<div class="Layer test">SLPlayer touch demo<hr/>This is a test<br/>Here is a browse button <input type="file" /><br/><input type="button" value="Save"/><input type="button" value="Cancel"/></div>
+	</div>
+	<h2>Traces</h2>
+	<div id="haxe:trace" class="traces">
+	</div>
+</body>
+</html>

@@ -20,6 +20,7 @@ import js.Dom;
 import org.slplayer.util.DomTools;
 
 import org.slplayer.component.ui.DisplayObject;
+import org.slplayer.component.template.TemplateMacros;
 
 /**
  * list component
@@ -31,6 +32,7 @@ import org.slplayer.component.ui.DisplayObject;
  * 	selected index/item
  * 	selected indexes / items
  */
+@tagNameFilter("ul")
 class List<ElementClass> extends DisplayObject
 {
 	public static inline var LIST_SELECTED_ITEM_CSS_CLASS:String = "listSelectedItem";
@@ -73,47 +75,57 @@ class List<ElementClass> extends DisplayObject
 	/**
 	 * init the component
 	 * get elements by class names 
-	 * initializes the process of refreshing the list
+	 * you can now initialize the process of refreshing the list by calling redraw()
 	 */
 	override public function init() : Void
 	{ 
+		// init the parent class
 		super.init();
-
+		// store the template
 		listTemplate = rootElement.innerHTML;
-
-		// end init
-		redraw();
 	}
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
-	 */
+	 * this method calls reloadData which then calls doRedraw
+	 */ 
 	public function redraw()
 	{
-		trace("redraw "+" - "+Type.getClassName(Type.getClass(this)));
+		//trace("redraw "+" - "+Type.getClassName(Type.getClass(this)));
 
-		// refreh list data
+		// refresh list data
 		reloadData();
-
+	}
+	/**
+	 * redraw the list without calling reloadData
+	 */
+	public function doRedraw()
+	{
 		// redraw list content
 		var listInnerHtml:String = "";
 		var t = new haxe.Template(listTemplate);
 		for (elem in dataProvider)
 		{
-			listInnerHtml += t.execute(elem);
+			try{
+				listInnerHtml += t.execute(elem, TemplateMacros);
+			}
+			catch(e:Dynamic){
+				throw("Error: an error occured while interpreting the template - "+listTemplate+" - for the element "+elem);
+			}
 		}
 		rootElement.innerHTML = listInnerHtml;
 
+		
 		attachListEvents();
 		updateSelectionDisplay([selectedItem]);
 	}
 	/**
-	 * refreh list data, but do not redraw display
-	 * to be overriden to handle the model 
-	 * or do nothing if you manipulate the list and dataProvider y composition
+	 * refreh list data, and then redraw the display by calling doRedraw
+	 * to be overriden to handle the model or do nothing if you manipulate the list and dataProvider by composition
+	 * if you override this, either call super.reloadData() to redraw immediately, or call doRedraw() when the data is ready
 	 */
 	public function reloadData()
 	{
-		
+		doRedraw();
 	}
 	/**
 	 * attach mouse events to the list and the items
@@ -155,7 +167,7 @@ class List<ElementClass> extends DisplayObject
 	 */
 	private function updateSelectionDisplay(selection:Array<ElementClass>)
 	{
-		trace("updateSelectionDisplay "+selection+" - "+Type.getClassName(Type.getClass(this)));
+		//trace("updateSelectionDisplay "+selection+" - "+Type.getClassName(Type.getClass(this)));
 
 		// handle the selected style 
 		var children = rootElement.getElementsByTagName("li");
@@ -223,8 +235,8 @@ class List<ElementClass> extends DisplayObject
 	 */
 	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> 
 	{
-		trace("setSelectedItem "+selected+" - "+Type.getClassName(Type.getClass(this)));
-		DomTools.inspectTrace(selected); 
+		//trace("setSelectedItem "+selected+" - "+Type.getClassName(Type.getClass(this)));
+		//DomTools.inspectTrace(selected, "org.slplayer.component.list.List"); 
 		if (selected != selectedItem)
 		{
 			if (selected != null)
@@ -259,7 +271,7 @@ class List<ElementClass> extends DisplayObject
 	 */
 	function setSelectedIndex(idx:Int):Int 
 	{
-		trace("setSelectedIndex "+idx+" - "+Type.getClassName(Type.getClass(this)));
+		//trace("setSelectedIndex "+idx+" - "+Type.getClassName(Type.getClass(this)));
 		if (idx != _selectedIndex)
 		{
 			if (idx >= 0 && dataProvider.length > idx && dataProvider[idx] != null)

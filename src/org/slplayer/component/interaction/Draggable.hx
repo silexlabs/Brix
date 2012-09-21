@@ -21,6 +21,9 @@ import js.Dom;
 import org.slplayer.util.DomTools;
 import org.slplayer.component.ui.DisplayObject;
 
+import org.slplayer.component.group.IGroupable;
+using org.slplayer.component.group.IGroupable.Groupable;
+
 enum DraggableState {
 	none;
 	dragging;
@@ -29,30 +32,84 @@ typedef DropZone = {
 	parent:HtmlDom,
 	position:Int
 }
+typedef DraggableEvent = {
+	dropZone : Null<DropZone>,
+	target: HtmlDom,
+	draggable: Draggable
+}
 
 /**
  * Draggable class
  * Attach mouse events to a "drag zone" and make it drag/drop the "Draggable" node
  * If drop zones are provided, display the best drop zone found and enable only these zones to be parents
  * define the drop zones with a "drop-zone" class name on the elements, or by setting the dropZones attribute
+ * FIXME: Not compatible with android native browser because of custom events
  */
-class Draggable extends DisplayObject
+class Draggable extends DisplayObject, implements IGroupable
 {
+	/**
+	 * the group element set by the Group class
+	 * implementation of IGroupable
+	 */
+	public var groupElement:HtmlDom;
+
 	////////////////////////////////////
 	// events
 	////////////////////////////////////
-	static inline var CSS_CLASS_DRAGZONE:String = "draggable-dragzone";
-	static inline var CSS_CLASS_DROPZONE:String = "draggable-dropzone";
-	static inline var CSS_CLASS_PHANTOM:String = "draggable-phantom";
+	/**
+	 * class name to set on the node which is the drag zone (knob or header)
+	 */
+	public static inline var CSS_CLASS_DRAGZONE = "draggable-dragzone";
+	/**
+	 * default class name for the drop zones, used if you do not specify a data-dropzones-class-name attribute
+	 */
+	public static inline var DEFAULT_CSS_CLASS_DROPZONE = "draggable-dropzone";
+	/**
+	 * default class name for the phantom style
+	 * the phantom is the visualization of the dragged element, while dragging
+	 */
+	public static inline var DEFAULT_CSS_CLASS_PHANTOM = "draggable-phantom";
 
-	static inline var ATTR_DROPZONE:String = "data-dropzones-class-name";
+	/**
+	 * name of the attribute to pass the phantomClassName param to this class
+	 * the phantomClassName class name is used to skin the phantom
+	 */
+	public static inline var ATTR_PHANTOM = "data-phantom-class-name";
+	/**
+	 * name of the attribute to pass the dropZonesClassName param to this class
+	 * the dropZonesClassName class name is to be set on the nodes which accept drops
+	 */
+	public static inline var ATTR_DROPZONE = "data-dropzones-class-name";
 
-	static inline var EVENT_DRAG:String = "dragEventDrag";
-	static inline var EVENT_DROPPED:String = "dragEventDropped";
+	/**
+	 * name of the event dispatched on rootElement when an the element starts to be dragged
+	 */
+	public static inline var EVENT_DRAG = "dragEventDrag";
+	/**
+	 * name of the event dispatched on rootElement when the dragged element is dropped
+	 */
+	public static inline var EVENT_DROPPED = "dragEventDropped";
+	/**
+	 * name of the event dispatched on rootElement when the dragged element is moved
+	 */
+	public static inline var EVENT_MOVE = "dragEventMove";
+	/**
+	 * callback used to add/remove events to the html body
+	 */
+	private var moveCallback:MouseEvent->Void;
+	/**
+	 * callback used to add/remove events to the html body
+	 */
+	private var mouseUpCallback:MouseEvent->Void;
 	/**
 	 * div element used to show where the element is about to be dropped
 	 */
 	private var phantom:HtmlDom;
+	/**
+	 * div element used to compute the best drop zone
+	 * it is placed at every position and its distance to mouse cursor is measured
+	 */
+	private var miniPhantom:HtmlDom;
 	/**
 	 * state of the draggable element (none, dragging)
 	 */
@@ -64,12 +121,17 @@ class Draggable extends DisplayObject
 	/**
 	 * html elment instances
 	 */
-	public var dropZones:HtmlCollection<js.HtmlDom>;
+	public var dropZones:HtmlCollection<HtmlDom>;
 	/**
-	 * class name to define drop zones
+	 * class name to select drop zones 
 	 * @default	dropzone 
 	 */
 	public var dropZonesClassName:String;
+	/**
+	 * class name to select the phantom 
+	 * @default	dropzone 
+	 */
+	public var phantomClassName:String;
 	/**
 	 * the latest found best drop zone
 	 * it contains the phantom HTML element
@@ -105,15 +167,29 @@ class Draggable extends DisplayObject
 	{
 		super(rootElement, SLPId);
 
+		// implementation of IGroupable
+		startGroupable();
+		if (groupElement == null){
+			groupElement = Lib.document.body;
+		}
+
 		// init
 		state = none;
+
+		// retrieve atribute of the html dom node 
+		phantomClassName = rootElement.getAttribute(ATTR_PHANTOM);
+
+		// default value
+		if (phantomClassName == null || phantomClassName == "")
+			phantomClassName = DEFAULT_CSS_CLASS_PHANTOM;
 
 		// retrieve atribute of the html dom node 
 		dropZonesClassName = rootElement.getAttribute(ATTR_DROPZONE);
 
 		// default value
 		if (dropZonesClassName == null || dropZonesClassName == "")
-			dropZonesClassName = CSS_CLASS_DROPZONE;
+			dropZonesClassName = DEFAULT_CSS_CLASS_DROPZONE;
+
 	}
 	/**
 	 * init the component
@@ -121,10 +197,10 @@ class Draggable extends DisplayObject
 	override public function init() : Void 
 	{ 
 		super.init();
-		trace("Draggable init");
 
 		// create the phantom
 		phantom = Lib.document.createElement("div");
+		miniPhantom = Lib.document.createElement("div");
 
 		// retrieve references to the elements
 		dragZone = DomTools.getSingleElement(rootElement, CSS_CLASS_DRAGZONE, false);
@@ -132,13 +208,15 @@ class Draggable extends DisplayObject
 			dragZone = rootElement;
 
 		// retrieve references to the elements
-		dropZones = Lib.document.body.getElementsByClassName(dropZonesClassName);
+		dropZones = groupElement.getElementsByClassName(dropZonesClassName);
 		if (dropZones.length == 0)
 			dropZones[0] = rootElement.parentNode;
 
 		// attach the events
-		dragZone.onmousedown = startDrag;
-		dragZone.onmouseup = stopDrag;
+		dragZone.addEventListener("mousedown", startDrag, false);
+		//dragZone.onmouseup = stopDrag;
+		mouseUpCallback = callback(stopDrag);
+		Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
 		dragZone.style.cursor = "move";
 	}
 	/**
@@ -167,11 +245,10 @@ class Draggable extends DisplayObject
 	/**
 	 * init phantom according to root element properties
 	 */
-	private function initPhantomStyle()
+	private function initPhantomStyle(phantom:HtmlDom)
 	{
-
+#if js
 		var computedStyle:Style = untyped __js__("window.getComputedStyle(this.rootElement, null)");
-		trace("initPhantomStyle "+computedStyle);
 
 		for (styleName in Reflect.fields(computedStyle)){
 			// retrieve the computed properties
@@ -186,7 +263,9 @@ class Draggable extends DisplayObject
 			//DomTools.inspectTrace(val);
 			Reflect.setField(phantom.style, styleName, val);
 		}
-		phantom.className = rootElement.className + " " + CSS_CLASS_PHANTOM;
+#end
+		//trace("initPhantomStyle "+computedStyle.position+" - "+phantom.style.position);
+		phantom.className = rootElement.className + " " + phantomClassName;
 	}
 	/**
 	 * init phantom according to root element properties
@@ -204,9 +283,8 @@ class Draggable extends DisplayObject
 	 * attach an onmousemove event to the body
 	 * memorize the rootElement style values and prepare it to be moved
 	 */
-	private function startDrag(e:js.Event)
+	private function startDrag(e:MouseEvent)
 	{
-		trace("Draggable startDrag "+state);
 		if (state == none)
 		{
 			state = dragging;
@@ -214,21 +292,29 @@ class Draggable extends DisplayObject
 			initialY = rootElement.offsetTop;
 			initialMouseX = e.clientX;
 			initialMouseY = e.clientY;
-			initPhantomStyle();
+			initPhantomStyle(phantom);
+			initPhantomStyle(miniPhantom);
 			initRootElementStyle();
 			//initialStylePosition = rootElement.style.position;
 
-			Lib.document.onmousemove = function(e){move(e);};
+			//Lib.document.onmousemove = function(e){move(e);};
+			moveCallback = callback(move);
+			Lib.document.body.addEventListener("mousemove", cast(moveCallback), false);
+
 			//rootElement.style.position = "absolute";
 			move(e);
 
 			// dispatch a custom event
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_DRAG, false, false, rootElement);
+			event.initCustomEvent(EVENT_DRAG, false, false, {
+				dropZone : bestDropZone,
+				target: rootElement,
+				draggable: this,
+			});
 			rootElement.dispatchEvent(event);
 		}
 		// prevent default behavior
-		untyped __js__ ("return false;");
+		e.preventDefault();
 	}
 	/**
 	 * stop dragging
@@ -236,48 +322,54 @@ class Draggable extends DisplayObject
 	 * if there is a best drop zone, set it as the parent of the component
 	 * reset the rootElement.style.position value to initial position
 	 */
-	public function stopDrag(e:js.Event)
+	public function stopDrag(e:MouseEvent)
 	{
-		trace("Draggable stopDrag droped! "+state);
 		if (state == dragging)
 		{
-			trace("Draggable stopDrag droped! "+bestDropZone);
 			// change parent node
 			if (bestDropZone != null)
 			{
 				rootElement.parentNode.removeChild(rootElement);
 				bestDropZone.parent.insertBefore(rootElement, bestDropZone.parent.childNodes[bestDropZone.position]);
-				trace("Draggable stopDrag droped! "+state);
 				
 				// dispatch a custom event
 				var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-				event.initCustomEvent(EVENT_DROPPED, false, false, bestDropZone.parent);
+				event.initCustomEvent(EVENT_DROPPED, false, false, {
+					dropZone : bestDropZone,
+					target: bestDropZone.parent,
+					draggable: this,
+				});
 				bestDropZone.parent.dispatchEvent(event);
 				
-				// dispatch a custom event
-				event = cast Lib.document.createEvent("CustomEvent");
-				event.initCustomEvent(EVENT_DROPPED, false, false, rootElement);
-				rootElement.dispatchEvent(event);
 			}
+			// dispatch a custom event
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_DROPPED, false, false, {
+				dropZone : bestDropZone,
+				target: rootElement,
+				draggable: this,
+			});
+			rootElement.dispatchEvent(event);
+
 			// reset state
 			state = none;
 			//rootElement.style.position = initialStylePosition;
 			resetRootElementStyle();
-			Lib.document.body.onmousemove = null;
+			Lib.document.body.removeEventListener("mousemove", cast(moveCallback), false);
+			// Leave the event, in case we miss the mouseup event (happens when the mouse leave the browser window while down)
+			// Lib.document.body.removeEventListener("mouseup", mouseUpCallback, false);
 			setAsBestDropZone(null);
 			// prevent default behavior
-			untyped __js__ ("return false;");
+			e.preventDefault();
 		}
-		untyped __js__ ("return true;");
 	}
 	/**
 	 * move during dragging
 	 * move the root element
 	 * look for closest drop zone if there are some
 	 */
-	public function move(e:js.Event)
+	public function move(e:MouseEvent)
 	{
-		// trace("Draggable move "+state);
 		if (state == dragging)
 		{
 			var x = e.clientX - initialMouseX + initialX;
@@ -285,6 +377,16 @@ class Draggable extends DisplayObject
 			rootElement.style.left = x + "px";
 			rootElement.style.top = y + "px";
 			setAsBestDropZone(getBestDropZone(e.clientX, e.clientY));
+
+			// dispatch a custom event
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_MOVE, false, false, {
+				dropZone : bestDropZone,
+				target: rootElement,
+				draggable: this,
+			});
+			rootElement.dispatchEvent(event);
+
 		}
 	}
 	/**
@@ -301,24 +403,42 @@ class Draggable extends DisplayObject
 				&& mouseY > zone.offsetTop && mouseY < zone.offsetTop + zone.offsetHeight )
 			{
 				var lastChildIdx:Int = 0;
+				var nearestDistance:Float = 999999999999;
 				// browse all children to see which one is after the desired zone
 				for (childIdx in 0...zone.childNodes.length){
 					var child = zone.childNodes[childIdx];
-
-					// do not take the phantom into account
-					//if (child.className == PHANTOM_CLASS_NAME)
-					//	continue;
-
-					// get the child which is after the mouse
-					if (mouseX > child.offsetLeft + Math.round(child.offsetWidth / 2))
+					// test the case before this child
+					zone.insertBefore(miniPhantom, child);
+					var bb = DomTools.getElementBoundingBox(miniPhantom);
+					var dist = computeDistance(bb, mouseX, mouseY);
+					if (dist < nearestDistance)
 					{
+						// new closest position
+						nearestDistance = dist;
 						lastChildIdx = childIdx;
 					}
 				}
+				// test the case of the last child
+				zone.appendChild(miniPhantom);
+				var bb = DomTools.getElementBoundingBox(miniPhantom);
+				var dist = computeDistance(bb, mouseX, mouseY);
+				if (dist < nearestDistance)
+				{
+					nearestDistance = dist;
+					lastChildIdx = zone.childNodes.length + 1;
+				}
+				zone.removeChild(miniPhantom);
 				return { parent: zone, position: lastChildIdx }
 			}
 		}
 		return null;
+	}
+	private function computeDistance(bb:{x:Int, y:Int, w:Int, h:Int},mouseX:Int, mouseY:Int) :Float
+	{
+		return Math.sqrt(
+			Math.pow((bb.x+bb.w/2.0)-mouseX, 2)
+			+ Math.pow((bb.y+bb.h/2.0)-mouseY, 2)
+		);
 	}
 	/**
 	 * keep a reference to closest drop zone
@@ -328,7 +448,6 @@ class Draggable extends DisplayObject
 	 */
 	public function setAsBestDropZone(zone:DropZone = null)
 	{
-		//trace("setAsBestDropZone "+zone.parent.style);
 		//DomTools.inspectTrace(zone.parent.style);
 		if (zone == bestDropZone)
 			return;

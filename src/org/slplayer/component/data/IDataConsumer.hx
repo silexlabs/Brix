@@ -24,6 +24,7 @@ import org.slplayer.component.data.IDataProvider;
  * A data consumer should implement to be compliant with data provider components.
  * 
  * note : this is a draft and may be abandonned / revised again in a near future.
+ * FIXME: Not compatible with android native browser because of custom events
  * 
  * @author Thomas Fétiveau
  */

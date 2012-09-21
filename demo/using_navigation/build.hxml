@@ -1,0 +1,14 @@
+################################
+## check the build_touch.hxml to compile all demos
+################################
+
+-js ./bin/touch.js
+-cp ../../src/
+-cp ../../../Cocktail/src/
+-debug
+-main org.slplayer.core.Application
+--macro org.slplayer.core.Builder.create('./src/touch.html')
+#-D slpdebug
+-D disableEmbedHtml
+-D stopOnError
+

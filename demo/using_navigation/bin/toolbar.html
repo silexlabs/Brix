@@ -1,0 +1,75 @@
+<HTML lang="en">
+<HEAD>
+	<META charset="utf-8"></META>
+	<TITLE>Menu example</TITLE>
+	<LINK href="toolbar.css" rel="stylesheet"></LINK>
+	
+	
+	
+	
+	<META name="initialPageName" content="welcome"></META>
+<SCRIPT src="toolbar.js"></SCRIPT></HEAD>
+
+</HTML><BODY>
+
+	<UL class="menu">
+	   <LI class="main"><A href="#sub-menu1" class="LinkToPage">File</A><A class="Page" name="sub-menu1"></A>
+			<DIV class="container-sub">
+				<UL class="Layer sub-menu1 sub">
+					<LI><A href="#toolbox" class="LinkToPage">Save</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">Save As</A></LI>
+				</UL>
+			</DIV>
+	   </LI>
+	   <LI class="main"><A href="#sub-menu2" class="LinkToPage">Edit</A><A class="Page" name="sub-menu2"></A>
+			<DIV class="container-sub">
+				<UL class="Layer sub-menu2 sub">
+					<LI><A href="#toolbox" class="LinkToPage">Cut</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">Copy</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">Paste</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">Select All</A></LI>
+				</UL>
+			</DIV>
+	   </LI>
+	   <LI class="main"><A href="#sub-menu3" class="LinkToPage">Search</A><A class="Page" name="sub-menu3"></A>
+			<DIV class="container-sub">
+				<UL class="Layer sub-menu3 sub">
+					<LI><A href="#toolbox" class="LinkToPage">Quick Find</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">Quick Find Next</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">Quick Find Previous</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">Find And Replace</A></LI>
+				</UL>
+			</DIV>
+	   </LI>
+	   <LI class="main"><A href="#sub-menu4" class="LinkToPage">Insert</A><A class="Page" name="sub-menu4"></A>
+			<DIV class="container-sub">
+				<UL class="Layer sub-menu4 sub-menu4-1 sub">
+					<LI><A href="#toolbox" class="LinkToPage">Snippet</A></LI>
+					<LI><A href="#sub-menu4-1" class="LinkToPage">Image &gt;</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">Table</A></LI>
+				</UL>
+				<A class="Page" name="sub-menu4-1"></A>
+				<UL class="Layer sub-menu4-1 sub sub-of-sub">
+					<LI><A href="#toolbox" class="LinkToPage">From File</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">From URL</A></LI>
+					<LI><A href="#toolbox" class="LinkToPage">From Picassa</A></LI>
+				</UL>
+			</DIV>
+	   </LI>
+	   <LI class="main"><A href="#sub-menu5" class="LinkToPage">Help</A><A class="Page" name="sub-menu5"></A>
+			<DIV class="container-sub">
+				<UL class="Layer sub-menu5 sub">
+					<LI><A href="#welcome" class="LinkToPage">Welcome page</A></LI>
+					<LI><A href="#about" class="LinkToPage">About</A></LI>
+				</UL>
+			</DIV>
+	   </LI>
+	</UL>
+	<A class="Page" name="welcome"></A>
+	<DIV class="Layer welcome"><BR></BR>Welcome to the Toolbar demo !<BR></BR><BR></BR>Please navigate through the toolbar menus and click on the menu items.<BR></BR></DIV>
+	<A class="Page" name="about"></A>
+	<DIV class="Layer about"><BR></BR>SLPlayer is © 2011-2012 Silex Labs and is released under the GPL License.<BR></BR><BR></BR></DIV>
+	<A class="Page" name="toolbox"></A>
+	<DIV class="Layer toolbox">Toolbox popup<HR></HR>Example of tool box (popup)<BR></BR>Save as: <INPUT type="file"/><BR></BR><INPUT type="button" value="Save"/><INPUT type="button" value="Cancel"/></DIV>
+
+</BODY>

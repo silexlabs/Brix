@@ -103,20 +103,19 @@ class GroupBuilder
 			if (childElt.nodeType != Lib.document.body.nodeType)
 				continue;
 			
-			if ( childElt.getAttribute("class") == null )
-				continue;
-			
-			for ( classAttr in childElt.getAttribute("class").split(" ") )
-			{
-				var potentialClasses = Builder.getClassNameFromClassTag(classAttr);
-				
-				if ( potentialClasses.length != 1 )
-					continue; //can't be a valid component class tag value
-				
-				if ( !MacroTools.is( switch( Context.getType(potentialClasses.first()) ) { case TInst( classRef , params ): classRef.get(); default : } , "org.slplayer.component.group.IGroupable" ) )
-					continue;
-				
-				groupables.add(childElt);
+			if ( childElt.getAttribute("class") != null ){
+				for ( classAttr in childElt.getAttribute("class").split(" ") )
+				{
+					var potentialClasses = Builder.getClassNameFromClassTag(classAttr);
+					
+					if ( potentialClasses.length != 1 ){
+						continue; //can't be a valid component class tag value
+					}
+					
+					if ( !MacroTools.is( switch( Context.getType(potentialClasses.first()) ) { case TInst( classRef , params ): classRef.get(); default : } , "org.slplayer.component.group.IGroupable" ) )
+						continue;
+					groupables.add(childElt);
+				}
 			}
 			
 			groupables = Lambda.concat(groupables, discoverGroupableChilds(directChilds[childCnt]));
