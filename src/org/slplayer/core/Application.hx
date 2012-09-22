@@ -250,13 +250,10 @@ import js.Dom;
 		
 		//call init on each component instances
 		callInitOnComponents();
-
-		// reset the registered components
-		registeredComponents = new Array();
 	}
 	
 	/**
-	 * This is a kind of factory method for all kinds of components (DisplayObjects and no DisplayObjects).
+	 * Creates the component instances in the entire DOM for a given component class.
 	 * 
 	 * @param	componentClassName the full component class name (with packages, for example : org.slplayer.component.player.ImagePlayer)
 	 */
@@ -424,6 +421,132 @@ import js.Dom;
 	}
 	
 	/**
+	 * Parses and initializes all declared components on a given node.
+	 * TODO find a way to reuse more code between application initialization stage and new node init at runtime. However, keep it as much performant as possible.
+	 * @param node:HtmlDom the node to initialize.
+	 */
+	public function initNode(node:HtmlDom):Void
+	{
+		if ( node.nodeType != Lib.document.body.nodeType )
+		{
+			// works only for elements
+			return;
+		}
+		
+		if ( node.getAttribute("data-" + SLPID_ATTR_NAME) != null )
+		{
+			// means that the node has already been initialized
+			return;
+		}
+		
+		if ( node.getAttribute("class") != null )
+		{
+			var classes = node.getAttribute("class").split(" ");
+			for (c in classes)
+			{
+				// TODO we may check the robustness of this if condition, a RegExp may be better here
+				if ( c.charCodeAt(0) >= 'A'.code && c.charCodeAt(0) <= 'Z'.code || c.lastIndexOf('.') > 0 && 
+				c.charCodeAt(c.lastIndexOf('.')+1) >= 'A'.code && c.charCodeAt(c.lastIndexOf('.')+1) <= 'Z'.code )
+				{
+					// then it's probably a component
+					// resolving component class
+					var componentClass = Type.resolveClass(c);
+
+					if (componentClass == null)
+					{
+						var rslErrMsg = "ERROR cannot resolve " + c;
+						#if stopOnError
+						throw(rslErrMsg);
+						#else
+						trace(rslErrMsg);
+						#end
+						return;
+					}
+					
+					// creation
+					var newDisplayObject;
+
+					#if !stopOnError
+					try
+					{
+					#end
+						
+						newDisplayObject = Type.createInstance( componentClass, [node, id] );
+						
+						#if slpdebug
+							trace("Successfuly created instance of "+c);
+						#end
+					
+					#if !stopOnError
+					}
+					catch ( unknown : Dynamic )
+					{
+						trace("ERROR while creating "+c+": "+Std.string(unknown));
+						var excptArr = haxe.Stack.exceptionStack();
+						if ( excptArr.length > 0 )
+						{
+							trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+						}
+					}
+					#end
+					
+					// initialization
+					#if !stopOnError
+					try
+					{
+					#end
+					
+						newDisplayObject.init();
+					
+					#if !stopOnError
+					}
+					catch (unknown : Dynamic)
+					{
+						trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(newDisplayObject))+": "+Std.string(unknown));
+						var excptArr = haxe.Stack.exceptionStack();
+						if ( excptArr.length > 0 )
+						{
+							trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+						}
+					}
+					#end
+				}
+			}
+		}
+		
+		for ( childCnt in 0...node.childNodes.length )
+		{
+			initNode(node.childNodes[childCnt]);
+		}
+	}
+	
+	/**
+	 * Removes all the component instances of a given node.
+	 * 
+	 * @param	node
+	 */
+	public function shutdownNode(node:HtmlDom):Void
+	{
+		if ( node.nodeType != Lib.document.body.nodeType )
+		{
+			// works only for elements
+			return;
+		}
+		
+		var comps:List<org.slplayer.component.ui.DisplayObject> = getAssociatedComponents(node, org.slplayer.component.ui.DisplayObject);
+		
+		for (c in comps)
+		{
+			c.remove();
+		}
+		
+		for ( childCnt in 0...node.childNodes.length )
+		{
+			shutdownNode(node.childNodes[childCnt]);
+		}
+	}
+	
+	/**
 	 * Adds a component instance to the list of associated component instances of a given node.
 	 * @param	node	the node we want to add an associated component instance to.
 	 * @param	cmp		the component instance to add.
@@ -466,8 +589,16 @@ import js.Dom;
 			// remove the component instance
 			associatedCmps = nodeToCmpInstances.get(nodeId);
 			var isError = !associatedCmps.remove(cmp);
-			if(isError){
+			if (isError)
+			{
 				throw("Could not find the component in the node's associated components list.");
+			}
+			if (associatedCmps.isEmpty())
+			{
+				// remove the node ID
+				node.removeAttribute("data-" + SLPID_ATTR_NAME);
+				// remove the empty list from nodeToCmpInstances
+				nodeToCmpInstances.remove(nodeId);
 			}
 		}
 		else
@@ -486,11 +617,12 @@ import js.Dom;
 
 		if (nodeId != null)
 		{
-			// remove the ID
+			// remove the node ID
 			node.removeAttribute("data-" + SLPID_ATTR_NAME);
 			// remove all component instances
 			var isError = !nodeToCmpInstances.remove(nodeId);
-			if(isError){
+			if (isError)
+			{
 				throw("Could not find the node in the associated components list.");
 			}
 		}

@@ -92,11 +92,22 @@ class DisplayObject implements IDisplayObject
 			SLPlayerComponent.checkRequiredParameters(Type.getClass(this) , rootElement);
 		#end
 		
-		Application.get(SLPlayerInstanceId).addAssociatedComponent(rootElement, this);
+		getSLPlayer().addAssociatedComponent(rootElement, this);
 	}
 	
 	/**
-	 * Tells if a given class is a DisplayObject. 
+	 * Removes the component from the application.
+	 */
+	public function remove():Void
+	{
+		onRemove();
+		
+		getSLPlayer().removeAssociatedComponent(rootElement,this);
+	}
+	
+	/**
+	 * Tells if a given class is a DisplayObject.
+	 * TODO cannot simply use Std.is here ?
 	 * 
 	 * @param	cmpClass	the Class to check.
 	 * @return	Bool		true if DisplayObject is in the Class inheritance tree.
@@ -140,4 +151,9 @@ class DisplayObject implements IDisplayObject
 	 * For specific initialization logic specific to your component class, override this method.
 	 */
 	public function init() : Void { }
+	
+	/**
+	 * Override this method if you need some special logic on your component when removing it.
+	 */
+	public function onRemove() : Void { }
 }
