@@ -692,6 +692,8 @@ showHelp()
 show...()
 */
 
+function addEventListener( event : String, listener: Event -> Void, useCapture : Bool ) : Void;
+
   // events
 var onload : Event -> Void;
 var onresize : Event -> Void;

@@ -1570,14 +1570,6 @@ org.slplayer.component.SLPlayerComponent.checkRequiredParameters = function(cmpC
 		if(elt.getAttribute(Std.string(r)) == null || StringTools.trim(elt.getAttribute(Std.string(r))) == "") throw Std.string(r) + " parameter is required for " + Type.getClassName(cmpClass);
 	}
 }
-org.slplayer.component.interaction = {}
-org.slplayer.component.interaction.DraggableState = $hxClasses["org.slplayer.component.interaction.DraggableState"] = { __ename__ : ["org","slplayer","component","interaction","DraggableState"], __constructs__ : ["none","dragging"] }
-org.slplayer.component.interaction.DraggableState.none = ["none",0];
-org.slplayer.component.interaction.DraggableState.none.toString = $estr;
-org.slplayer.component.interaction.DraggableState.none.__enum__ = org.slplayer.component.interaction.DraggableState;
-org.slplayer.component.interaction.DraggableState.dragging = ["dragging",1];
-org.slplayer.component.interaction.DraggableState.dragging.toString = $estr;
-org.slplayer.component.interaction.DraggableState.dragging.__enum__ = org.slplayer.component.interaction.DraggableState;
 org.slplayer.component.ui = {}
 org.slplayer.component.ui.IDisplayObject = function() { }
 $hxClasses["org.slplayer.component.ui.IDisplayObject"] = org.slplayer.component.ui.IDisplayObject;
@@ -1587,6 +1579,37 @@ org.slplayer.component.ui.IDisplayObject.prototype = {
 	rootElement: null
 	,__class__: org.slplayer.component.ui.IDisplayObject
 }
+org.slplayer.component.group = {}
+org.slplayer.component.group.IGroupable = function() { }
+$hxClasses["org.slplayer.component.group.IGroupable"] = org.slplayer.component.group.IGroupable;
+org.slplayer.component.group.IGroupable.__name__ = ["org","slplayer","component","group","IGroupable"];
+org.slplayer.component.group.IGroupable.__interfaces__ = [org.slplayer.component.ui.IDisplayObject];
+org.slplayer.component.group.IGroupable.prototype = {
+	groupElement: null
+	,__class__: org.slplayer.component.group.IGroupable
+}
+org.slplayer.component.group.Groupable = function() { }
+$hxClasses["org.slplayer.component.group.Groupable"] = org.slplayer.component.group.Groupable;
+org.slplayer.component.group.Groupable.__name__ = ["org","slplayer","component","group","Groupable"];
+org.slplayer.component.group.Groupable.startGroupable = function(groupable) {
+	var groupId = groupable.rootElement.getAttribute("data-group-id");
+	if(groupId == null) return;
+	var groupElements = js.Lib.document.getElementsByClassName(groupId);
+	if(groupElements.length < 1) {
+		haxe.Log.trace("WARNING: could not find the group component " + groupId,{ fileName : "IGroupable.hx", lineNumber : 57, className : "org.slplayer.component.group.Groupable", methodName : "startGroupable"});
+		return;
+	}
+	if(groupElements.length > 1) throw "ERROR " + groupElements.length + " Group components are declared with the same group id " + groupId;
+	groupable.groupElement = groupElements[0];
+}
+org.slplayer.component.interaction = {}
+org.slplayer.component.interaction.DraggableState = $hxClasses["org.slplayer.component.interaction.DraggableState"] = { __ename__ : ["org","slplayer","component","interaction","DraggableState"], __constructs__ : ["none","dragging"] }
+org.slplayer.component.interaction.DraggableState.none = ["none",0];
+org.slplayer.component.interaction.DraggableState.none.toString = $estr;
+org.slplayer.component.interaction.DraggableState.none.__enum__ = org.slplayer.component.interaction.DraggableState;
+org.slplayer.component.interaction.DraggableState.dragging = ["dragging",1];
+org.slplayer.component.interaction.DraggableState.dragging.toString = $estr;
+org.slplayer.component.interaction.DraggableState.dragging.__enum__ = org.slplayer.component.interaction.DraggableState;
 org.slplayer.component.ui.DisplayObject = function(rootElement,SLPId) {
 	this.rootElement = rootElement;
 	org.slplayer.component.SLPlayerComponent.initSLPlayerComponent(this,SLPId);
@@ -1621,6 +1644,8 @@ org.slplayer.component.ui.DisplayObject.prototype = {
 }
 org.slplayer.component.interaction.Draggable = function(rootElement,SLPId) {
 	org.slplayer.component.ui.DisplayObject.call(this,rootElement,SLPId);
+	org.slplayer.component.group.Groupable.startGroupable(this);
+	if(this.groupElement == null) this.groupElement = js.Lib.document.body;
 	this.state = org.slplayer.component.interaction.DraggableState.none;
 	this.phantomClassName = rootElement.getAttribute("data-phantom-class-name");
 	if(this.phantomClassName == null || this.phantomClassName == "") this.phantomClassName = "draggable-phantom";
@@ -1629,32 +1654,42 @@ org.slplayer.component.interaction.Draggable = function(rootElement,SLPId) {
 };
 $hxClasses["org.slplayer.component.interaction.Draggable"] = org.slplayer.component.interaction.Draggable;
 org.slplayer.component.interaction.Draggable.__name__ = ["org","slplayer","component","interaction","Draggable"];
+org.slplayer.component.interaction.Draggable.__interfaces__ = [org.slplayer.component.group.IGroupable];
 org.slplayer.component.interaction.Draggable.__super__ = org.slplayer.component.ui.DisplayObject;
 org.slplayer.component.interaction.Draggable.prototype = $extend(org.slplayer.component.ui.DisplayObject.prototype,{
 	setAsBestDropZone: function(zone) {
 		if(zone == this.bestDropZone) return;
 		if(this.bestDropZone != null) this.bestDropZone.parent.removeChild(this.phantom);
-		if(zone != null) zone.parent.insertBefore(this.phantom,zone.parent.childNodes[zone.position]);
+		if(zone != null) {
+			if(zone.parent.childNodes.length <= zone.position) zone.parent.appendChild(this.phantom); else zone.parent.insertBefore(this.phantom,zone.parent.childNodes[zone.position]);
+		}
 		this.bestDropZone = zone;
 	}
 	,computeDistance: function(bb,mouseX,mouseY) {
 		return Math.sqrt(Math.pow(bb.x + bb.w / 2.0 - mouseX,2) + Math.pow(bb.y + bb.h / 2.0 - mouseY,2));
+		var x = bb.x + bb.w / 2.0 + mouseX - this.initialMouseX - this.initialX;
+		var y = bb.y + bb.h / 2.0 + mouseY - this.initialMouseY - this.initialY;
+		return Math.sqrt(Math.pow(x - mouseX,2) + Math.pow(y - mouseY,2));
 	}
 	,getBestDropZone: function(mouseX,mouseY) {
-		var _g1 = 0, _g = this.dropZones.length;
+		var dropZones = this.groupElement.getElementsByClassName(this.dropZonesClassName);
+		if(dropZones.length == 0) dropZones[0] = this.rootElement.parentNode;
+		var _g1 = 0, _g = dropZones.length;
 		while(_g1 < _g) {
 			var zoneIdx = _g1++;
-			var zone = this.dropZones[zoneIdx];
-			if(mouseX > zone.offsetLeft && mouseX < zone.offsetLeft + zone.offsetWidth && mouseY > zone.offsetTop && mouseY < zone.offsetTop + zone.offsetHeight) {
+			var zone = dropZones[zoneIdx];
+			var boundingBox = org.slplayer.util.DomTools.getElementBoundingBox(zone);
+			var pos = org.slplayer.util.DomTools.localToGlobal(mouseX,mouseY,zone);
+			if(pos.x > boundingBox.x && pos.x < boundingBox.x + boundingBox.w && pos.y > boundingBox.y && pos.y < boundingBox.y + boundingBox.h) {
 				var lastChildIdx = 0;
-				var nearestDistance = 999999999999;
+				var nearestDistance = Math.POSITIVE_INFINITY;
 				var _g3 = 0, _g2 = zone.childNodes.length;
 				while(_g3 < _g2) {
 					var childIdx = _g3++;
 					var child = zone.childNodes[childIdx];
 					zone.insertBefore(this.miniPhantom,child);
 					var bb = org.slplayer.util.DomTools.getElementBoundingBox(this.miniPhantom);
-					var dist = this.computeDistance(bb,mouseX,mouseY);
+					var dist = this.computeDistance(bb,pos.x,pos.y);
 					if(dist < nearestDistance) {
 						nearestDistance = dist;
 						lastChildIdx = childIdx;
@@ -1662,24 +1697,26 @@ org.slplayer.component.interaction.Draggable.prototype = $extend(org.slplayer.co
 				}
 				zone.appendChild(this.miniPhantom);
 				var bb = org.slplayer.util.DomTools.getElementBoundingBox(this.miniPhantom);
-				var dist = this.computeDistance(bb,mouseX,mouseY);
+				var dist = this.computeDistance(bb,pos.x,pos.y);
 				if(dist < nearestDistance) {
 					nearestDistance = dist;
-					lastChildIdx = -1;
+					lastChildIdx = zone.childNodes.length + 1;
 				}
+				haxe.Log.trace("DRAGABBLE BEST DISTANCE " + nearestDistance + " - " + bb.y + " - " + this.miniPhantom.offsetTop + " - " + this.miniPhantom.parentNode.offsetTop + " - " + zone.childNodes.length,{ fileName : "Draggable.hx", lineNumber : 438, className : "org.slplayer.component.interaction.Draggable", methodName : "getBestDropZone"});
 				zone.removeChild(this.miniPhantom);
 				return { parent : zone, position : lastChildIdx};
 			}
 		}
+		haxe.Log.trace("DRAGABBLE NO DROP ZONE " + dropZones.length,{ fileName : "Draggable.hx", lineNumber : 443, className : "org.slplayer.component.interaction.Draggable", methodName : "getBestDropZone"});
 		return null;
 	}
 	,move: function(e) {
 		if(this.state == org.slplayer.component.interaction.DraggableState.dragging) {
-			var x = e.clientX - this.initialMouseX + this.initialX;
-			var y = e.clientY - this.initialMouseY + this.initialY;
+			var x = e.pageX - this.initialMouseX + this.initialX;
+			var y = e.pageY - this.initialMouseY + this.initialY;
 			this.rootElement.style.left = x + "px";
 			this.rootElement.style.top = y + "px";
-			this.setAsBestDropZone(this.getBestDropZone(e.clientX,e.clientY));
+			this.setAsBestDropZone(this.getBestDropZone(e.pageX,e.pageY));
 			var event = js.Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent("dragEventMove",false,false,{ dropZone : this.bestDropZone, target : this.rootElement, draggable : this});
 			this.rootElement.dispatchEvent(event);
@@ -1706,13 +1743,14 @@ org.slplayer.component.interaction.Draggable.prototype = $extend(org.slplayer.co
 	}
 	,startDrag: function(e) {
 		if(this.state == org.slplayer.component.interaction.DraggableState.none) {
+			var boundingBox = org.slplayer.util.DomTools.getElementBoundingBox(this.rootElement);
 			this.state = org.slplayer.component.interaction.DraggableState.dragging;
-			this.initialX = this.rootElement.offsetLeft;
-			this.initialY = this.rootElement.offsetTop;
-			this.initialMouseX = e.clientX;
-			this.initialMouseY = e.clientY;
-			this.initPhantomStyle(this.phantom);
-			this.initPhantomStyle(this.miniPhantom);
+			this.initialX = boundingBox.x;
+			this.initialY = boundingBox.y;
+			this.initialMouseX = e.pageX;
+			this.initialMouseY = e.pageY;
+			this.initPhantomStyle();
+			this.initPhantomStyle();
 			this.initRootElementStyle();
 			this.moveCallback = (function(f) {
 				return function(e1) {
@@ -1736,8 +1774,9 @@ org.slplayer.component.interaction.Draggable.prototype = $extend(org.slplayer.co
 			this.rootElement.style[styleName] = val;
 		}
 	}
-	,initPhantomStyle: function(phantom) {
-		var computedStyle = window.getComputedStyle(this.rootElement, null);
+	,initPhantomStyle: function(refHtmlDom) {
+		if(refHtmlDom == null) refHtmlDom = this.rootElement;
+		var computedStyle = window.getComputedStyle(refHtmlDom, null);
 		var _g = 0, _g1 = Reflect.fields(computedStyle);
 		while(_g < _g1.length) {
 			var styleName = _g1[_g];
@@ -1745,9 +1784,11 @@ org.slplayer.component.interaction.Draggable.prototype = $extend(org.slplayer.co
 			var val = Reflect.field(computedStyle,styleName);
 			var mozzVal = computedStyle.getPropertyValue(val);
 			if(mozzVal != null) val = mozzVal;
-			phantom.style[styleName] = val;
+			this.phantom.style[styleName] = val;
+			this.miniPhantom.style[styleName] = val;
 		}
-		phantom.className = this.rootElement.className + " " + this.phantomClassName;
+		this.phantom.className = refHtmlDom.className + " " + this.phantomClassName;
+		this.miniPhantom.className = refHtmlDom.className + " " + this.phantomClassName;
 	}
 	,initRootElementStyle: function() {
 		this.initialStyle = { };
@@ -1764,9 +1805,7 @@ org.slplayer.component.interaction.Draggable.prototype = $extend(org.slplayer.co
 		this.miniPhantom = js.Lib.document.createElement("div");
 		this.dragZone = org.slplayer.util.DomTools.getSingleElement(this.rootElement,"draggable-dragzone",false);
 		if(this.dragZone == null) this.dragZone = this.rootElement;
-		this.dropZones = js.Lib.document.body.getElementsByClassName(this.dropZonesClassName);
-		if(this.dropZones.length == 0) this.dropZones[0] = this.rootElement.parentNode;
-		this.dragZone.onmousedown = $bind(this,this.startDrag);
+		this.dragZone.addEventListener("mousedown",$bind(this,this.startDrag),false);
 		this.mouseUpCallback = (function(f) {
 			return function(e) {
 				return f(e);
@@ -1783,13 +1822,13 @@ org.slplayer.component.interaction.Draggable.prototype = $extend(org.slplayer.co
 	,bestDropZone: null
 	,phantomClassName: null
 	,dropZonesClassName: null
-	,dropZones: null
 	,dragZone: null
 	,state: null
 	,miniPhantom: null
 	,phantom: null
 	,mouseUpCallback: null
 	,moveCallback: null
+	,groupElement: null
 	,__class__: org.slplayer.component.interaction.Draggable
 });
 org.slplayer.core = {}
@@ -1858,6 +1897,23 @@ org.slplayer.core.Application.prototype = {
 		}
 		return new List();
 	}
+	,removeAllAssociatedComponent: function(node) {
+		var nodeId = node.getAttribute("data-" + "slpid");
+		if(nodeId != null) {
+			node.removeAttribute("data-" + "slpid");
+			var isError = !this.nodeToCmpInstances.remove(nodeId);
+			if(isError) throw "Could not find the node in the associated components list.";
+		} else haxe.Log.trace("Warning: there are no components associated with this node",{ fileName : "Application.hx", lineNumber : 499, className : "org.slplayer.core.Application", methodName : "removeAllAssociatedComponent"});
+	}
+	,removeAssociatedComponent: function(node,cmp) {
+		var nodeId = node.getAttribute("data-" + "slpid");
+		var associatedCmps;
+		if(nodeId != null) {
+			associatedCmps = this.nodeToCmpInstances.get(nodeId);
+			var isError = !associatedCmps.remove(cmp);
+			if(isError) throw "Could not find the component in the node's associated components list.";
+		} else haxe.Log.trace("Warning: there are no components associated with this node",{ fileName : "Application.hx", lineNumber : 475, className : "org.slplayer.core.Application", methodName : "removeAssociatedComponent"});
+	}
 	,addAssociatedComponent: function(node,cmp) {
 		var nodeId = node.getAttribute("data-" + "slpid");
 		var associatedCmps;
@@ -1871,7 +1927,7 @@ org.slplayer.core.Application.prototype = {
 		this.nodeToCmpInstances.set(nodeId,associatedCmps);
 	}
 	,callInitOnComponents: function() {
-		haxe.Log.trace("call Init On Components",{ fileName : "Application.hx", lineNumber : 393, className : "org.slplayer.core.Application", methodName : "callInitOnComponents"});
+		haxe.Log.trace("call Init On Components",{ fileName : "Application.hx", lineNumber : 396, className : "org.slplayer.core.Application", methodName : "callInitOnComponents"});
 		var $it0 = this.nodeToCmpInstances.iterator();
 		while( $it0.hasNext() ) {
 			var l = $it0.next();
@@ -1881,25 +1937,25 @@ org.slplayer.core.Application.prototype = {
 				try {
 					c.init();
 				} catch( unknown ) {
-					haxe.Log.trace("ERROR while trying to call init() on a " + Type.getClassName(Type.getClass(c)) + ": " + Std.string(unknown),{ fileName : "Application.hx", lineNumber : 411, className : "org.slplayer.core.Application", methodName : "callInitOnComponents"});
+					haxe.Log.trace("ERROR while trying to call init() on a " + Type.getClassName(Type.getClass(c)) + ": " + Std.string(unknown),{ fileName : "Application.hx", lineNumber : 414, className : "org.slplayer.core.Application", methodName : "callInitOnComponents"});
 					var excptArr = haxe.Stack.exceptionStack();
-					if(excptArr.length > 0) haxe.Log.trace(haxe.Stack.toString(haxe.Stack.exceptionStack()),{ fileName : "Application.hx", lineNumber : 415, className : "org.slplayer.core.Application", methodName : "callInitOnComponents"});
+					if(excptArr.length > 0) haxe.Log.trace(haxe.Stack.toString(haxe.Stack.exceptionStack()),{ fileName : "Application.hx", lineNumber : 418, className : "org.slplayer.core.Application", methodName : "callInitOnComponents"});
 				}
 			}
 		}
 	}
 	,createComponentsOfType: function(componentClassName,args) {
-		haxe.Log.trace("Creating " + componentClassName + "...",{ fileName : "Application.hx", lineNumber : 263, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+		haxe.Log.trace("Creating " + componentClassName + "...",{ fileName : "Application.hx", lineNumber : 266, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 		var componentClass = Type.resolveClass(componentClassName);
 		if(componentClass == null) {
 			var rslErrMsg = "ERROR cannot resolve " + componentClassName;
-			haxe.Log.trace(rslErrMsg,{ fileName : "Application.hx", lineNumber : 274, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+			haxe.Log.trace(rslErrMsg,{ fileName : "Application.hx", lineNumber : 277, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 			return;
 		}
-		haxe.Log.trace(componentClassName + " class resolved ",{ fileName : "Application.hx", lineNumber : 280, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+		haxe.Log.trace(componentClassName + " class resolved ",{ fileName : "Application.hx", lineNumber : 283, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 		if(org.slplayer.component.ui.DisplayObject.isDisplayObject(componentClass)) {
 			var classTag = this.getUnconflictedClassTag(componentClassName);
-			haxe.Log.trace("searching now for class tag = " + classTag,{ fileName : "Application.hx", lineNumber : 288, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+			haxe.Log.trace("searching now for class tag = " + classTag,{ fileName : "Application.hx", lineNumber : 291, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 			var taggedNodes = new Array();
 			var taggedNodesCollection = this.htmlRootElement.getElementsByClassName(classTag);
 			var _g1 = 0, _g = taggedNodesCollection.length;
@@ -1908,7 +1964,7 @@ org.slplayer.core.Application.prototype = {
 				taggedNodes.push(taggedNodesCollection[nodeCnt]);
 			}
 			if(componentClassName != classTag) {
-				haxe.Log.trace("searching now for class tag = " + componentClassName,{ fileName : "Application.hx", lineNumber : 301, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+				haxe.Log.trace("searching now for class tag = " + componentClassName,{ fileName : "Application.hx", lineNumber : 304, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 				taggedNodesCollection = this.htmlRootElement.getElementsByClassName(componentClassName);
 				var _g1 = 0, _g = taggedNodesCollection.length;
 				while(_g1 < _g) {
@@ -1916,7 +1972,7 @@ org.slplayer.core.Application.prototype = {
 					taggedNodes.push(taggedNodesCollection[nodeCnt]);
 				}
 			}
-			haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "Application.hx", lineNumber : 312, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+			haxe.Log.trace("taggedNodes = " + taggedNodes.length,{ fileName : "Application.hx", lineNumber : 315, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 			var _g = 0;
 			while(_g < taggedNodes.length) {
 				var node = taggedNodes[_g];
@@ -1924,23 +1980,23 @@ org.slplayer.core.Application.prototype = {
 				var newDisplayObject;
 				try {
 					newDisplayObject = Type.createInstance(componentClass,[node,this.id]);
-					haxe.Log.trace("Successfuly created instance of " + componentClassName,{ fileName : "Application.hx", lineNumber : 327, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+					haxe.Log.trace("Successfuly created instance of " + componentClassName,{ fileName : "Application.hx", lineNumber : 330, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 				} catch( unknown ) {
-					haxe.Log.trace("ERROR while creating " + componentClassName + ": " + Std.string(unknown),{ fileName : "Application.hx", lineNumber : 334, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+					haxe.Log.trace("ERROR while creating " + componentClassName + ": " + Std.string(unknown),{ fileName : "Application.hx", lineNumber : 337, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 					var excptArr = haxe.Stack.exceptionStack();
-					if(excptArr.length > 0) haxe.Log.trace(haxe.Stack.toString(haxe.Stack.exceptionStack()),{ fileName : "Application.hx", lineNumber : 338, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+					if(excptArr.length > 0) haxe.Log.trace(haxe.Stack.toString(haxe.Stack.exceptionStack()),{ fileName : "Application.hx", lineNumber : 341, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 				}
 			}
 		} else {
-			haxe.Log.trace("Try to create an instance of " + componentClassName + " non visual component",{ fileName : "Application.hx", lineNumber : 347, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+			haxe.Log.trace("Try to create an instance of " + componentClassName + " non visual component",{ fileName : "Application.hx", lineNumber : 350, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 			var cmpInstance = null;
 			try {
 				if(args != null) cmpInstance = Type.createInstance(componentClass,[args]); else cmpInstance = Type.createInstance(componentClass,[]);
-				haxe.Log.trace("Successfuly created instance of " + componentClassName,{ fileName : "Application.hx", lineNumber : 363, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+				haxe.Log.trace("Successfuly created instance of " + componentClassName,{ fileName : "Application.hx", lineNumber : 366, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 			} catch( unknown ) {
-				haxe.Log.trace("ERROR while creating " + componentClassName + ": " + Std.string(unknown),{ fileName : "Application.hx", lineNumber : 370, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+				haxe.Log.trace("ERROR while creating " + componentClassName + ": " + Std.string(unknown),{ fileName : "Application.hx", lineNumber : 373, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 				var excptArr = haxe.Stack.exceptionStack();
-				if(excptArr.length > 0) haxe.Log.trace(haxe.Stack.toString(haxe.Stack.exceptionStack()),{ fileName : "Application.hx", lineNumber : 374, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
+				if(excptArr.length > 0) haxe.Log.trace(haxe.Stack.toString(haxe.Stack.exceptionStack()),{ fileName : "Application.hx", lineNumber : 377, className : "org.slplayer.core.Application", methodName : "createComponentsOfType"});
 			}
 			if(cmpInstance != null && js.Boot.__instanceof(cmpInstance,org.slplayer.component.ISLPlayerComponent)) cmpInstance.initSLPlayerComponent(this.id);
 		}
@@ -1956,6 +2012,7 @@ org.slplayer.core.Application.prototype = {
 			this.createComponentsOfType(rc.classname,rc.args);
 		}
 		this.callInitOnComponents();
+		this.registeredComponents = new Array();
 	}
 	,registerComponent: function(componentClassName,args) {
 		this.registeredComponents.push({ classname : componentClassName, args : args});
@@ -2020,17 +2077,38 @@ org.slplayer.util.DomTools.getSingleElement = function(rootElement,className,req
 org.slplayer.util.DomTools.getElementBoundingBox = function(htmlDom) {
 	var halfBorderH = 0;
 	var halfBorderV = 0;
-	return { x : Math.floor(htmlDom.offsetLeft - halfBorderH), y : Math.floor(htmlDom.offsetTop - halfBorderV), w : Math.floor(htmlDom.offsetWidth - halfBorderH), h : Math.floor(htmlDom.offsetHeight - halfBorderV)};
+	var scrollTop = 0;
+	var scrollLeft = 0;
+	var element = htmlDom;
+	while(element.parentNode != null && element.tagName.toLowerCase() != "body") {
+		scrollTop -= element.scrollTop;
+		scrollLeft -= element.scrollLeft;
+		element = element.parentNode;
+	}
+	scrollTop -= element.scrollTop;
+	scrollLeft -= element.scrollLeft;
+	return { x : Math.floor(htmlDom.offsetLeft - halfBorderH) + scrollLeft, y : Math.floor(htmlDom.offsetTop - halfBorderV) + scrollTop, w : Math.floor(htmlDom.offsetWidth - halfBorderH), h : Math.floor(htmlDom.offsetHeight - halfBorderV)};
+}
+org.slplayer.util.DomTools.localToGlobal = function(x,y,htmlDom) {
+	var element = htmlDom;
+	while(element.parentNode != null && element.tagName.toLowerCase() != "body") {
+		x -= element.offsetLeft;
+		y -= element.offsetTop;
+		element = element.parentNode;
+	}
+	x -= element.offsetLeft;
+	y -= element.offsetTop;
+	return { x : x, y : y};
 }
 org.slplayer.util.DomTools.inspectTrace = function(obj,callingClass) {
-	haxe.Log.trace("-- " + callingClass + " inspecting element --",{ fileName : "DomTools.hx", lineNumber : 104, className : "org.slplayer.util.DomTools", methodName : "inspectTrace"});
+	haxe.Log.trace("-- " + callingClass + " inspecting element --",{ fileName : "DomTools.hx", lineNumber : 153, className : "org.slplayer.util.DomTools", methodName : "inspectTrace"});
 	var _g = 0, _g1 = Reflect.fields(obj);
 	while(_g < _g1.length) {
 		var prop = _g1[_g];
 		++_g;
-		haxe.Log.trace("- " + prop + " = " + Std.string(Reflect.field(obj,prop)),{ fileName : "DomTools.hx", lineNumber : 107, className : "org.slplayer.util.DomTools", methodName : "inspectTrace"});
+		haxe.Log.trace("- " + prop + " = " + Std.string(Reflect.field(obj,prop)),{ fileName : "DomTools.hx", lineNumber : 156, className : "org.slplayer.util.DomTools", methodName : "inspectTrace"});
 	}
-	haxe.Log.trace("-- --",{ fileName : "DomTools.hx", lineNumber : 109, className : "org.slplayer.util.DomTools", methodName : "inspectTrace"});
+	haxe.Log.trace("-- --",{ fileName : "DomTools.hx", lineNumber : 158, className : "org.slplayer.util.DomTools", methodName : "inspectTrace"});
 }
 org.slplayer.util.DomTools.toggleClass = function(element,className) {
 	if(org.slplayer.util.DomTools.hasClass(element,className)) org.slplayer.util.DomTools.removeClass(element,className); else org.slplayer.util.DomTools.addClass(element,className);
@@ -2133,7 +2211,7 @@ org.slplayer.util.DomTools.setBaseTag = function(href) {
 	var head = js.Lib.document.getElementsByTagName("head")[0];
 	var baseNodes = js.Lib.document.getElementsByTagName("base");
 	if(baseNodes.length > 0) {
-		haxe.Log.trace("Warning: base tag already set in the head section. Current value (\"" + baseNodes[0].getAttribute("href") + "\") will be replaced by \"" + href + "\"",{ fileName : "DomTools.hx", lineNumber : 288, className : "org.slplayer.util.DomTools", methodName : "setBaseTag"});
+		haxe.Log.trace("Warning: base tag already set in the head section. Current value (\"" + baseNodes[0].getAttribute("href") + "\") will be replaced by \"" + href + "\"",{ fileName : "DomTools.hx", lineNumber : 337, className : "org.slplayer.util.DomTools", methodName : "setBaseTag"});
 		baseNodes[0].setAttribute("href",href);
 	} else {
 		var node = js.Lib.document.createElement("base");
