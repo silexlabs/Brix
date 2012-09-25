@@ -584,27 +584,35 @@ class Builder
 			
 			var cmpClassType = switch( Context.getType(cmpClassName) ) { case TInst( classRef , params ): classRef.get(); default: };
 			
-			//TODO wouldn't it be better to initialize the components knowing that they are DisplayObjects or not, right from here
-			if ( !Lambda.empty(cmpArgs) && cmpClassType.is("org.slplayer.component.ui.DisplayObject") )
+			var argsExpr = macro null;
+			
+			if ( !Lambda.empty(cmpArgs) )
 			{
 				//case the component has data-arguments on its script tag
 				var argsArrayName = cmpClassName.replace( "." , "_" ) + "Args";
+				
 				registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
+				
+				argsExpr = { expr : EConst(CIdent(argsArrayName)), pos : pos };
 				
 				for ( cmpArg in {iterator : cmpArgs.keys})
 				{
 					if (cmpArg.startsWith( "data-" ) && cmpArg != "data-"+SLP_USE_ATTR_NAME)
 						registerComponentsforInitExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(argsArrayName)), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(cmpArg)), pos : pos }, { expr : EConst(CString(cmpArgs.get(cmpArg))), pos : pos } ]), pos : pos } );
 				}
-				
-				//generate call to registerComponent with additionnal arguments
-				registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(argsArrayName)), pos : pos } ]), pos : pos } );
+			}
+			var cmpClassNameExpr = { expr:EConst(CString(cmpClassName)), pos:pos };
+			var registerCompExpr;
+			
+			if ( cmpClassType.is("org.slplayer.component.ui.DisplayObject") )
+			{
+				registerCompExpr = macro registeredUIComponents.push({classname:$cmpClassNameExpr, args:$argsExpr});
 			}
 			else
 			{
-				//generate call to registerComponent with no additionnal arguments
-				registerComponentsforInitExprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
+				registerCompExpr = macro registeredNonUIComponents.push({classname:$cmpClassNameExpr, args:$argsExpr});
 			}
+			registerComponentsforInitExprs.push(registerCompExpr);
 			
 			#if slpdebug
 				neko.Lib.println("added call to registerComponent("+cmpClassName+")");

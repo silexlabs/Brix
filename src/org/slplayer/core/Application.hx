@@ -66,11 +66,18 @@ import js.Dom;
 	 */
 	public var dataObject(default,null) : Dynamic;
 	/**
-	 * A collection of the <script> declared components with the optionnal data- args passed on the <script> tag.
+	 * A collection of the <script> declared UI components with the optionnal data- args passed on the <script> tag.
+	 * A UI component class is a child class of org.slplayer.component.ui.DisplayObject
 	 */
-	private var registeredComponents : Array<RegisteredComponent>;
+	private var registeredUIComponents : Array<RegisteredComponent>;
+	/**
+	 * A collection of the <script> declared Non UI components with the optionnal data- args passed on the <script> tag.
+	 * Ideally, a component class should at least implement org.slplayer.component.ISLPlayerComponent.
+	 */
+	private var registeredNonUIComponents : Array<RegisteredComponent>;
 	/**
 	 * A collection of name => content <meta> header parameters from the source HTML page.
+	 * TODO shouldn't we just access the page's meta params ?
 	 */
 	private var metaParameters : Hash<String>;
 	
@@ -119,7 +126,8 @@ import js.Dom;
 		this.dataObject = args;
 		this.id = id;
 		this.nodesIdSequence = 0;
-		this.registeredComponents = new Array();
+		this.registeredUIComponents = new Array();
+		this.registeredNonUIComponents = new Array();
 		this.nodeToCmpInstances = new Hash();
 		this.metaParameters = new Hash();
 
@@ -218,13 +226,10 @@ import js.Dom;
 	
 	/**
 	 * This function is implemented by the AppBuilder macro.
+	 * It simply pushes each component class declared in the headers of the HTML source file in the
+	 * registeredUIComponents and registeredNonUIComponents collections.
 	 */
 	private function registerComponentsforInit() { }
-	
-	private function registerComponent(componentClassName : String , ?args:Hash<String>)
-	{
-		registeredComponents.push({classname:componentClassName, args:args});
-	}
 
 	/**
 	 * Initialize the application's components in 2 stages : first create the instances and then call init()
@@ -232,106 +237,107 @@ import js.Dom;
 	 */
 	public function initComponents()
 	{
-		//build the SLPlayer instance meta parameters Hash
+		// build the SLPlayer instance meta parameters Hash
 		initMetaParameters();
 		
-		//register the application components for initialization
+		// register the application components for initialization
 		registerComponentsforInit();
-		
-		#if slpdebug
-			trace("SLPlayer id "+id+" launched !");
-		#end
 
-		//Create the components instances
-		for (rc in registeredComponents)
-		{
-			createComponentsOfType(rc.classname, rc.args);
-		}
+		// create the UI components instances
+		initNode(htmlRootElement);
 		
-		//call init on each component instances
-		callInitOnComponents();
+		// create the non-UI component instances
+		createNonUIComponents();
 	}
 	
 	/**
-	 * Creates the component instances in the entire DOM for a given component class.
+	 * Parses and initializes all declared components on a given node.
 	 * 
-	 * @param	componentClassName the full component class name (with packages, for example : org.slplayer.component.player.ImagePlayer)
+	 * @param node:HtmlDom the node to initialize.
 	 */
-	private function createComponentsOfType(componentClassName : String , ?args:Hash<String>)
+	public function initNode(node:HtmlDom):Void
 	{
-		#if slpdebug
-			trace("Creating "+componentClassName+"...");
-		#end
-		
-		var componentClass = Type.resolveClass(componentClassName);
-		
-		if (componentClass == null)
+		if ( node.nodeType != Lib.document.body.nodeType )
 		{
-			var rslErrMsg = "ERROR cannot resolve " + componentClassName;
-			#if stopOnError
-			throw(rslErrMsg);
-			#else
-			trace(rslErrMsg);
-			#end
+			// works only for elements
 			return;
 		}
 		
-		#if slpdebug
-			trace(componentClassName+" class resolved ");
-		#end
-		
-		if (org.slplayer.component.ui.DisplayObject.isDisplayObject(componentClass)) // case DisplayObject component
+		if ( node.getAttribute("data-" + SLPID_ATTR_NAME) != null )
 		{
-			var classTag = getUnconflictedClassTag(componentClassName );
+			// means that the node has already been initialized
+			return;
+		}
+		
+		// creation and initialization are two steps. We need to store temporarly the component instances to init while
+		// finishing to create them all.
+		var compsToInit:List<org.slplayer.component.ui.DisplayObject> = new List();
+		
+		// search for any registered component instance declaration in the newly added node
+		for (rc in registeredUIComponents)
+		{
+			var componentClass = resolveCompClass(rc.classname);
 			
-			#if slpdebug
-				trace("searching now for class tag = "+classTag);
-			#end
+			if (componentClass == null)
+			{
+				continue;
+			}
+			
+			var classAttrValues:Array<String> = [getUnconflictedClassTag(rc.classname)];
+			
+			if (classAttrValues[0] != rc.classname)
+			{
+				classAttrValues.push(rc.classname);
+			}
 			
 			var taggedNodes : Array<HtmlDom> = new Array();
 			
-			var taggedNodesCollection : HtmlCollection<HtmlDom> = untyped htmlRootElement.getElementsByClassName(classTag);
-			for (nodeCnt in 0...taggedNodesCollection.length)
-			{
-				taggedNodes.push(taggedNodesCollection[nodeCnt]);
-			}
-			if (componentClassName != classTag)
+			for (cav in classAttrValues)
 			{
 				#if slpdebug
-					trace("searching now for class tag = "+componentClassName);
+					trace("searching now for class tag = "+cav);
 				#end
 				
-				taggedNodesCollection = untyped htmlRootElement.getElementsByClassName(componentClassName);
+				// search in the node's class attr value
+				if (node.getAttribute("class") != null)
+				{
+					for (nodeClassVal in node.getAttribute("class").split(" "))
+					{
+						if (nodeClassVal == cav)
+						{
+							taggedNodes.push(node);
+						}
+					}
+				}
+				
+				// search in the node's children
+				var taggedNodesCollection : HtmlCollection<HtmlDom> = node.getElementsByClassName(cav);
 				for (nodeCnt in 0...taggedNodesCollection.length)
 				{
 					taggedNodes.push(taggedNodesCollection[nodeCnt]);
 				}
 			}
 			
-			#if slpdebug
-				trace("taggedNodes = "+taggedNodes.length);
-			#end
-			
-			for (node in taggedNodes)
+			for (tgn in taggedNodes)
 			{
-				var newDisplayObject;
+				var newDisplayObject = null;
 				
 				#if !stopOnError
 				try
 				{
 				#end
 					
-					newDisplayObject = Type.createInstance( componentClass, [node, id] );
+					newDisplayObject = Type.createInstance( componentClass, [tgn, id] );
 					
 					#if slpdebug
-						trace("Successfuly created instance of "+componentClassName);
+						trace("Successfuly created instance of "+rc.classname);
 					#end
 				
 				#if !stopOnError
 				}
 				catch ( unknown : Dynamic )
 				{
-					trace("ERROR while creating "+componentClassName+": "+Std.string(unknown));
+					trace("ERROR while creating "+rc.classname+": "+Std.string(unknown));
 					var excptArr = haxe.Stack.exceptionStack();
 					if ( excptArr.length > 0 )
 					{
@@ -339,13 +345,64 @@ import js.Dom;
 					}
 				}
 				#end
+				
+				compsToInit.add(newDisplayObject);
 			}
 		}
-		else //case of non-visual component: we just try to create an instance, no call on init()
+		
+		// Initialization
+		initUIComponents(compsToInit);
+	}
+	
+	/**
+	 * Initializes a collection of UI component instances.
+	 */
+	private function initUIComponents(compInstances:List<org.slplayer.component.ui.DisplayObject>):Void
+	{
+		for (ci in compInstances)
+		{
+			#if !stopOnError
+			try
+			{
+			#end
+				
+				#if slpdebug
+					trace("call init() on "+Type.getClassName(Type.getClass(ci)));
+				#end
+				ci.init();
+			
+			#if !stopOnError
+			}
+			catch (unknown : Dynamic)
+			{
+				trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
+				var excptArr = haxe.Stack.exceptionStack();
+				if ( excptArr.length > 0 )
+				{
+					trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+				}
+			}
+			#end
+		}
+	}
+	
+	/**
+	 * Instanciates the non UI components.
+	 */
+	private function createNonUIComponents():Void
+	{
+		for (rc in registeredNonUIComponents)
 		{
 			#if slpdebug
-				trace("Try to create an instance of "+componentClassName+" non visual component");
+				trace("Try to create an instance of "+rc.classname+" non visual component");
 			#end
+			
+			var componentClass = resolveCompClass(rc.classname);
+			
+			if (componentClass == null)
+			{
+				continue;
+			}
 			
 			var cmpInstance = null;
 			
@@ -354,20 +411,20 @@ import js.Dom;
 			{
 			#end
 			
-				if (args != null)
-					cmpInstance = Type.createInstance( componentClass, [args] );
+				if (rc.args != null)
+					cmpInstance = Type.createInstance( componentClass, [rc.args] );
 				else
 					cmpInstance = Type.createInstance( componentClass, [] );
 				
 				#if slpdebug
-					trace("Successfuly created instance of "+componentClassName);
+					trace("Successfuly created instance of "+rc.classname);
 				#end
 			
 			#if !stopOnError
 			}
 			catch (unknown : Dynamic )
 			{
-				trace("ERROR while creating "+componentClassName+": "+Std.string(unknown));
+				trace("ERROR while creating "+rc.classname+": "+Std.string(unknown));
 				var excptArr = haxe.Stack.exceptionStack();
 				if ( excptArr.length > 0 )
 				{
@@ -385,139 +442,21 @@ import js.Dom;
 	}
 	
 	/**
-	 * Initializes all registered UI component instances.
+	 * 
+	 * @return
 	 */
-	private function callInitOnComponents():Void
+	private function resolveCompClass(classname:String):Class<Dynamic>
 	{
-		#if slpdebug
-			trace("call Init On Components");
-		#end
-		
-		for (l in nodeToCmpInstances)
+		var componentClass = Type.resolveClass(classname);
+			
+		if (componentClass == null)
 		{
-			for (c in l)
-			{
-				#if !stopOnError
-				try
-				{
-				#end
-				
-					c.init();
-				
-				#if !stopOnError
-				}
-				catch (unknown : Dynamic)
-				{
-					trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(c))+": "+Std.string(unknown));
-					var excptArr = haxe.Stack.exceptionStack();
-					if ( excptArr.length > 0 )
-					{
-						trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
-					}
-				}
-				#end
-			}
+			#if stopOnError
+			throw "ERROR cannot resolve "+classname;
+			#end
+			trace("ERROR cannot resolve "+classname);
 		}
-	}
-	
-	/**
-	 * Parses and initializes all declared components on a given node.
-	 * TODO find a way to reuse more code between application initialization stage and new node init at runtime. However, keep it as much performant as possible.
-	 * @param node:HtmlDom the node to initialize.
-	 */
-	public function initNode(node:HtmlDom):Void
-	{
-		if ( node.nodeType != Lib.document.body.nodeType )
-		{
-			// works only for elements
-			return;
-		}
-		
-		if ( node.getAttribute("data-" + SLPID_ATTR_NAME) != null )
-		{
-			// means that the node has already been initialized
-			return;
-		}
-		
-		if ( node.getAttribute("class") != null )
-		{
-			var classes = node.getAttribute("class").split(" ");
-			for (c in classes)
-			{
-				// TODO we may check the robustness of this if condition, a RegExp may be better here
-				if ( c.charCodeAt(0) >= 'A'.code && c.charCodeAt(0) <= 'Z'.code || c.lastIndexOf('.') > 0 && 
-				c.charCodeAt(c.lastIndexOf('.')+1) >= 'A'.code && c.charCodeAt(c.lastIndexOf('.')+1) <= 'Z'.code )
-				{
-					// then it's probably a component
-					// resolving component class
-					var componentClass = Type.resolveClass(c);
-
-					if (componentClass == null)
-					{
-						var rslErrMsg = "ERROR cannot resolve " + c;
-						#if stopOnError
-						throw(rslErrMsg);
-						#else
-						trace(rslErrMsg);
-						#end
-						return;
-					}
-					
-					// creation
-					var newDisplayObject;
-
-					#if !stopOnError
-					try
-					{
-					#end
-						
-						newDisplayObject = Type.createInstance( componentClass, [node, id] );
-						
-						#if slpdebug
-							trace("Successfuly created instance of "+c);
-						#end
-					
-					#if !stopOnError
-					}
-					catch ( unknown : Dynamic )
-					{
-						trace("ERROR while creating "+c+": "+Std.string(unknown));
-						var excptArr = haxe.Stack.exceptionStack();
-						if ( excptArr.length > 0 )
-						{
-							trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
-						}
-					}
-					#end
-					
-					// initialization
-					#if !stopOnError
-					try
-					{
-					#end
-					
-						newDisplayObject.init();
-					
-					#if !stopOnError
-					}
-					catch (unknown : Dynamic)
-					{
-						trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(newDisplayObject))+": "+Std.string(unknown));
-						var excptArr = haxe.Stack.exceptionStack();
-						if ( excptArr.length > 0 )
-						{
-							trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
-						}
-					}
-					#end
-				}
-			}
-		}
-		
-		for ( childCnt in 0...node.childNodes.length )
-		{
-			initNode(node.childNodes[childCnt]);
-		}
+		return componentClass;
 	}
 	
 	/**
@@ -525,14 +464,14 @@ import js.Dom;
 	 * 
 	 * @param	node
 	 */
-	public function shutdownNode(node:HtmlDom):Void
+	public function cleanNode(node:HtmlDom):Void
 	{
 		if ( node.nodeType != Lib.document.body.nodeType )
 		{
 			// works only for elements
 			return;
 		}
-		
+		trace("clean "+node.tagName);
 		var comps:List<org.slplayer.component.ui.DisplayObject> = getAssociatedComponents(node, org.slplayer.component.ui.DisplayObject);
 		
 		for (c in comps)
@@ -542,7 +481,7 @@ import js.Dom;
 		
 		for ( childCnt in 0...node.childNodes.length )
 		{
-			shutdownNode(node.childNodes[childCnt]);
+			cleanNode(node.childNodes[childCnt]);
 		}
 	}
 	
@@ -678,7 +617,7 @@ import js.Dom;
 		if (classTag.indexOf(".") != -1)
 			classTag = classTag.substr(classTag.lastIndexOf(".") + 1);
 		
-		for (rc in registeredComponents)
+		for (rc in registeredUIComponents)
 		{
 			if (rc.classname != displayObjectClassName && classTag == rc.classname.substr(classTag.lastIndexOf(".") + 1))
 			{
