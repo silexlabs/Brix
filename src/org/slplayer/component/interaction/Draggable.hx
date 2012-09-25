@@ -195,7 +195,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * init the component
 	 */
 	override public function init() : Void 
-	{ 
+	{
 		super.init();
 
 		// create the phantom
@@ -213,12 +213,25 @@ class Draggable extends DisplayObject, implements IGroupable
 			dropZones[0] = rootElement.parentNode;
 
 		// attach the events
+		trace("!!!!!! dragZone = "+dragZone);
 		dragZone.addEventListener("mousedown", startDrag, false);
 		//dragZone.onmouseup = stopDrag;
 		mouseUpCallback = callback(stopDrag);
-		Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
+		Lib.document.body.addEventListener("mouseup", mouseUpCallback, false);
 		dragZone.style.cursor = "move";
 	}
+	
+	/**
+	 * clean the component
+	 */
+	override public function clean() : Void
+	{
+		super.clean(); trace("cleaning Draggable... dragZone="+dragZone);
+
+		dragZone.removeEventListener("mousedown", startDrag, false);
+		Lib.document.body.removeEventListener("mouseup", mouseUpCallback, false);
+	}
+	
 	/**
 	 * set all properties of root element with absolute values 
 	 */
