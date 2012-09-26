@@ -36,6 +36,20 @@ import org.slplayer.component.template.TemplateMacros;
 class List<ElementClass> extends DisplayObject
 {
 	public static inline var LIST_SELECTED_ITEM_CSS_CLASS:String = "listSelectedItem";
+	public static inline var DATA_ATTR_LIST_ITEM_INDEX:String = "data-list-item-idx";
+
+	/**
+	 * event dispatched when the selection changes
+	 */
+	public static inline var EVENT_CHANGE:String = "listChange";
+	/**
+	 * event dispatched when an item is clicked (will likely also change the selection)
+	 */
+	public static inline var EVENT_CLICK:String = "listClick";
+	/**
+	 * event dispatched when an item is hovered
+	 */
+	public static inline var EVENT_ROLL_OVER:String = "listRollOver";
 
 	/**
 	 * list elements template
@@ -56,14 +70,6 @@ class List<ElementClass> extends DisplayObject
 	public var selectedIndex(getSelectedIndex, setSelectedIndex):Int;
 	private var _selectedIndex:Int;
 	/**
-	 * on change callback
-	 */
-	public var onChange:ElementClass->Void;
-	/**
-	 * on roll over callback
-	 */
-	public var onRollOver:ElementClass->Void;
-	/**
 	 * constructor
 	 */
 	public function new(rootElement:HtmlDom, SLPId:String)
@@ -83,6 +89,9 @@ class List<ElementClass> extends DisplayObject
 		super.init();
 		// store the template
 		listTemplate = rootElement.innerHTML;
+
+		rootElement.addEventListener("click", click, false);
+		rootElement.addEventListener("rollOver", rollOver, false);
 	}
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
@@ -135,10 +144,26 @@ class List<ElementClass> extends DisplayObject
 		var children = rootElement.getElementsByTagName("li");
 		for (idx in 0...children.length)
 		{
-			Reflect.setField(children[idx], "data-listwidgetitemidx", Std.string(idx));
-			children[idx].onclick = click;
-			children[idx].onmouseover = rollOver;
+			children[idx].setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
 		}
+	}
+
+	/**
+	 * retrieve the id of a node
+	 */
+	private function getItemID(childElement:HtmlDom):Int
+	{
+		var element = childElement;
+		var idx = element.getAttribute(DATA_ATTR_LIST_ITEM_INDEX);
+		while (idx == null && element!=rootElement && element!=null){
+			element = element.parentNode;
+			idx = element.getAttribute(DATA_ATTR_LIST_ITEM_INDEX);
+		}
+		if (idx == null)
+		{
+			throw("Error, could not find the element clicked in the list.");
+		}
+		return Std.parseInt(idx);
 	}
 	/**
 	 * handle click in the list
@@ -146,19 +171,34 @@ class List<ElementClass> extends DisplayObject
 	 */
 	private function click(e:js.Event)
 	{
-		var idx:Int = Std.parseInt(Reflect.field(e.target, "data-listwidgetitemidx"));
+		// retrieve the element of the list
+		var element = e.target;
+		var idx = getItemID(element);
 		selectedItem = dataProvider[idx];
+
+		// dispatch a custom event
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_CLICK, false, false, {
+			target: rootElement,
+			item: selectedItem,
+		});
+		rootElement.dispatchEvent(event);
 	}
 	/**
 	 * handle roll over
 	 */
 	private function rollOver(e:js.Event)
 	{
-		if (onRollOver != null)
-		{
-			var idx:Int = Std.parseInt(Reflect.field(e.target, "data-listwidgetitemidx"));
-			onRollOver(dataProvider[idx]);
-		}
+		var element = e.target;
+		var idx = getItemID(element);
+
+		// dispatch a custom event
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_CHANGE, false, false, {
+			target: rootElement,
+			item: dataProvider[idx],
+		});
+		rootElement.dispatchEvent(event);
 	}
 	/**
 	 * handle a selection change
@@ -173,7 +213,7 @@ class List<ElementClass> extends DisplayObject
 		var children = rootElement.getElementsByTagName("li");
 		for (idx in 0...children.length)
 		{
-			var idxElem:Int = Std.parseInt(Reflect.field(children[idx], "data-listwidgetitemidx"));
+			var idxElem:Int = getItemID(children[idx]);
 			if (idxElem >= 0)
 			{
 				var found = false;
@@ -192,32 +232,15 @@ class List<ElementClass> extends DisplayObject
 					continue;
 				}
 
-				var className = "";
-				//if (children[idx].className != null)
-					className = children[idx].className;
-				
 				if (found)
 				{
-					if (className.indexOf(LIST_SELECTED_ITEM_CSS_CLASS)<0)
-						className += " "+LIST_SELECTED_ITEM_CSS_CLASS;
+					DomTools.addClass(children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
 				}
 				else
 				{
-					var pos = className.indexOf(LIST_SELECTED_ITEM_CSS_CLASS);
-					if (pos >= 0)
-					{
-						// remove the spaces
-						var tmp = className;
-						className = StringTools.trim(className.substr(0, pos));
-						className += " "+StringTools.trim(tmp.substr(pos+LIST_SELECTED_ITEM_CSS_CLASS.length));
-					}
+					DomTools.removeClass(children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
 				}
-				children[idx].className = className;
 			}
-		}
-		if (onChange != null)
-		{
-			onChange(selectedItem);
 		}
 	}
 	////////////////////////////////////////////////////////////
@@ -283,6 +306,14 @@ class List<ElementClass> extends DisplayObject
 				_selectedIndex = -1;
 			}
 			updateSelectionDisplay([selectedItem]);
+
+			// dispatch a custom event
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_CHANGE, false, false, {
+				target: rootElement,
+				item: selectedItem,
+			});
+			rootElement.dispatchEvent(event);
 		}
 		return idx;
 	}

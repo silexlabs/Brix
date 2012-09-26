@@ -74,6 +74,10 @@ class DomTools
 	{
 		var domElements = rootElement.getElementsByClassName(className);
 		
+		if (domElements.length > 1)
+		{
+			throw("Error: search for the element with class name \""+className+"\" gave "+domElements.length+" results");
+		}
 		if (domElements != null && domElements.length == 1)
 		{
 			return domElements[0];

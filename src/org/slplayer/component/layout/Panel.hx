@@ -100,6 +100,7 @@ class Panel extends DisplayObject
 		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_HEADER);
 		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_HEADER;
 		header = DomTools.getSingleElement(rootElement, cssClassName, false);
+		if (header == null) trace("Warning, no header for Panel component");
 		
 		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_BODY);
 		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_BODY;
@@ -108,6 +109,7 @@ class Panel extends DisplayObject
 		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_FOOTER);
 		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_FOOTER;
 		footer = DomTools.getSingleElement(rootElement, cssClassName, false);
+		if (footer == null) trace("Warning, no footer for Panel component");
 
 		// attributes
 		if (rootElement.getAttribute(ATTR_IS_HORIZONTAL) == "true")
