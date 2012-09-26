@@ -17,6 +17,12 @@ package org.slplayer.component;
 
 import org.slplayer.core.Application;
 
+#if macro
+import cocktail.Dom;
+#else
+import js.Dom;
+#end
+
 /**
  * The interface each SLPlayer component should implement to be able to standardly retreive their SLPlayer Application instance.
  * 
@@ -56,7 +62,7 @@ class SLPlayerComponent
 	 * @param	the class of the component to check.
 	 * @param	the DOM element to check. By default the rootElement.
 	 */
-	static public function checkRequiredParameters( cmpClass : Class<Dynamic> , elt:js.Dom.HtmlDom ) : Void
+	static public function checkRequiredParameters( cmpClass : Class<Dynamic> , elt:HtmlDom ) : Void
 	{
 		var requires = haxe.rtti.Meta.getType(cmpClass).requires;
 		

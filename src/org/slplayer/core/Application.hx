@@ -15,8 +15,13 @@
  */
 package org.slplayer.core;
 
+#if macro
+import cocktail.Lib;
+import cocktail.Dom;
+#else
 import js.Lib;
 import js.Dom;
+#end
 
 /**
  * The main SLPlayer class handles the application initialization. It instanciates the components, tracking for each of them their 
@@ -25,7 +30,7 @@ import js.Dom;
  * 
  * @author Thomas Fétiveau
  */
-@:build(org.slplayer.core.Builder.build()) class Application 
+class Application 
 {
 	/**
 	 * The data- attribute set by the slplayer on the HTML elements associated with one or more component.
@@ -65,28 +70,47 @@ import js.Dom;
 	 * The potential arguments passed to the SLPlayer class at instanciation.
 	 */
 	public var dataObject(default,null) : Dynamic;
+	
+	#if !macro
+	/**
+	 * For runtime only: the context containing the list of registered components, the embedded HTML...
+	 */
+	private var applicationContext:ApplicationContext;
+	#end
+	
 	/**
 	 * A collection of the <script> declared UI components with the optionnal data- args passed on the <script> tag.
 	 * A UI component class is a child class of org.slplayer.component.ui.DisplayObject
 	 */
-	private var registeredUIComponents : Array<RegisteredComponent>;
+	public var registeredUIComponents(getRegisteredUIComponents, null) : Array<RegisteredComponent>;
+	public function getRegisteredUIComponents():Array<RegisteredComponent>
+	{
+		#if macro
+		if (registeredUIComponents == null)
+		{
+			registeredUIComponents = new Array();
+		}
+		return registeredUIComponents;
+		#else
+		return applicationContext.registeredUIComponents;
+		#end
+	}
 	/**
 	 * A collection of the <script> declared Non UI components with the optionnal data- args passed on the <script> tag.
 	 * Ideally, a component class should at least implement org.slplayer.component.ISLPlayerComponent.
 	 */
-	private var registeredNonUIComponents : Array<RegisteredComponent>;
-	/**
-	 * A collection of name => content <meta> header parameters from the source HTML page.
-	 * TODO shouldn't we just access the page's meta params ?
-	 */
-	private var metaParameters : Hash<String>;
-	
-	/**
-	 * Gets a meta parameter value.
-	 */
-	public function getMetaParameter(metaParamKey:String):Null<String>
+	public var registeredNonUIComponents(getRegisteredNonUIComponents,null) : Array<RegisteredComponent>;
+	public function getRegisteredNonUIComponents():Array<RegisteredComponent>
 	{
-		return metaParameters.get(metaParamKey);
+		#if macro
+		if (registeredNonUIComponents == null)
+		{
+			registeredNonUIComponents = new Array();
+		}
+		return registeredNonUIComponents;
+		#else
+		return applicationContext.registeredNonUIComponents;
+		#end
 	}
 
 	/**
@@ -100,7 +124,7 @@ import js.Dom;
 				trace("noAutoStart not defined: calling init()...");
 			#end
 
-			var newApp = createApplication();
+			var newApp:Application = createApplication();
 
 			#if (js && disableEmbedHtml)
 				//special case in js when auto starting the application, 
@@ -129,7 +153,11 @@ import js.Dom;
 		this.registeredUIComponents = new Array();
 		this.registeredNonUIComponents = new Array();
 		this.nodeToCmpInstances = new Hash();
-		this.metaParameters = new Hash();
+		//this.metaParameters = new Hash();
+
+		#if !macro
+		this.applicationContext = new ApplicationContext();
+		#end
 
 		#if slpdebug
 			trace("new SLPlayer instance built");
@@ -202,8 +230,11 @@ import js.Dom;
 			return;
 		}
 		
-		#if !disableEmbedHtml
-			htmlRootElement.innerHTML = _htmlDocumentElement;
+		// at macro time, htmlRootElement == Lib.document.documentElement so we already have the source html in 
+		// htmlRootElement.innerHTML
+		#if (!macro && !disableEmbedHtml)
+			//htmlRootElement.innerHTML = ApplicationContext.getEmbeddedHtml();
+			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
 		#end
 	}
 	
@@ -218,18 +249,6 @@ import js.Dom;
 		// return haxe.Md5.encode(Date.now().toString()+Std.string(Std.random(Std.int(Date.now().getTime()))));
 		return Std.string(Math.round(Math.random()*10000));
 	}
-	
-	/**
-	 * This function is implemented by the AppBuilder macro.
-	 */
-	private function initMetaParameters() { }
-	
-	/**
-	 * This function is implemented by the AppBuilder macro.
-	 * It simply pushes each component class declared in the headers of the HTML source file in the
-	 * registeredUIComponents and registeredNonUIComponents collections.
-	 */
-	private function registerComponentsforInit() { }
 
 	/**
 	 * Initialize the application's components in 2 stages : first create the instances and then call init()
@@ -238,10 +257,10 @@ import js.Dom;
 	public function initComponents()
 	{
 		// build the SLPlayer instance meta parameters Hash
-		initMetaParameters();
+		//initMetaParameters();
 		
 		// register the application components for initialization
-		registerComponentsforInit();
+		//registerComponentsforInit();
 
 		// create the UI components instances
 		initNode(htmlRootElement);
@@ -351,7 +370,9 @@ import js.Dom;
 		}
 		
 		// Initialization
+		#if !macro
 		initUIComponents(compsToInit);
+		#end
 	}
 	
 	/**
@@ -447,7 +468,15 @@ import js.Dom;
 	 */
 	private function resolveCompClass(classname:String):Class<Dynamic>
 	{
-		var componentClass = Type.resolveClass(classname);
+		#if macro
+		trace("is std.Type.resolveClass('haxe.Serializer') == null ? "+(std.Type.resolveClass("haxe.Serializer")==null));
+		trace("is std.Type.resolveClass('"+classname+"') == null ? "+(std.Type.resolveClass(classname)==null));
+		trace("getting module "+classname);
+		haxe.macro.Context.getModule(classname);
+		trace("is std.Type.resolveClass('"+classname+"') == null ? "+(std.Type.resolveClass(classname)==null));
+		#end
+		
+		var componentClass = std.Type.resolveClass(classname);
 			
 		if (componentClass == null)
 		{

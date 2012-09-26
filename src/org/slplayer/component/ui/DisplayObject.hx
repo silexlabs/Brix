@@ -20,8 +20,13 @@ import org.slplayer.core.Application;
 import org.slplayer.component.ISLPlayerComponent;
 using org.slplayer.component.ISLPlayerComponent.SLPlayerComponent;
 
+#if macro
+import cocktail.Lib;
+import cocktail.Dom;
+#else
 import js.Lib;
 import js.Dom;
+#end
 
 import haxe.Template;
 

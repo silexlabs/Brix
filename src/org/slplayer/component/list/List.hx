@@ -82,7 +82,8 @@ class List<ElementClass> extends DisplayObject
 		// init the parent class
 		super.init();
 		// store the template
-		listTemplate = rootElement.innerHTML;
+		//listTemplate = rootElement.innerHTML;
+		listTemplate = "<li class=\"Draggable\">::title::</li>"; // temporary dirty fix
 	}
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
@@ -112,8 +113,18 @@ class List<ElementClass> extends DisplayObject
 				throw("Error: an error occured while interpreting the template - "+listTemplate+" - for the element "+elem);
 			}
 		}
+		
+		for (i in 0...rootElement.childNodes.length)
+		{ trace("wanna clean "+rootElement.childNodes[i]);
+			getSLPlayer().cleanNode(rootElement.childNodes[i]);
+		}
+		
 		rootElement.innerHTML = listInnerHtml;
-
+		
+		for (i in 0...rootElement.childNodes.length)
+		{ trace("wanna init "+rootElement.childNodes[i]);
+			getSLPlayer().initNode(rootElement.childNodes[i]);
+		}
 		
 		attachListEvents();
 		updateSelectionDisplay([selectedItem]);
