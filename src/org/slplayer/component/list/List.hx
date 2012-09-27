@@ -162,22 +162,20 @@ class List<ElementClass> extends DisplayObject
 	}
 
 	/**
-	 * retrieve the id of a node
+	 * retrieves the id of the item containing a given node
+	 * @param the given DOM node
 	 */
 	private function getItemID(childElement:HtmlDom):Int
 	{
-		var element = childElement;
-		var idx = element.getAttribute(DATA_ATTR_LIST_ITEM_INDEX);
-		while (idx == null && element != rootElement && element != null)
-		{
-			element = element.parentNode;
-			idx = element.getAttribute(DATA_ATTR_LIST_ITEM_INDEX);
-		}
-		if (idx == null)
+		if (childElement == rootElement || childElement == null)
 		{
 			throw("Error, could not find the element clicked in the list.");
 		}
-		return Std.parseInt(idx);
+		if (childElement.nodeType != rootElement.nodeType || childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
+		{
+			return getItemID(childElement.parentNode);
+		}
+		return Std.parseInt(childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX));
 	}
 	/**
 	 * handle click in the list
