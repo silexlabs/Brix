@@ -82,6 +82,12 @@ class Builder
 	 * FIXME find a way to expose in read only mode
 	 */
 	static public var declaredComponents : Hash<Hash<String>> = new Hash();
+	
+	/**
+	 * TODO add comments
+	 */
+	static public var macroApplication : Application;// = Application.createApplication();
+	
 	/**
 	 * The js exposed name.
 	 */
@@ -102,10 +108,6 @@ class Builder
 	 * The expressions array of the registerComponentsforInit() method.
 	 */
 	static private var registerComponentsforInitExprs : Array<haxe.macro.Expr>;
-	/**
-	 * The expressions array of the main() method.
-	 */
-	static private var mainExprs : Array<haxe.macro.Expr>;
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// MACROS
@@ -188,6 +190,7 @@ class Builder
 			
 			//check the components restrictions (needs to be done after includeComponents() 'cause it wouldn't resolve the component classes otherwise)
 			checkComponents();
+			//runMacroApplication(); // temporarly commented because of http://code.google.com/p/haxe/issues/detail?id=924 but will replace checkComponents() eventually.
 			
 			//embeds the html (body) within the application
 			embedHTML(fields);
@@ -366,6 +369,18 @@ class Builder
 	static private function parseBody() : Void { }
 	
 	/**
+	 * Run the application (and its component instances) at macro time.
+	 * This allows components to run macro time logic on their DOM node as
+	 * well as performing constraints checking against the component and its
+	 * DOM node.
+	 */
+	static function runMacroApplication():Void
+	{
+		macroApplication.initDom();
+		macroApplication.initComponents();
+	}
+	
+	/**
 	 * Checks if the declared components can be found in the classpath and if their use 
 	 * complies with their potential restrictions (on html tags or attribute settings).
 	 */
@@ -399,7 +414,7 @@ class Builder
 						
 						for (tagToSearchFor in tagsToSearchFor)
 						{
-							//taggedElts = taggedElts.concat(cocktail.Lib.document.body.getElementsByClassName(tagToSearchFor));
+							taggedElts = taggedElts.concat(cocktail.Lib.document.body.getElementsByClassName(tagToSearchFor));
 							taggedElts = taggedElts.concat(sourceHTMLDocument.body.getElementsByClassName(tagToSearchFor));
 						}
 						
@@ -519,53 +534,52 @@ class Builder
 			switch (fields[fc].kind)
 			{
 				case FFun(f) :
-					
+
 					switch (f.expr.expr)
 					{
 						case EBlock(exprs):
-							
+
 							if (fields[fc].name == "initMetaParameters")
 								initMetaParametersExprs = exprs;
-							
+
 							if (fields[fc].name == "registerComponentsforInit")
 								registerComponentsforInitExprs = exprs;
-							
-							if (fields[fc].name == "main")
-								mainExprs = exprs;
-						
+
 						default : 
 					}
-					
+
 				default : 
 			}
 		}
 	}
 	
 	/**
-	 * Embeds the HTML content in the application main class.
+	 * Embeds the HTML content in the ApplicationContext class.
 	 */
 	static public function embedHTML(fields:Array<Field>) : Void
 	{
-		var pos = Context.currentPos();
-		
-		if (!Context.defined('disableEmbedHtml'))
+		if (Context.defined('disableEmbedHtml'))
 		{
-			//add the _htmlDocumentElement static var to the SLPlayer class
-			var documentInnerHtml = haxe.Serializer.run("");
-			
-			if (cocktail.Lib.document.documentElement.innerHTML != null)
-			{
-				documentInnerHtml = haxe.Serializer.run(cocktail.Lib.document.documentElement.innerHTML);
-			}
-			
-			var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
-			
-			fields.push( { name : "_htmlDocumentElement", doc : null, meta : [], access : [APrivate, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
-				
-			#if slpdebug
-				neko.Lib.println("documentInnerHtml extracted and set on SLPlayer with a size of "+documentInnerHtml.length);
-			#end
+			return;
 		}
+		
+		var pos = Context.currentPos();
+	
+		//add the _htmlDocumentElement static var to ApplicationContext
+		var documentInnerHtml = haxe.Serializer.run("");
+		
+		if (cocktail.Lib.document.documentElement.innerHTML != null)
+		{
+			documentInnerHtml = haxe.Serializer.run(cocktail.Lib.document.documentElement.innerHTML);
+		}
+		
+		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
+		
+		fields.push( { name : "htmlDocumentElement", doc : null, meta : [], access : [APublic, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
+			
+		#if slpdebug
+			neko.Lib.println("documentInnerHtml extracted and set on SLPlayer with a size of "+documentInnerHtml.length);
+		#end
 	}
 	
 	/**
@@ -606,17 +620,23 @@ class Builder
 			
 			if ( cmpClassType.is("org.slplayer.component.ui.DisplayObject") )
 			{
-				registerCompExpr = macro registeredUIComponents.push({classname:$cmpClassNameExpr, args:$argsExpr});
+				registerCompExpr = macro registeredUIComponents.push( { classname:$cmpClassNameExpr, args:$argsExpr } );
+				//macroApplication.getRegisteredUIComponents().push( { classname:cmpClassName, args:null } ); // FIXME pass the args
+
+				#if slpdebug
+					neko.Lib.println("added to registeredUIComponents: "+cmpClassName+"");
+				#end
 			}
 			else
 			{
 				registerCompExpr = macro registeredNonUIComponents.push({classname:$cmpClassNameExpr, args:$argsExpr});
+				//macroApplication.getRegisteredNonUIComponents().push( { classname:cmpClassName, args:null } ); // FIXME pass the args
+
+				#if slpdebug
+					neko.Lib.println("added to registeredNonUIComponents: "+cmpClassName+"");
+				#end
 			}
 			registerComponentsforInitExprs.push(registerCompExpr);
-			
-			#if slpdebug
-				neko.Lib.println("added call to registerComponent("+cmpClassName+")");
-			#end
 		}
 	}
 	
@@ -627,19 +647,19 @@ class Builder
 	{
 		var pos;
 		
-		//keepComments option
+		// keepComments option
 		if ( !Context.defined('keepComments') )
 		{
 			removeComments(Lib.document.documentElement);
 		}
 		
-		//minimizeHtml option
+		// minimizeHtml option
 		if ( Context.defined('minimizeHtml') )
 		{
 			minimizeHtml(Lib.document.documentElement);
 		}
 		
-		//removes useless nodes
+		// clean DOM by removing useless nodes
 		for (n in nodesToRemove)
 		{
 			if (n.parentNode != null)
@@ -650,7 +670,7 @@ class Builder
 			}
 		}
 		
-		//specific js-target application packaging
+		// specific js-target application packaging
 		if (Context.defined('js'))
 		{
 			packForJs();
@@ -751,9 +771,11 @@ class Builder
 			#end
 			haxe.macro.Compiler.define("js-modern");
 		}
-		
+
 		//set the SLPlayer Class exposed name for js version
-		if ( Context.getLocalClass().get().meta.has(":expose"))
+		//if ( Context.getLocalClass().get().meta.has(":expose"))
+		var applicationClassType:haxe.macro.Ref<haxe.macro.ClassType> = switch(Context.getType("org.slplayer.core.Application")) { case TInst(classRef, params): classRef; default: null; } ;
+		if ( applicationClassType.get().meta.has(":expose"))
 		{
 			neko.Lib.println( "\nWARNING you should not set manually the @:expose meta tag on Application class as SLPlayer sets it automatically." );
 		}
@@ -768,7 +790,8 @@ class Builder
 				neko.Lib.println("Setting @:expose("+jsExposedName+") meta tag on SLPlayer class.");
 			#end
 
-			Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
+			//Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
+			applicationClassType.get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
 		}
 
 		if (Context.defined('disableEmbedHtml'))

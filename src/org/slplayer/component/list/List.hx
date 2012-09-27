@@ -77,6 +77,11 @@ class List<ElementClass> extends DisplayObject
 		super(rootElement, SLPId);
 		_selectedIndex = -1;
 		dataProvider = [];
+
+		// store the template
+		listTemplate = rootElement.innerHTML;
+		// and clear the rootElement contents
+		rootElement.innerHTML = "";
 	}
 	/**
 	 * init the component
@@ -87,8 +92,6 @@ class List<ElementClass> extends DisplayObject
 	{ 
 		// init the parent class
 		super.init();
-		// store the template
-		listTemplate = rootElement.innerHTML;
 
 		rootElement.addEventListener("click", click, false);
 		rootElement.addEventListener("rollOver", rollOver, false);
@@ -121,9 +124,19 @@ class List<ElementClass> extends DisplayObject
 				throw("Error: an error occured while interpreting the template - "+listTemplate+" - for the element "+elem);
 			}
 		}
+
+		for (i in 0...rootElement.childNodes.length)
+		{ trace("wanna clean "+rootElement.childNodes[i]);
+			getSLPlayer().cleanNode(rootElement.childNodes[i]);
+		}
+
 		rootElement.innerHTML = listInnerHtml;
 
-		
+		for (i in 0...rootElement.childNodes.length)
+		{ trace("wanna init "+rootElement.childNodes[i]);
+			getSLPlayer().initNode(rootElement.childNodes[i]);
+		}
+
 		attachListEvents();
 		updateSelectionDisplay([selectedItem]);
 	}
@@ -155,7 +168,8 @@ class List<ElementClass> extends DisplayObject
 	{
 		var element = childElement;
 		var idx = element.getAttribute(DATA_ATTR_LIST_ITEM_INDEX);
-		while (idx == null && element!=rootElement && element!=null){
+		while (idx == null && element != rootElement && element != null)
+		{
 			element = element.parentNode;
 			idx = element.getAttribute(DATA_ATTR_LIST_ITEM_INDEX);
 		}

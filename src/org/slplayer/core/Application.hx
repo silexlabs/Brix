@@ -15,8 +15,13 @@
  */
 package org.slplayer.core;
 
+#if macro
+import cocktail.Lib;
+import cocktail.Dom;
+#else
 import js.Lib;
 import js.Dom;
+#end
 
 /**
  * The main SLPlayer class handles the application initialization. It instanciates the components, tracking for each of them their 
@@ -25,7 +30,7 @@ import js.Dom;
  * 
  * @author Thomas Fétiveau
  */
-@:build(org.slplayer.core.Builder.build()) class Application 
+class Application 
 {
 	/**
 	 * The data- attribute set by the slplayer on the HTML elements associated with one or more component.
@@ -65,28 +70,47 @@ import js.Dom;
 	 * The potential arguments passed to the SLPlayer class at instanciation.
 	 */
 	public var dataObject(default,null) : Dynamic;
+	
+	#if !macro
+	/**
+	 * For runtime only: the context containing the list of registered components, the embedded HTML...
+	 */
+	private var applicationContext:ApplicationContext;
+	#end
+	
 	/**
 	 * A collection of the <script> declared UI components with the optionnal data- args passed on the <script> tag.
 	 * A UI component class is a child class of org.slplayer.component.ui.DisplayObject
 	 */
-	private var registeredUIComponents : Array<RegisteredComponent>;
+	public var registeredUIComponents(getRegisteredUIComponents, null) : Array<RegisteredComponent>;
+	public function getRegisteredUIComponents():Array<RegisteredComponent>
+	{
+		#if macro
+		if (registeredUIComponents == null)
+		{
+			registeredUIComponents = new Array();
+		}
+		return registeredUIComponents;
+		#else
+		return applicationContext.registeredUIComponents;
+		#end
+	}
 	/**
 	 * A collection of the <script> declared Non UI components with the optionnal data- args passed on the <script> tag.
 	 * Ideally, a component class should at least implement org.slplayer.component.ISLPlayerComponent.
 	 */
-	private var registeredNonUIComponents : Array<RegisteredComponent>;
-	/**
-	 * A collection of name => content <meta> header parameters from the source HTML page.
-	 * TODO shouldn't we just access the page's meta params ?
-	 */
-	private var metaParameters : Hash<String>;
-	
-	/**
-	 * Gets a meta parameter value.
-	 */
-	public function getMetaParameter(metaParamKey:String):Null<String>
+	public var registeredNonUIComponents(getRegisteredNonUIComponents,null) : Array<RegisteredComponent>;
+	public function getRegisteredNonUIComponents():Array<RegisteredComponent>
 	{
-		return metaParameters.get(metaParamKey);
+		#if macro
+		if (registeredNonUIComponents == null)
+		{
+			registeredNonUIComponents = new Array();
+		}
+		return registeredNonUIComponents;
+		#else
+		return applicationContext.registeredNonUIComponents;
+		#end
 	}
 
 	/**
@@ -100,7 +124,7 @@ import js.Dom;
 				trace("noAutoStart not defined: calling init()...");
 			#end
 
-			var newApp = createApplication();
+			var newApp:Application = createApplication();
 
 			#if (js && disableEmbedHtml)
 				//special case in js when auto starting the application, 
@@ -129,7 +153,11 @@ import js.Dom;
 		this.registeredUIComponents = new Array();
 		this.registeredNonUIComponents = new Array();
 		this.nodeToCmpInstances = new Hash();
-		this.metaParameters = new Hash();
+		//this.metaParameters = new Hash();
+
+		#if !macro
+		this.applicationContext = new ApplicationContext();
+		#end
 
 		#if slpdebug
 			trace("new SLPlayer instance built");
@@ -202,8 +230,11 @@ import js.Dom;
 			return;
 		}
 		
-		#if !disableEmbedHtml
-			htmlRootElement.innerHTML = _htmlDocumentElement;
+		// at macro time, htmlRootElement == Lib.document.documentElement so we already have the source html in 
+		// htmlRootElement.innerHTML
+		#if (!macro && !disableEmbedHtml)
+			//htmlRootElement.innerHTML = ApplicationContext.getEmbeddedHtml();
+			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
 		#end
 	}
 	
@@ -218,18 +249,6 @@ import js.Dom;
 		// return haxe.Md5.encode(Date.now().toString()+Std.string(Std.random(Std.int(Date.now().getTime()))));
 		return Std.string(Math.round(Math.random()*10000));
 	}
-	
-	/**
-	 * This function is implemented by the AppBuilder macro.
-	 */
-	private function initMetaParameters() { }
-	
-	/**
-	 * This function is implemented by the AppBuilder macro.
-	 * It simply pushes each component class declared in the headers of the HTML source file in the
-	 * registeredUIComponents and registeredNonUIComponents collections.
-	 */
-	private function registerComponentsforInit() { }
 
 	/**
 	 * Initialize the application's components in 2 stages : first create the instances and then call init()
@@ -238,10 +257,10 @@ import js.Dom;
 	public function initComponents()
 	{
 		// build the SLPlayer instance meta parameters Hash
-		initMetaParameters();
+		//initMetaParameters();
 		
 		// register the application components for initialization
-		registerComponentsforInit();
+		//registerComponentsforInit();
 
 		// create the UI components instances
 		initNode(htmlRootElement);
@@ -254,108 +273,123 @@ import js.Dom;
 	 * Parses and initializes all declared components on a given node.
 	 * 
 	 * @param node:HtmlDom the node to initialize.
+	 * @return 
 	 */
 	public function initNode(node:HtmlDom):Void
+	{
+		var comps:List<org.slplayer.component.ui.DisplayObject> = createUIComponents(node);
+		
+		if (comps == null)
+		{
+			return; // case node already initialized or not an element
+		}
+		
+		// initialization
+		#if !macro
+		initUIComponents(comps);
+		#end
+	}
+	
+	/**
+	 * Creates the UI component instances on a given node (and recursively on its children).
+	 * @param	node the DOM node where to start creating declared components
+	 * @return	a List of DisplayObject.
+	 */
+	private function createUIComponents(node:HtmlDom):Null<List<org.slplayer.component.ui.DisplayObject>>
 	{
 		if ( node.nodeType != Lib.document.body.nodeType )
 		{
 			// works only for elements
-			return;
+			return null;
 		}
 		
 		if ( node.getAttribute("data-" + SLPID_ATTR_NAME) != null )
 		{
 			// means that the node has already been initialized
-			return;
+			return null;
 		}
 		
 		// creation and initialization are two steps. We need to store temporarly the component instances to init while
 		// finishing to create them all.
 		var compsToInit:List<org.slplayer.component.ui.DisplayObject> = new List();
-		
-		// search for any registered component instance declaration in the newly added node
-		for (rc in registeredUIComponents)
+
+		if (node.getAttribute("class") != null)
 		{
-			var componentClass = resolveCompClass(rc.classname);
-			
-			if (componentClass == null)
+			// we iterate on the node's class attribute values in the order they've been specified
+			for (classValue in node.getAttribute("class").split(" "))
 			{
-				continue;
-			}
-			
-			var classAttrValues:Array<String> = [getUnconflictedClassTag(rc.classname)];
-			
-			if (classAttrValues[0] != rc.classname)
-			{
-				classAttrValues.push(rc.classname);
-			}
-			
-			var taggedNodes : Array<HtmlDom> = new Array();
-			
-			for (cav in classAttrValues)
-			{
-				#if slpdebug
-					trace("searching now for class tag = "+cav);
-				#end
-				
-				// search in the node's class attr value
-				if (node.getAttribute("class") != null)
+				// search for any registered component that could match this class attr value
+				for (rc in registeredUIComponents)
 				{
-					for (nodeClassVal in node.getAttribute("class").split(" "))
+					// the possible class attr values for this component
+					var componentClassAttrValues:Array<String> = [getUnconflictedClassTag(rc.classname)]; // TODO FIXME, this could probably be stored somewhere to avoid doing it all the time ?
+
+					if (componentClassAttrValues[0] != rc.classname)
 					{
-						if (nodeClassVal == cav)
+						componentClassAttrValues.push(rc.classname);
+					}
+
+					if (!Lambda.exists(componentClassAttrValues, function(s:String) { return s == classValue; } ))
+					{
+						continue;
+					}
+					// component identified, try now to resolve its class
+					var componentClass = resolveCompClass(rc.classname); // TODO FIXME, this could probably be stored somewhere to avoid doing it all the time ?
+
+					if (componentClass == null)
+					{
+						continue;
+					}
+
+					// create a new instance of this component
+					var newDisplayObject = null;
+
+					#if !stopOnError
+					try
+					{
+					#end
+
+						newDisplayObject = Type.createInstance( componentClass, [node, id] );
+
+						#if slpdebug
+							trace("Successfuly created instance of "+rc.classname);
+						#end
+
+					#if !stopOnError
+					}
+					catch ( unknown : Dynamic )
+					{
+						trace("ERROR while creating "+rc.classname+": "+Std.string(unknown));
+						var excptArr = haxe.Stack.exceptionStack();
+						if ( excptArr.length > 0 )
 						{
-							taggedNodes.push(node);
+							trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
 						}
 					}
-				}
-				
-				// search in the node's children
-				var taggedNodesCollection : HtmlCollection<HtmlDom> = node.getElementsByClassName(cav);
-				for (nodeCnt in 0...taggedNodesCollection.length)
-				{
-					taggedNodes.push(taggedNodesCollection[nodeCnt]);
-				}
-			}
-			
-			for (tgn in taggedNodes)
-			{
-				var newDisplayObject = null;
-				
-				#if !stopOnError
-				try
-				{
-				#end
-					
-					newDisplayObject = Type.createInstance( componentClass, [tgn, id] );
-					
-					#if slpdebug
-						trace("Successfuly created instance of "+rc.classname);
 					#end
-				
-				#if !stopOnError
+
+					compsToInit.add(newDisplayObject);
 				}
-				catch ( unknown : Dynamic )
-				{
-					trace("ERROR while creating "+rc.classname+": "+Std.string(unknown));
-					var excptArr = haxe.Stack.exceptionStack();
-					if ( excptArr.length > 0 )
-					{
-						trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
-					}
-				}
-				#end
-				
-				compsToInit.add(newDisplayObject);
 			}
 		}
-		
-		// Initialization
-		initUIComponents(compsToInit);
+
+		// iterate on child nodes
+		for (cc in 0...node.childNodes.length)
+		{
+			var res = createUIComponents(node.childNodes[cc]);
+
+			if (res != null)
+			{
+				compsToInit = Lambda.concat( compsToInit, res );
+			}
+		}
+
+		return compsToInit;
 	}
 	
 	/**
 	 * Initializes a collection of UI component instances.
+	 * @param the List of DisplayObject instances to init.
 	 */
 	private function initUIComponents(compInstances:List<org.slplayer.component.ui.DisplayObject>):Void
 	{
@@ -447,7 +481,15 @@ import js.Dom;
 	 */
 	private function resolveCompClass(classname:String):Class<Dynamic>
 	{
-		var componentClass = Type.resolveClass(classname);
+		#if macro
+		trace("is std.Type.resolveClass('haxe.Serializer') == null ? "+(std.Type.resolveClass("haxe.Serializer")==null));
+		trace("is std.Type.resolveClass('"+classname+"') == null ? "+(std.Type.resolveClass(classname)==null));
+		trace("getting module "+classname);
+		haxe.macro.Context.getModule(classname);
+		trace("is std.Type.resolveClass('"+classname+"') == null ? "+(std.Type.resolveClass(classname)==null));
+		#end
+		
+		var componentClass = std.Type.resolveClass(classname);
 			
 		if (componentClass == null)
 		{
