@@ -208,7 +208,6 @@ class Draggable extends DisplayObject, implements IGroupable
 			dragZone = rootElement;
 
 		// attach the events
-		trace("!!!!!! dragZone = "+dragZone);
 		dragZone.addEventListener("mousedown", startDrag, false);
 		//dragZone.onmouseup = stopDrag;
 		mouseUpCallback = callback(stopDrag);
@@ -221,7 +220,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 */
 	override public function clean() : Void
 	{
-		super.clean(); trace("cleaning Draggable... dragZone="+dragZone);
+		super.clean();
 
 		dragZone.removeEventListener("mousedown", startDrag, false);
 		Lib.document.body.removeEventListener("mouseup", mouseUpCallback, false);
