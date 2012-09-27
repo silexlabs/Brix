@@ -257,6 +257,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		if (refHtmlDom == null) 
 			refHtmlDom = rootElement;
+/*
 #if js
 		var computedStyle:Style = untyped __js__("window.getComputedStyle(refHtmlDom, null)");
 
@@ -275,6 +276,7 @@ class Draggable extends DisplayObject, implements IGroupable
 			Reflect.setField(miniPhantom.style, styleName, val);
 		}
 #end
+*/
 		//trace("initPhantomStyle "+computedStyle.position+" - "+phantom.style.position);
 		phantom.className = refHtmlDom.className + " " + phantomClassName;
 		miniPhantom.className = refHtmlDom.className + " " + phantomClassName;

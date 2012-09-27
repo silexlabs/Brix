@@ -155,6 +155,10 @@ class Panel extends DisplayObject
 			var margin = (rootElement.offsetHeight - rootElement.clientHeight);
 			var bodyMargin = (body.offsetHeight - body.clientHeight);
 
+			if (header != null){
+				body.style.top = header.offsetHeight + "px";
+			}
+
 			bodySize = boundingBox.h;
 			bodySize += bodyMargin;
 			bodySize -= margin;
