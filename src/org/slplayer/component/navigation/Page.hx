@@ -185,7 +185,7 @@ class Page extends DisplayObject, implements IGroupable
 			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name
 		)
 		{
-			open(null, null, true, true);
+			DomTools.doLater(callback(open, null, null, true, true));
 		}
 	}
 
@@ -259,7 +259,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Remove the children from the DOM
 	 */
 	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null, preventTransitions:Bool = false) 
-	{// trace("close "+transitionData+", "+name+" - "+preventTransitions);
+	{trace("close "+transitionData+", "+name+" - "+preventTransitions+" - "+groupElement);
 		// default value
 		if (preventCloseByClassName==null)
 			preventCloseByClassName = new Array();
