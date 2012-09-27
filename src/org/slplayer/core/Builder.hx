@@ -103,7 +103,7 @@ class Builder
 	/**
 	 * The expressions array of the initMetaParameters() method.
 	 */
-	static private var initMetaParametersExprs : Array<haxe.macro.Expr>;
+	//static private var initMetaParametersExprs : Array<haxe.macro.Expr>;
 	/**
 	 * The expressions array of the registerComponentsforInit() method.
 	 */
@@ -180,10 +180,10 @@ class Builder
 			var pos = Context.currentPos();
 			
 			//set the metaParameters var
-			for ( metaName in { iterator : metaParameters.keys } )
-			{
-				initMetaParametersExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent( "metaParameters" )), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString( metaName )), pos : pos }, { expr : EConst(CString( metaParameters.get(metaName) )), pos : pos } ]), pos : pos } );
-			}
+			//for ( metaName in { iterator : metaParameters.keys } )
+			//{
+				//initMetaParametersExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent( "metaParameters" )), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString( metaName )), pos : pos }, { expr : EConst(CString( metaParameters.get(metaName) )), pos : pos } ]), pos : pos } );
+			//}
 			
 			//add the import and init() calls for the declared components in the application
 			includeComponents();
@@ -539,8 +539,8 @@ class Builder
 					{
 						case EBlock(exprs):
 
-							if (fields[fc].name == "initMetaParameters")
-								initMetaParametersExprs = exprs;
+							//if (fields[fc].name == "initMetaParameters")
+								//initMetaParametersExprs = exprs;
 
 							if (fields[fc].name == "registerComponentsforInit")
 								registerComponentsforInitExprs = exprs;

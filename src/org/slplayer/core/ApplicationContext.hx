@@ -28,7 +28,7 @@ import org.slplayer.core.Application;
 		
 		registeredNonUIComponents = new Array();
 		
-		initMetaParameters();
+		//initMetaParameters();
 		
 		registerComponentsforInit();
 	}
@@ -36,7 +36,7 @@ import org.slplayer.core.Application;
 	/**
 	 * This function is implemented by the AppBuilder macro.
 	 */
-	private function initMetaParameters() { }
+	//private function initMetaParameters() { }
 	
 	/**
 	 * This function is implemented by the AppBuilder macro.
