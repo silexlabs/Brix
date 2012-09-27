@@ -893,17 +893,17 @@ class Builder
 	 * 
 	 * @return a List of classnames.
 	 */
-	//static public function getClassNameFromClassTag( classTag : String ) : List<String>
-	//{
-		//var classNames : List<String> = new List();
-		//
-		//for ( className in { iterator : declaredComponents.keys } )
-		//{
-			//var a = className.split(".");
-			//if (a[a.length-1] == classTag)
-				//classNames.add( className );
-		//}
-		//
-		//return classNames;
-	//}
+	static public function getClassNameFromClassTag( classTag : String ) : List<String>
+	{
+		var classNames : List<String> = new List();
+		
+		for ( className in { iterator : declaredComponents.keys } )
+		{
+			var a = className.split(".");
+			if (a[a.length-1] == classTag)
+				classNames.add( className );
+		}
+		
+		return classNames;
+	}
 }

@@ -71,6 +71,11 @@ class List<ElementClass> extends DisplayObject
 		super(rootElement, SLPId);
 		_selectedIndex = -1;
 		dataProvider = [];
+		
+		// store the template
+		listTemplate = rootElement.innerHTML;
+		// and clear the rootElement contents
+		rootElement.innerHTML = "";
 	}
 	/**
 	 * init the component
@@ -81,9 +86,6 @@ class List<ElementClass> extends DisplayObject
 	{ 
 		// init the parent class
 		super.init();
-		// store the template
-		//listTemplate = rootElement.innerHTML;
-		listTemplate = "<li class=\"Draggable\">::title::</li>"; // temporary dirty fix
 	}
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
