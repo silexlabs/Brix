@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"html",
+				"htmlDom"
+			],
+			[
+				"root",
+				"rootElement"
+			],
+			[
 				"border-",
 				"border-width"
 			],
@@ -190,10 +198,6 @@
 			[
 				"Dra",
 				"DragableState	class"
-			],
-			[
-				"root",
-				"rootElement	var"
 			],
 			[
 				"bod",
@@ -407,6 +411,38 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "src/dragDrop.html",
+			"settings":
+			{
+				"buffer_size": 1095,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "bin/dragDrop.css",
+			"settings":
+			{
+				"buffer_size": 1085,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/component/interaction/Draggable.hx",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/lexa/Documents/repositories/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/util/DomTools.hx",
+			"settings":
+			{
+				"buffer_size": 12301,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "Packages/HaXe/Hxml.sublime-build",
 	"command_palette":
@@ -440,6 +476,7 @@
 	},
 	"file_history":
 	[
+		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/util/DomTools.hx",
 		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/component/interaction/Draggable.hx",
 		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/bin/lists.css",
 		"/Users/lexa/Dropbox/fdt-workspace/SLPlayer/demo/tool_box_demo/bin/pannel.css",
@@ -555,6 +592,26 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"-=",
+			"+=",
+			"-=",
+			"+=",
+			"pos.y",
+			"pos.x",
+			"mouseY",
+			"mouseX",
+			"+=",
+			"getElementBoundingBox",
+			"bb",
+			"+=",
+			"initialX",
+			"offsetX",
+			"boundingBox.",
+			"\n		",
+			"		\n",
+			"initialX",
+			"moveCallback",
+			"addEventListener",
 			"phantom",
 			"initPhantomStyle",
 			"phantom",
@@ -662,27 +719,7 @@
 			"slBuilder.",
 			"SLBuilderBridge",
 			"var",
-			"testp",
-			"widget",
-			"layer",
-			"Layer",
-			"layer",
-			"ayer",
-			"layer",
-			"ArrayStore",
-			"removeComponent",
-			"width",
-			"height",
-			"ComponentsWidget",
-			"componentsWidget",
-			"gridFormHtmlDom",
-			"initDomReferences",
-			"getComponents",
-			"parent",
-			"parentId",
-			"root",
-			"NAME_COLUMN_TITLE",
-			"Layer"
+			"testp"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -703,8 +740,120 @@
 	"groups":
 	[
 		{
+			"selected": 3,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "src/dragDrop.html",
+					"settings":
+					{
+						"buffer_size": 1095,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								805,
+								795
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "bin/dragDrop.css",
+					"settings":
+					{
+						"buffer_size": 1085,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								125,
+								125
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/component/interaction/Draggable.hx",
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"haxe-build-id": 0,
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 6902.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/home/lexa/Documents/repositories/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/util/DomTools.hx",
+					"settings":
+					{
+						"buffer_size": 12301,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								681,
+								681
+							]
+						],
+						"settings":
+						{
+							"haxe-build-id": 0,
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
 			]
 		}
 	],

@@ -39,7 +39,6 @@ enum LayerStatus
  * The DOM element is first made empty by removing all its children from the DOM.
  * When a page is to be displayed, the content of the corresponding layers are attached back to the DOM.
  */
-@tagNameFilter("div")
 class Layer extends DisplayObject
 {
 	/**

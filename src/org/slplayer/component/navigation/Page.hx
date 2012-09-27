@@ -19,6 +19,7 @@ import js.Lib;
 import js.Dom;
 
 import org.slplayer.component.ui.DisplayObject;
+import org.slplayer.component.navigation.link.LinkBase;
 import org.slplayer.component.navigation.transition.TransitionData;
 import org.slplayer.util.DomTools;
 import org.slplayer.core.Application;
@@ -52,6 +53,10 @@ class Page extends DisplayObject, implements IGroupable
 	 * constant, initial page's name data tag, on the group node
 	 */
 	public static inline var ATTRIBUTE_INITIAL_PAGE_NAME:String = "data-initial-page-name";
+	/**
+	 * css class name added to links when their corresponding page is opened
+	 */
+	public static inline var OPENED_PAGE_CSS_CLASS:String = "page-opened";
 	/**
 	 * Name of the page.
 	 * This is the anchor name to be used as a link/deeplink
@@ -171,12 +176,16 @@ class Page extends DisplayObject, implements IGroupable
 	override public function init()
 	{
 		super.init();
+		// group element is body element by default
+		if (groupElement == null)
+			groupElement = Lib.document.body;
+
 		// close if it is not the default page
 		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
-			|| (groupElement != null && groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name)
+			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name
 		)
 		{
-			open(null, null, true, true);
+			DomTools.doLater(callback(open, null, null, true, true));
 		}
 	}
 
@@ -230,7 +239,19 @@ class Page extends DisplayObject, implements IGroupable
 					layerInstance.show(transitionData, preventTransitions);
 			}
 		}
-
+		// add the page-opened css style on links to this page
+		var nodes = DomTools.getElementsByAttribute(groupElement, LinkBase.CONFIG_PAGE_NAME_ATTR, name);
+		for (idxLayerNode in 0...nodes.length)
+		{
+			var element = nodes[idxLayerNode];
+			DomTools.addClass(element, OPENED_PAGE_CSS_CLASS);
+		}
+		var nodes = DomTools.getElementsByAttribute(groupElement, LinkBase.CONFIG_PAGE_NAME_ATTR, "#"+name);
+		for (idxLayerNode in 0...nodes.length)
+		{
+			var element = nodes[idxLayerNode];
+			DomTools.addClass(element, OPENED_PAGE_CSS_CLASS);
+		}
 	}
 
 	/**
@@ -238,7 +259,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Remove the children from the DOM
 	 */
 	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null, preventTransitions:Bool = false) 
-	{// trace("close "+transitionData+", "+name+" - "+preventTransitions);
+	{trace("close "+transitionData+", "+name+" - "+preventTransitions+" - "+groupElement);
 		// default value
 		if (preventCloseByClassName==null)
 			preventCloseByClassName = new Array();
@@ -268,6 +289,19 @@ class Page extends DisplayObject, implements IGroupable
 					cast(layerInstance, Layer).hide(transitionData, preventTransitions);
 				}
 			}
+		}
+		// remove the page-opened css style on links to this page
+		var nodes = DomTools.getElementsByAttribute(groupElement, LinkBase.CONFIG_PAGE_NAME_ATTR, name);
+		for (idxLayerNode in 0...nodes.length)
+		{
+			var element = nodes[idxLayerNode];
+			DomTools.removeClass(element, OPENED_PAGE_CSS_CLASS);
+		}
+		var nodes = DomTools.getElementsByAttribute(groupElement, LinkBase.CONFIG_PAGE_NAME_ATTR, "#" + name);
+		for (idxLayerNode in 0...nodes.length)
+		{
+			var element = nodes[idxLayerNode];
+			DomTools.removeClass(element, OPENED_PAGE_CSS_CLASS);
 		}
 	}
 }
