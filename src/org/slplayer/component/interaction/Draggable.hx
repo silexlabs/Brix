@@ -121,7 +121,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	/**
 	 * html elment instances
 	 */
-	public var dropZones:HtmlCollection<HtmlDom>;
+//	public var dropZones:HtmlCollection<HtmlDom>;
 	/**
 	 * class name to select drop zones 
 	 * @default	dropzone 
@@ -207,11 +207,6 @@ class Draggable extends DisplayObject, implements IGroupable
 		if (dragZone == null)
 			dragZone = rootElement;
 
-		// retrieve references to the elements
-		dropZones = groupElement.getElementsByClassName(dropZonesClassName);
-		if (dropZones.length == 0)
-			dropZones[0] = rootElement.parentNode;
-
 		// attach the events
 		trace("!!!!!! dragZone = "+dragZone);
 		dragZone.addEventListener("mousedown", startDrag, false);
@@ -258,10 +253,13 @@ class Draggable extends DisplayObject, implements IGroupable
 	/**
 	 * init phantom according to root element properties
 	 */
-	private function initPhantomStyle(phantom:HtmlDom)
+	public function initPhantomStyle(refHtmlDom:HtmlDom=null)
 	{
+		if (refHtmlDom == null) 
+			refHtmlDom = rootElement;
+/*
 #if js
-		var computedStyle:Style = untyped __js__("window.getComputedStyle(this.rootElement, null)");
+		var computedStyle:Style = untyped __js__("window.getComputedStyle(refHtmlDom, null)");
 
 		for (styleName in Reflect.fields(computedStyle)){
 			// retrieve the computed properties
@@ -275,10 +273,13 @@ class Draggable extends DisplayObject, implements IGroupable
 			//trace("set style "+styleName+" = "+val+" - "+mozzVal);
 			//DomTools.inspectTrace(val);
 			Reflect.setField(phantom.style, styleName, val);
+			Reflect.setField(miniPhantom.style, styleName, val);
 		}
 #end
+*/
 		//trace("initPhantomStyle "+computedStyle.position+" - "+phantom.style.position);
-		phantom.className = rootElement.className + " " + phantomClassName;
+		phantom.className = refHtmlDom.className + " " + phantomClassName;
+		miniPhantom.className = refHtmlDom.className + " " + phantomClassName;
 	}
 	/**
 	 * init phantom according to root element properties
@@ -300,13 +301,14 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		if (state == none)
 		{
+			var boundingBox = DomTools.getElementBoundingBox(rootElement);
 			state = dragging;
-			initialX = rootElement.offsetLeft;
-			initialY = rootElement.offsetTop;
-			initialMouseX = e.clientX;
-			initialMouseY = e.clientY;
-			initPhantomStyle(phantom);
-			initPhantomStyle(miniPhantom);
+			initialX = boundingBox.x;
+			initialY = boundingBox.y;
+			initialMouseX = e.pageX;
+			initialMouseY = e.pageY;
+			initPhantomStyle();
+			initPhantomStyle();
 			initRootElementStyle();
 			//initialStylePosition = rootElement.style.position;
 
@@ -385,11 +387,11 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		if (state == dragging)
 		{
-			var x = e.clientX - initialMouseX + initialX;
-			var y = e.clientY - initialMouseY + initialY;
+			var x = e.pageX - initialMouseX + initialX;
+			var y = e.pageY - initialMouseY + initialY;
 			rootElement.style.left = x + "px";
 			rootElement.style.top = y + "px";
-			setAsBestDropZone(getBestDropZone(e.clientX, e.clientY));
+			setAsBestDropZone(getBestDropZone(e.pageX, e.pageY));
 
 			// dispatch a custom event
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
@@ -407,6 +409,11 @@ class Draggable extends DisplayObject, implements IGroupable
 	 */
 	public function getBestDropZone(mouseX:Int, mouseY:Int):Null<DropZone>
 	{
+		// retrieve references to the elements
+		var dropZones = groupElement.getElementsByClassName(dropZonesClassName);
+		if (dropZones.length == 0)
+			dropZones[0] = rootElement.parentNode;
+
 		for (zoneIdx in 0...dropZones.length)
 		{
 			var zone = dropZones[zoneIdx];
@@ -446,11 +453,19 @@ class Draggable extends DisplayObject, implements IGroupable
 		}
 		return null;
 	}
-	private function computeDistance(bb:{x:Int, y:Int, w:Int, h:Int},mouseX:Int, mouseY:Int) :Float
+	private function computeDistance(bb:BoundingBox,mouseX:Int, mouseY:Int) :Float
 	{
+/**/
 		return Math.sqrt(
-			Math.pow((bb.x+bb.w/2.0)-mouseX, 2)
-			+ Math.pow((bb.y+bb.h/2.0)-mouseY, 2)
+			Math.pow((bb.x)-mouseX, 2)
+			+ Math.pow((bb.y)-mouseY, 2)
+		);
+/**/
+		var x = (bb.x+bb.w/2.0) + mouseX - initialMouseX - initialX;
+		var y = (bb.y+bb.h/2.0) + mouseY - initialMouseY - initialY;
+		return Math.sqrt(
+			Math.pow(x-mouseX, 2)
+			+ Math.pow(y-mouseY, 2)
 		);
 	}
 	/**
@@ -471,7 +486,13 @@ class Draggable extends DisplayObject, implements IGroupable
 		}
 		if (zone != null)
 		{
-			zone.parent.insertBefore(phantom, zone.parent.childNodes[zone.position]);
+			if (zone.parent.childNodes.length <= zone.position){
+				// insert after the last child
+				zone.parent.appendChild(phantom);
+			}
+			else{
+				zone.parent.insertBefore(phantom, zone.parent.childNodes[zone.position]);
+			}
 		}
 		bestDropZone = zone;
 	}

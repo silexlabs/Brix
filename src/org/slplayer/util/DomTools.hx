@@ -18,6 +18,13 @@ package org.slplayer.util;
 import js.Lib;
 import js.Dom;
 
+typedef BoundingBox = {
+	x:Int,
+	y:Int,
+	w:Int,
+	h:Int,
+}
+
 /**
  * Some additional DOM functions extending the standard ones.
  * 
@@ -67,6 +74,10 @@ class DomTools
 	{
 		var domElements = rootElement.getElementsByClassName(className);
 		
+		if (domElements.length > 1)
+		{
+			throw("Error: search for the element with class name \""+className+"\" gave "+domElements.length+" results");
+		}
 		if (domElements != null && domElements.length == 1)
 		{
 			return domElements[0];
@@ -82,17 +93,58 @@ class DomTools
 	/**
 	 * Compute the htmlDom element size and position, taking margins, paddings and borders into account, and also the parents ones
 	 * @param	htmlDom 	HtmlDom element of which we want to know the size 
-	 * @return 	the width in pixels
+	 * @return 	the BoundingBox object
 	 */
-	static public function getElementBoundingBox(htmlDom:HtmlDom):{x:Int, y:Int, w:Int, h:Int}{
+	static public function getElementBoundingBox(htmlDom:HtmlDom):BoundingBox{
 		var halfBorderH = 0;//(htmlDom.offsetWidth - htmlDom.clientWidth)/2.0;
 		var halfBorderV = 0;//(htmlDom.offsetHeight - htmlDom.clientHeight)/2.0;
+
+		// add the scroll offset of all container
+		// and the position of all positioned ancecestors
+		var scrollTop = 0;
+		var scrollLeft = 0;
+		var element = htmlDom;
+		while (element.parentNode != null && element.tagName.toLowerCase() != "body" 
+			//&& element.style.position != "relative" && element.style.position != "absolute" && element.style.position != "fixed"
+			){
+			//trace("parent "+element.scrollTop);
+			scrollTop -= element.scrollTop;
+			scrollLeft -= element.scrollLeft;
+
+			element = element.parentNode;
+		}
+		scrollTop -= element.scrollTop;
+		scrollLeft -= element.scrollLeft;
+
 		return {
-			x:Math.floor(htmlDom.offsetLeft - halfBorderH),
-			y:Math.floor(htmlDom.offsetTop - halfBorderV),
+			x:Math.floor(htmlDom.offsetLeft - halfBorderH)+scrollLeft,
+			y:Math.floor(htmlDom.offsetTop - halfBorderV)+scrollTop,
 			w:Math.floor(htmlDom.offsetWidth - halfBorderH),
 			h:Math.floor(htmlDom.offsetHeight - halfBorderV)
 		};
+	}
+	static public function localToGlobal(x, y, htmlDom:HtmlDom): {x:Int, y:Int}
+	{
+		// add the scroll offset of all container
+		// and the position of all positioned ancecestors
+		var element = htmlDom;
+		while (element.parentNode != null && element.tagName.toLowerCase() != "body" 
+			//&& element.style.position != "relative" && element.style.position != "absolute" && element.style.position != "fixed"
+			){
+
+			// add the position when the ancestor is positioned, i.e. with position relative, absolute, or fixed
+			x -= element.offsetLeft;
+			y -= element.offsetTop;
+			//x += element.scrollLeft;
+			//y += element.scrollTop;
+			element = element.parentNode;
+		}
+		x -= element.offsetLeft;
+		y -= element.offsetTop;
+		//x += element.scrollLeft;
+		//y += element.scrollTop;
+
+		return {x:x, y:y};
 	}
 	
 	/**

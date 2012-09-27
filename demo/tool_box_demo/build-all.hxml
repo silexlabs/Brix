@@ -1,6 +1,6 @@
 -js bin/toolBox.js
--cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
+-cp ../../src/
 -main org.slplayer.core.Application
 --macro org.slplayer.core.Builder.create('./src/toolBox.html')
 -D slpdebug
@@ -9,8 +9,8 @@
 --next
 
 -js bin/dragDrop.js
--cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
+-cp ../../src/
 -main org.slplayer.core.Application
 --macro org.slplayer.core.Builder.create('./src/dragDrop.html')
 -D slpdebug
@@ -19,8 +19,8 @@
 --next
 
 -js bin/lists.js
--cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
+-cp ../../src/
 -main org.slplayer.core.Application
 --macro org.slplayer.core.Builder.create('./src/lists.html')
 -D slpdebug
@@ -29,8 +29,8 @@
 --next
 
 -js bin/pannel.js
--cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
+-cp ../../src/
 -main org.slplayer.core.Application
 --macro org.slplayer.core.Builder.create('./src/pannel.html')
 -D slpdebug

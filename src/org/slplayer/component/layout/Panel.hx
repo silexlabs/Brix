@@ -83,11 +83,9 @@ class Panel extends DisplayObject
 	public function new(rootElement:HtmlDom, SLPId:String){
 		super(rootElement, SLPId);
 		var _this_ = this;
-#if js
-		untyped __js__("window.addEventListener('resize', function(e){_this_.redraw();});");
-#else
-		Lib.window.addEventListener('resize', function(e){redraw();});
-#end
+
+		Lib.window.addEventListener('resize', callback(redrawCallback), false);
+
 		// do not work: Lib.document.addEventListener("resize", redraw, false);
 		// do not compile: Lib.window.addEventListener("resize", redraw, false);
 		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
@@ -102,6 +100,7 @@ class Panel extends DisplayObject
 		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_HEADER);
 		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_HEADER;
 		header = DomTools.getSingleElement(rootElement, cssClassName, false);
+		if (header == null) trace("Warning, no header for Panel component");
 		
 		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_BODY);
 		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_BODY;
@@ -110,6 +109,7 @@ class Panel extends DisplayObject
 		var cssClassName = rootElement.getAttribute(ATTR_CSS_CLASS_FOOTER);
 		if (cssClassName == null) cssClassName = DEFAULT_CSS_CLASS_FOOTER;
 		footer = DomTools.getSingleElement(rootElement, cssClassName, false);
+		if (footer == null) trace("Warning, no footer for Panel component");
 
 		// attributes
 		if (rootElement.getAttribute(ATTR_IS_HORIZONTAL) == "true")
@@ -121,10 +121,16 @@ class Panel extends DisplayObject
 		DomTools.doLater(redraw);
 	}
 	/**
+	 * call redraw when an event occures
+	 */
+	public function redrawCallback(e:Event){
+		redraw();
+	}
+
+	/**
 	 * computes the size of each element
 	 */
 	public function redraw(){
-		trace("redraw ");
 		var bodySize:Int;
 		var boundingBox = DomTools.getElementBoundingBox(rootElement);
 		if (isHorizontal){
@@ -142,11 +148,16 @@ class Panel extends DisplayObject
 				bodySize -= boundingBox.w;
 				bodySize -= footerMargin;
 			}
+			bodySize-=5;
 			body.style.width = bodySize+"px";
 		}
 		else{
 			var margin = (rootElement.offsetHeight - rootElement.clientHeight);
 			var bodyMargin = (body.offsetHeight - body.clientHeight);
+
+			if (header != null){
+				body.style.top = header.offsetHeight + "px";
+			}
 
 			bodySize = boundingBox.h;
 			bodySize += bodyMargin;
@@ -161,7 +172,7 @@ class Panel extends DisplayObject
 				bodySize -= boundingBox.h;
 				bodySize -= footerMargin;
 			}
-			bodySize--;
+			bodySize-=5;
 			body.style.height = bodySize+"px";
 		}
 	}
