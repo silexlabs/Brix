@@ -400,7 +400,6 @@ class Draggable extends DisplayObject, implements IGroupable
 				draggable: this,
 			});
 			rootElement.dispatchEvent(event);
-
 		}
 	}
 	/**
@@ -409,14 +408,19 @@ class Draggable extends DisplayObject, implements IGroupable
 	public function getBestDropZone(mouseX:Int, mouseY:Int):Null<DropZone>
 	{
 		// retrieve references to the elements
-		var dropZones = groupElement.getElementsByClassName(dropZonesClassName);
-		if (dropZones.length == 0)
-			dropZones[0] = rootElement.parentNode;
-
-		for (zoneIdx in 0...dropZones.length)
+		var dropZones:List<HtmlDom> = new List();
+		var taggedDropZones = groupElement.getElementsByClassName(dropZonesClassName);
+		for ( dzi in 0...taggedDropZones.length )
 		{
-			var zone = dropZones[zoneIdx];
+			dropZones.add(taggedDropZones[dzi]);
+		}
+		if (dropZones.isEmpty())
+		{
+			dropZones.add(rootElement.parentNode);
+		}
 
+		for (zone in dropZones)
+		{
 			// if the mouse is in the zone
 			if ( mouseX > zone.offsetLeft && mouseX < zone.offsetLeft + zone.offsetWidth
 				&& mouseY > zone.offsetTop && mouseY < zone.offsetTop + zone.offsetHeight )
@@ -424,7 +428,8 @@ class Draggable extends DisplayObject, implements IGroupable
 				var lastChildIdx:Int = 0;
 				var nearestDistance:Float = 999999999999;
 				// browse all children to see which one is after the desired zone
-				for (childIdx in 0...zone.childNodes.length){
+				for (childIdx in 0...zone.childNodes.length)
+				{
 					var child = zone.childNodes[childIdx];
 					// test the case before this child
 					zone.insertBefore(miniPhantom, child);
@@ -437,6 +442,7 @@ class Draggable extends DisplayObject, implements IGroupable
 						lastChildIdx = childIdx;
 					}
 				}
+
 				// test the case of the last child
 				zone.appendChild(miniPhantom);
 				var bb = DomTools.getElementBoundingBox(miniPhantom);
