@@ -17,6 +17,8 @@ package org.slplayer.component.list;
 
 import js.Lib;
 import js.Dom;
+import org.slplayer.component.interaction.Draggable;
+
 import org.slplayer.util.DomTools;
 
 import org.slplayer.component.ui.DisplayObject;
@@ -95,17 +97,53 @@ class List<ElementClass> extends DisplayObject
 
 		rootElement.addEventListener("click", click, false);
 		rootElement.addEventListener("rollOver", rollOver, false);
+		rootElement.addEventListener(Draggable.EVENT_DROPPED, listDOMChanged, false);
 	}
+
+	/**
+	 * Cleans the list object before removal.
+	 */
+	override public function clean() : Void
+	{
+		super.clean();
+
+		rootElement.removeEventListener("click", click, false);
+		rootElement.removeEventListener("rollOver", rollOver, false);
+		rootElement.removeEventListener(Draggable.EVENT_DROPPED, listDOMChanged, false);
+	}
+
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
 	 * this method calls reloadData which then calls doRedraw
 	 */ 
 	public function redraw()
 	{
-		//trace("redraw "+" - "+Type.getClassName(Type.getClass(this)));
-
 		// refresh list data
 		reloadData();
+	}
+	/**
+	 * Triggered when the list's DOM tree has changed.
+	 */
+	public function listDOMChanged(?e:Event):Void
+	{
+		e.stopPropagation();
+		var newDataProvider:Array<ElementClass> = new Array();
+		// re-order the items in the dataprovider according to the DOM
+		for (i in 0...rootElement.childNodes.length)
+		{
+			if (rootElement.childNodes[i].nodeType != rootElement.nodeType || 
+				rootElement.childNodes[i].getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
+			{
+				continue;
+			}
+			// TODO support new elts with no DATA_ATTR_LIST_ITEM_INDEX attribute yet (need retro-template for that)
+			newDataProvider.push(dataProvider[Std.parseInt(rootElement.childNodes[i].getAttribute(DATA_ATTR_LIST_ITEM_INDEX))]);
+		}
+		dataProvider = newDataProvider;
+		// reset the item ids
+		setItemIds(true);
+		
+trace("new dataProvider = "+dataProvider);
 	}
 	/**
 	 * redraw the list without calling reloadData
@@ -117,7 +155,8 @@ class List<ElementClass> extends DisplayObject
 		var t = new haxe.Template(listTemplate);
 		for (elem in dataProvider)
 		{
-			try{
+			try
+			{
 				listInnerHtml += t.execute(elem, TemplateMacros);
 			}
 			catch(e:Dynamic){
@@ -126,18 +165,18 @@ class List<ElementClass> extends DisplayObject
 		}
 
 		for (i in 0...rootElement.childNodes.length)
-		{ trace("wanna clean "+rootElement.childNodes[i]);
+		{
 			getSLPlayer().cleanNode(rootElement.childNodes[i]);
 		}
 
 		rootElement.innerHTML = listInnerHtml;
 
 		for (i in 0...rootElement.childNodes.length)
-		{ trace("wanna init "+rootElement.childNodes[i]);
+		{
 			getSLPlayer().initNode(rootElement.childNodes[i]);
 		}
 
-		attachListEvents();
+		setItemIds();
 		updateSelectionDisplay([selectedItem]);
 	}
 	/**
@@ -145,19 +184,25 @@ class List<ElementClass> extends DisplayObject
 	 * to be overriden to handle the model or do nothing if you manipulate the list and dataProvider by composition
 	 * if you override this, either call super.reloadData() to redraw immediately, or call doRedraw() when the data is ready
 	 */
-	public function reloadData()
+	public function reloadData():Void
 	{
 		doRedraw();
 	}
 	/**
-	 * attach mouse events to the list and the items
+	 * Set ids on the items.
 	 */
-	private function attachListEvents()
+	private function setItemIds(?reset=false):Void
 	{
-		var children = rootElement.getElementsByTagName("li");
-		for (idx in 0...children.length)
+		var idx = 0;
+		for (i in 0...rootElement.childNodes.length)
 		{
-			children[idx].setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
+			if (rootElement.childNodes[i].nodeType != rootElement.nodeType ||
+				reset && rootElement.childNodes[i].getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
+			{
+				continue;
+			}
+			rootElement.childNodes[i].setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
+			idx++;
 		}
 	}
 

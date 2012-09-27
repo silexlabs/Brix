@@ -41,6 +41,7 @@ class XmlList extends List<Xml>
 		{
 			dataProvider.push(xmlToObj(item));
 		}
+		trace("dataProvider = "+dataProvider);
 	}
 	/**
 	 * init the component
@@ -49,9 +50,9 @@ class XmlList extends List<Xml>
 	 */
 	override public function init() : Void
 	{ 
+		redraw();
 		// init the parent class
 		super.init();
-		redraw();
 	}
 	private function xmlToObj(xml:Xml):Dynamic
 	{
