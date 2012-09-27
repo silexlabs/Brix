@@ -68,7 +68,7 @@ class DisplayObject implements IDisplayObject
 	 * components are dispatched to and listened from this DOM element.
 	 */
 	public var rootElement(default, null) : HtmlDom;
-	
+
 	/**
 	 * Returns the associated running Application instance.
 	 * 
@@ -78,7 +78,7 @@ class DisplayObject implements IDisplayObject
 	{
 		return SLPlayerComponent.getSLPlayer(this);
 	}
-	
+
 	/**
 	 * Common constructor for all DisplayObjects. If there is anything specific to a given component class initialization, override the init() method.
 	 * 
@@ -87,29 +87,29 @@ class DisplayObject implements IDisplayObject
 	private function new(rootElement : HtmlDom, SLPId:String) 
 	{
 		this.rootElement = rootElement;
-		
+
 		initSLPlayerComponent(SLPId);
-		
+
 		#if disableFastInit
 			//check the @tagNameFilter constraints
 			checkFilterOnElt(Type.getClass(this) , rootElement);
 			//check the @requires constraints
 			SLPlayerComponent.checkRequiredParameters(Type.getClass(this) , rootElement);
 		#end
-		
+
 		getSLPlayer().addAssociatedComponent(rootElement, this);
 	}
-	
+
 	/**
 	 * Removes the component from the application.
 	 */
 	public function remove():Void
 	{
 		clean();
-		
+
 		getSLPlayer().removeAssociatedComponent(rootElement,this);
 	}
-	
+
 	/**
 	 * Tells if a given class is a DisplayObject.
 	 * TODO cannot simply use Std.is here ?
@@ -121,13 +121,13 @@ class DisplayObject implements IDisplayObject
 	{
 		if (cmpClass == Type.resolveClass("org.slplayer.component.ui.DisplayObject"))
 			return true;
-		
+
 		if (Type.getSuperClass(cmpClass) != null)
 			return isDisplayObject(Type.getSuperClass(cmpClass));
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Checks if a given element is allowed to be the component's rootElement against the tag filters.
 	 * 
@@ -138,9 +138,9 @@ class DisplayObject implements IDisplayObject
 	{
 		if (elt.nodeType != Lib.document.body.nodeType)
 			throw "cannot instantiate "+Type.getClassName(cmpClass)+" on a non element node.";
-		
+
 		var tagFilter = (haxe.rtti.Meta.getType(cmpClass) != null) ? haxe.rtti.Meta.getType(cmpClass).tagNameFilter : null ;
-		
+
 		if ( tagFilter == null)
 			return;
 
@@ -149,14 +149,14 @@ class DisplayObject implements IDisplayObject
 		
 		throw "cannot instantiate "+Type.getClassName(cmpClass)+" on this type of HTML element: "+elt.nodeName.toLowerCase();
 	}
-	
+
 	// --- CUSTOMIZABLE API ---
-	
+
 	/**
 	 * For specific initialization logic specific to your component class, override this method.
 	 */
 	public function init() : Void { }
-	
+
 	/**
 	 * Override this method if you need some special logic on your component when removing it.
 	 */
