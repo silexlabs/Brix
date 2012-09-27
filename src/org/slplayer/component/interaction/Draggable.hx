@@ -305,8 +305,8 @@ class Draggable extends DisplayObject, implements IGroupable
 			state = dragging;
 			initialX = boundingBox.x;
 			initialY = boundingBox.y;
-			initialMouseX = e.pageX;
-			initialMouseY = e.pageY;
+			initialMouseX = e.clientX;
+			initialMouseY = e.clientY;
 			initPhantomStyle();
 			initPhantomStyle();
 			initRootElementStyle();
@@ -387,11 +387,11 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		if (state == dragging)
 		{
-			var x = e.pageX - initialMouseX + initialX;
-			var y = e.pageY - initialMouseY + initialY;
+			var x = e.clientX - initialMouseX + initialX;
+			var y = e.clientY - initialMouseY + initialY;
 			rootElement.style.left = x + "px";
 			rootElement.style.top = y + "px";
-			setAsBestDropZone(getBestDropZone(e.pageX, e.pageY));
+			setAsBestDropZone(getBestDropZone(e.clientX, e.clientY));
 
 			// dispatch a custom event
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
