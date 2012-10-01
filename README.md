@@ -1,22 +1,29 @@
-Author: Thomas Fétiveau
-Lisence: GPL
-Copyright: Silex Labs
+/*
+ * SLPlayer, open source application development framework
+ *
+ * Copyright (c) Silex Labs (http://twitter.com/silexlabs)
+ * Author: Thomas Fétiveau
+ * SLPlayer is available under the GPL license
+*/
 
 This project is under development. 
-> follow us on twitter http://twitter.com/silexlabs
 
-SLPlayer is an open-source framework used to make cross platform applications. It's very easy to use as you can make an application out of a simple HTML file and it's also very easy to extend especially if you're already familiar with javascript or Haxe. 
+SLPlayer is an open source application development framework.
+It provides ready-to-use components to build applications faster and easier.
+It is using HTML/CSS & HaxeJS, which is close to JavaScript but strictly typed and easier to maintain.
+It provides a robust development workflow thanks to HTML validation, components’ modularity, and existing IDEs.
 
-It is cross-platform, embeddable and portable.
+SLPlayer is an alternative to Flex based on HTML/CSS web standards.
 
-Cross-platform
+SLPlayer is compatible with Cocktail, which provides cross-platform compilation and can output native and web applications.
+http://haxe.org/com/libs/cocktail
 
-Same rendering on all the targets, desktop, browser and mobile. SLPlayer exists in javascript/HTML5, ActionScript Flash, neko and php versions.
+–
 
-Embeddable
+Typical workflow
 
-SLPlayer is made to be compiled or included with your application, in javascript, php, ActionScript, or haXe.
-
-Portable
-
-The SLPlayer do not require any installation. It is distributed as a .js, .as or .phar file.
+-Define an application interface using a set of pre-defined components (forms, buttons, lists, layouts, tab view and so on)
+-Arrange components into a user interface design
+-Use styles to define the visual design
+-Add functional logic
+-Define and connect to data services as needed
