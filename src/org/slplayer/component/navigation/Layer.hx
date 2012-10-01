@@ -263,9 +263,9 @@ with sum of the css classes
 		}
 		// play the videos/sounds when entering the page
 		var audioNodes = rootElement.getElementsByTagName("audio");
-		setupMediaElements(cast(audioNodes));
+		setupAudioElements(cast(audioNodes));
 		var videoNodes = rootElement.getElementsByTagName("video");
-		setupMediaElements(cast(videoNodes));
+		setupVideoElements(cast(videoNodes));
 
 		// dispatch a custom event on the root element
 		try{
@@ -395,9 +395,9 @@ with sum of the css classes
 		}
 		// stop the videos/sounds when leaving the page
 		var audioNodes = rootElement.getElementsByTagName("audio");
-		cleanupMediaElements(cast(audioNodes));
+		cleanupAudioElements(cast(audioNodes));
 		var videoNodes = rootElement.getElementsByTagName("video");
-		cleanupMediaElements(cast(videoNodes));
+		cleanupVideoElements(cast(videoNodes));
 
 		// remove children 
 		while (rootElement.childNodes.length > 0)
@@ -415,7 +415,32 @@ with sum of the css classes
 	/**
 	 * play the videos/sounds when entering the page
 	 */ 
-	private function setupMediaElements(nodeList:HtmlCollection<Media>) 
+	private function setupAudioElements(nodeList:HtmlCollection<Audio>) 
+	{
+		for (idx in 0...nodeList.length)
+		{
+			try
+			{				
+				var element = nodeList[idx];
+				if (element.autoplay == true)
+				{
+					element.currentTime = 0;
+					element.play();
+				}
+				element.muted = SoundOn.isMuted;
+			}
+			catch (e:Dynamic)
+			{
+				// this happens when the element was removed from the dom for example
+				// it is the case when transition is immediate
+				trace("Layer error: could not access audio or video element");
+			}
+		}
+	}
+	/**
+	 * play the videos/sounds when entering the page
+	 */ 
+	private function setupVideoElements(nodeList:HtmlCollection<Video>) 
 	{
 		for (idx in 0...nodeList.length)
 		{
@@ -440,7 +465,29 @@ with sum of the css classes
 	/**
 	 * stop the videos/sounds when leaving the page
 	 */ 
-	private function cleanupMediaElements(nodeList:HtmlCollection<Media>) 
+	private function cleanupAudioElements(nodeList:HtmlCollection<Audio>) 
+	{
+		for (idx in 0...nodeList.length)
+		{
+			try
+			{				
+				var element = nodeList[idx];
+				element.pause();
+				element.currentTime = 0;
+			}
+			catch (e:Dynamic)
+			{
+				// this happens when the element was removed from the dom for example
+				// or when the video or audio format is not supported (e.g. mp3 in firefox)
+				// it is the case when transition is immediate
+				trace("Layer error: could not access audio or video element");
+			}
+		}
+	}
+	/**
+	 * stop the videos/sounds when leaving the page
+	 */ 
+	private function cleanupVideoElements(nodeList:HtmlCollection<Video>) 
 	{
 		for (idx in 0...nodeList.length)
 		{
