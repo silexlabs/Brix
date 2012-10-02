@@ -260,27 +260,13 @@ with sum of the css classes
 		{
 			var element = childrenArray.shift();
 			rootElement.appendChild(element);
-			// play the videos/sounds when entering the page
-			if (element.tagName != null && (element.tagName.toLowerCase() == "audio" || element.tagName.toLowerCase() == "video"))
-			{
-				try
-				{				
-					var audioElement:Audio = cast(element);
-					if (audioElement.autoplay == true)
-					{
-						audioElement.currentTime = 0;
-						audioElement.play();
-					}
-					audioElement.muted = SoundOn.isMuted;
-				}
-				catch (e:Dynamic)
-				{
-					// this happens when the element was removed from the dom for example
-					// it is the case when transition is immediate
-					trace("Layer error: could not access audio or video element");
-				}
-			}
 		}
+		// play the videos/sounds when entering the page
+		var audioNodes = rootElement.getElementsByTagName("audio");
+		setupAudioElements(cast(audioNodes));
+		var videoNodes = rootElement.getElementsByTagName("video");
+		setupVideoElements(cast(videoNodes));
+
 		// dispatch a custom event on the root element
 		try{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
@@ -407,31 +393,118 @@ with sum of the css classes
 			// android browsers
 			trace("Error: could not dispatch event "+e);
 		}
+		// stop the videos/sounds when leaving the page
+		var audioNodes = rootElement.getElementsByTagName("audio");
+		cleanupAudioElements(cast(audioNodes));
+		var videoNodes = rootElement.getElementsByTagName("video");
+		cleanupVideoElements(cast(videoNodes));
+
 		// remove children 
 		while (rootElement.childNodes.length > 0)
 		{
 			var element:HtmlDom = rootElement.childNodes[0];
 			rootElement.removeChild(element);
 			childrenArray.push(element);
-			// stop the videos/sounds when leaving the page
-			if(element.tagName!= null && (element.tagName.toLowerCase() == "audio" || element.tagName.toLowerCase() == "video"))
-			{
-				try
-				{				
-					var audioElement:Audio = cast(element);
-					audioElement.pause();
-					audioElement.currentTime = 0;
-				}
-				catch (e:Dynamic)
-				{
-					// this happens when the element was removed from the dom for example
-					// or when the video or audio format is not supported (e.g. mp3 in firefox)
-					// it is the case when transition is immediate
-					trace("Layer error: could not access audio or video element");
-				}
-			}
 		}
 		// set or reset style.display
 		rootElement.style.display="none";
 	}
+	//////////////////////////////////////////////////////
+	// Media
+	//////////////////////////////////////////////////////
+	/**
+	 * play the videos/sounds when entering the page
+	 */ 
+	private function setupAudioElements(nodeList:HtmlCollection<Audio>) 
+	{
+		for (idx in 0...nodeList.length)
+		{
+			try
+			{				
+				var element = nodeList[idx];
+				if (element.autoplay == true)
+				{
+					element.currentTime = 0;
+					element.play();
+				}
+				element.muted = SoundOn.isMuted;
+			}
+			catch (e:Dynamic)
+			{
+				// this happens when the element was removed from the dom for example
+				// it is the case when transition is immediate
+				trace("Layer error: could not access audio or video element");
+			}
+		}
+	}
+	/**
+	 * play the videos/sounds when entering the page
+	 */ 
+	private function setupVideoElements(nodeList:HtmlCollection<Video>) 
+	{
+		for (idx in 0...nodeList.length)
+		{
+			try
+			{				
+				var element = nodeList[idx];
+				if (element.autoplay == true)
+				{
+					element.currentTime = 0;
+					element.play();
+				}
+				element.muted = SoundOn.isMuted;
+			}
+			catch (e:Dynamic)
+			{
+				// this happens when the element was removed from the dom for example
+				// it is the case when transition is immediate
+				trace("Layer error: could not access audio or video element");
+			}
+		}
+	}
+	/**
+	 * stop the videos/sounds when leaving the page
+	 */ 
+	private function cleanupAudioElements(nodeList:HtmlCollection<Audio>) 
+	{
+		for (idx in 0...nodeList.length)
+		{
+			try
+			{				
+				var element = nodeList[idx];
+				element.pause();
+				element.currentTime = 0;
+			}
+			catch (e:Dynamic)
+			{
+				// this happens when the element was removed from the dom for example
+				// or when the video or audio format is not supported (e.g. mp3 in firefox)
+				// it is the case when transition is immediate
+				trace("Layer error: could not access audio or video element");
+			}
+		}
+	}
+	/**
+	 * stop the videos/sounds when leaving the page
+	 */ 
+	private function cleanupVideoElements(nodeList:HtmlCollection<Video>) 
+	{
+		for (idx in 0...nodeList.length)
+		{
+			try
+			{				
+				var element = nodeList[idx];
+				element.pause();
+				element.currentTime = 0;
+			}
+			catch (e:Dynamic)
+			{
+				// this happens when the element was removed from the dom for example
+				// or when the video or audio format is not supported (e.g. mp3 in firefox)
+				// it is the case when transition is immediate
+				trace("Layer error: could not access audio or video element");
+			}
+		}
+	}
+
 }
