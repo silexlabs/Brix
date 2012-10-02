@@ -175,7 +175,7 @@ class TouchLink extends DisplayObject, implements IGroupable{
 		touchStart = null;
 	}
 	public function dispatchClick(){
-		var evt = Lib.document.createEvent('MouseEvents');
+		var evt = Lib.document.createEvent('MouseEvent');
 		//cast(evt).initMouseEvent('click', true, true);
 		evt.initEvent(
 		   'click'      // event type
