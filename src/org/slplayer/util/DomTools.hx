@@ -96,57 +96,46 @@ class DomTools
 	 * @return 	the BoundingBox object
 	 */
 	static public function getElementBoundingBox(htmlDom:HtmlDom):BoundingBox{
-		var halfBorderH = 0;//(htmlDom.offsetWidth - htmlDom.clientWidth)/2.0;
-		var halfBorderV = 0;//(htmlDom.offsetHeight - htmlDom.clientHeight)/2.0;
+		if (htmlDom.nodeType != 1)
+			return null;
+
+		//trace("getElementBoundingBox "+htmlDom+" - "+htmlDom.offsetLeft+", "+htmlDom.offsetWidth);
+
 
 		// add the scroll offset of all container
 		// and the position of all positioned ancecestors
-		var scrollTop = 0;
-		var scrollLeft = 0;
+		var offsetTop = 0;
+		var offsetLeft = 0;
+		var offsetWidth = 0.0;
+		var offsetHeight = 0.0;
 		var element = htmlDom;
-		while (element.parentNode != null && element.tagName.toLowerCase() != "body" 
+		while (element != null
+			//&& element.tagName.toLowerCase() != "body" 
 			//&& element.style.position != "relative" && element.style.position != "absolute" && element.style.position != "fixed"
 			){
-			//trace("parent "+element.scrollTop);
-			scrollTop -= element.scrollTop;
-			scrollLeft -= element.scrollLeft;
+			var halfBorderH = (element.offsetWidth - element.clientWidth)/2.0;
+			var halfBorderV = (element.offsetHeight - element.clientHeight)/2.0;
+			//offsetWidth -= halfBorderH;
+			//offsetHeight -= halfBorderV;
 
-			element = element.parentNode;
+			//trace("parent "+element.scrollTop);
+			offsetTop -= element.scrollTop;
+			offsetLeft -= element.scrollLeft;
+
+			offsetTop += element.offsetTop;
+			offsetLeft += element.offsetLeft;
+
+			element = element.offsetParent;
 		}
-		scrollTop -= element.scrollTop;
-		scrollLeft -= element.scrollLeft;
 
 		return {
-			x:Math.floor(htmlDom.offsetLeft - halfBorderH)+scrollLeft,
-			y:Math.floor(htmlDom.offsetTop - halfBorderV)+scrollTop,
-			w:Math.floor(htmlDom.offsetWidth - halfBorderH),
-			h:Math.floor(htmlDom.offsetHeight - halfBorderV)
+			x:Math.round(offsetLeft),
+			y:Math.round(offsetTop),
+			w:Math.round(htmlDom.offsetWidth + offsetWidth),
+			h:Math.round(htmlDom.offsetHeight + offsetHeight)
 		};
 	}
-	static public function localToGlobal(x, y, htmlDom:HtmlDom): {x:Int, y:Int}
-	{
-		// add the scroll offset of all container
-		// and the position of all positioned ancecestors
-		var element = htmlDom;
-		while (element.parentNode != null && element.tagName.toLowerCase() != "body" 
-			//&& element.style.position != "relative" && element.style.position != "absolute" && element.style.position != "fixed"
-			){
 
-			// add the position when the ancestor is positioned, i.e. with position relative, absolute, or fixed
-			x -= element.offsetLeft;
-			y -= element.offsetTop;
-			//x += element.scrollLeft;
-			//y += element.scrollTop;
-			element = element.parentNode;
-		}
-		x -= element.offsetLeft;
-		y -= element.offsetTop;
-		//x += element.scrollLeft;
-		//y += element.scrollTop;
-
-		return {x:x, y:y};
-	}
-	
 	/**
 	 * for debug purpose
 	 * trace the properties of an object
