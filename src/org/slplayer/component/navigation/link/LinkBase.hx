@@ -84,16 +84,18 @@ class LinkBase extends DisplayObject, implements IGroupable
 		rootElement.addEventListener("click", onClick, false);
 
 		// retrieve the name of our link 
-		if (rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR) != null){
+		if (rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR) != null)
+		{
 			linkName = rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR).trim();
 			// removes the URL before the deep link
 			linkName = linkName.substr(linkName.indexOf("#")+1);
 		}
-		else {
+		else
+		{
 			trace("Warning: the link has no href atribute ("+rootElement+")");
 		}
-		// retrieve the target attr of our link 
 
+		// retrieve the target attr of our link 
 		if (rootElement.getAttribute(CONFIG_TARGET_ATTR) != null && rootElement.getAttribute(CONFIG_TARGET_ATTR).trim() != "")
 		{
 			targetAttr = rootElement.getAttribute(CONFIG_TARGET_ATTR).trim();

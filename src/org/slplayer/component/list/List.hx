@@ -142,8 +142,6 @@ class List<ElementClass> extends DisplayObject
 		dataProvider = newDataProvider;
 		// reset the item ids
 		setItemIds(true);
-		
-trace("new dataProvider = "+dataProvider);
 	}
 	/**
 	 * redraw the list without calling reloadData
@@ -264,8 +262,6 @@ trace("new dataProvider = "+dataProvider);
 	 */
 	private function updateSelectionDisplay(selection:Array<ElementClass>)
 	{
-		//trace("updateSelectionDisplay "+selection+" - "+Type.getClassName(Type.getClass(this)));
-
 		// handle the selected style 
 		var children = rootElement.getElementsByTagName("li");
 		for (idx in 0...children.length)

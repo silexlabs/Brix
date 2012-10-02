@@ -29,20 +29,24 @@ class TransitionTools
 		var res:TransitionData = null;
 
 		// build the attribute name
-		if (type == TransitionType.show){
+		if (type == TransitionType.show)
+		{
 			var start = rootElement.getAttribute(SHOW_START_STYLE_ATTR_NAME);
 			var end = rootElement.getAttribute(SHOW_END_STYLE_ATTR_NAME);
-			if (start != null && end != null){
+			if (start != null && end != null)
+			{
 				res = {
 					startStyleName : start,
 					endStyleName : end,
 				};
 			}
 		}
-		else{
+		else
+		{
 			var start = rootElement.getAttribute(HIDE_START_STYLE_ATTR_NAME);
 			var end = rootElement.getAttribute(HIDE_END_STYLE_ATTR_NAME);
-			if (start != null && end != null){
+			if (start != null && end != null)
+			{
 				res = {
 					startStyleName : start,
 					endStyleName : end,

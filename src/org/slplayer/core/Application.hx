@@ -281,6 +281,9 @@ class Application
 		
 		if (comps == null)
 		{
+			#if slpdebug
+				trace("no UI component to initialize");
+			#end
 			return; // case node already initialized or not an element
 		}
 		
@@ -297,14 +300,17 @@ class Application
 	 */
 	private function createUIComponents(node:HtmlDom):Null<List<org.slplayer.component.ui.DisplayObject>>
 	{
-		if ( node.nodeType != Lib.document.body.nodeType )
+		if ( node.nodeType != 1 )
 		{
 			// works only for elements
 			return null;
 		}
-		
+
 		if ( node.getAttribute("data-" + SLPID_ATTR_NAME) != null )
 		{
+			#if slpdebug
+				trace("WARNING this node has already been initialized !");
+			#end
 			// means that the node has already been initialized
 			return null;
 		}
