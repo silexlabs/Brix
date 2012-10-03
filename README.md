@@ -1,29 +1,41 @@
-/*
- * SLPlayer, open source application development framework
- *
- * Copyright (c) Silex Labs (http://twitter.com/silexlabs)
- * Author: Thomas Fétiveau
- * SLPlayer is available under the GPL license
-*/
-
 This project is under development. 
+> follow us on twitter http://twitter.com/silexlabs
 
-SLPlayer is an open source application development framework.
-It provides ready-to-use components to build applications faster and easier.
-It is using HTML/CSS & HaxeJS, which is close to JavaScript but strictly typed and easier to maintain.
-It provides a robust development workflow thanks to HTML validation, components’ modularity, and existing IDEs.
+Brix is an HTML5, CSS3 and Haxe JS based application framework.
 
-SLPlayer is an alternative to Flex based on HTML/CSS web standards.
+It provides ready-to-use components to build applications faster.
+It injects ready-to-use components into your HTML pages to make a Rich UI application out of it.
+The set of Brix components are aggregable, extendable and skinnable with CSS.
 
-SLPlayer is compatible with Cocktail, which provides cross-platform compilation and can output native and web applications.
-http://haxe.org/com/libs/cocktail
+Brix is an alternative to Flex based on HTML/CSS web standards.
 
-–
+What Brix brings to your workflow:
 
-Typical workflow
+Easier and faster development:
+- build applications out of HTML/CSS pages,
+- industrialize application development by reusing existing components and skins,
+- integration with existing IDEs as it's based on standard technologies: HTML5, CSS3 and Haxe,
 
--Define an application interface using a set of pre-defined components (forms, buttons, lists, layouts, tab view and so on)
--Arrange components into a user interface design
--Use styles to define the visual design
--Add functional logic
--Define and connect to data services as needed
+Robustness:
+- Brix components are written with Haxe JS which is - contrary to javascript - strictly typed,
+- compilation of HTML and CSS source files (syntax checking, ...),
+
+Performance:
+- better performances with the compile time components feature.
+
+Brix is compatible with the <a href="http://www.silexlabs.org/groups/labs/cocktail/">Cocktail</a> and NME Haxe libraries so it can also be compiled to native applications (Android, iOS, desktop) and AIR/Flash applications. Also, a Brix application compiled to HTML5/CSS3/javascript is compatible with PhoneGap.
+
+<ul>
+<li>Lead developer: Thomas Fétiveau</li>
+<li>Contributors: Alexandre Hoyau</li>
+<li><a href="http://opensource.org/licenses/MIT">License: MIT</a></li>
+<li><a href="http://www.silexlabs.org">Copyright: Silex Labs</a></li>
+</ul>
+
+Links
+
+<ul>
+<li><a href="http://www.silexlabs.org/groups/labs/slplayer-project/slplayer-developers/home/">Contributors home</a></li>
+<li><a href="http://www.silexlabs.org/groups/labs/slplayer-project/slplayer/home/">Developers home</a></li>
+<li><a href="https://github.com/silexlabs/Brix">Brix source code</a></li>
+</ul>
