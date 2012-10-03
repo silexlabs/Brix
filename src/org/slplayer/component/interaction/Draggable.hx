@@ -208,10 +208,10 @@ class Draggable extends DisplayObject, implements IGroupable
 			dragZone = rootElement;
 
 		// attach the events
-		dragZone.addEventListener("mousedown", startDrag, false);
+		dragZone.addEventListener("mousedown", cast(startDrag), false);
 		//dragZone.onmouseup = stopDrag;
 		mouseUpCallback = callback(stopDrag);
-		Lib.document.body.addEventListener("mouseup", mouseUpCallback, false);
+		Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
 		dragZone.style.cursor = "move";
 	}
 	
@@ -222,8 +222,8 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		super.clean();
 
-		dragZone.removeEventListener("mousedown", startDrag, false);
-		Lib.document.body.removeEventListener("mouseup", mouseUpCallback, false);
+		dragZone.removeEventListener("mousedown", cast(startDrag), false);
+		Lib.document.body.removeEventListener("mouseup", cast(mouseUpCallback), false);
 	}
 	
 	/**

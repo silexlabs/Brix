@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"offsetW",
+				"offsetWidth"
+			],
+			[
+				"Str",
+				"StringTools	class"
+			],
+			[
+				"html",
+				"htmlDom"
+			],
+			[
+				"get",
+				"getElementBoundingBox	function"
+			],
+			[
+				"sc",
+				"script	Tag"
+			],
+			[
 				"do",
 				"doTestBoundingBox	function"
 			],
@@ -38,10 +58,6 @@
 			[
 				"BUI",
 				"BUILDER_ROOT_NODE_CLASS"
-			],
-			[
-				"sc",
-				"SCRIPT	Tag"
 			],
 			[
 				"Publ",
@@ -124,20 +140,12 @@
 				"public"
 			],
 			[
-				"html",
-				"htmlEscape"
-			],
-			[
 				"publica",
 				"publicationName"
 			],
 			[
 				"a",
 				"appendChild( child : js.HtmlDom )	Void"
-			],
-			[
-				"get",
-				"getElementsByTagName(...)	js.HtmlCollection<js.HtmlDom>"
 			],
 			[
 				"init",
@@ -232,10 +240,6 @@
 				"HtmlDom"
 			],
 			[
-				"Str",
-				"String"
-			],
-			[
 				"pa",
 				"parentNode"
 			],
@@ -247,6 +251,38 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "build.hxml",
+			"settings":
+			{
+				"buffer_size": 120,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "bin/util-test.html",
+			"settings":
+			{
+				"buffer_size": 3567,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "util/UtilTest.hx",
+			"settings":
+			{
+				"buffer_size": 1896,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/util/DomTools.hx",
+			"settings":
+			{
+				"buffer_size": 11840,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "Packages/HaXe/Hxml.sublime-build",
 	"command_palette":
@@ -411,7 +447,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 93.0,
+		"height": 0.0,
 		"where_history":
 		[
 			"-*.js,-*.php,-*.map",
@@ -425,6 +461,14 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"htmlDom",
+			"magin",
+			"maginLeft",
+			"padding",
+			"-= element.offset",
+			"element.offset",
+			"nodeType",
+			",",
 			"MouseEvent",
 			"addEventListener",
 			"parentNode",
@@ -544,15 +588,7 @@
 			"CONFIG_INITIAL_PAGE_NAME",
 			"_list",
 			"CONFIG",
-			"PUBLICATIONS_FOLDER",
-			"php.",
-			"/?/",
-			"main",
-			"manage",
-			"arvix",
-			"height",
-			"layers",
-			"components"
+			"PUBLICATIONS_FOLDER"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -574,6 +610,116 @@
 		{
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "build.hxml",
+					"settings":
+					{
+						"buffer_size": 120,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								117,
+								117
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HaXe/Hxml.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "bin/util-test.html",
+					"settings":
+					{
+						"buffer_size": 3567,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1008,
+								1008
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 74.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "util/UtilTest.hx",
+					"settings":
+					{
+						"buffer_size": 1896,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1890,
+								1890
+							]
+						],
+						"settings":
+						{
+							"haxe-build-id": 0,
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 574.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/Users/lexa/Dropbox/fdt-workspace/SLPlayer/src/org/slplayer/util/DomTools.hx",
+					"settings":
+					{
+						"buffer_size": 11840,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4798,
+								4798
+							]
+						],
+						"settings":
+						{
+							"haxe-build-id": 0,
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1754.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
 			]
 		}
 	],
