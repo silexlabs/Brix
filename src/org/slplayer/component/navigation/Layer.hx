@@ -144,19 +144,23 @@ with sum of the css classes
 
 		// add the transition data from the link
 		var sumOfTransitions:Array<TransitionData> = new Array();
-		if (transitionData != null){
+		if (transitionData != null)
+		{
 			sumOfTransitions.push(transitionData);
 		}
-		if (transitionData2 != null){
+		if (transitionData2 != null)
+		{
 			sumOfTransitions.push(transitionData2);
 		}
 		// apply the initial transition params
-		if (sumOfTransitions.length==0){
+		if (sumOfTransitions.length == 0)
+		{
 			// no transition
 			if(onComplete != null)
 				onComplete(null);
 		}
-		else{
+		else
+		{
 			// set the fla
 			hasTransitionStarted = true;
 			// prevent anim at this stage
@@ -174,7 +178,8 @@ with sum of the css classes
 		for (transition in sumOfTransitions)
 			DomTools.removeClass(rootElement, transition.startStyleName);
 		// listen for the transition end event
-		if (onComplete != null){
+		if (onComplete != null)
+		{
 			addTransitionEvent(onComplete);
 		}
 		// allow anim at this stage
@@ -186,11 +191,13 @@ with sum of the css classes
 	private function endTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
 	{
 		removeTransitionEvent(onComplete);
-		if (transitionData != null){
+		if (transitionData != null)
+		{
 			DomTools.removeClass(rootElement, transitionData.endStyleName);
 		}
 		var transitionData2 = TransitionTools.getTransitionData(rootElement, type);
-		if (transitionData2 != null){
+		if (transitionData2 != null)
+		{
 			DomTools.removeClass(rootElement, transitionData2.endStyleName);
 		}
 	}
@@ -236,18 +243,21 @@ with sum of the css classes
 	 */
 	public function show(transitionData:Null<TransitionData> = null, preventTransitions:Bool = false) : Void
 	{
-		if (status != hidden && status != notInit){
+		if (status != hidden && status != notInit)
+		{
 			trace("Warning: can not show the layer, since it has the status '"+status+"'");
 			return;
 		}
 		// reset transition if it is pending
-		if (status == hideTransition){
+		if (status == hideTransition)
+		{
 			trace("Warning: hide break previous transition hide");
 			doHideCallback(null);
 			removeTransitionEvent(doHideCallback);
 		}
 		// reset transition if it is pending
-		else if (status == showTransition){
+		else if (status == showTransition)
+		{
 			trace("Warning: hide break previous transition show");
 			doShowCallback(null);
 			removeTransitionEvent(doShowCallback);
@@ -268,7 +278,8 @@ with sum of the css classes
 		setupVideoElements(cast(videoNodes));
 
 		// dispatch a custom event on the root element
-		try{
+		try
+		{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_TYPE_SHOW, false, false, {
 				transitionData : transitionData,
@@ -277,7 +288,8 @@ with sum of the css classes
 			});
 			rootElement.dispatchEvent(event);
 		}
-		catch(e:Dynamic){
+		catch (e:Dynamic)
+		{
 			// android browsers
 			trace("Error: could not dispatch event "+e);
 		}
@@ -294,7 +306,6 @@ with sum of the css classes
 		}
 		// set or reset style.display
 		rootElement.style.display=styleAttrDisplay;
-
 	}
 	/**
 	 * transition is over

@@ -86,7 +86,7 @@ class Builder
 	/**
 	 * TODO add comments
 	 */
-	static public var macroApplication : Application;// = Application.createApplication();
+	//static public var macroApplication : Application;// = Application.createApplication();
 	
 	/**
 	 * The js exposed name.
@@ -374,11 +374,11 @@ class Builder
 	 * well as performing constraints checking against the component and its
 	 * DOM node.
 	 */
-	static function runMacroApplication():Void
-	{
-		macroApplication.initDom();
-		macroApplication.initComponents();
-	}
+	//static function runMacroApplication():Void
+	//{
+		//macroApplication.initDom();
+		//macroApplication.initComponents();
+	//}
 	
 	/**
 	 * Checks if the declared components can be found in the classpath and if their use 
