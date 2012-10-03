@@ -6,9 +6,9 @@
 -cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
 -debug
--main org.slplayer.core.Application
---macro org.slplayer.core.Builder.create('./src/touch.html')
--D slpdebug
+-main org.brix.core.Application
+--macro org.brix.core.Builder.create('./src/touch.html')
+-D brixdebug
 -D disableEmbedHtml
 -D stopOnError
 
