@@ -18,6 +18,8 @@ package org.slplayer.util;
 import js.Lib;
 import js.Dom;
 
+using StringTools;
+
 typedef BoundingBox = {
 	x:Int,
 	y:Int,
@@ -171,45 +173,91 @@ class DomTools
 		else
 			addClass(element, className);
 	}
-	
+
 	/**
-	 * add a css class to a node if it is not already in the class name
+	 * Adds a css class to a node if it is not already in the class name.
+	 * @param 
+	 * @param 
 	 */
-	static public function addClass(element:HtmlDom, className:String)
+	static public function addClass(element:HtmlDom, className:String):Void
 	{
 		if (element.className == null) element.className = "";
-		if(!hasClass(element, className)){
+
+		if (!hasClass(element, className))
+		{
 			if (element.className != "") element.className += " ";
 			element.className += className;
 		}
 	}
-	
+
 	/**
-	 * remove a css class from a node 
+	 * Removes a/several css class(es) from a DOM node.
+	 * @param the DOM element to consider.
+	 * @param the class name(s) to remove. Several class names can be passed, separated by a white space, ie: "myClass1 myClass2".
 	 */
-	static public function removeClass(element:HtmlDom, className:String)
+	static public function removeClass(element:HtmlDom, className:String):Void
 	{
 		if (element.className == null) return;
-		if(hasClass(element, className)){
-			var arr = element.className.split(" ");
-			for (idx in 0...arr.length)
-				if (arr[idx] == className)
-					arr[idx] = "";
-			element.className = arr.join(" ");
-		}
-		//	element.className = StringTools.replace(element.className, className, "");
+
+		var classNamesToKeep:Array<String> = new Array();
+		var cns = className.split(" ");
+
+		Lambda.iter( element.className.split(" "), function(ecn:String) { if (!Lambda.has(cns, ecn)) { classNamesToKeep.push(ecn); } } );
+
+		element.className = classNamesToKeep.join(" ");
 	}
-	
+
 	/**
-	 * check if the node has a given css class
-	 * TODO: this is not good since hasClass(element, "Page") would return true for element with className set to "LinkToPage", so split in array and use Lambda 
+	 * Checks if the node has a given css class. Use the orderedClassName param if you want to search for class names in a specific
+	 * order.
+	 * @param the DOM element to consider
+	 * @param the class name to search for. It can be several class names seperated by spaces like: "myClass1 myClass2"
+	 * @param in case several class names are passed, set this to true will tell the hasClass function to search for the class names
+	 * in the order they've been passed to it. ie: <div class="class2 class1"></div> => hasClass(node, "class1 class2") => true
+	 * 																				 => hasClass(node, "class1 class2", true) => false
+	 * 																				 => hasClass(node, "class2 class1", true) => true
+	 * @return true if className found, else false.
 	 */
-	static public function hasClass(element:HtmlDom, className:String)
+	static public function hasClass(element:HtmlDom, className:String, ?orderedClassName:Bool=false):Bool
 	{
-		if (element.className == null) return false;
-		//return element.className.indexOf(className) > -1;
-		return Lambda.has(element.className.split(" "), className);
+		if (element.className == null || className == null) return false;
+
+		if (orderedClassName)
+		{
+			var cns:Array<String> = className.split(" ");
+			var ecns:Array<String> = element.className.split(" ");
+
+			var result:List<Int> = Lambda.map( cns, function (cn:String) { return Lambda.indexOf(ecns, cn); } );
+			var prevR:Int = 0;
+			for (r in result)
+			{
+				if (r < prevR)
+				{
+					return false;
+				}
+				prevR = r;
+			}
+			return true;
+		}
+		else
+		{
+			for (cn in className.split(" "))
+			{
+				if (cn == null || cn.trim() == "")
+				{
+					continue;
+				}
+				var found:Bool = Lambda.has(element.className.split(" "), cn);
+
+				if (!found)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 	}
+
 	/**
 	 * Set the value of a given HTML head/meta tags
 	 * @param	name 			the value of the name attribute of the desired meta tag

@@ -55,6 +55,13 @@ class TransitionTools
 		}
 		return res;
 	}
+
+	/**
+	 * 
+	 * @param	rootElement
+	 * @param	name
+	 * @param	value
+	 */
 	public static function setTransitionProperty(rootElement:HtmlDom, name, value) 
 	{
 		Reflect.setProperty(rootElement.style, name, value);
