@@ -1,0 +1,6 @@
+-cp ../../../../workspace_cocktail_silexlabs/src/
+-cp ../../../src/
+-cp ../src/
+-main org.brix.test.unit.DomToolsTests
+-lib utest
+-js ../bin/org/brix/test/unit/DomToolsTests.js
