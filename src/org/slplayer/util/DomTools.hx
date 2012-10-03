@@ -165,18 +165,14 @@ class DomTools
 
 	/**
 	 * Adds a css class to a node if it is not already in the class name.
-	 * @param 
-	 * @param 
+	 * @param the DOM element to consider.
+	 * @param the class name(s) to add.
 	 */
 	static public function addClass(element:HtmlDom, className:String):Void
 	{
 		if (element.className == null) element.className = "";
 
-		if (!hasClass(element, className))
-		{
-			if (element.className != "") element.className += " ";
-			element.className += className;
-		}
+		Lambda.iter( className.split(" "), function(cn:String) { if (!Lambda.has(element.className.split(" "), cn)) { if (element.className != "") { element.className += " "; } element.className += cn; } } );
 	}
 
 	/**
@@ -186,7 +182,7 @@ class DomTools
 	 */
 	static public function removeClass(element:HtmlDom, className:String):Void
 	{
-		if (element.className == null) return;
+		if (element.className == null || element.className.trim() == "") return;
 
 		var classNamesToKeep:Array<String> = new Array();
 		var cns = className.split(" ");
@@ -209,7 +205,7 @@ class DomTools
 	 */
 	static public function hasClass(element:HtmlDom, className:String, ?orderedClassName:Bool=false):Bool
 	{
-		if (element.className == null || className == null) return false;
+		if (element.className == null || element.className.trim() == "" || className == null || className.trim() == "") return false;
 
 		if (orderedClassName)
 		{
