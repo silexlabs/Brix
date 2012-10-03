@@ -8,7 +8,7 @@ import utest.ui.Report;
 import js.Lib;
 import js.Dom;
 
-import org.slplayer.util.DomTools;
+import org.brix.util.DomTools;
 
 class UtilTest {
 

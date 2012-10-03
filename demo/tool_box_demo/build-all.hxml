@@ -1,9 +1,9 @@
 -js bin/toolBox.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.slplayer.core.Application
---macro org.slplayer.core.Builder.create('./src/toolBox.html')
--D slpdebug
+-main org.brix.core.Application
+--macro org.brix.core.Builder.create('./src/toolBox.html')
+-D brixdebug
 -D disableEmbedHtml
 
 --next
@@ -11,9 +11,9 @@
 -js bin/dragDrop.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.slplayer.core.Application
---macro org.slplayer.core.Builder.create('./src/dragDrop.html')
--D slpdebug
+-main org.brix.core.Application
+--macro org.brix.core.Builder.create('./src/dragDrop.html')
+-D brixdebug
 -D disableEmbedHtml
 
 --next
@@ -21,9 +21,9 @@
 -js bin/lists.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.slplayer.core.Application
---macro org.slplayer.core.Builder.create('./src/lists.html')
--D slpdebug
+-main org.brix.core.Application
+--macro org.brix.core.Builder.create('./src/lists.html')
+-D brixdebug
 -D disableEmbedHtml
 
 --next
@@ -31,8 +31,8 @@
 -js bin/pannel.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.slplayer.core.Application
---macro org.slplayer.core.Builder.create('./src/pannel.html')
--D slpdebug
+-main org.brix.core.Application
+--macro org.brix.core.Builder.create('./src/pannel.html')
+-D brixdebug
 -D disableEmbedHtml
 
