@@ -28,7 +28,7 @@ Brix is compatible with the <a href="http://www.silexlabs.org/groups/labs/cockta
 <ul>
 <li>Lead developer: Thomas Fétiveau</li>
 <li>Contributors: Alexandre Hoyau</li>
-<li><a href="http://opensource.org/licenses/MIT">License: MIT</a></li>
+<li><a href="http://www.silexlabs.org/labs/brix-licensing/">License: MIT</a></li>
 <li><a href="http://www.silexlabs.org">Copyright: Silex Labs</a></li>
 </ul>
 
