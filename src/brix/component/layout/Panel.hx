@@ -17,9 +17,10 @@ import brix.component.ui.DisplayObject;
 
 /**
  * Panel class
- *
+ * This is a component which takes html nodes as header, body and footer, 
+ * and move/resize them so that only the body takes all the available room between the header and the footer
  */
-class Panel extends DisplayObject
+class Panel extends LayoutBase
 {
 	/**
 	 * default class name for the header
@@ -75,13 +76,6 @@ class Panel extends DisplayObject
 	 */
 	public function new(rootElement:HtmlDom, BrixId:String){
 		super(rootElement, BrixId);
-		var _this_ = this;
-
-		Lib.window.addEventListener('resize', callback(redrawCallback), false);
-
-		// do not work: Lib.document.addEventListener("resize", redraw, false);
-		// do not compile: Lib.window.addEventListener("resize", redraw, false);
-		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
 	}
 	/**
 	 * init the component
@@ -109,21 +103,18 @@ class Panel extends DisplayObject
 			isHorizontal = true;
 		else
 			isHorizontal = false;
-
-		// redraw
-		DomTools.doLater(redraw);
-	}
-	/**
-	 * call redraw when an event occures
-	 */
-	public function redrawCallback(e:Event){
-		redraw();
 	}
 
 	/**
 	 * computes the size of each element
 	 */
-	public function redraw(){
+	override public function redraw(){
+		if (preventRedraw){
+			trace("Redraw layout stopped");
+			return;
+		}
+		trace("Redraw layout");
+
 		var bodySize:Int;
 		var boundingBox = DomTools.getElementBoundingBox(rootElement);
 		if (isHorizontal){
@@ -168,5 +159,6 @@ class Panel extends DisplayObject
 			bodySize-=5;
 			body.style.height = bodySize+"px";
 		}
+		super.redraw();
 	}
 }
