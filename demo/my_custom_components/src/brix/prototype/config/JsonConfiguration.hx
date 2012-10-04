@@ -5,8 +5,8 @@ import js.Dom;
 
 using brix.prototype.util.DomTools;
 
-import org.brix.component.data.DataProvider;
-using org.brix.component.data.DataProvider;
+import brix.component.data.DataProvider;
+using brix.component.data.DataProvider;
 
 /**
  * ...

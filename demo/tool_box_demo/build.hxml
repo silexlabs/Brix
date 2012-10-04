@@ -1,7 +1,7 @@
 -js bin/dragDrop.js
 -cp ../../src/
 -cp ../../../Cocktail/src/
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/dragDrop.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/dragDrop.html')
 -D brixdebug
 -D disableEmbedHtml

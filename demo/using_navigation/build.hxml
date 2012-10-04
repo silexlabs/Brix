@@ -6,8 +6,8 @@
 -cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
 -debug
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/touch.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/touch.html')
 #-D brixdebug
 -D disableEmbedHtml
 -D stopOnError

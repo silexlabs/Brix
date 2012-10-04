@@ -9,7 +9,7 @@ import flash.system.ApplicationDomain;
 import flash.system.SecurityDomain;
 
 /**
- * Parent application source. Embeds both slplayer_01 and slplayer_02 using different ApplicationDomain to avoid class conflicts.
+ * Parent application source. Embeds both brix_01 and brix_02 using different ApplicationDomain to avoid class conflicts.
  * 
  * @author Thomas Fétiveau
  */
@@ -26,7 +26,7 @@ class Output extends Sprite
 		addChild(spriteA);
 		var appDomainA:ApplicationDomain = new ApplicationDomain(ApplicationDomain.currentDomain);
 		var ldrA = new Loader(); 
-		var reqA:URLRequest = new URLRequest("myEmbeddedSLPlayerApplication.swf"); 
+		var reqA:URLRequest = new URLRequest("myEmbeddedBrixApplication.swf"); 
 		var ldrContextA:LoaderContext = new LoaderContext(false, appDomainA);
 		ldrA.contentLoaderInfo.addEventListener(Event.INIT, completeHandlerA); 
 		ldrA.load(reqA, ldrContextA);
@@ -36,7 +36,7 @@ class Output extends Sprite
 		var appDomainB:ApplicationDomain = new ApplicationDomain(ApplicationDomain.currentDomain);
 		
 		var ldrB = new Loader(); 
-		var reqB:URLRequest = new URLRequest("myEmbeddedSLPlayerApplication2.swf"); 
+		var reqB:URLRequest = new URLRequest("myEmbeddedBrixApplication2.swf"); 
 		var ldrContextB:LoaderContext = new LoaderContext(false, appDomainB);
 		
 		ldrContextB.allowCodeImport = true;
