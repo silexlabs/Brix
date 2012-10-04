@@ -1,8 +1,8 @@
 -js bin/toolBox.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/toolBox.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/toolBox.html')
 -D brixdebug
 -D disableEmbedHtml
 
@@ -11,8 +11,8 @@
 -js bin/dragDrop.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/dragDrop.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/dragDrop.html')
 -D brixdebug
 -D disableEmbedHtml
 
@@ -21,8 +21,8 @@
 -js bin/lists.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/lists.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/lists.html')
 -D brixdebug
 -D disableEmbedHtml
 
@@ -31,8 +31,8 @@
 -js bin/pannel.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/pannel.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/pannel.html')
 -D brixdebug
 -D disableEmbedHtml
 

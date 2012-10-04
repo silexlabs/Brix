@@ -9,7 +9,7 @@ package brix.prototype.ui;
  */
 @tagNameFilter("pre")
 @:build(brix.prototype.ui.CodeViewerBuilder.build())
-class CodeViewer extends org.brix.component.ui.DisplayObject
+class CodeViewer extends brix.component.ui.DisplayObject
 {
 	/**
 	 * The data- optional attribute used to specify with HTML element we're viewing.

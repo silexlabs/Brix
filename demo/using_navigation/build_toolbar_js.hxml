@@ -6,8 +6,8 @@
 -cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
 -debug
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/toolbar.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/toolbar.html')
 -D brixdebug
 -D disableEmbedHtml
 -D stopOnError
@@ -18,8 +18,8 @@
 -cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
 -debug
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/multiple-toolbars.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/multiple-toolbars.html')
 -D brixdebug
 -D disableEmbedHtml
 -D stopOnError
