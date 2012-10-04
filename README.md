@@ -4,7 +4,7 @@ This project is under development.
 Brix is an HTML5, CSS3 and Haxe JS based application framework.
 
 It provides ready-to-use components to build applications faster.
-It injects ready-to-use components into your HTML pages to make a Rich UI application out of it.
+It injects components into your HTML pages to make a Rich UI application out of it.
 The set of Brix components are aggregable, extendable and skinnable with CSS.
 
 Brix is an alternative to Flex based on HTML/CSS web standards.
