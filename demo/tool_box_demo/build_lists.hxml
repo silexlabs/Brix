@@ -1,7 +1,7 @@
 -js bin/lists.js
 -cp ../../../haxe_libs/Cocktail/src/
 -cp ../../src/
--main org.brix.core.Application
---macro org.brix.core.Builder.create('./src/lists.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/lists.html')
 -D brixdebug
 -D disableEmbedHtml

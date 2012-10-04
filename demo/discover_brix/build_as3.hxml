@@ -1,9 +1,9 @@
--swf discover_slplayer.swf
+-swf discover_brix.swf
 -cp .
 -cp ../my_custom_components/src/
 -cp ../../src/
 -cp ../../../haxe_libs/Cocktail/src/
--main org.brix.core.Application
---macro org.brix.core.Builder.create('source.html')
+-main brix.core.Application
+--macro brix.core.Builder.create('source.html')
 --remap js:cocktail
 -swf-version 10.2

@@ -8,7 +8,7 @@ import utest.ui.Report;
 import js.Lib;
 import js.Dom;
 
-import org.brix.util.DomTools;
+import brix.util.DomTools;
 
 class UtilTest {
 

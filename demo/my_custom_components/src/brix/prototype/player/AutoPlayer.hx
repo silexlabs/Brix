@@ -3,13 +3,13 @@ package brix.prototype.player;
 import js.Dom;
 import js.Lib;
 
-import org.brix.component.ui.DisplayObject;
+import brix.component.ui.DisplayObject;
 
-import org.brix.component.player.IPlayerControl;
-using org.brix.component.player.IPlayerControl.PlayerControl;
+import brix.component.player.IPlayerControl;
+using brix.component.player.IPlayerControl.PlayerControl;
 
-import org.brix.component.group.IGroupable;
-using org.brix.component.group.IGroupable.Groupable;
+import brix.component.group.IGroupable;
+using brix.component.group.IGroupable.Groupable;
 
 import haxe.Timer;
 

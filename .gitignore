@@ -1,0 +1,7 @@
+*.hxproj
+*.js
+*.js.map
+*.swf
+*.sublime-project
+*.sublime-workspace
+/demo/code_embed
