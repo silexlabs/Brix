@@ -5,11 +5,11 @@ import js.Dom;
 
 import haxe.Template;
 
-import org.brix.component.ui.DisplayObject;
+import brix.component.ui.DisplayObject;
 
-import org.brix.component.data.IDataConsumer;
-using org.brix.component.data.IDataConsumer.DataConsumer;
-import org.brix.component.data.IDataProvider;
+import brix.component.data.IDataConsumer;
+using brix.component.data.IDataConsumer.DataConsumer;
+import brix.component.data.IDataProvider;
 
 /**
  * The TemplateRenderer is a simple DataConsumer component that renders a template against 

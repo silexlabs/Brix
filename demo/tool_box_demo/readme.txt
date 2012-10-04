@@ -28,7 +28,7 @@ PannelLayout
 - functional tests
 
 List
-- slplayer.ui.lists.List et slplayer.ui.lists.XmlList
+- brix.component.list.List et brix.component.list.XmlList
 - dataProvider dans les enfants au lieu de param html?
 - Lists doivent etre DataConsumer
 - multiple selection
@@ -36,7 +36,7 @@ List
 
 next comps
 - Redrawable
-  . slplayer.ui.interaction.Redrawable
+  . brix.component.interaction.Redrawable
   . Redrawable.hx
   . class de mixin Redrawable avec init() qui écoute l'event "redraw" => appel de redraw()
     . initRedrawable ( cmp : IRedrawable , nodes : Array<HtmlDom> )

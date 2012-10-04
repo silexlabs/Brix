@@ -1,7 +1,7 @@
 package brix.prototype.debug;
 
-import org.brix.component.ui.DisplayObject;
-import org.brix.core.Application;
+import brix.component.ui.DisplayObject;
+import brix.core.Application;
 
 import js.Lib;
 import js.Dom;
@@ -24,7 +24,7 @@ class DebugNodes  extends DisplayObject
 	
 	public function debugNodes(e : Event)
 	{
-		debugNode(getBrix().htmlRootElement);
+		debugNode(getBrixApplication().htmlRootElement);
 	}
 	
 	public function debugNode(node : HtmlDom)
@@ -37,7 +37,7 @@ class DebugNodes  extends DisplayObject
 				var tagName = untyped elt.nodeName;
 				trace("tag " + tagName +
 				" with class=" + elt.className +
-				" has associated components : "+getBrix().getAssociatedComponents(elt,Type.resolveClass("org.brix.component.ui.DisplayObject")));
+				" has associated components : "+getBrixApplication().getAssociatedComponents(elt,Type.resolveClass("brix.component.ui.DisplayObject")));
 			}
 			if (node.childNodes[cCount].hasChildNodes())
 				debugNode( elt );

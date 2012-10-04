@@ -1,9 +1,9 @@
 package brix.prototype.data;
 
-import org.brix.component.ui.DisplayObject;
+import brix.component.ui.DisplayObject;
 
-import org.brix.component.group.IGroupable;
-using org.brix.component.group.IGroupable.Groupable;
+import brix.component.group.IGroupable;
+using brix.component.group.IGroupable.Groupable;
 
 import haxe.Http;
 
@@ -11,8 +11,8 @@ import js.Dom;
 import js.Lib;
 
 //need this to be a standard compliant data provider
-import org.brix.component.data.IDataProvider;
-using org.brix.component.data.IDataProvider.DataProvider;
+import brix.component.data.IDataProvider;
+using brix.component.data.IDataProvider.DataProvider;
 
 /**
  * An RSS data provider component.
@@ -86,7 +86,7 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 	/**
 	 * Callback invoked when a new data consumer is showing up.
 	 */
-	public function onNewDataConsumer( dataConsumer : org.brix.component.data.IDataConsumer ):Void
+	public function onNewDataConsumer( dataConsumer : brix.component.data.IDataConsumer ):Void
 	{
 		if ( lastResult != null )
 			dataConsumer.onData( lastResult );

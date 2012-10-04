@@ -5,22 +5,22 @@ import js.Dom;
 
 import haxe.Template;
 
-import org.brix.component.ui.DisplayObject;
+import brix.component.ui.DisplayObject;
 
 //these two lines below are mandatory to be a standard data consumer
-import org.brix.component.data.IDataConsumer;
-using org.brix.component.data.IDataConsumer.DataConsumer;
-import org.brix.component.data.IDataProvider;
+import brix.component.data.IDataConsumer;
+using brix.component.data.IDataConsumer.DataConsumer;
+import brix.component.data.IDataProvider;
 
-import org.brix.component.player.IPlayable;
-import org.brix.component.player.IPlayerControl;
-using org.brix.component.player.IPlayable.Playable;
+import brix.component.player.IPlayable;
+import brix.component.player.IPlayerControl;
+using brix.component.player.IPlayable.Playable;
 
-import org.brix.component.group.IGroupable;
-using org.brix.component.group.IGroupable.Groupable;
+import brix.component.group.IGroupable;
+using brix.component.group.IGroupable.Groupable;
 
 /**
- * Gallery component for SLPlayer applications.
+ * Gallery component for Brix applications.
  * @author Thomas Fétiveau
  */
 @tagNameFilter("ul","ol")
