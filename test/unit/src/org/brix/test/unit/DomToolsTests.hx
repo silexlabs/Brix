@@ -19,7 +19,7 @@ import utest.Assert;
 import utest.Runner;
 import utest.ui.Report;
 
-import org.slplayer.util.DomTools;
+import org.brix.util.DomTools;
 
 import js.Dom;
 import js.Lib;

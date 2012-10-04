@@ -1,0 +1,10 @@
+-js Brix.js
+-cp ../../../haxe_libs/Cocktail/src/
+-cp ../../src/
+-cp ../my_custom_components/src/
+-debug
+-main org.brix.core.Application
+--macro org.brix.core.Builder.create('source.html')
+-D brixdebug
+-D disableEmbedHtml
+-D stopOnError

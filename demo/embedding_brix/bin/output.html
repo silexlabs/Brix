@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<style type="text/css">
+		.code { font-family:monospace; font-size:12pt; }
+		.block { margin:25px; }
+		.intro { background-color:#d5d5d5; }
+		li { margin:8px; }
+		body {font-family:'Arial'; color:#656565;}
+	</style>
+	<script type="text/javascript" src="myEmbeddedBrixApplication2.js" ></script>
+	<script type="text/javascript" src="myEmbeddedBrixApplication.js" ></script>
+</head>
+<body>
+<script type="text/javascript" >
+	window.onload = function() {
+		//alert(document.getElementById('myEmbeddedBrixApplication'));
+		var myEmbed1 = myEmbeddedBrixApplication.createApplication();
+		myEmbed1.initDom(document.getElementById('myEmbeddedBrixApplication'));
+		myEmbed1.initComponents();
+		
+		//see the HTML source of myEmbeddedBrixApplication2.js to understand why the exposed name is MyGallery in that case
+		var myEmbed2 = MyGallery.createApplication();
+		myEmbed2.initDom(document.getElementById('myEmbeddedBrixApplication2'));
+		myEmbed2.initComponents();
+		
+		var myEmbed3 = MyGallery.createApplication();
+		myEmbed3.initDom(document.getElementById('myEmbeddedBrixApplication2bis'));
+		myEmbed3.initComponents();
+	}
+</script>
+
+<div class="block intro">
+	To embed an Brix application for the js target, you should :
+	<ol style="list-">
+	<li>as a general good practice, ensure your Brix components never use <span class="code">Lib.document</span> or <span class="code">Lib.document.body</span> but the htmlRootElement attribute of the Brix instance in which they're supposed to run.</li>
+	<li>compile your Brix application with the -D embedHtml and -D noAutoStart compile options. The first one embeds the HTML source page in your .js file and the second one prevents the application to start automatically when included in your page through a <span class="code"> &lt;script src="[...].js"&gt; </span>tag.</li>
+	<li>then to start your Brix application, do : <span class="code"> &lt; name of your .js application script without the .js extension &gt;.init(&lt; the html DOM element where to put your Brix app. &gt;); </span></li>
+	</ol>
+	Each Brix application instance won't share the same namespace (no use of the global one) which will avoid any conflict between them or with other js libraries your pages might use.
+</div>
+
+<div class="block">
+	My embedded Brix application :
+	<div style="border:1px solid black;" id="myEmbeddedBrixApplication"></div>
+</div>
+
+<div class="block">
+	Another Brix embedded application :
+	<div style="border:1px solid black;" id="myEmbeddedBrixApplication2"></div>
+</div>
+
+<div class="block">
+	Another instance of the same Brix embedded application :
+	<div style="border:1px solid black;" id="myEmbeddedBrixApplication2bis"></div>
+</div>
+
+</body>
+</html>
