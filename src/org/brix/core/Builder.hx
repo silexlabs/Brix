@@ -40,7 +40,7 @@ class Builder
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * The data- attribute set by the slplayer on the HTML elements associated with one or more components.
+	 * The data- attribute set by the brix on the HTML elements associated with one or more components.
 	 */
 	static inline public var BRIX_USE_ATTR_NAME : String = "data-brix-use";
 	/**
@@ -114,7 +114,7 @@ class Builder
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Main entry point for the compilation of an SLPlayer application. Parses the HTML source file and presets
+	 * Main entry point for the compilation of an Brix application. Parses the HTML source file and presets
 	 * data and flags that will be used during the compilation of the application. Also performs some initial 
 	 * checking on the HTML document content, the use of the components...
 	 * 
@@ -162,7 +162,7 @@ class Builder
 	}
 	
 	/**
-	 * Actually builds the SLPlayer application from what has been extracted from the HTML source.
+	 * Actually builds the Brix application from what has been extracted from the HTML source.
 	 * 
 	 * @return Array<Field>	the fields of the application main class.
 	 */
@@ -175,7 +175,7 @@ class Builder
 		//{
 		//TODO debug error catching: why some errors in component are catch and other not ?
 			//parse the Application class fields to find the methods to fill in
-			discoverSLPlayerMethods(fields);
+			discoverApplicationContextMethods(fields);
 			
 			var pos = Context.currentPos();
 			
@@ -523,11 +523,11 @@ class Builder
 	}
 	
 	/**
-	 * Parse the SLPlayer fields to create references to the methods to implement.
+	 * Parse the ApplicationContext class fields to create references to the methods to implement.
 	 * 
-	 * @param	fields, array of SLPlayer fields
+	 * @param	fields, array of ApplicationContext fields
 	 */
-	static private function discoverSLPlayerMethods( fields : Array<Field> ) : Void
+	static private function discoverApplicationContextMethods( fields : Array<Field> ) : Void
 	{
 		for (fc in 0...fields.length)
 		{
@@ -578,7 +578,7 @@ class Builder
 		fields.push( { name : "htmlDocumentElement", doc : null, meta : [], access : [APublic, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
 			
 		#if brixdebug
-			neko.Lib.println("documentInnerHtml extracted and set on SLPlayer with a size of "+documentInnerHtml.length);
+			neko.Lib.println("documentInnerHtml extracted and set on ApplicationContext with a size of "+documentInnerHtml.length);
 		#end
 	}
 	
@@ -755,7 +755,7 @@ class Builder
 		
 		var output = Compiler.getOutput();
 		
-		//the compiled SLPlayer application filename
+		//the compiled Brix application filename
 		var outputFileName = output;
 		
 		var outputFileNameBegin = (output.indexOf('/') > -1) ? output.lastIndexOf('/') + 1 : 0 ;
@@ -772,12 +772,12 @@ class Builder
 			haxe.macro.Compiler.define("js-modern");
 		}
 
-		//set the SLPlayer Class exposed name for js version
+		//set the Brix Class exposed name for js version
 		//if ( Context.getLocalClass().get().meta.has(":expose"))
 		var applicationClassType:haxe.macro.Ref<haxe.macro.ClassType> = switch(Context.getType("org.brix.core.Application")) { case TInst(classRef, params): classRef; default: null; } ;
 		if ( applicationClassType.get().meta.has(":expose"))
 		{
-			neko.Lib.println( "\nWARNING you should not set manually the @:expose meta tag on Application class as SLPlayer sets it automatically." );
+			neko.Lib.println( "\nWARNING you should not set manually the @:expose meta tag on Application class as Brix sets it automatically." );
 		}
 		else
 		{
@@ -787,7 +787,7 @@ class Builder
 			}
 			
 			#if brixdebug
-				neko.Lib.println("Setting @:expose("+jsExposedName+") meta tag on SLPlayer class.");
+				neko.Lib.println("Setting @:expose("+jsExposedName+") meta tag on Application class.");
 			#end
 
 			//Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
