@@ -110,10 +110,8 @@ class Panel extends LayoutBase
 	 */
 	override public function redraw(){
 		if (preventRedraw){
-			trace("Redraw layout stopped");
 			return;
 		}
-		trace("Redraw layout");
 
 		var bodySize:Int;
 		var boundingBox = DomTools.getElementBoundingBox(rootElement);
