@@ -169,27 +169,27 @@ class Builder
 		//TODO debug error catching: why some errors in component are catch and other not ?
 			//parse the Application class fields to find the methods to fill in
 			discoverApplicationContextMethods(fields);
-			
+
 			var pos = Context.currentPos();
-			
+
 			//set the metaParameters var
 			//for ( metaName in { iterator : metaParameters.keys } )
 			//{
 				//initMetaParametersExprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent( "metaParameters" )), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString( metaName )), pos : pos }, { expr : EConst(CString( metaParameters.get(metaName) )), pos : pos } ]), pos : pos } );
 			//}
-			
+
 			//add the import and init() calls for the declared components in the application
 			includeComponents();
-			
+
 			//check the components restrictions (needs to be done after includeComponents() 'cause it wouldn't resolve the component classes otherwise)
 			checkComponents();
 			//runMacroApplication(); // temporarly commented because of http://code.google.com/p/haxe/issues/detail?id=924 but will replace checkComponents() eventually.
-			
-			//embeds the html (body) within the application
-			embedHTML(fields);
-			
+
 			//finalize the application compilation
 			pack();
+
+			//embeds the html (body) within the application
+			embedHTML(fields);
 		//}
 		//catch (unknown : Dynamic)
 		//{
@@ -555,21 +555,20 @@ class Builder
 		{
 			return;
 		}
-		
 		var pos = Context.currentPos();
 	
 		//add the _htmlDocumentElement static var to ApplicationContext
 		var documentInnerHtml = haxe.Serializer.run("");
-		
+
 		if (cocktail.Lib.document.documentElement.innerHTML != null)
 		{
 			documentInnerHtml = haxe.Serializer.run(cocktail.Lib.document.documentElement.innerHTML);
 		}
-		
+
 		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
-		
+
 		fields.push( { name : "htmlDocumentElement", doc : null, meta : [], access : [APublic, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
-			
+
 		#if brixdebug
 			neko.Lib.println("documentInnerHtml extracted and set on ApplicationContext with a size of "+documentInnerHtml.length);
 		#end
