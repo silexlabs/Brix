@@ -89,30 +89,37 @@ class GroupBuilder
 	static private function discoverGroupableChilds( elt:HtmlDom ) : List<HtmlDom>
 	{
 		var groupables : List<HtmlDom> = new List();
-		
+
 		var directChilds:HtmlCollection<Dynamic> = elt.childNodes;
-		
+
 		for (childCnt in 0...directChilds.length)
 		{
 			var childElt : HtmlDom = cast directChilds[childCnt];
 			if (childElt.nodeType != Lib.document.body.nodeType)
 				continue;
-			
-			if ( childElt.getAttribute("class") != null ){
-				for ( classAttr in childElt.getAttribute("class").split(" ") )
+
+			if ( childElt.className != null )
+			{
+				for ( classAttr in childElt.className.split(" ") )
 				{
 					var potentialClasses = Builder.getClassNameFromClassTag(classAttr);
-					
-					if ( potentialClasses.length != 1 ){
+
+					if ( potentialClasses.length != 1 )
+					{
 						continue; //can't be a valid component class tag value
 					}
-					
 					if ( !MacroTools.is( switch( Context.getType(potentialClasses.first()) ) { case TInst( classRef , params ): classRef.get(); default : } , "brix.component.group.IGroupable" ) )
+					{
 						continue;
+					}
 					groupables.add(childElt);
+					break;
+				}
+				if (Lambda.has(childElt.className.split(" "), "Group"))
+				{
+					continue;
 				}
 			}
-			
 			groupables = Lambda.concat(groupables, discoverGroupableChilds(directChilds[childCnt]));
 		}
 		return groupables;

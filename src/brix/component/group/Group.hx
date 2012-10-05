@@ -11,22 +11,21 @@ package brix.component.group;
 import brix.component.ui.DisplayObject;
 
 import js.Dom;
-//import js.Lib;
 
 /**
  * Gives its child elements a common event-based communication point.
  * 
  * @author Thomas Fétiveau
  */
-//@:build(brix.component.group.GroupBuilder.build())
+@:build(brix.component.group.GroupBuilder.build())
 class Group extends DisplayObject
 {
 	/**
-	 * 
+	 * The node attribute name for Groupable components to keep a reference to their group
 	 */
 	static inline private var GROUP_ID_ATTR:String = "data-group-id";
 	/**
-	 * 
+	 * The runtime group id sequence
 	 */
 	static public var GROUP_SEQ:Int = 0;
 	
@@ -70,25 +69,28 @@ class Group extends DisplayObject
 	{
 		var groupables : List<HtmlDom> = new List();
 
-		if (elt.nodeType != 1 || elt.className==null) return groupables;
-
-		//if (!getBrixApplication().getAssociatedComponents(elt,brix.component.group.IGroupable).isEmpty())
-		for (c in elt.className.split(" "))
-		{
-			var rc:Class<Dynamic> = getBrixApplication().resolveUIComponentClass(c);
-
-			if ( rc == null ) continue;
-
-			var ci = Type.createEmptyInstance(rc);
-
-			if ( ci == null || !Std.is( ci, brix.component.group.IGroupable) ) continue;
-
-			groupables.add(elt);
-			break;
-		}
-
 		for (childCnt in 0...elt.childNodes.length)
 		{
+			if (elt.childNodes[childCnt].nodeType != 1)
+			{
+				continue;
+			}
+			if (elt.childNodes[childCnt].className != null)
+			{
+				for (c in elt.childNodes[childCnt].className.split(" "))
+				{
+					var rc:Class<Dynamic> = getBrixApplication().resolveUIComponentClass(c, brix.component.group.IGroupable);
+
+					if ( rc == null ) continue;
+
+					groupables.add(elt.childNodes[childCnt]);
+					break;
+				}
+				if (Lambda.has(elt.childNodes[childCnt].className.split(" "), "Group"))
+				{
+					continue;
+				}
+			}
 			groupables = Lambda.concat(groupables, discoverGroupableChilds(elt.childNodes[childCnt]));
 		}
 		return groupables;

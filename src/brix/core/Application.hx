@@ -632,9 +632,10 @@ class Application
 	/**
 	 * Tries to resolve a UI component Class from a class name (can be full class name or short class name without packages)
 	 * @param the class name to resolve
+	 * @param optional, a type filter (for example: brix.component.ui.DisplayObject, ... or an interface like : brix.component.group.IGroupable ).
 	 * @return null il cannot resolve, an instance of the components's Class<Dynamic> 
 	 */
-	public function resolveUIComponentClass(className:String):Null<Class<Dynamic>>
+	public function resolveUIComponentClass(className:String, ?typeFilter:Class<Dynamic>=null):Null<Class<Dynamic>>
 	{
 		for (rc in registeredUIComponents)
 		{
@@ -656,6 +657,13 @@ class Application
 			if (componentClass == null)
 			{
 				continue;
+			}
+			if (typeFilter != null)
+			{
+				if ( !Std.is( Type.createEmptyInstance(componentClass), typeFilter) )
+				{
+					return null;
+				}
 			}
 			return componentClass;
 		}
