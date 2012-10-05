@@ -34,8 +34,12 @@ class GroupTests
 	{
 		// the html content that will be added at runtime
 		var htmlBoot:String = "<div class=\"Group\">"+
-									"<a class=\"LinkToPage\" >o</a>"+
-									"<a class=\"LinkToPage\" >o</a>"+
+									"<a class=\"LinkToPage\">o</a>"+
+									"<a class=\"LinkToPage\">o</a>"+
+									"<div class=\"Group\">"+
+										"<a class=\"LinkToPage\">i</a>"+
+										"<a class=\"LinkToPage\">i</a>"+
+									"</div>"+
 								"</div>";
 
 		// we create a root node for our application
@@ -59,6 +63,10 @@ class GroupTests
 		Assert.equals(appNode.innerHTML, "<div data-brix-id=\"1\" class=\"Group1r\">"+
 												"<a data-brix-id=\"2\" data-group-id=\"Group1r\" class=\"LinkToPage\">o</a>"+
 												"<a data-brix-id=\"3\" data-group-id=\"Group1r\" class=\"LinkToPage\">o</a>"+
+													"<div data-brix-id=\"4\" class=\"Group2r\">"+
+														"<a data-brix-id=\"5\" data-group-id=\"Group2r\" class=\"LinkToPage\">i</a>"+
+														"<a data-brix-id=\"6\" data-group-id=\"Group2r\" class=\"LinkToPage\">i</a>"+
+													"</div>"+
 											"</div>");
 	}
 }

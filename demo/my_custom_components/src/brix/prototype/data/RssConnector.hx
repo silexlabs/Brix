@@ -47,7 +47,7 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 	
 	private override function new(rootElement : HtmlDom, brixId:String)
 	{
-		super(rootElement,BrixId);
+		super(rootElement,brixId);
 		
 		startGroupable();
 		
