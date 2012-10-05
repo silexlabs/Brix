@@ -77,11 +77,11 @@ class DisplayObject implements IDisplayObject
 	 * 
 	 * @param	rootElement
 	 */
-	private function new(rootElement : HtmlDom, BrixId:String) 
+	private function new(rootElement : HtmlDom, brixId:String) 
 	{
 		this.rootElement = rootElement;
 
-		initBrixComponent(BrixId);
+		initBrixComponent(brixId);
 
 		#if disableFastInit
 			//check the @tagNameFilter constraints

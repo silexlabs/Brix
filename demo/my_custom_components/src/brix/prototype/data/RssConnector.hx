@@ -45,7 +45,7 @@ class RssConnector extends DisplayObject, implements IDataProvider, implements I
 		return src;
 	}
 	
-	private override function new(rootElement : HtmlDom, BrixId:String)
+	private override function new(rootElement : HtmlDom, brixId:String)
 	{
 		super(rootElement,BrixId);
 		

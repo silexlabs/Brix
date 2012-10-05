@@ -312,63 +312,47 @@ class Application
 		// finishing to create them all.
 		var compsToInit:List<brix.component.ui.DisplayObject> = new List();
 
-		if (node.getAttribute("class") != null)
+		if (node.className != null)
 		{
 			// we iterate on the node's class attribute values in the order they've been specified
-			for (classValue in node.getAttribute("class").split(" "))
+			for (classValue in node.className.split(" "))
 			{
-				// search for any registered component that could match this class attr value
-				for (rc in registeredUIComponents)
+				// try to resolve a potential matching UI component class
+				var componentClass = resolveUIComponentClass(classValue);
+
+				if (componentClass == null)
 				{
-					// the possible class attr values for this component
-					var componentClassAttrValues:Array<String> = [getUnconflictedClassTag(rc.classname)]; // TODO FIXME, this could probably be stored somewhere to avoid doing it all the time ?
-
-					if (componentClassAttrValues[0] != rc.classname)
-					{
-						componentClassAttrValues.push(rc.classname);
-					}
-
-					if (!Lambda.exists(componentClassAttrValues, function(s:String) { return s == classValue; } ))
-					{
-						continue;
-					}
-					// component identified, try now to resolve its class
-					var componentClass = resolveCompClass(rc.classname); // TODO FIXME, this could probably be stored somewhere to avoid doing it all the time ?
-
-					if (componentClass == null)
-					{
-						continue;
-					}
-
-					// create a new instance of this component
-					var newDisplayObject = null;
-
-					#if !stopOnError
-					try
-					{
-					#end
-
-						newDisplayObject = Type.createInstance( componentClass, [node, id] );
-
-						#if brixdebug
-							trace("Successfuly created instance of "+rc.classname);
-						#end
-
-					#if !stopOnError
-					}
-					catch ( unknown : Dynamic )
-					{
-						trace("ERROR while creating "+rc.classname+": "+Std.string(unknown));
-						var excptArr = haxe.Stack.exceptionStack();
-						if ( excptArr.length > 0 )
-						{
-							trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
-						}
-					}
-					#end
-
-					compsToInit.add(newDisplayObject);
+					continue;
 				}
+
+				// create a new instance of this component
+				var newDisplayObject = null;
+
+				#if !stopOnError
+				try
+				{
+				#end
+
+					newDisplayObject = Type.createInstance( componentClass, [node, id] );
+
+					#if brixdebug
+						trace("Successfuly created instance of "+Type.getClassName(componentClass));
+					#end
+
+				#if !stopOnError
+				}
+				catch ( unknown : Dynamic )
+				{
+					trace("ERROR while creating "+Type.getClassName(componentClass)+": "+Std.string(unknown));
+					var excptArr = haxe.Stack.exceptionStack();
+					if ( excptArr.length > 0 )
+					{
+						trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+					}
+				}
+				#end
+
+				compsToInit.add(newDisplayObject);
 			}
 		}
 
@@ -408,7 +392,8 @@ class Application
 			}
 			catch (unknown : Dynamic)
 			{
-				trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
+				//trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
+				Lib.alert("ERROR while trying to call init() on a component "+unknown);
 				var excptArr = haxe.Stack.exceptionStack();
 				if ( excptArr.length > 0 )
 				{
@@ -430,7 +415,7 @@ class Application
 				trace("Try to create an instance of "+rc.classname+" non visual component");
 			#end
 			
-			var componentClass = resolveCompClass(rc.classname);
+			var componentClass = resolveComponentClass(rc.classname);
 			
 			if (componentClass == null)
 			{
@@ -473,33 +458,7 @@ class Application
 			}
 		}
 	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private function resolveCompClass(classname:String):Class<Dynamic>
-	{
-		#if macro
-		trace("is std.Type.resolveClass('haxe.Serializer') == null ? "+(std.Type.resolveClass("haxe.Serializer")==null));
-		trace("is std.Type.resolveClass('"+classname+"') == null ? "+(std.Type.resolveClass(classname)==null));
-		trace("getting module "+classname);
-		haxe.macro.Context.getModule(classname);
-		trace("is std.Type.resolveClass('"+classname+"') == null ? "+(std.Type.resolveClass(classname)==null));
-		#end
-		
-		var componentClass = std.Type.resolveClass(classname);
-			
-		if (componentClass == null)
-		{
-			#if stopOnError
-			throw "ERROR cannot resolve "+classname;
-			#end
-			trace("ERROR cannot resolve "+classname);
-		}
-		return componentClass;
-	}
-	
+
 	/**
 	 * Removes all the component instances of a given node.
 	 * 
@@ -619,10 +578,10 @@ class Application
 	 * @param	typeFilter	an optionnal type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
 	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
-	public function getAssociatedComponents<TypeFilter : brix.component.ui.DisplayObject>(node : HtmlDom, typeFilter:Class<TypeFilter>) : List<TypeFilter>
+	public function getAssociatedComponents<TypeFilter>(node : HtmlDom, typeFilter:Class<TypeFilter>) : List<TypeFilter>
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
-		
+
 		if (nodeId != null)
 		{
 			var l = new List<TypeFilter>();
@@ -630,10 +589,12 @@ class Application
 			// this is because we are on the wrong application instance
 			// which means that we are looking for instances on a node which has been initialized 
 			// by another instance of Brix Application
-			if (nodeToCmpInstances.exists(nodeId)){
+			if (nodeToCmpInstances.exists(nodeId))
+			{
 				for (i in nodeToCmpInstances.get(nodeId))
 				{
-					if (Std.is(i, typeFilter)){
+					if (Std.is(i, typeFilter))
+					{
 						var inst:TypeFilter = cast(i);
 						l.add(inst);
 					}
@@ -641,7 +602,6 @@ class Application
 			}
 			return l;
 		}
-		
 		return new List<TypeFilter>();
 	}
 	
@@ -654,10 +614,10 @@ class Application
 	public function getUnconflictedClassTag(displayObjectClassName : String) : String
 	{
 		var classTag = displayObjectClassName;
-		
+
 		if (classTag.indexOf(".") != -1)
 			classTag = classTag.substr(classTag.lastIndexOf(".") + 1);
-		
+
 		for (rc in registeredUIComponents)
 		{
 			if (rc.classname != displayObjectClassName && classTag == rc.classname.substr(classTag.lastIndexOf(".") + 1))
@@ -665,8 +625,68 @@ class Application
 				return displayObjectClassName;
 			}
 		}
-		
+
 		return classTag;
+	}
+
+	/**
+	 * Tries to resolve a UI component Class from a class name (can be full class name or short class name without packages)
+	 * @param the class name to resolve
+	 * @return null il cannot resolve, an instance of the components's Class<Dynamic> 
+	 */
+	public function resolveUIComponentClass(className:String):Null<Class<Dynamic>>
+	{
+		for (rc in registeredUIComponents)
+		{
+			// the possible class attr values for this component
+			var componentClassAttrValues:Array<String> = [getUnconflictedClassTag(rc.classname)]; // TODO FIXME, this could probably be stored somewhere to avoid doing it all the time ?
+
+			if (componentClassAttrValues[0] != rc.classname)
+			{
+				componentClassAttrValues.push(rc.classname);
+			}
+
+			if (!Lambda.exists(componentClassAttrValues, function(s:String) { return s == className; } ))
+			{
+				continue;
+			}
+			// component identified, try now to resolve its class
+			var componentClass = resolveComponentClass(rc.classname); // TODO FIXME, this could probably be stored somewhere to avoid doing it all the time ?
+
+			if (componentClass == null)
+			{
+				continue;
+			}
+			return componentClass;
+		}
+		return null;
+	}
+
+	/**
+	 * Tries to resolve a component class at macro time and runtime.
+	 * @param the class to resolve.
+	 * @return null if failed or th component's Class<Dynamic> if succeed.
+	 */
+	private function resolveComponentClass(classname:String):Null<Class<Dynamic>>
+	{
+		#if macro
+		//trace("is std.Type.resolveClass('haxe.Serializer') == null ? "+(std.Type.resolveClass("haxe.Serializer")==null));
+		//trace("is std.Type.resolveClass('"+classname+"') == null ? "+(std.Type.resolveClass(classname)==null));
+		//trace("getting module "+classname);
+		haxe.macro.Context.getModule(classname);
+		//trace("is std.Type.resolveClass('"+classname+"') == null ? "+(std.Type.resolveClass(classname)==null));
+		#end
+
+		var componentClass = std.Type.resolveClass(classname);
+
+		if (componentClass == null)
+		{
+			#if stopOnError
+			throw "ERROR cannot resolve "+classname;
+			#end
+			trace("ERROR cannot resolve "+classname);
+		}
+		return componentClass;
 	}
 }
 

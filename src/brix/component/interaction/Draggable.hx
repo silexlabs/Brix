@@ -156,9 +156,9 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * init properties
 	 * retrieve atributes of the html dom node
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String)
+	public function new(rootElement:HtmlDom, brixId:String)
 	{
-		super(rootElement, BrixId);
+		super(rootElement, brixId);
 
 		// implementation of IGroupable
 		startGroupable();

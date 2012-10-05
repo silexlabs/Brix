@@ -73,8 +73,8 @@ class Panel extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String){
-		super(rootElement, BrixId);
+	public function new(rootElement:HtmlDom, brixId:String){
+		super(rootElement, brixId);
 		var _this_ = this;
 
 		Lib.window.addEventListener('resize', callback(redrawCallback), false);
