@@ -33,9 +33,9 @@ class LinkToContext extends LinkBase
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String)
+	public function new(rootElement:HtmlDom, brixId:String)
 	{
-		super(rootElement, BrixId);
+		super(rootElement, brixId);
 		// retrieve the name of our link in data-context instead of href
 		if (rootElement.getAttribute(CONFIG_TRANSITION_DURATION) != null)
 		{

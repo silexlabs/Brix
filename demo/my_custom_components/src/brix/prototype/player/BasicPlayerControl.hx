@@ -41,7 +41,7 @@ class BasicPlayerControl extends DisplayObject, implements IPlayerControl, imple
 	
 	public var groupElement:HtmlDom;
 	
-	private override function new(rootElement : HtmlDom, BrixId:String)
+	private override function new(rootElement : HtmlDom, brixId:String)
 	{
 		super(rootElement,BrixId);
 		

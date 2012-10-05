@@ -164,9 +164,9 @@ class Page extends DisplayObject, implements IGroupable
 	 * Init the attributes
 	 * Close the page
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String) 
+	public function new(rootElement:HtmlDom, brixId:String) 
 	{
-		super(rootElement, BrixId);
+		super(rootElement, brixId);
 
 		// implementation of IGroupable
 		startGroupable();

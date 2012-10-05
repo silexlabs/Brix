@@ -35,7 +35,7 @@ class AutoPlayer  extends DisplayObject, implements IPlayerControl, implements I
 	
 	public var groupElement:HtmlDom;
 	
-	private override function new(rootElement : HtmlDom, BrixId:String)
+	private override function new(rootElement : HtmlDom, brixId:String)
 	{
 		super(rootElement,BrixId);
 		

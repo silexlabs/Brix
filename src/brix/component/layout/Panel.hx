@@ -71,16 +71,20 @@ class Panel extends LayoutBase
 	 * html elment instance
 	 */
 	public var footer:HtmlDom;
+
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String){
-		super(rootElement, BrixId);
+	public function new(rootElement:HtmlDom, brixId:String)
+	{
+		super(rootElement, brixId);
 	}
+
 	/**
 	 * init the component
 	 */
-	override public function init() : Void { 
+	override public function init() : Void
+	{ 
 		super.init();
 
 		// retrieve references to the elements
