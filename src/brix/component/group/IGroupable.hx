@@ -43,7 +43,7 @@ class Groupable
 			return ;
 
 		// get the group elements corresponding to this ID
-		var groupElements = Lib.document.getElementsByClassName(groupId);
+		var groupElements = groupable.getBrixApplication().htmlRootElement.getElementsByClassName(groupId);
 		// check if we have one and only one group for this ID
 		if ( groupElements.length < 1 )
 		{

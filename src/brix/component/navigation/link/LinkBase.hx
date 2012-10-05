@@ -66,9 +66,9 @@ class LinkBase extends DisplayObject, implements IGroupable
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String)
+	public function new(rootElement:HtmlDom, brixId:String)
 	{
-		super(rootElement, BrixId);
+		super(rootElement, brixId);
 
 		// implementation of IGroupable
 		startGroupable();

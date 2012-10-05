@@ -8,15 +8,17 @@
  */
 package brix.component.group;
 
+
+import haxe.macro.Expr;
+import haxe.macro.Context;
+import haxe.macro.Type;
+
 import brix.core.Builder;
 import brix.util.MacroTools;
 
 import cocktail.Dom;
 import cocktail.Lib;
 
-import haxe.macro.Expr;
-import haxe.macro.Context;
-import haxe.macro.Type;
 
 using Lambda;
 
@@ -77,7 +79,7 @@ class GroupBuilder
 		}
 		return haxe.macro.Context.getBuildFields();
 	}
-	
+
 	/**
 	 * Search for groupable components in the childs of the given HTML element.
 	 * 

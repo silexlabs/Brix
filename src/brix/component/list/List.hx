@@ -67,9 +67,9 @@ class List<ElementClass> extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String)
+	public function new(rootElement:HtmlDom, brixId:String)
 	{
-		super(rootElement, BrixId);
+		super(rootElement, brixId);
 		_selectedIndex = -1;
 		dataProvider = [];
 

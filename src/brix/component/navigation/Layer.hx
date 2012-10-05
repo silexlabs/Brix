@@ -74,9 +74,9 @@ class Layer extends DisplayObject
 	 * constructor
 	 * removes all children from the DOM
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String)
+	public function new(rootElement:HtmlDom, brixId:String)
 	{
-		super(rootElement, BrixId);
+		super(rootElement, brixId);
 		childrenArray = new Array();
 		status = notInit;
 		// Store the transition data for use in onEnd

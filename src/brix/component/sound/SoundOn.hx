@@ -24,9 +24,9 @@ class SoundOn extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String)
+	public function new(rootElement:HtmlDom, brixId:String)
 	{
-		super(rootElement, BrixId);
+		super(rootElement, brixId);
 		rootElement.onclick = onClick;
 	}
 

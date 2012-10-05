@@ -24,9 +24,9 @@ class XmlList extends List<Xml>
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String)
+	public function new(rootElement:HtmlDom, brixId:String)
 	{
-		super(rootElement, BrixId);
+		super(rootElement, brixId);
 		var attr = rootElement.getAttribute(ATTR_ITEMS);
 		var xmlData:Xml = Xml.parse(StringTools.htmlUnescape(attr));
 		dataProvider = [];
