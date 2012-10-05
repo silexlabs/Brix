@@ -217,10 +217,10 @@ class List<ElementClass> extends DisplayObject
 	 * handle click in the list
 	 * TODO: multiple selection
 	 */
-	private function click(e:js.Event)
+	private function click(e:Event)
 	{
 		// retrieve the element of the list
-		var element = e.target;
+		var element = cast(e.target);
 		var idx = getItemID(element);
 		selectedItem = dataProvider[idx];
 
@@ -235,9 +235,9 @@ class List<ElementClass> extends DisplayObject
 	/**
 	 * handle roll over
 	 */
-	private function rollOver(e:js.Event)
+	private function rollOver(e:Event)
 	{
-		var element = e.target;
+		var element:HtmlDom = cast(e.target);
 		var idx = getItemID(element);
 
 		// dispatch a custom event
