@@ -45,7 +45,7 @@ class ConnectorBase<DataType> extends DisplayObject, implements IDataProvider, i
 		return src;
 	}
 	
-	private override function new(rootElement : HtmlDom, BrixId:String)
+	private override function new(rootElement : HtmlDom, brixId:String)
 	{
 		super(rootElement,BrixId);
 		

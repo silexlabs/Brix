@@ -37,7 +37,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	 */
 	var dataProviders(default,null) : Hash<Array<Dynamic>>;
 	
-	private override function new(rootElement : HtmlDom, BrixId:String)
+	private override function new(rootElement : HtmlDom, brixId:String)
 	{
 		super(rootElement,BrixId);
 		
