@@ -471,7 +471,6 @@ class Application
 			// works only for elements
 			return;
 		}
-		trace("clean "+node.tagName);
 		var comps:List<brix.component.ui.DisplayObject> = getAssociatedComponents(node, brix.component.ui.DisplayObject);
 		
 		for (c in comps)

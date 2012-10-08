@@ -226,12 +226,13 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		initialStyle = {};
 		
-		//for (styleName in Reflect.fields(rootElement.style))
-		//{
-			//var val:String = Reflect.field(rootElement.style, styleName);
-			//Reflect.setField(initialStyle, styleName, val);
+		// set all inline styles
+		for (styleName in Reflect.fields(rootElement.style))
+		{
+			var val:String = Reflect.field(rootElement.style, styleName);
+			Reflect.setField(initialStyle, styleName, val);
 			//trace("initRootElementStyle keep style "+styleName+" = "+val);
-		//}
+		}
 		
 		initialStyle.width = rootElement.style.width;
 		rootElement.style.width = rootElement.clientWidth + "px";
@@ -249,29 +250,29 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		if (refHtmlDom == null) 
 			refHtmlDom = rootElement;
-/*
-#if js
-		var computedStyle:Style = untyped __js__("window.getComputedStyle(refHtmlDom, null)");
 
-		for (styleName in Reflect.fields(computedStyle)){
-			// retrieve the computed properties
-			var val:String = Reflect.field(computedStyle, styleName);
-			// firefox way
-			var  mozzVal = untyped __js__("computedStyle.getPropertyValue(val)");
-			if (mozzVal != null)
-				val = mozzVal;
-
-			// set the style to the phantom
-			//trace("set style "+styleName+" = "+val+" - "+mozzVal);
-			//DomTools.inspectTrace(val);
-			Reflect.setField(phantom.style, styleName, val);
-			Reflect.setField(miniPhantom.style, styleName, val);
+		// set all inline styles
+		for (styleName in Reflect.fields(refHtmlDom.style))
+		{
+			try{
+				var val:String = Reflect.field(refHtmlDom.style, styleName);
+				Reflect.setField(phantom, styleName, val);
+				Reflect.setField(miniPhantom, styleName, val);
+				//trace("initPhantomStyle keep style "+styleName+" = "+val);
+			}
+			catch(e:Dynamic){
+				// some properties are read only
+			}
 		}
-#end
-*/
+
 		//trace("initPhantomStyle "+computedStyle.position+" - "+phantom.style.position);
-		phantom.className = refHtmlDom.className + " " + phantomClassName;
-		miniPhantom.className = refHtmlDom.className + " " + phantomClassName;
+		phantom.className = phantomClassName;
+		miniPhantom.className = phantomClassName;
+
+		phantom.style.width = refHtmlDom.clientWidth + "px";
+		phantom.style.height = refHtmlDom.clientHeight + "px";
+		miniPhantom.style.width = refHtmlDom.clientWidth + "px";
+		miniPhantom.style.height = refHtmlDom.clientHeight + "px";
 	}
 	/**
 	 * init phantom according to root element properties
@@ -280,8 +281,13 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		for (styleName in Reflect.fields(initialStyle))
 		{
-			var val:String = Reflect.field(initialStyle, styleName);
-			Reflect.setField(rootElement.style, styleName, val);
+			try{
+				var val:String = Reflect.field(initialStyle, styleName);
+				Reflect.setField(rootElement.style, styleName, val);
+			}
+			catch(e:Dynamic){
+				// some properties are read only
+			}
 		}
 	}
 	/**
@@ -290,7 +296,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * memorize the rootElement style values and prepare it to be moved
 	 */
 	private function startDrag(e:MouseEvent)
-	{
+	{trace("startDrag "+state);
 		if (state == none)
 		{
 			var boundingBox = DomTools.getElementBoundingBox(rootElement);
@@ -299,9 +305,8 @@ class Draggable extends DisplayObject, implements IGroupable
 			initialY = boundingBox.y;
 			initialMouseX = e.clientX;
 			initialMouseY = e.clientY;
-			initPhantomStyle();
-			initPhantomStyle();
 			initRootElementStyle();
+			initPhantomStyle();
 			//initialStylePosition = rootElement.style.position;
 
 			//Lib.document.onmousemove = function(e){move(e);};
@@ -311,7 +316,7 @@ class Draggable extends DisplayObject, implements IGroupable
 			//rootElement.style.position = "absolute";
 			move(e);
 
-			// dispatch a custom event
+			// dispatch event so that other components can change the phantom style
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_DRAG, false, false, {
 				dropZone : bestDropZone,
@@ -376,14 +381,19 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * look for closest drop zone if there are some
 	 */
 	public function move(e:MouseEvent)
-	{
+	{trace("move");
 		if (state == dragging)
 		{
-			var x = e.clientX - initialMouseX + initialX;
-			var y = e.clientY - initialMouseY + initialY;
-			rootElement.style.left = x + "px";
-			rootElement.style.top = y + "px";
-			setAsBestDropZone(getBestDropZone(e.clientX, e.clientY));
+			// find the closest postition 
+			var mouseX = e.clientX + initialX;
+			var mouseY = e.clientY + initialY;
+			var elementX = mouseX - initialMouseX;
+			var elementY = mouseY - initialMouseY;
+			setAsBestDropZone(getBestDropZone(elementX, elementY));
+
+			// position of the dragged element under the mouse
+			rootElement.style.left = elementX + "px";
+			rootElement.style.top = elementY + "px";
 
 			// dispatch a custom event
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
@@ -458,13 +468,16 @@ class Draggable extends DisplayObject, implements IGroupable
 			Math.pow((bb.x)-mouseX, 2)
 			+ Math.pow((bb.y)-mouseY, 2)
 		);
-/**/
-		var x = (bb.x+bb.w/2.0) + mouseX - initialMouseX - initialX;
-		var y = (bb.y+bb.h/2.0) + mouseY - initialMouseY - initialY;
+/*
+		// take the size of the dragged element in to account
+//this does not work?
+		var x = (bb.x+bb.w/2.0);
+		var y = (bb.y+bb.h/2.0);
 		return Math.sqrt(
 			Math.pow(x-mouseX, 2)
 			+ Math.pow(y-mouseY, 2)
 		);
+/**/
 	}
 	/**
 	 * keep a reference to closest drop zone

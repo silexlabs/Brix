@@ -64,12 +64,6 @@ class Page extends DisplayObject, implements IGroupable
 	/** 
 	 * Open the page with the given "name" attribute
 	 * This will close other pages
-	 * @param 
-	 * @param 
-	 * @param 
-	 * @param 
-	 * @param 
-	 * @param 
 	 */
 	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, brixId:String, root:HtmlDom = null)
 	{//trace("openPage ("+pageName+", "+isPopup+", "+brixId+", "+root+")");
@@ -193,7 +187,15 @@ class Page extends DisplayObject, implements IGroupable
 			DomTools.doLater(callback(open, null, null, true, true));
 		}
 	}
-
+	/** 
+	 * Set the name attribute of the page, i.e. change the name attribute on rootElement
+	 */
+	public function setPageName(newPageName:String):String
+	{
+		rootElement.setAttribute(CONFIG_NAME_ATTR, newPageName);
+		name = newPageName;
+		return newPageName;
+	}
 	/**
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 * Also close the other pages if doCloseOthers is true
