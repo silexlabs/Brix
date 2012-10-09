@@ -64,7 +64,8 @@ class LayoutBase extends DisplayObject
 	}
 
 	/**
-	 * computes the size of each element
+	 * throw a redraw event for the other layouts
+	 * to be overriden in the derived classes
 	 */
 	public function redraw(){
 		if (preventRedraw){
