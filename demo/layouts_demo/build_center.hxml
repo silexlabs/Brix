@@ -1,0 +1,7 @@
+-js bin/center.js
+-cp ../../src/
+-cp ../../../Cocktail/src/
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/center.html')
+-D brixdebug
+-D disableEmbedHtml
