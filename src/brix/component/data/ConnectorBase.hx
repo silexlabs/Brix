@@ -47,7 +47,7 @@ class ConnectorBase<DataType> extends DisplayObject, implements IDataProvider, i
 	
 	private override function new(rootElement : HtmlDom, brixId:String)
 	{
-		super(rootElement,BrixId);
+		super(rootElement,brixId);
 		
 		startGroupable();
 		

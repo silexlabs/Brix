@@ -39,7 +39,7 @@ class ImagePlayer extends DisplayObject, implements IDataConsumer, implements IP
 	
 	private override function new(rootElement : HtmlDom, brixId:String)
 	{
-		super(rootElement,BrixId);
+		super(rootElement,brixId);
 		
 		startGroupable();
 	}
