@@ -102,7 +102,7 @@ class LinkBase extends DisplayObject, implements IGroupable
 	private function onClick(e:Event)
 	{
 		// prevent the hash tag to change the scroll position as an HTML anchor would
-		e.preventDefault();
+		//e.preventDefault();
 		// values for the transition
 		transitionDataShow = TransitionTools.getTransitionData(rootElement, TransitionType.show);
 		transitionDataHide = TransitionTools.getTransitionData(rootElement, TransitionType.hide);
