@@ -299,6 +299,7 @@ with sum of the css classes
 		}
 		// set or reset style.display
 		rootElement.style.display=styleAttrDisplay;
+		rootElement.style.visibility="visible";
 	}
 	/**
 	 * transition is over
@@ -412,6 +413,7 @@ with sum of the css classes
 		}
 		// set or reset style.display
 		rootElement.style.display="none";
+		rootElement.style.visibility="hidden";
 	}
 	//////////////////////////////////////////////////////
 	// Media
