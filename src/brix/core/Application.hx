@@ -229,7 +229,7 @@ class Application
 		#if (!macro && !disableEmbedHtml)
 			var updateRootRef:Bool = (htmlRootElement == Lib.document.documentElement);
 
-			htmlRootElement.innerHTML = ApplicationContext.getEmbeddedHtml();
+			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
 			//htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
 
 			if (updateRootRef)
