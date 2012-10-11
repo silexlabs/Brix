@@ -131,11 +131,11 @@ class Builder
 			//var htmlSource : String = '<html>	<head>		<script data-brix-use="org.silex.components.Page"></script>		<script data-brix-use="org.silex.components.Layer"></script>		<script data-brix-use="org.silex.components.LinkToPage"></script>		<script data-brix-use="org.silex.components.LinkClosePage"></script>		<script data-brix-use="org.silex.components.SoundOn"></script>		<script data-brix-use="org.silex.components.SoundOff"></script>		<script data-brix-use="org.silex.components.EmailForm"></script>		<script data-brix-use="org.silex.components.SWFImport"></script>		<link rel="stylesheet" type="text/css" href="app.css" />		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 		<meta name="HomePage" content="page1"/>	</head>	<body>		<div class="main-container">			<!-- POP UPs -->			<div class="popup-container">				<a name="popup1" class="Page">Popup 1</a>				<div class="Layer popup1">					<p>Test of a popup. <br/><a href="http://itunes.apple.com/fr/artist/europa-apps/id481656283?uo=4" target="_blank">Voir les applis sur l app store</a>					</p>					<a href="#popup1" class="LinkClosePage">						<img src="assets/close.png" class="illustration" />					</a>					<div class="EmailForm" data-service-url="http://www.europa-apps.com/wpsb-opt-in.webservice.php">						<input type="text" class="email-form-text-input" />						<input type="submit" value="Submit" class="email-form-submit-button" />						<p class="email-form-messages-zone email-form-error-message email-form-success-message" />					</div>				</div>			</div>			<!-- PAGES -->			<div class="pages-container">				<!-- INTERFACE -->				<img src="assets/son-on-off.png" class="SoundOn" />				<img src="assets/son-on-off.png" class="SoundOff" />				<a href="#popup1" target="_top" class="LinkToPage">					<img src="assets/open_pop-up01.png" />				</a>				<!-- SEQ 1 -->				<a name="page1" class="Page">Page 1</a>				<div class="Layer page1">					<!-- PERSO -->					<!-- BACKGROUND -->					<object class="SWFImport" 						data="illustrations/seq1.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page1-txt.mp3" type="audio/mp3" />					</audio>					<audio autoplay="autoplay" loop="loop">						<source src="sounds/page1-bg.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page2" class="LinkToPage next">						<img src="assets/next.png" />					</a>				</div>				<!-- SEQ 2 -->				<a name="page2" class="Page">Page 2</a>				<div class="Layer page2">					<!-- BACKGROUND -->					<object class="SWFImport"						data="illustrations/seq2.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page2-txt.mp3" type="audio/mp3" />					</audio>					<audio autoplay="autoplay" loop="loop">						<source src="sounds/page2-bg.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page1" class="LinkToPage previous">						<img src="assets/previous.png" />					</a>					<a href="#page3" class="LinkToPage next">						<img src="assets/next.png" />					</a>				</div>				<!-- PAGE 3 -->				<a name="page3" class="Page">Page 3</a>				<div class="Layer page3">					<!-- BACKGROUND -->					<object class="SWFImport"						data="illustrations/seq3.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page3-txt.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page2" class="LinkToPage previous">						<img src="assets/previous.png" />					</a>				</div>				<div class="Layer page2 page3 page2-3">					<p>TEST SUR 2 PAGES, PAGE 2 et 3</p>				</div>			</div>		</div>	</body></html>';
 			
 			//init the DOM tree from source HTML file content
-			cocktail.Lib.document.documentElement.outerHTML = htmlSource;
+			cocktail.Lib.document.innerHTML = htmlSource;
 			
 			//init a copy of the source DOM tree
 			sourceHTMLDocument = new Document();
-			sourceHTMLDocument.documentElement.outerHTML = htmlSource;
+			sourceHTMLDocument.innerHTML = htmlSource;
 			
 			//parse <meta> elements
 			parseMetas();
@@ -558,20 +558,20 @@ class Builder
 		var pos = Context.currentPos();
 	
 		//add the _htmlDocumentElement static var to ApplicationContext
-		var documentOuterHtml = haxe.Serializer.run("");
+		var documentInnerHtml = haxe.Serializer.run("");
 
-		var outerHtml:String = cocktail.Lib.document.documentElement.outerHTML;
-		if (outerHtml != null)
+		var innerHtml:String = cocktail.Lib.document.innerHTML;
+		if (innerHtml != null)
 		{
-			documentOuterHtml = haxe.Serializer.run(outerHtml);
+			documentInnerHtml = haxe.Serializer.run(innerHtml);
 		}
 
-		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentOuterHtml)), pos : pos }]), pos : pos };
+		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
 
 		fields.push( { name : "htmlDocumentElement", doc : null, meta : [], access : [APublic, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
 
 		#if brixdebug
-			neko.Lib.println("document outerHtml extracted and set on ApplicationContext with a size of "+documentOuterHtml.length);
+			neko.Lib.println("document innerHtml extracted and set on ApplicationContext with a size of "+documentInnerHtml.length);
 		#end
 	}
 	
@@ -689,7 +689,7 @@ class Builder
 				neko.Lib.println("Saving "+outputFilePath);
 			#end
 
-			sys.io.File.saveContent( outputFilePath , cocktail.Lib.document.documentElement.outerHTML );
+			sys.io.File.saveContent( outputFilePath , cocktail.Lib.document.innerHTML );
 		}
 		
 		// specific js-target application packaging
