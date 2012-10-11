@@ -131,11 +131,11 @@ class Builder
 			//var htmlSource : String = '<html>	<head>		<script data-brix-use="org.silex.components.Page"></script>		<script data-brix-use="org.silex.components.Layer"></script>		<script data-brix-use="org.silex.components.LinkToPage"></script>		<script data-brix-use="org.silex.components.LinkClosePage"></script>		<script data-brix-use="org.silex.components.SoundOn"></script>		<script data-brix-use="org.silex.components.SoundOff"></script>		<script data-brix-use="org.silex.components.EmailForm"></script>		<script data-brix-use="org.silex.components.SWFImport"></script>		<link rel="stylesheet" type="text/css" href="app.css" />		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 		<meta name="HomePage" content="page1"/>	</head>	<body>		<div class="main-container">			<!-- POP UPs -->			<div class="popup-container">				<a name="popup1" class="Page">Popup 1</a>				<div class="Layer popup1">					<p>Test of a popup. <br/><a href="http://itunes.apple.com/fr/artist/europa-apps/id481656283?uo=4" target="_blank">Voir les applis sur l app store</a>					</p>					<a href="#popup1" class="LinkClosePage">						<img src="assets/close.png" class="illustration" />					</a>					<div class="EmailForm" data-service-url="http://www.europa-apps.com/wpsb-opt-in.webservice.php">						<input type="text" class="email-form-text-input" />						<input type="submit" value="Submit" class="email-form-submit-button" />						<p class="email-form-messages-zone email-form-error-message email-form-success-message" />					</div>				</div>			</div>			<!-- PAGES -->			<div class="pages-container">				<!-- INTERFACE -->				<img src="assets/son-on-off.png" class="SoundOn" />				<img src="assets/son-on-off.png" class="SoundOff" />				<a href="#popup1" target="_top" class="LinkToPage">					<img src="assets/open_pop-up01.png" />				</a>				<!-- SEQ 1 -->				<a name="page1" class="Page">Page 1</a>				<div class="Layer page1">					<!-- PERSO -->					<!-- BACKGROUND -->					<object class="SWFImport" 						data="illustrations/seq1.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page1-txt.mp3" type="audio/mp3" />					</audio>					<audio autoplay="autoplay" loop="loop">						<source src="sounds/page1-bg.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page2" class="LinkToPage next">						<img src="assets/next.png" />					</a>				</div>				<!-- SEQ 2 -->				<a name="page2" class="Page">Page 2</a>				<div class="Layer page2">					<!-- BACKGROUND -->					<object class="SWFImport"						data="illustrations/seq2.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page2-txt.mp3" type="audio/mp3" />					</audio>					<audio autoplay="autoplay" loop="loop">						<source src="sounds/page2-bg.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page1" class="LinkToPage previous">						<img src="assets/previous.png" />					</a>					<a href="#page3" class="LinkToPage next">						<img src="assets/next.png" />					</a>				</div>				<!-- PAGE 3 -->				<a name="page3" class="Page">Page 3</a>				<div class="Layer page3">					<!-- BACKGROUND -->					<object class="SWFImport"						data="illustrations/seq3.swf">					</object>					<!-- SOUND -->					<audio autoplay="autoplay">						<source src="sounds/page3-txt.mp3" type="audio/mp3" />					</audio>					<!-- INTERFACE -->					<a href="#page2" class="LinkToPage previous">						<img src="assets/previous.png" />					</a>				</div>				<div class="Layer page2 page3 page2-3">					<p>TEST SUR 2 PAGES, PAGE 2 et 3</p>				</div>			</div>		</div>	</body></html>';
 			
 			//init the DOM tree from source HTML file content
-			cocktail.Lib.document.documentElement.innerHTML = htmlSource;
+			cocktail.Lib.document.documentElement.outerHTML = htmlSource;
 			
 			//init a copy of the source DOM tree
 			sourceHTMLDocument = new Document();
-			sourceHTMLDocument.documentElement.innerHTML = htmlSource;
+			sourceHTMLDocument.documentElement.outerHTML = htmlSource;
 			
 			//parse <meta> elements
 			parseMetas();
@@ -562,7 +562,7 @@ class Builder
 
 		if (cocktail.Lib.document.documentElement.innerHTML != null)
 		{
-			documentInnerHtml = haxe.Serializer.run(cocktail.Lib.document.documentElement.innerHTML);
+			documentInnerHtml = haxe.Serializer.run(cocktail.Lib.document.documentElement.outerHTML); trace(cocktail.Lib.document.documentElement.outerHTML);
 		}
 
 		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
@@ -661,11 +661,88 @@ class Builder
 				parent.removeChild(n);
 			}
 		}
+
+		if (Context.defined('disableEmbedHtml'))
+		{
+			var output = Compiler.getOutput();
+
+			//the compiled Brix application filename
+			var outputFileName = output;
+
+			var outputFileNameBegin = (output.indexOf('/') > -1) ? output.lastIndexOf('/') + 1 : 0 ;
+
+			outputFileName = output.substr( outputFileNameBegin, (( output.lastIndexOf('.') > outputFileNameBegin ) ? output.lastIndexOf('.') : output.length) - outputFileNameBegin );
+
+			//generates the "compiled" HTML file if not embed
+			if (outputFilePath == null)
+			{
+				var outputDirectory = "./";
+
+				if (output.lastIndexOf('/') != null)
+					outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
+
+				outputFilePath = outputDirectory + outputFileName + ".html";
+			}
+
+			#if brixdebug
+				neko.Lib.println("Saving "+outputFilePath);
+			#end
+
+			sys.io.File.saveContent( outputFilePath , cocktail.Lib.document.documentElement.outerHTML );
+		}
 		
 		// specific js-target application packaging
 		if (Context.defined('js'))
 		{
 			packForJs();
+		}
+	}
+	
+	/**
+	 * Performs the js-specific compile config and output generating tasks.
+	 */
+	static function packForJs() : Void
+	{
+		var pos = Context.currentPos();
+
+		var output = Compiler.getOutput();
+
+		//the compiled Brix application filename
+		var outputFileName = output;
+
+		var outputFileNameBegin = (output.indexOf('/') > -1) ? output.lastIndexOf('/') + 1 : 0 ;
+
+		outputFileName = output.substr( outputFileNameBegin, (( output.lastIndexOf('.') > outputFileNameBegin ) ? output.lastIndexOf('.') : output.length) - outputFileNameBegin );
+
+		//set the js-modern mode
+		if (!Context.defined('js-modern'))
+		{
+			#if brixdebug
+				neko.Lib.println("Setting js-modern mode.");
+			#end
+			haxe.macro.Compiler.define("js-modern");
+		}
+
+		//set the Brix Class exposed name for js version
+		//if ( Context.getLocalClass().get().meta.has(":expose"))
+		var applicationClassType:haxe.macro.Ref<haxe.macro.ClassType> = switch(Context.getType("brix.core.Application")) { case TInst(classRef, params): classRef; default: null; } ;
+		if ( applicationClassType.get().meta.has(":expose"))
+		{
+			neko.Lib.println( "\nWARNING you should not set manually the @:expose meta tag on Application class as Brix sets it automatically." );
+		}
+		else
+		{
+			if (jsExposedName == null)
+			{
+				jsExposedName = outputFileName;
+			}
+			
+			#if brixdebug
+				neko.Lib.println("Setting @:expose("+jsExposedName+") meta tag on Application class.");
+			#end
+
+			//Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
+			applicationClassType.get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
 		}
 	}
 	
@@ -735,76 +812,6 @@ class Builder
 					
 				default:
 			}
-		}
-	}
-	
-	/**
-	 * Performs the js-specific compile config and output generating tasks.
-	 */
-	static function packForJs() : Void
-	{
-		var pos = Context.currentPos();
-		
-		var output = Compiler.getOutput();
-		
-		//the compiled Brix application filename
-		var outputFileName = output;
-		
-		var outputFileNameBegin = (output.indexOf('/') > -1) ? output.lastIndexOf('/') + 1 : 0 ;
-		
-		outputFileName = output.substr( outputFileNameBegin, (( output.lastIndexOf('.') > outputFileNameBegin ) ? output.lastIndexOf('.') : output.length) - outputFileNameBegin );
-		
-		
-		//set the js-modern mode
-		if (!Context.defined('js-modern'))
-		{
-			#if brixdebug
-				neko.Lib.println("Setting js-modern mode.");
-			#end
-			haxe.macro.Compiler.define("js-modern");
-		}
-
-		//set the Brix Class exposed name for js version
-		//if ( Context.getLocalClass().get().meta.has(":expose"))
-		var applicationClassType:haxe.macro.Ref<haxe.macro.ClassType> = switch(Context.getType("brix.core.Application")) { case TInst(classRef, params): classRef; default: null; } ;
-		if ( applicationClassType.get().meta.has(":expose"))
-		{
-			neko.Lib.println( "\nWARNING you should not set manually the @:expose meta tag on Application class as Brix sets it automatically." );
-		}
-		else
-		{
-			if (jsExposedName == null)
-			{
-				jsExposedName = outputFileName;
-			}
-			
-			#if brixdebug
-				neko.Lib.println("Setting @:expose("+jsExposedName+") meta tag on Application class.");
-			#end
-
-			//Context.getLocalClass().get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
-			applicationClassType.get().meta.add( ":expose", [{ expr : EConst(CString(jsExposedName)), pos : pos }], pos);
-		}
-
-		if (Context.defined('disableEmbedHtml'))
-		{
-			//generates the "compiled" HTML file if not embed
-
-			if (outputFilePath == null)
-			{
-				var outputDirectory = "./";
-
-				if (output.lastIndexOf('/') != null)
-					outputDirectory = output.substr( 0 , output.lastIndexOf('/') + 1 );
-
-				outputFilePath = outputDirectory + outputFileName + ".html";
-			}
-
-			#if brixdebug
-				neko.Lib.println("Saving "+outputFilePath);
-			#end
-
-			sys.io.File.saveContent( outputFilePath , cocktail.Lib.document.documentElement.innerHTML );
 		}
 	}
 	
