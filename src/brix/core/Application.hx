@@ -119,10 +119,11 @@ class Application
 
 			var newApp:Application = createApplication();
 
-			#if (js && disableEmbedHtml)
+			#if ((php || js) && disableEmbedHtml)
 				//special case in js when auto starting the application, 
 				//we need to ensure first that the parent document is ready
-				Lib.window.onload = function(e:Event) { 
+				Lib.window.onload = function(e:Event)
+				{ 
 					newApp.initDom(); 
 					newApp.initComponents(); 
 				};
@@ -227,7 +228,7 @@ class Application
 		// htmlRootElement.innerHTML
 		#if (!macro && !disableEmbedHtml)
 			//htmlRootElement.innerHTML = ApplicationContext.getEmbeddedHtml();
-			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
+			htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
 		#end
 	}
 	
@@ -299,13 +300,24 @@ class Application
 			return null;
 		}
 
-		if ( node.getAttribute(BRIX_ID_ATTR_NAME) != null )
+		// check if we have an existing data-brix-id attribute on the node
+		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
+		if ( nodeId != null )
 		{
-			#if brixdebug
-				trace("WARNING this node has already been initialized !");
-			#end
-			// means that the node has already been initialized
-			return null;
+			if (!nodeToCmpInstances.exists(nodeId))
+			{
+				// we remove this brix id attribute as it has been set before Application
+				// startup (in html src, at compilation or on server side for example)
+				node .removeAttribute(BRIX_ID_ATTR_NAME);
+			}
+			else
+			{	// TODO / FIXME we may support calling initNode on a already initialized node
+				#if brixdebug
+					trace("WARNING this node has already been initialized !");
+				#end
+				// means that the node has already been initialized
+				return null;
+			}
 		}
 		
 		// creation and initialization are two steps. We need to store temporarly the component instances to init while
@@ -575,7 +587,7 @@ class Application
 	/**
 	 * Gets the component instance(s) associated with a given node.
 	 * @param	node		the HTML node for which we search the associated component instances.
-	 * @param	typeFilter	an optionnal type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
+	 * @param	typeFilter	a type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
 	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
 	public function getAssociatedComponents<TypeFilter>(node : HtmlDom, typeFilter:Class<TypeFilter>) : List<TypeFilter>
@@ -604,7 +616,30 @@ class Application
 		}
 		return new List<TypeFilter>();
 	}
-	
+
+	/**
+	 * Returns all the component instances of TypeFilter of the Application.
+	 * @param	typeFilter	a type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
+	 * @return a list of TypeFilter.
+	 */
+	public function getComponents<TypeFilter>(typeFilter:Class<TypeFilter>) : List<TypeFilter>
+	{
+		var l = new List<TypeFilter>();
+
+		for (n in nodeToCmpInstances)
+		{
+			for (i in n)
+			{
+				if (Std.is(i, typeFilter))
+				{
+					var inst:TypeFilter = cast(i);
+					l.add(inst);
+				}
+			}
+		}
+		return l;
+	}
+
 	/**
 	 * Determine a class tag value for a component that won't be conflicting with other components.
 	 * 
