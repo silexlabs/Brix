@@ -211,7 +211,7 @@ class Application
 			#end
 			htmlRootElement = Lib.document.documentElement;
 		}
-		
+
 		if ( htmlRootElement == null )
 		{
 			#if js
@@ -223,12 +223,19 @@ class Application
 			//do not continue
 			return;
 		}
-		
+
 		// at macro time, htmlRootElement == Lib.document.documentElement so we already have the source html in 
 		// htmlRootElement.innerHTML
 		#if (!macro && !disableEmbedHtml)
-			//htmlRootElement.innerHTML = ApplicationContext.getEmbeddedHtml();
-			htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
+			var updateRootRef:Bool = (htmlRootElement == Lib.document.documentElement);
+
+			htmlRootElement.innerHTML = ApplicationContext.getEmbeddedHtml();
+			//htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
+
+			if (updateRootRef)
+			{
+				htmlRootElement = Lib.document.documentElement // needed for cocktail
+			}
 		#end
 	}
 	
