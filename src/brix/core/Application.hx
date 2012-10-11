@@ -234,7 +234,7 @@ class Application
 
 			if (updateRootRef)
 			{
-				htmlRootElement = Lib.document.documentElement // needed for cocktail
+				htmlRootElement = Lib.document.documentElement; // needed for cocktail
 			}
 		#end
 	}
