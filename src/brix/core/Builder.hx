@@ -558,19 +558,20 @@ class Builder
 		var pos = Context.currentPos();
 	
 		//add the _htmlDocumentElement static var to ApplicationContext
-		var documentInnerHtml = haxe.Serializer.run("");
+		var documentOuterHtml = haxe.Serializer.run("");
 
-		if (cocktail.Lib.document.documentElement.innerHTML != null)
+		var outerHtml:String = cocktail.Lib.document.documentElement.outerHTML;
+		if (outerHtml != null)
 		{
-			documentInnerHtml = haxe.Serializer.run(cocktail.Lib.document.documentElement.outerHTML); trace(cocktail.Lib.document.documentElement.outerHTML);
+			documentOuterHtml = haxe.Serializer.run(outerHtml);
 		}
 
-		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
+		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentOuterHtml)), pos : pos }]), pos : pos };
 
 		fields.push( { name : "htmlDocumentElement", doc : null, meta : [], access : [APublic, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
 
 		#if brixdebug
-			neko.Lib.println("documentInnerHtml extracted and set on ApplicationContext with a size of "+documentInnerHtml.length);
+			neko.Lib.println("document outerHtml extracted and set on ApplicationContext with a size of "+documentOuterHtml.length);
 		#end
 	}
 	
