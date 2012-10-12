@@ -236,11 +236,6 @@ with sum of the css classes
 	 */
 	public function show(transitionData:Null<TransitionData> = null, preventTransitions:Bool = false) : Void
 	{
-		if (status != hidden && status != notInit)
-		{
-			trace("Warning: can not show the layer, since it has the status '"+status+"'");
-			return;
-		}
 		// reset transition if it is pending
 		if (status == hideTransition)
 		{
@@ -254,6 +249,11 @@ with sum of the css classes
 			trace("Warning: hide break previous transition show");
 			doShowCallback(null);
 			removeTransitionEvent(doShowCallback);
+		}
+		if (status != hidden && status != notInit)
+		{
+			trace("Warning: can not show the layer, since it has the status '"+status+"'");
+			return;
 		}
 		// update status 
 		status = showTransition;
@@ -330,11 +330,9 @@ with sum of the css classes
 	 * start the transition and then hide
 	 */
 	public function hide(transitionData:Null<TransitionData> = null, preventTransitions:Bool) : Void
+	{// trace("hide "+preventTransitions);
+
 	{ // trace("hide "+preventTransitions);
-		if (status != visible && status != notInit){
-			//trace("Warning, can not hide the layer, since it has the status '"+status+"'");
-			return;
-		}
 		// reset transition if it is pending
 		if (status == hideTransition)
 		{
@@ -348,6 +346,10 @@ with sum of the css classes
 			trace("Warning: hide break previous transition show");
 			doShowCallback(null);
 			removeTransitionEvent(doShowCallback);
+		}
+		if (status != visible && status != notInit){
+			trace("Warning, can not hide the layer, since it has the status '"+status+"'");
+			return;
 		}
 		// update status 
 		status = hideTransition;

@@ -34,7 +34,7 @@ class DomTools
 	{
 #if js
 		haxe.Timer.delay(callbackFunction, Math.round(200));
-#elseif flash || nme
+#elseif (flash || nme)
 		haxe.Timer.delay(callbackFunction, 1);
 #else
 		callbackFunction();
@@ -112,8 +112,12 @@ class DomTools
 			){
 			var borderH = (element.offsetWidth - element.clientWidth)/2;
 			var borderV = (element.offsetHeight - element.clientHeight)/2;
+
+			offsetWidth += borderH;
+			offsetHeight += borderV;
 			offsetWidth -= borderH;
 			offsetHeight -= borderV;
+
 			offsetTop -= Math.round(borderV/2.0);
 			offsetLeft -= Math.round(borderH/2.0);
 
