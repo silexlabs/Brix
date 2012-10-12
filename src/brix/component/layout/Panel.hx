@@ -123,10 +123,22 @@ class Panel extends LayoutBase
 			var margin = (rootElement.offsetWidth - rootElement.clientWidth);
 			var bodyMargin = (body.offsetWidth - body.clientWidth);
 
+			// init body size
 			bodySize = boundingBox.w;
-			bodySize += bodyMargin;
+
+			// substract header size, and position the body
+			if (header != null){
+				var bbHeader = DomTools.getElementBoundingBox(header);
+				DomTools.moveTo(body, bbHeader.w, null);
+				bodySize -= bbHeader.w;
+			}else{
+				DomTools.moveTo(body, 0, null);
+			}
+
+			// substract largins and
+			bodySize -= bodyMargin;
 			bodySize -= margin;
-			bodySize -= body.offsetLeft;
+			//bodySize -= boundingBox.x;
 
 			if (footer != null){
 				var footerMargin = (footer.offsetWidth - footer.clientWidth);
@@ -141,16 +153,23 @@ class Panel extends LayoutBase
 			var margin = (rootElement.offsetHeight - rootElement.clientHeight);
 			var bodyMargin = (body.offsetHeight - body.clientHeight);
 
+			// init body size
+			bodySize = boundingBox.h;
+
+			// substract header size, and position the body
 			if (header != null){
-				body.style.top = header.offsetHeight + "px";
+				var bbHeader = DomTools.getElementBoundingBox(header);
+				DomTools.moveTo(body, null, bbHeader.h);
+				bodySize -= bbHeader.h;
+			}else{
+				DomTools.moveTo(body, null, 0);
 			}
 
-			bodySize = boundingBox.h;
-			bodySize += bodyMargin;
+			bodySize -= bodyMargin;
 			bodySize -= margin;
-			bodySize -= body.offsetTop;
+			//bodySize -= boundingBox.y;
 			// case of a pannel which parent is not positioned in absolute, does not initiate the flow 
-			bodySize += boundingBox.y;
+			//bodySize += boundingBox.y;
 
 			if (footer != null){
 				var footerMargin = (footer.offsetHeight - footer.clientHeight);
