@@ -265,9 +265,9 @@ class Draggable extends DisplayObject, implements IGroupable
 			}
 		}
 
-		//trace("initPhantomStyle "+computedStyle.position+" - "+phantom.style.position);
 		phantom.className = phantomClassName;
 		miniPhantom.className = phantomClassName;
+		trace("initPhantomStyle "+phantom.className+" - "+phantom.style.display+" - "+dropZonesClassName);
 
 		phantom.style.width = refHtmlDom.clientWidth + "px";
 		phantom.style.height = refHtmlDom.clientHeight + "px";
@@ -381,7 +381,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * look for closest drop zone if there are some
 	 */
 	public function move(e:MouseEvent)
-	{trace("move");
+	{trace("move "+state+" - "+bestDropZone+" - "+dropZonesClassName+" - "+groupElement.className+" - "+groupElement.getElementsByClassName(dropZonesClassName).length+" - "+Lib.document.body.getElementsByClassName(dropZonesClassName).length);
 		if (state == dragging)
 		{
 			// find the closest postition 
@@ -392,8 +392,7 @@ class Draggable extends DisplayObject, implements IGroupable
 			setAsBestDropZone(getBestDropZone(elementX, elementY));
 
 			// position of the dragged element under the mouse
-			rootElement.style.left = elementX + "px";
-			rootElement.style.top = elementY + "px";
+			DomTools.moveTo(rootElement, elementX, elementY);
 
 			// dispatch a custom event
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
@@ -424,10 +423,12 @@ class Draggable extends DisplayObject, implements IGroupable
 
 		for (zone in dropZones)
 		{
+			var bbZone = DomTools.getElementBoundingBox(zone);
 			// if the mouse is in the zone
-			if ( mouseX > zone.offsetLeft && mouseX < zone.offsetLeft + zone.offsetWidth
-				&& mouseY > zone.offsetTop && mouseY < zone.offsetTop + zone.offsetHeight )
+			if ( mouseX > bbZone.x && mouseX < bbZone.x + bbZone.w
+				&& mouseY > bbZone.y && mouseY < bbZone.y + bbZone.h )
 			{
+				var bbElement = DomTools.getElementBoundingBox(rootElement);
 				var lastChildIdx:Int = 0;
 				var nearestDistance:Float = 999999999999;
 				// browse all children to see which one is after the desired zone
@@ -436,8 +437,8 @@ class Draggable extends DisplayObject, implements IGroupable
 					var child = zone.childNodes[childIdx];
 					// test the case before this child
 					zone.insertBefore(miniPhantom, child);
-					var bb = DomTools.getElementBoundingBox(miniPhantom);
-					var dist = computeDistance(bb, mouseX, mouseY);
+					var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
+					var dist = computeDistance(bbPhantom, bbElement);
 					if (dist < nearestDistance)
 					{
 						// new closest position
@@ -448,8 +449,8 @@ class Draggable extends DisplayObject, implements IGroupable
 
 				// test the case of the last child
 				zone.appendChild(miniPhantom);
-				var bb = DomTools.getElementBoundingBox(miniPhantom);
-				var dist = computeDistance(bb, mouseX, mouseY);
+				var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
+				var dist = computeDistance(bbPhantom, bbElement);
 				if (dist < nearestDistance)
 				{
 					nearestDistance = dist;
@@ -461,12 +462,16 @@ class Draggable extends DisplayObject, implements IGroupable
 		}
 		return null;
 	}
-	private function computeDistance(bb:BoundingBox,mouseX:Int, mouseY:Int) :Float
+	private function computeDistance(bbElement:BoundingBox,bbTarget:BoundingBox) :Float
 	{
 /**/
+		var centerElementX = bbElement.x+ (bbElement.w/2.0);
+		var centerElementY = bbElement.y+ (bbElement.h/2.0);
+		var centerTargetX = bbTarget.x+ (bbTarget.w/2.0);
+		var centerTargetY = bbTarget.y+ (bbTarget.h/2.0);
 		return Math.sqrt(
-			Math.pow((bb.x)-mouseX, 2)
-			+ Math.pow((bb.y)-mouseY, 2)
+			Math.pow((centerElementX-centerTargetX), 2)
+			+ Math.pow((centerElementY-centerTargetY), 2)
 		);
 /*
 		// take the size of the dragged element in to account

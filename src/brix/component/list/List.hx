@@ -201,7 +201,7 @@ class List<ElementClass> extends DisplayObject
 	 * retrieves the id of the item containing a given node
 	 * @param the given DOM node
 	 */
-	private function getItemID(childElement:HtmlDom):Int
+	public function getItemIdx(childElement:HtmlDom):Int
 	{
 		if (childElement == rootElement || childElement == null)
 		{
@@ -209,7 +209,7 @@ class List<ElementClass> extends DisplayObject
 		}
 		if (childElement.nodeType != rootElement.nodeType || childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
 		{
-			return getItemID(childElement.parentNode);
+			return getItemIdx(childElement.parentNode);
 		}
 		return Std.parseInt(childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX));
 	}
@@ -221,7 +221,7 @@ class List<ElementClass> extends DisplayObject
 	{
 		// retrieve the element of the list
 		var element = cast(e.target);
-		var idx = getItemID(element);
+		var idx = getItemIdx(element);
 		selectedItem = dataProvider[idx];
 
 		// dispatch a custom event
@@ -238,7 +238,7 @@ class List<ElementClass> extends DisplayObject
 	private function rollOver(e:Event)
 	{
 		var element:HtmlDom = cast(e.target);
-		var idx = getItemID(element);
+		var idx = getItemIdx(element);
 
 		// dispatch a custom event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
@@ -259,7 +259,7 @@ class List<ElementClass> extends DisplayObject
 		var children = rootElement.getElementsByTagName("li");
 		for (idx in 0...children.length)
 		{
-			var idxElem:Int = getItemID(children[idx]);
+			var idxElem:Int = getItemIdx(children[idx]);
 			if (idxElem >= 0)
 			{
 				var found = false;

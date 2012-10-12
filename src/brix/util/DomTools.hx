@@ -30,12 +30,14 @@ class DomTools
 	 * Call a calback later. This is useful sometimes when dealing with layout, because it needs time to be redrawn
 	 * @param 	callbackFunction	The callback function to be called in the next frame
 	 */
-	static public function doLater(callbackFunction:Void->Void, nFrames:Float=1)
+	static public function doLater(callbackFunction:Void->Void)
 	{
-#if php
-		callbackFunction();
+#if js
+		haxe.Timer.delay(callbackFunction, Math.round(200));
+#elseif (flash || nme)
+		haxe.Timer.delay(callbackFunction, 1);
 #else
-		haxe.Timer.delay(callbackFunction, Math.round(200*nFrames));
+		callbackFunction();
 #end
 	}
 	/**
@@ -108,12 +110,13 @@ class DomTools
 			//&& element.tagName.toLowerCase() != "body" 
 			//&& element.style.position != "relative" && element.style.position != "absolute" && element.style.position != "fixed"
 			){
-			var halfBorderH = (element.offsetWidth - element.clientWidth)/2.0;
-			var halfBorderV = (element.offsetHeight - element.clientHeight)/2.0;
-			//offsetWidth -= halfBorderH;
-			//offsetHeight -= halfBorderV;
+			var borderH = (element.offsetWidth - element.clientWidth)/2;
+			var borderV = (element.offsetHeight - element.clientHeight)/2;
+			offsetWidth -= borderH;
+			offsetHeight -= borderV;
+			offsetTop -= Math.round(borderV/2.0);
+			offsetLeft -= Math.round(borderH/2.0);
 
-			//trace("parent "+element.scrollTop);
 			offsetTop -= element.scrollTop;
 			offsetLeft -= element.scrollLeft;
 
@@ -130,7 +133,31 @@ class DomTools
 			h:Math.round(htmlDom.offsetHeight + offsetHeight)
 		};
 	}
+	/**
+	 * position the given element at the given position
+	 * apply an offest instead of an absolut position, in order to handle the case of the container being position absolute or relative
+	 * @param 	htmlDom 	the elment to move
+	 * @param 	x 			the position in the window global coordinate system
+	 * @param 	y 			the position in the window global coordinate system
+	 */
+	static public function moveTo(htmlDom: HtmlDom, x:Null<Int>, y:Null<Int>) 
+	{
+		// retrieve the bounding boxes
+		var elementBox = DomTools.getElementBoundingBox(htmlDom);
 
+		if (x != null){
+			// apply the offset between the 2 positions
+			var newPosX = htmlDom.offsetLeft + (x - elementBox.x);
+			// move the element to the position
+			htmlDom.style.left = Math.round(newPosX) + "px";
+		}
+		if (y != null){
+			// apply the offset between the 2 positions
+			var newPosY = htmlDom.offsetTop + (y - elementBox.y);
+			// move the element to the position
+			htmlDom.style.top = Math.round(newPosY) + "px";
+		}
+	}
 	/**
 	 * for debug purpose
 	 * trace the properties of an object
