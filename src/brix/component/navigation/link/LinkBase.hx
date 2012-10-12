@@ -94,6 +94,7 @@ class LinkBase extends DisplayObject, implements IGroupable
 			targetAttr = rootElement.getAttribute(CONFIG_TARGET_ATTR).trim();
 		}
 	}
+
 	/**
 	 * user clicked the link
 	 * do an action to the pages corresponding to our link
@@ -101,8 +102,9 @@ class LinkBase extends DisplayObject, implements IGroupable
 	 */
 	private function onClick(e:Event)
 	{
-		// prevent the hash tag to change the scroll position as an HTML anchor would
+		// prevent the link from being followed or the hash tag to change the scroll position as an HTML anchor would
 		e.preventDefault();
+
 		// values for the transition
 		transitionDataShow = TransitionTools.getTransitionData(rootElement, TransitionType.show);
 		transitionDataHide = TransitionTools.getTransitionData(rootElement, TransitionType.hide);
