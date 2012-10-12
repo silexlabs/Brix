@@ -42,7 +42,7 @@ class TouchLink extends DisplayObject, implements IGroupable{
 	 * default value for the minimum gesture distance
 	 * in pixels
 	 */
-	public static inline var DEFAULT_DETECT_DISTANCE = 200;
+	public static inline var DEFAULT_DETECT_DISTANCE = 10;
 	/**
 	 * store the detection threshold
 	 * in pixels
@@ -135,7 +135,7 @@ class TouchLink extends DisplayObject, implements IGroupable{
 		//DomTools.display("onTouchMove "+event);
 		var xOffset = event.touches.item(0).screenX - touchStart.x;
 		var yOffset = event.touches.item(0).screenY - touchStart.y;
-		if (Math.abs(xOffset) > 200){
+		if (Math.abs(xOffset) > detectDistance){
 			touchStart = null;
 			if (xOffset>0){
 				if (touchType == swipeLeft){

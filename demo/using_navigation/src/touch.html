@@ -7,19 +7,8 @@
 	<script data-brix-use="brix.component.navigation.Layer"></script>
 	<script data-brix-use="brix.component.navigation.link.LinkToPage"></script>
 	<script data-brix-use="brix.component.navigation.link.TouchLink"></script>
+	<script data-brix-use="brix.component.navigation.link.LinkClosePage"></script>
 	<meta name="initialPageName" content="welcome"></meta>
-	<style type="text/css">
-		.container{
-		}
-		.Page{
-			display: none;
-		}
-		.traces{
-			width: 80%;
-			min-width: 0;
-			border: 2px solid;
-		}
-	</style>
 </head>
 <body>
 	<div class="Group container">
@@ -27,6 +16,7 @@
 		<a href="#welcome" class="LinkToPage TouchLink" data-touch-type="left">Welcome</a>
 		<a href="#about" class="LinkToPage TouchLink" data-touch-type="right">About</a>
 		<a href="#test" class="LinkToPage TouchLink" data-touch-type="up">Test</a>
+		<a href="#touch-click" class="LinkToPage TouchLink" data-touch-type="down">touch+click</a>
 		<h2>Pages</h2>
 		<a name="welcome" class="Page"></a>
 		<div class="Layer welcome"><br/>Welcome to the touch demo !<br/><br/>Please swipe left/right to test.<br/></div>
@@ -36,6 +26,22 @@
 
 		<a name="test" class="Page"></a>
 		<div class="Layer test">Brix touch demo<hr/>This is a test<br/>Here is a browse button <input type="file" /><br/><input type="button" value="Save"/><input type="button" value="Cancel"/></div>
+
+		<a name="touch-click" class="Page"></a>
+		<div class="Layer touch-click">
+			This is a test with gesture + click. Click in the area bellow to open a "popup".
+			<a href="#touch-click-popup" class="LinkToPage" target="_top">
+				<div style="width:500px; height:500px; background-color: green;">
+				</div>
+			</a>
+		</div>
+		<a name="touch-click-popup" class="Page"></a>
+		<div class="Layer touch-click-popup" style="width:100%; height:100%; background-color: black; opacity: .7; position: absolute; top:0; left:0;">
+			<a href="#touch-click-popup" class="LinkClosePage" style="color: white; margin: 100px;">
+				Click here, or swipe, to close.
+			</a>
+		</div>
+
 	</div>
 	<h2>Traces</h2>
 	<div id="haxe:trace" class="traces">

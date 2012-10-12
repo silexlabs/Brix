@@ -1,0 +1,22 @@
+body{
+	font-family: Verdana, Arial;
+	font-size: 14pt;
+}
+.main{
+    position: relative;
+    width: 50%;
+    height: 50%;
+    background-color: black;
+    top: 250px;
+    left: 250px;
+/*
+*/
+}
+.CenterBox{
+    position: relative;
+    background-color: DarkSlateGray;
+    border: 1px solid green;
+    width: 300px;
+    height: 300px;
+    overflow: auto;
+}
