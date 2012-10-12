@@ -331,8 +331,6 @@ with sum of the css classes
 	 */
 	public function hide(transitionData:Null<TransitionData> = null, preventTransitions:Bool) : Void
 	{// trace("hide "+preventTransitions);
-
-	{ // trace("hide "+preventTransitions);
 		// reset transition if it is pending
 		if (status == hideTransition)
 		{
