@@ -20,6 +20,8 @@ import brix.core.Application;
 import brix.component.group.IGroupable;
 using brix.component.group.IGroupable.Groupable;
 
+using StringTools;
+
 /**
  * This component is linked to a DOM element, which is an anchor
  * with the page name/deeplink in the name attribute and the page "displayed name"/description as a child of the node.
@@ -84,6 +86,7 @@ class Page extends DisplayObject, implements IGroupable
 		// open the page as a page or a popup
 		page.open(transitionDataShow, transitionDataHide, !isPopup);
 	}
+
 	/** 
 	 * Close the page with the given "name" attribute
 	 * This will close only this page
@@ -93,7 +96,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * @param 
 	 */
 	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlDom = null)
-	{//trace("closePage "+pageName+" root="+root);
+	{ //trace("closePage "+pageName+" root="+root);
 		// default is the whole document
 		var document:Dynamic = root;
 		if (root == null)
@@ -111,19 +114,22 @@ class Page extends DisplayObject, implements IGroupable
 		// close the page
 		page.close(transitionData);
 	}
+
 	/** 
 	 * Retrieve all the pages of this application or group
 	 */
 	static public function getPageNodes(brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
 	{
 		// default is the hole document
-		var document:Dynamic = root;
+		var document:HtmlDom = root;
 		if (root == null)
+		{
 			document = Lib.document.documentElement;
-
-		// get all pages, i.e. all element with class name "page"
+		}
+		// get all pages, i.e. all elements with class name "Page"
 		return document.getElementsByClassName(Page.CLASS_NAME);
 	}
+
 	/** 
 	 * Retrieve the page whose "name" attribute is pageName
 	 */
@@ -153,6 +159,7 @@ class Page extends DisplayObject, implements IGroupable
 		}
 		return null;
 	}
+
 	/**
 	 * constructor
 	 * Init the attributes
@@ -164,27 +171,27 @@ class Page extends DisplayObject, implements IGroupable
 
 		// implementation of IGroupable
 		startGroupable();
-
-		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
-		if (name == null || name == "")
+		// group element is body element by default
+		if (groupElement == null)
 		{
-			throw("Pages have to have a 'name' attribute");
+			groupElement = Lib.document.body; // FIXME shouldn't it be getBrixApplication().htmlRootElement ?
+		}
+		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
+		if (name == null || name.trim() == "")
+		{
+			throw("Pages must have a non empty 'name' attribute");
 		}
 	}
 
 	override public function init()
 	{
 		super.init();
-		// group element is body element by default
-		if (groupElement == null)
-			groupElement = Lib.document.body;
 
 		// close if it is not the default page
 		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
-			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name
-		)
+			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name )
 		{
-			DomTools.doLater(callback(open, null, null, true, true));
+			open(null, null, true, true);
 		}
 	}
 	/** 
@@ -201,10 +208,11 @@ class Page extends DisplayObject, implements IGroupable
 	 * Also close the other pages if doCloseOthers is true
 	 */
 	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true, preventTransitions:Bool = false) 
-	{// trace("open - "+doCloseOthers+" - name="+name+" - "+preventTransitions);
+	{ //trace("open - "+doCloseOthers+" - name="+name+" - "+preventTransitions);
 		if (doCloseOthers)
+		{
 			closeOthers(transitionDataHide, preventTransitions);
-
+		}
 		doOpen(transitionDataShow, preventTransitions);
 	}
 
@@ -212,8 +220,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Close all other pages
 	 */
 	public function closeOthers(transitionData:TransitionData = null, preventTransitions:Bool = false)
-	{// trace("closeOthers("+transitionData+") - "+preventTransitions);
-
+	{ //trace("closeOthers("+transitionData+") - "+preventTransitions);
 		// find all the pages in this application and close them
 		var nodes = getPageNodes(brixInstanceId, groupElement);
 		for (idxPageNode in 0...nodes.length)
@@ -223,7 +230,9 @@ class Page extends DisplayObject, implements IGroupable
 			for (pageInstance in pageInstances)
 			{
 				if (pageInstance != this)
+				{ //trace("closing "+pageInstance.name);
 					pageInstance.close(transitionData, [name], preventTransitions);
+				}
 			}
 		}
 	}
@@ -268,9 +277,10 @@ class Page extends DisplayObject, implements IGroupable
 	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null, preventTransitions:Bool = false) 
 	{
 		// default value
-		if (preventCloseByClassName==null)
+		if (preventCloseByClassName == null)
+		{
 			preventCloseByClassName = new Array();
-
+		}
 		// find all the layers which have the page name in their css class attribute
 		var nodes = Layer.getLayerNodes(name, brixInstanceId, groupElement);
 

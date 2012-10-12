@@ -331,14 +331,18 @@ with sum of the css classes
 	 */
 	public function hide(transitionData:Null<TransitionData> = null, preventTransitions:Bool) : Void
 	{// trace("hide "+preventTransitions);
+
+	{ // trace("hide "+preventTransitions);
 		// reset transition if it is pending
-		if (status == hideTransition){
+		if (status == hideTransition)
+		{
 			trace("Warning: hide break previous transition hide");
 			doHideCallback(null);
 			removeTransitionEvent(doHideCallback);
 		}
 		// reset transition if it is pending
-		else if (status == showTransition){
+		else if (status == showTransition)
+		{
 			trace("Warning: hide break previous transition show");
 			doShowCallback(null);
 			removeTransitionEvent(doShowCallback);
@@ -366,13 +370,14 @@ with sum of the css classes
 	 * remove children from the DOM and store it in childrenArray
 	 */
 	public function doHide(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
-	{ // trace("doHide "+preventTransitions);
-
-		if (e!=null && e.target != rootElement){
+	{  //trace("doHide "+preventTransitions);
+		if (e != null && e.target != rootElement)
+		{
 			trace("End transition event from another html element");
 			return;
 		}
-		if (preventTransitions == false && doHideCallback == null){
+		if (preventTransitions == false && doHideCallback == null)
+		{
 			trace("Warning: end transition callback already called");
 			return;
 		}
@@ -385,7 +390,8 @@ with sum of the css classes
 		status = hidden;
 
 		// dispatch a custom event on the root element
-		try{
+		try
+		{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_TYPE_HIDE, false, false, {
 				transitionData : transitionData,
@@ -394,7 +400,8 @@ with sum of the css classes
 			});
 			rootElement.dispatchEvent(event);
 		}
-		catch(e:Dynamic){
+		catch (e:Dynamic)
+		{
 			// android browsers
 			trace("Error: could not dispatch event "+e);
 		}
@@ -412,8 +419,8 @@ with sum of the css classes
 			childrenArray.push(element);
 		}
 		// set or reset style.display
-		rootElement.style.display="none";
-		rootElement.style.visibility="hidden";
+		rootElement.style.display = "none";
+		rootElement.style.visibility = "hidden";
 	}
 	//////////////////////////////////////////////////////
 	// Media
