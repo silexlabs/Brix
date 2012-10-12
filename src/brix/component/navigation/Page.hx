@@ -191,8 +191,7 @@ class Page extends DisplayObject, implements IGroupable
 		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
 			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name )
 		{
-			//DomTools.doLater(callback(open, null, null, true, true));
-			open();
+			open(null, null, true, true);
 		}
 	}
 	/** 
