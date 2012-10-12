@@ -411,8 +411,7 @@ class Application
 			}
 			catch (unknown : Dynamic)
 			{
-				//trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
-				Lib.alert("ERROR while trying to call init() on a component "+unknown);
+				trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
 				var excptArr = haxe.Stack.exceptionStack();
 				if ( excptArr.length > 0 )
 				{
