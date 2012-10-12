@@ -4,4 +4,5 @@
 *.swf
 *.sublime-project
 *.sublime-workspace
+*.DS_Store
 /demo/code_embed

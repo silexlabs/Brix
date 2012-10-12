@@ -211,7 +211,7 @@ class Application
 			#end
 			htmlRootElement = Lib.document.documentElement;
 		}
-		
+
 		if ( htmlRootElement == null )
 		{
 			#if js
@@ -223,12 +223,19 @@ class Application
 			//do not continue
 			return;
 		}
-		
+
 		// at macro time, htmlRootElement == Lib.document.documentElement so we already have the source html in 
 		// htmlRootElement.innerHTML
 		#if (!macro && !disableEmbedHtml)
-			//htmlRootElement.innerHTML = ApplicationContext.getEmbeddedHtml();
-			htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
+			var updateRootRef:Bool = (htmlRootElement == Lib.document.documentElement);
+
+			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
+			//htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
+
+			if (updateRootRef)
+			{
+				htmlRootElement = Lib.document.documentElement; // needed for cocktail
+			}
 		#end
 	}
 	
@@ -404,8 +411,7 @@ class Application
 			}
 			catch (unknown : Dynamic)
 			{
-				//trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
-				Lib.alert("ERROR while trying to call init() on a component "+unknown);
+				trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
 				var excptArr = haxe.Stack.exceptionStack();
 				if ( excptArr.length > 0 )
 				{
