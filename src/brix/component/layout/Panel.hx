@@ -146,7 +146,6 @@ class Panel extends LayoutBase
 				bodySize -= boundingBox.w;
 				bodySize -= footerMargin;
 			}
-			bodySize-=5;
 			body.style.width = bodySize+"px";
 		}
 		else{
@@ -177,7 +176,6 @@ class Panel extends LayoutBase
 				bodySize -= boundingBox.h;
 				bodySize -= footerMargin;
 			}
-			bodySize-=5;
 			body.style.height = bodySize+"px";
 		}
 		super.redraw();

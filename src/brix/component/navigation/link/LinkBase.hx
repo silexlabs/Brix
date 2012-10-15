@@ -27,13 +27,18 @@ using StringTools;
  * Retrieve the href attribute and make an action on the pages which node has the targetted class name
  * Virtual class, it is supposed to be overriden to implement a behavior on click (override the onClick method)
  */
-@tagNameFilter("a")
+@tagNameFilter("a" ,"div")
 class LinkBase extends DisplayObject, implements IGroupable
 {
 	/**
 	 * constant, name of attribute href
 	 */
 	public static inline var CONFIG_PAGE_NAME_ATTR:String = "href";
+	/**
+	 * constant, name of attribute href
+	 * in case the link is not on a "a" tag
+	 */
+	public static inline var CONFIG_PAGE_NAME_DATA_ATTR:String = "data-href";
 	/**
 	 * constant, name of attribute target
 	 */
@@ -85,7 +90,14 @@ class LinkBase extends DisplayObject, implements IGroupable
 		}
 		else
 		{
-			trace("Warning: the link has no href atribute ("+rootElement+")");
+			if (rootElement.getAttribute(CONFIG_PAGE_NAME_DATA_ATTR) != null)
+			{
+				linkName = rootElement.getAttribute(CONFIG_PAGE_NAME_DATA_ATTR).trim();
+			}
+			else
+			{
+				trace("Warning: the link has no href atribute ("+rootElement+")");
+			}
 		}
 
 		// retrieve the target attr of our link 
