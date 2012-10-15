@@ -144,14 +144,6 @@ class Draggable extends DisplayObject, implements IGroupable
 	 */
 	private var initialMouseY:Int;
 	/**
-	 * initial position
-	 */
-	private var initialX:Int;
-	/**
-	 * initial position
-	 */
-	private var initialY:Int;
-	/**
 	 * constructor
 	 * init properties
 	 * retrieve atributes of the html dom node
@@ -267,12 +259,15 @@ class Draggable extends DisplayObject, implements IGroupable
 
 		phantom.className = phantomClassName;
 		miniPhantom.className = phantomClassName;
+		phantom.className += " "+refHtmlDom.className;
+		miniPhantom.className += " "+refHtmlDom.className;
 		trace("initPhantomStyle "+phantom.className+" - "+phantom.style.display+" - "+dropZonesClassName);
 
 		phantom.style.width = refHtmlDom.clientWidth + "px";
 		phantom.style.height = refHtmlDom.clientHeight + "px";
 		miniPhantom.style.width = refHtmlDom.clientWidth + "px";
 		miniPhantom.style.height = refHtmlDom.clientHeight + "px";
+
 	}
 	/**
 	 * init phantom according to root element properties
@@ -301,10 +296,8 @@ class Draggable extends DisplayObject, implements IGroupable
 		{
 			var boundingBox = DomTools.getElementBoundingBox(rootElement);
 			state = dragging;
-			initialX = boundingBox.x;
-			initialY = boundingBox.y;
-			initialMouseX = e.clientX;
-			initialMouseY = e.clientY;
+			initialMouseX = e.clientX-boundingBox.x;
+			initialMouseY = e.clientY-boundingBox.y;
 			initRootElementStyle();
 			initPhantomStyle();
 			//initialStylePosition = rootElement.style.position;
@@ -381,18 +374,36 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * look for closest drop zone if there are some
 	 */
 	public function move(e:MouseEvent)
-	{trace("move "+state+" - "+bestDropZone+" - "+dropZonesClassName+" - "+groupElement.className+" - "+groupElement.getElementsByClassName(dropZonesClassName).length+" - "+Lib.document.body.getElementsByClassName(dropZonesClassName).length);
+	{//trace("move "+state+" - "+bestDropZone+" - "+dropZonesClassName+" - "+groupElement.className+" - "+groupElement.getElementsByClassName(dropZonesClassName).length+" - "+Lib.document.body.getElementsByClassName(dropZonesClassName).length);
+		currentMouseX = e.clientX;
+		currentMouseY = e.clientY;
+		// position of the dragged element under the mouse
+		DomTools.moveTo(rootElement, currentMouseX-initialMouseX, currentMouseY-initialMouseY);
+		invalidateBestDropZone();
+
+	}
+	var currentMouseX:Int;
+	var currentMouseY:Int;
+	var isDirty = false;
+	public function invalidateBestDropZone() 
+	{
+		if (isDirty == false)
+		{
+			isDirty = true;
+			haxe.Timer.delay(updateBestDropZone, 50);
+		}
+	}
+	private function updateBestDropZone() 
+	{//trace("updateBestDropZone ");
+		isDirty = false;
 		if (state == dragging)
 		{
 			// find the closest postition 
-			var mouseX = e.clientX + initialX;
-			var mouseY = e.clientY + initialY;
-			var elementX = mouseX - initialMouseX;
-			var elementY = mouseY - initialMouseY;
-			setAsBestDropZone(getBestDropZone(elementX, elementY));
+			setAsBestDropZone(null);
+			setAsBestDropZone(getBestDropZone(currentMouseX, currentMouseY));
 
 			// position of the dragged element under the mouse
-			DomTools.moveTo(rootElement, elementX, elementY);
+			//DomTools.moveTo(rootElement, elementX, elementY);
 
 			// dispatch a custom event
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
@@ -421,16 +432,19 @@ class Draggable extends DisplayObject, implements IGroupable
 			dropZones.add(rootElement.parentNode);
 		}
 
+		var nearestDistance:Float = 999999999999;
+		var nearestZone:HtmlDom = null;
+		var lastChildIdx:Int = 0;
+		var bbElement = DomTools.getElementBoundingBox(rootElement);
 		for (zone in dropZones)
 		{
 			var bbZone = DomTools.getElementBoundingBox(zone);
 			// if the mouse is in the zone
-			if ( mouseX > bbZone.x && mouseX < bbZone.x + bbZone.w
-				&& mouseY > bbZone.y && mouseY < bbZone.y + bbZone.h )
+			if (zone.style.display != "none"
+//				&& mouseX > bbZone.x && mouseX < bbZone.x + bbZone.w
+//				&& mouseY > bbZone.y && mouseY < bbZone.y + bbZone.h
+				)
 			{
-				var bbElement = DomTools.getElementBoundingBox(rootElement);
-				var lastChildIdx:Int = 0;
-				var nearestDistance:Float = 999999999999;
 				// browse all children to see which one is after the desired zone
 				for (childIdx in 0...zone.childNodes.length)
 				{
@@ -443,6 +457,7 @@ class Draggable extends DisplayObject, implements IGroupable
 					{
 						// new closest position
 						nearestDistance = dist;
+						nearestZone = zone;
 						lastChildIdx = childIdx;
 					}
 				}
@@ -454,35 +469,28 @@ class Draggable extends DisplayObject, implements IGroupable
 				if (dist < nearestDistance)
 				{
 					nearestDistance = dist;
+					nearestZone = zone;
 					lastChildIdx = zone.childNodes.length + 1;
 				}
 				zone.removeChild(miniPhantom);
-				return { parent: zone, position: lastChildIdx }
+//				return { parent: zone, position: lastChildIdx }
 			}
 		}
-		return null;
+		if (nearestZone != null)
+			return { parent: nearestZone, position: lastChildIdx }
+		else
+			return null;
 	}
-	private function computeDistance(bbElement:BoundingBox,bbTarget:BoundingBox) :Float
+	private function computeDistance(boundingBox1:BoundingBox,boundingBox2:BoundingBox) :Float
 	{
-/**/
-		var centerElementX = bbElement.x+ (bbElement.w/2.0);
-		var centerElementY = bbElement.y+ (bbElement.h/2.0);
-		var centerTargetX = bbTarget.x+ (bbTarget.w/2.0);
-		var centerTargetY = bbTarget.y+ (bbTarget.h/2.0);
+		var centerBox1X = boundingBox1.x + (boundingBox1.w/2.0);
+		var centerBox1Y = boundingBox1.y + (boundingBox1.h/2.0);
+		var centerBox2X = boundingBox2.x + (boundingBox2.w/2.0);
+		var centerBox2Y = boundingBox2.y + (boundingBox2.h/2.0);
 		return Math.sqrt(
-			Math.pow((centerElementX-centerTargetX), 2)
-			+ Math.pow((centerElementY-centerTargetY), 2)
+			Math.pow((centerBox1X-centerBox2X), 2)
+			+ Math.pow((centerBox1Y-centerBox2Y), 2)
 		);
-/*
-		// take the size of the dragged element in to account
-//this does not work?
-		var x = (bb.x+bb.w/2.0);
-		var y = (bb.y+bb.h/2.0);
-		return Math.sqrt(
-			Math.pow(x-mouseX, 2)
-			+ Math.pow(y-mouseY, 2)
-		);
-/**/
 	}
 	/**
 	 * keep a reference to closest drop zone
