@@ -138,6 +138,17 @@ class DomTools
 		};
 	}
 	/**
+	 * retrieve the postion of a node in its parent's children
+	 */
+	public static function getElementIndex(childNode:HtmlDom):Int
+	{
+		var i = 0;
+		var child = childNode;
+		while((child = child.previousSibling) != null ) 
+			i++;
+		return i;
+	}
+	/**
 	 * position the given element at the given position
 	 * apply an offest instead of an absolut position, in order to handle the case of the container being position absolute or relative
 	 * @param 	htmlDom 	the elment to move
