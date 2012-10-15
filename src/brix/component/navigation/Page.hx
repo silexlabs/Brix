@@ -295,7 +295,6 @@ class Page extends DisplayObject, implements IGroupable
 				if (DomTools.hasClass(layerNode, className))
 				{
 					hasForbiddenClass = true;
-					break;
 				}
 			}
 			if (!hasForbiddenClass)
