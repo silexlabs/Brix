@@ -81,4 +81,13 @@ class LayoutBase extends DisplayObject
 		rootElement.dispatchEvent(event);
 		preventRedraw = false;
 	}
+	/**
+	 * throw a redraw event for the other layouts
+	 */
+	public static function redrawLayouts(){
+		// dispatch a custom event
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_LAYOUT_REDRAW, true, true, {});
+		Lib.document.dispatchEvent(event);
+	}
 }
