@@ -252,7 +252,7 @@ with sum of the css classes
 		}
 		if (status != hidden && status != notInit)
 		{
-			trace("Warning: can not show the layer, since it has the status '"+status+"'");
+			// trace("Warning: can not show the layer, since it has the status '"+status+"'");
 			return;
 		}
 		// update status 
@@ -299,7 +299,6 @@ with sum of the css classes
 		}
 		// set or reset style.display
 		rootElement.style.display=styleAttrDisplay;
-		rootElement.style.visibility="visible";
 	}
 	/**
 	 * transition is over
@@ -346,7 +345,7 @@ with sum of the css classes
 			removeTransitionEvent(doShowCallback);
 		}
 		if (status != visible && status != notInit){
-			trace("Warning, can not hide the layer, since it has the status '"+status+"'");
+			// trace("Warning, can not hide the layer, since it has the status '"+status+"'");
 			return;
 		}
 		// update status 
@@ -418,7 +417,6 @@ with sum of the css classes
 		}
 		// set or reset style.display
 		rootElement.style.display = "none";
-		rootElement.style.visibility = "hidden";
 	}
 	//////////////////////////////////////////////////////
 	// Media
