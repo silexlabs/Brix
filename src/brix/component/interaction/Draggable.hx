@@ -435,15 +435,11 @@ class Draggable extends DisplayObject, implements IGroupable
 		var nearestDistance:Float = 999999999999;
 		var nearestZone:HtmlDom = null;
 		var lastChildIdx:Int = 0;
-		var bbElement = DomTools.getElementBoundingBox(rootElement);
 		for (zone in dropZones)
 		{
 			var bbZone = DomTools.getElementBoundingBox(zone);
 			// if the mouse is in the zone
-			if (zone.style.display != "none"
-//				&& mouseX > bbZone.x && mouseX < bbZone.x + bbZone.w
-//				&& mouseY > bbZone.y && mouseY < bbZone.y + bbZone.h
-				)
+			if (zone.style.display != "none")
 			{
 				// browse all children to see which one is after the desired zone
 				for (childIdx in 0...zone.childNodes.length)
@@ -452,7 +448,7 @@ class Draggable extends DisplayObject, implements IGroupable
 					// test the case before this child
 					zone.insertBefore(miniPhantom, child);
 					var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
-					var dist = computeDistance(bbPhantom, bbElement);
+					var dist = computeDistance(bbPhantom, mouseX, mouseY);
 					if (dist < nearestDistance)
 					{
 						// new closest position
@@ -465,7 +461,7 @@ class Draggable extends DisplayObject, implements IGroupable
 				// test the case of the last child
 				zone.appendChild(miniPhantom);
 				var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
-				var dist = computeDistance(bbPhantom, bbElement);
+				var dist = computeDistance(bbPhantom, mouseX, mouseY);
 				if (dist < nearestDistance)
 				{
 					nearestDistance = dist;
@@ -473,7 +469,6 @@ class Draggable extends DisplayObject, implements IGroupable
 					lastChildIdx = zone.childNodes.length + 1;
 				}
 				zone.removeChild(miniPhantom);
-//				return { parent: zone, position: lastChildIdx }
 			}
 		}
 		if (nearestZone != null)
@@ -481,15 +476,16 @@ class Draggable extends DisplayObject, implements IGroupable
 		else
 			return null;
 	}
-	private function computeDistance(boundingBox1:BoundingBox,boundingBox2:BoundingBox) :Float
+	/**
+	 * compute distance between the center of the bounding box and the mouse cursor
+	 */
+	private function computeDistance(boundingBox1:BoundingBox,mouseX:Int, mouseY:Int) :Float
 	{
 		var centerBox1X = boundingBox1.x + (boundingBox1.w/2.0);
 		var centerBox1Y = boundingBox1.y + (boundingBox1.h/2.0);
-		var centerBox2X = boundingBox2.x + (boundingBox2.w/2.0);
-		var centerBox2Y = boundingBox2.y + (boundingBox2.h/2.0);
 		return Math.sqrt(
-			Math.pow((centerBox1X-centerBox2X), 2)
-			+ Math.pow((centerBox1Y-centerBox2Y), 2)
+			Math.pow((centerBox1X-mouseX), 2)
+			+ Math.pow((centerBox1Y-mouseY), 2)
 		);
 	}
 	/**
