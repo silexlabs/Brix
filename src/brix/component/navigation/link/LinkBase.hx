@@ -80,6 +80,8 @@ class LinkBase extends DisplayObject, implements IGroupable
 		
 		// catch the click
 		rootElement.addEventListener("click", onClick, false);
+		// show that it is clickable
+		rootElement.style.cursor = "pointer";
 
 		// retrieve the name of our link 
 		if (rootElement.getAttribute(CONFIG_PAGE_NAME_ATTR) != null)
