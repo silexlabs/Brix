@@ -622,11 +622,11 @@ class Builder
 			}
 			else
 			{
-				registerCompExpr = macro registeredNonUIComponents.push({classname:$cmpClassNameExpr, args:$argsExpr});
+				registerCompExpr = macro registeredGlobalComponents.push({classname:$cmpClassNameExpr, args:$argsExpr});
 				//macroApplication.getRegisteredNonUIComponents().push( { classname:cmpClassName, args:null } ); // FIXME pass the args
 
 				#if brixdebug
-					neko.Lib.println("added to registeredNonUIComponents: "+cmpClassName+"");
+					neko.Lib.println("added to registeredGlobalComponents: "+cmpClassName+"");
 				#end
 			}
 			registerComponentsforInitExprs.push(registerCompExpr);
