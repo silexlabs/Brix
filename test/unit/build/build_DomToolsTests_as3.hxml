@@ -1,7 +1,0 @@
--cp ../../../../workspace_cocktail_silexlabs/src/
--cp ../../../src/
--cp ../src/
--main brix.test.unit.DomToolsTests
--lib utest
--swf ../bin/brix/test/unit/DomToolsTests.swf
--swf-version 10.2
