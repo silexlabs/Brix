@@ -1,0 +1,66 @@
+<xliff version='1.2' xmlns='urn:oasis:names:tc:xliff:document:1.2'>
+<file source-language='en' target-language='fr' original='hello.txt' datatype='plaintext'>
+<body>
+<trans-unit id='title'>
+	<source>Translator component use case</source>
+	<target>Cas d'utilisation du composant Translator</target>
+</trans-unit>
+<trans-unit id='t01'>
+	<source>Simple Beauty H1 Title or Logo</source>
+	<target>Titre H1 ou logo "Simple Beauty"</target>
+</trans-unit>
+<trans-unit id='t02'>
+	<source>... your slogan or tag line here</source>
+	<target>... votre slogan ou signature ici</target>
+</trans-unit>
+<trans-unit id='t03'>
+	<source>Simple Beauty H2 SubTitle</source>
+	<target>Sous-titre H2 "Simple Beauty"</target>
+</trans-unit>
+<trans-unit id='t04'>
+	<source>Simple Beauty H2 SubTitle</source>
+	<target>Sous-titre H2 "Simple Beauty"</target>
+</trans-unit>
+<trans-unit id='t05'>
+	<source>This site design is open source, so feel free to use it as you want, but you must keep the link "Design by Pikanai.com" live on the design. Enjoy!</source>
+	<target>Ce design de site est open source, vous pouvez donc l'utiliser comme bon vous semble du moment que vous gardez le lien "Design by Pikanai.com" en pied de page.</target>
+</trans-unit>
+<trans-unit id='t06'>
+	<source>There could be your favourite quote or slogan.</source>
+	<target>Vous pourriez mettre là votre citation ou slogan favori.</target>
+</trans-unit>
+<trans-unit id='t07'>
+	<source>H2 SubTitle #2</source>
+	<target>Sous-titre H2 n°2</target>
+</trans-unit>
+<trans-unit id='t08'>
+	<source>Main menu</source>
+	<target>Menu principal</target>
+</trans-unit>
+<trans-unit id='t09'>
+	<source>About me</source>
+	<target>A propos de moi</target>
+</trans-unit>
+<trans-unit id='t10'>
+	<source>Contact me</source>
+	<target>Contactez moi</target>
+</trans-unit>
+<trans-unit id='t11'>
+	<source>Sub menu</source>
+	<target>Sous-menu</target>
+</trans-unit>
+<trans-unit id='t12'>
+	<source>Friends</source>
+	<target>Amis</target>
+</trans-unit>
+<trans-unit id='t13'>
+	<source>Your Site</source>
+	<target>Votre Site</target>
+</trans-unit>
+<trans-unit id='t14'>
+	<source>Design by</source>
+	<target>Design signé </target>
+</trans-unit>
+</body>
+</file>
+</xliff>

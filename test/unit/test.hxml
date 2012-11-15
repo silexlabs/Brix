@@ -1,0 +1,22 @@
+## Flash 9+
+#-main TestMain
+#-lib munit
+#-lib hamcrest
+#-cp ../../../workspace_cocktail_silexlabs/src/
+#-cp ../../src
+#
+#-cp src
+#-swf-version 9
+#-swf bin/as3_test.swf
+#
+#--next
+
+## JavaScript
+-main TestMain
+-lib munit
+-lib hamcrest
+-cp ../../../workspace_cocktail_silexlabs/src/
+-cp ../../src
+
+-cp src
+-js bin/js_test.js

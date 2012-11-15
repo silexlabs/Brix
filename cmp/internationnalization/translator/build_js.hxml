@@ -1,0 +1,10 @@
+-js ./bin/application.js
+-cp ../../../../workspace_cocktail_silexlabs/src/
+-cp ../../../src/
+-lib hscript
+-debug
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/index.html', './bin/index.html')
+-D brixdebug
+-D disableEmbedHtml
+-D stopOnError

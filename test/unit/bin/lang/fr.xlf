@@ -1,0 +1,25 @@
+<xliff version='1.2' xmlns='urn:oasis:names:tc:xliff:document:1.2'>
+<file source-language='en' target-language='fr' original='hello.txt' datatype='plaintext'>
+<body>
+<trans-unit id='01'>
+	<source>Hello world!</source>
+	<target>Bonjour le monde !</target>
+	<alt-trans>
+		<target xml:lang='es'>Hola mundo</target>
+	</alt-trans>
+</trans-unit>
+<trans-unit id='02'>
+	<source><![CDATA[Hello]]></source>
+	<target>Bonjour</target>
+</trans-unit>
+<trans-unit id='03'>
+	<source>Bye</source>
+	<target>Au revoir</target>
+</trans-unit>
+<trans-unit id='04'>
+	<source>Bye bye</source>
+	<target>Bye bye</target>
+</trans-unit>
+</body>
+</file>
+</xliff>
