@@ -298,7 +298,8 @@ with sum of the css classes
 			doShow(transitionData, preventTransitions, null);
 		}
 		// set or reset style.display
-		rootElement.style.display=styleAttrDisplay;
+		//rootElement.style.display=styleAttrDisplay;
+		rootElement.style.display=null;
 	}
 	/**
 	 * transition is over
