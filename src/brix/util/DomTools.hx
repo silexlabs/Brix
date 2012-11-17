@@ -29,16 +29,171 @@ class DomTools
 	/**
 	 * Call a calback later. This is useful sometimes when dealing with layout, because it needs time to be redrawn
 	 * @param 	callbackFunction	The callback function to be called in the next frame
+	 * @param 	frames	Optional - number of frames to skip, default is 1
 	 */
-	static public function doLater(callbackFunction:Void->Void)
+	static public function doLater(callbackFunction:Void->Void, frames:Int=1)
 	{
 #if js
-		haxe.Timer.delay(callbackFunction, Math.round(200));
+		// interval between frames in ms
+		var frameInterval = 200;
+		haxe.Timer.delay(callbackFunction, frames*frameInterval);
 #elseif (flash || nme)
-		haxe.Timer.delay(callbackFunction, 1);
+		haxe.Timer.delay(callbackFunction, frames);
 #else
 		callbackFunction();
 #end
+	}
+	/**
+	 * convert into relative url
+	 */
+	static public function abs2rel(url:String, base:Null<String>=null):String
+	{
+		// store the initial value of url
+		var initialUrl = url;
+
+		// default value for base is the document 
+		if (base == null)
+		{
+			base = getBaseUrl();
+		}
+
+		// **
+		// remove http
+		var idx = base.indexOf("://");
+		// check that we have absolute urls
+		if (idx == -1)
+		{
+			trace("Warning, could not make URL relative because base URL is relative and should be absolute - could not find pattern \"://\" in "+base+". Now returns "+initialUrl);
+			return initialUrl;
+		}
+		else
+		{
+			base = base.substr(idx+3);
+		}
+		var idx = url.indexOf("://");
+		// check that we have absolute urls
+		if (idx == -1)
+		{
+			trace("Warning, could not make URL relative because it is relative already - could not find pattern \"://\". Now returns "+initialUrl);
+			return initialUrl;
+		}
+		else
+		{
+			url = url.substr(idx+3);
+		}
+
+
+		// split base url
+		var baseArray = base.split("/");
+		// split url
+		var urlArray = url.split("/");
+
+		// check that there is a common domain name
+		if (baseArray[0] != urlArray[0])
+		{
+			trace("Warning, could not make URL relative because the url is absolute external url - "+urlArray[0]+" != "+baseArray[0]+". Now returns initial URL "+initialUrl);
+			// the url is absolute external url
+			return initialUrl;
+		}
+
+		// **
+		// find the common parts in both base and url
+		var diffIdx = 0;
+		for (idx in 0...baseArray.length)
+		{
+			if (urlArray.length < idx || baseArray[idx] != urlArray[idx]){
+				//trace("abs2rel found differenciation idx = "+idx+" ("+urlArray[idx]+" != "+baseArray[idx]+")");
+				// at this point, URLs are different
+				diffIdx = idx;
+				break;
+			}
+		}
+		// **
+		// build the final result
+		var resUrl = "";
+		// add "../"
+		if (baseArray.length>diffIdx+1)
+		{
+			for (idx in diffIdx...baseArray.length-1){
+				resUrl += "../";
+			}
+		}
+		// add everything after the common part
+		for (idx in diffIdx...urlArray.length){
+			resUrl += urlArray[idx];
+			// only if it is not the file name
+			if (idx != urlArray.length-1)
+			{
+				resUrl += "/";
+			}
+		}
+		return resUrl;
+
+
+		// remove path to the publication folder
+/*		var pubUrl = "publications/";
+		var idxPubFolder = url.indexOf(pubUrl);
+		if (idxPubFolder >= 0){
+			// remove all the common parts
+			url = url.substr(idxPubFolder + pubUrl.length);
+			// remove publication name if it is the current publication or add the relative path "../"
+			var pubUrl = PublicationModel.getInstance().currentName + "/";
+			var idxPubFolder = url.indexOf(pubUrl);
+			if (idxPubFolder >= 0){
+				// remove all the common parts
+				url = url.substr(idxPubFolder + pubUrl.length);
+			}
+			else{
+				// add the relative path to publication folder
+				url = "../"+url;
+			}
+		}
+		return url;
+*/	}
+	/**
+	 * convert into absolute url
+	 * duplicated from cocktail.core.history.History
+	 * 
+	 * handle the .. in relative urls, take the base tag into account
+	 * todo: do it right like described here http://dev.w3.org/html5/spec/single-page.html#fallback-base-url
+	 */
+	static public function rel2abs(url:String, base:Null<String>=null):String
+	{
+		// default value for base is the document 
+		// todo: do it right like described here (with case of iframe abd about:blank) http://dev.w3.org/html5/spec/single-page.html#fallback-base-url
+		if (base == null)
+		{
+			base = getBaseUrl();
+		}
+		// replace all "\" by "/" in url
+		url = StringTools.replace(url, "\\", "/");
+
+		// add base to url if needed
+		var idxBase = url.indexOf("://");
+		if (idxBase == -1)
+		{
+			url = base+url;
+		}
+
+		// resolve the ".."
+		var urlArray = url.split("/");
+		var absoluteUrlArray = new Array();
+		for (idx in 0...urlArray.length)
+		{
+			// check if this is a ".."
+			if (urlArray[idx]==".."){
+				// removes the last element of the final array
+				absoluteUrlArray.pop();
+			}
+			else{
+				// add the path element to the final array
+				absoluteUrlArray.push(urlArray[idx]);
+			}
+		}
+		url = absoluteUrlArray.join("/");
+
+		// return the absolute url
+		return url;
 	}
 	/**
 	 * Search for all children elements of the given element that have the given attribute with the given value. Note that you should
@@ -240,6 +395,7 @@ class DomTools
 	 */
 	static public function hasClass(element:HtmlDom, className:String, ?orderedClassName:Bool=false):Bool
 	{
+		//	trace(haxe.Stack.toString(haxe.Stack.callStack()));
 		if (element.className == null || element.className.trim() == "" || className == null || className.trim() == "") return false;
 
 		if (orderedClassName)
@@ -387,7 +543,6 @@ class DomTools
 	 * Get the html page base tag
 	 */
 	public static function getBaseTag():Null<String>{
-		var head = Lib.document.getElementsByTagName("head")[0];
 		var baseNodes = Lib.document.getElementsByTagName("base");
 		if (baseNodes.length > 0){
 			return baseNodes[0].getAttribute("href");
@@ -404,6 +559,8 @@ class DomTools
 		// browse all tags in the head section and check if it a base tag is already set
 		var head = Lib.document.getElementsByTagName("head")[0];
 		var baseNodes = Lib.document.getElementsByTagName("base");
+		trace("set base tag "+href+" -> "+DomTools.rel2abs(href));
+		href = DomTools.rel2abs(href);
 		if (baseNodes.length > 0){
 			trace("Warning: base tag already set in the head section. Current value (\""+baseNodes[0].getAttribute("href")+"\") will be replaced by \""+href+"\"");
 			baseNodes[0].setAttribute("href", href);
@@ -418,5 +575,19 @@ class DomTools
 				head.appendChild(node);
 		}
 	}
-
+	/**
+	 * compute the base url of the document
+	 * handle base tag if any, otherwise take the documentlocation
+	 */
+	public static function getBaseUrl():String
+	{
+		var base = getBaseTag();
+		// defaults to the document location
+		if (base == null)
+		{
+			// todo: use location
+			base = Lib.window.location.href;
+		}
+		return base;
+	}
 }
