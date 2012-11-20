@@ -46,16 +46,13 @@ class DomTools
 	/**
 	 * convert into relative url
 	 */
-	static public function abs2rel(url:String, base:Null<String>=null):String
+	static public function abs2rel(url:String):String
 	{
 		// store the initial value of url
 		var initialUrl = url;
 
-		// default value for base is the document 
-		if (base == null)
-		{
-			base = getBaseUrl();
-		}
+		// value for base is the document or the base tag
+		var base = getBaseUrl();
 
 		// **
 		// remove http
@@ -118,6 +115,10 @@ class DomTools
 				resUrl += "../";
 			}
 		}
+		else{
+			// todo: decide if we should add a ./ when needed
+			//resUrl = "./";
+		}
 		// add everything after the common part
 		for (idx in diffIdx...urlArray.length){
 			resUrl += urlArray[idx];
@@ -128,28 +129,7 @@ class DomTools
 			}
 		}
 		return resUrl;
-
-
-		// remove path to the publication folder
-/*		var pubUrl = "publications/";
-		var idxPubFolder = url.indexOf(pubUrl);
-		if (idxPubFolder >= 0){
-			// remove all the common parts
-			url = url.substr(idxPubFolder + pubUrl.length);
-			// remove publication name if it is the current publication or add the relative path "../"
-			var pubUrl = PublicationModel.getInstance().currentName + "/";
-			var idxPubFolder = url.indexOf(pubUrl);
-			if (idxPubFolder >= 0){
-				// remove all the common parts
-				url = url.substr(idxPubFolder + pubUrl.length);
-			}
-			else{
-				// add the relative path to publication folder
-				url = "../"+url;
-			}
-		}
-		return url;
-*/	}
+	}
 	/**
 	 * convert into absolute url
 	 * duplicated from cocktail.core.history.History

@@ -9,6 +9,7 @@
 package brix.component.group;
 
 import brix.core.Application;
+import brix.util.DomTools;
 import brix.component.ui.DisplayObject;
 
 import js.Dom;
@@ -35,7 +36,7 @@ class Groupable
 	/**
 	 * Simply retrieves the group element by calling getElementsByClassName on the application root element.
 	 */ 
-	static public function startGroupable( groupable : IGroupable ) : Void
+	static public function startGroupable( groupable : IGroupable, rootElement : HtmlDom = null ) : Void
 	{
 		// retrieve the group ID in the node's attributes
 		var groupId = groupable.rootElement.getAttribute("data-group-id");
@@ -43,18 +44,41 @@ class Groupable
 			return ;
 
 		// get the group elements corresponding to this ID
-		var groupElements = groupable.getBrixApplication().htmlRootElement.getElementsByClassName(groupId);
-		// check if we have one and only one group for this ID
-		if ( groupElements.length < 1 )
+		if (rootElement == null)
 		{
-			trace("WARNING: could not find the group component "+groupId);
-			return;
+			// look for a unique group id in the whole document
+			var groupElements = groupable.getBrixApplication().htmlRootElement.getElementsByClassName(groupId);
+			// check if we have one and only one group for this ID
+			if ( groupElements.length < 1 )
+			{
+				trace("WARNING: could not find the group component "+groupId);
+				return;
+			}
+			if ( groupElements.length > 1 )
+			{
+				throw "ERROR "+groupElements.length+" Group components are declared with the same group id "+groupId;
+			}
+			// set the reference to the group node on the element
+			groupable.groupElement = groupElements[0];
 		}
-		if ( groupElements.length > 1 )
+		else
 		{
-			throw "ERROR "+groupElements.length+" Group components are declared with the same group id "+groupId;
+			// look for a group id in the rootElement's parents
+			var domElement = rootElement;
+			while (domElement != null && !DomTools.hasClass(domElement, groupId))
+			{
+				domElement = domElement.parentNode;
+			}
+			if (domElement != null)
+			{
+				// set the reference to the group node on the element
+				groupable.groupElement = domElement;
+			}
+			else
+			{
+				trace("WARNING: could not find the group component "+groupId);
+				return;
+			}
 		}
-		// set the reference to the group node on the element
-		groupable.groupElement = groupElements[0];
 	}
 }

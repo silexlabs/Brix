@@ -202,6 +202,8 @@ class Draggable extends DisplayObject, implements IGroupable
 	
 	/**
 	 * clean the component
+	 * FIXME: here, there is memory leak due to startDrag and mouseUpCallback 
+	 * which should be references to functions created with the keyword "callback" to avoid being encapsulted with each call 
 	 */
 	override public function clean() : Void
 	{

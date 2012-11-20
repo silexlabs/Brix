@@ -1,13 +1,13 @@
 ################################
-## check the build_touch.hxml to compile all demos
+## check the build_context.hxml to compile all demos
 ################################
 
--js ./bin/touch.js
+-js ./bin/context.js
 -cp ../../src/
 -cp ../../../Cocktail/src/
 -debug
 -main brix.core.Application
---macro brix.core.Builder.create('./src/touch.html')
+--macro brix.core.Builder.create('./src/context.html')
 #-D brixdebug
 -D disableEmbedHtml
 -D stopOnError
