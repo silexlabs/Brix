@@ -1,0 +1,53 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8"></meta>
+	<title>Menu example</title>
+	<script data-brix-use="brix.component.group.Group"></script>
+	<script data-brix-use="brix.component.navigation.link.LinkToContext"></script>
+	<meta name="initialPageName" content="context1"></meta>
+	<style type="text/css">
+		.context-container{
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div>
+		<h1>Context demo</h1>
+		<nav>
+			<a href="#context1" class="LinkToContext">Context 1</a>
+			<a href="#context2" class="LinkToContext">Context 2</a>
+			<a href="#context3" class="LinkToContext">Context 3</a>
+			<a href="#context4" class="LinkToContext">Context 4</a>
+		</nav>
+		<h2>Context 1</h2>
+		<div class="context-container context1">
+			<br/>Welcome to the contexts demo !<br/>
+		</div>
+		<h2>Context 2</h2>
+		<div class="context-container context2">
+			<br/>Brix is © 2011-2012 Silex Labs and is released under the GPL License.<br/><br/>
+		</div>
+		<h2>Context 3</h2>
+		<div class="context-container context3">
+			Brix contexts demo<hr/>This is a test<br/>Here is a browse button <input type="file" /><br/><input type="button" value="Save"/><input type="button" value="Cancel"/>, don't click it!
+		</div>
+		<h2>Context 4</h2>
+		<div class="context-container context4">
+			This is a test. Click in the area bellow to open a "popup".
+			<a href="#context-popup" class="LinkToContext">
+				<div style="width:500px; height:500px; background-color: green;">
+				</div>
+			</a>
+			<div class="context-container context-popup" style="width:100%; height:100%; background-color: black; opacity: .7; position: absolute; top:0; left:0;">
+				<a href="#context-popup" class="LinkRemoveContext" style="color: white; margin: 100px;">
+					Click here to close.
+				</a>
+			</div>
+		</div>
+	</div>
+	<h2>Traces</h2>
+	<div id="haxe:trace" class="traces">
+	</div>
+</body>
+</html>

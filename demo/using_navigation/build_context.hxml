@@ -1,0 +1,14 @@
+################################
+## check the build_context.hxml to compile all demos
+################################
+
+-js ./bin/context.js
+-cp ../../src/
+-cp ../../../Cocktail/src/
+-debug
+-main brix.core.Application
+--macro brix.core.Builder.create('./src/context.html')
+#-D brixdebug
+-D disableEmbedHtml
+-D stopOnError
+
