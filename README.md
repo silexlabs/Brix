@@ -35,7 +35,7 @@ Brix is compatible with the <a href="http://www.silexlabs.org/groups/labs/cockta
 Links
 
 <ul>
-<li><a href="http://www.silexlabs.org/groups/labs/slplayer-project/slplayer-developers/home/">Contributors home</a></li>
-<li><a href="http://www.silexlabs.org/groups/labs/slplayer-project/slplayer/home/">Developers home</a></li>
+<li><a href="http://www.silexlabs.org/groups/brix/contributors/">Contributors home</a></li>
+<li><a href="http://www.silexlabs.org/groups/brix/users/">Users home</a></li>
 <li><a href="https://github.com/silexlabs/Brix">Brix source code</a></li>
 </ul>
