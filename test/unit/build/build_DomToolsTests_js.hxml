@@ -1,6 +1,0 @@
--cp ../../../../workspace_cocktail_silexlabs/src/
--cp ../../../src/
--cp ../src/
--main brix.test.unit.DomToolsTests
--lib utest
--js ../bin/brix/test/unit/DomToolsTests.js

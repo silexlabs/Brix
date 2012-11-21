@@ -18,8 +18,8 @@ import js.Dom;
 
 /**
  * The main Brix class handles the application initialization. It instanciates the components, tracking for each of them their 
- * association with their DOM rootElement. This class is based on the content of the application HTML file and is thus associated 
- * with the AppBuilder building macro.
+ * association with their DOM rootElement. This class is based on the content of the application source HTML file and is thus 
+ * associated with the AppBuilder building macro.
  * 
  * @author Thomas Fétiveau
  */
@@ -28,12 +28,12 @@ class Application
 	/**
 	 * The data- attribute set by the Brix Application instance on the HTML elements associated with one or more component.
 	 */
-	static inline private var BRIX_ID_ATTR_NAME = "data-brix-id";
+	static inline private var BRIX_ID_ATTR_NAME:String = "data-brix-id";
 	
 	/**
 	 * A Hash of Brix Application instances indexed by their id.
 	 */
-	static private var instances : Hash<Application> = new Hash();
+	static private var instances:Hash<Application> = new Hash();
 	/**
 	 * Gets an Brix Application instance corresponding to an id.
 	 */
@@ -45,24 +45,28 @@ class Application
 	/**
 	 * The Brix Application instance id.
 	 */
-	public var id(default, null) : String;
+	public var id(default, null):String;
 	/**
 	 * The node ID sequence ( data-brix-id="..." ).
 	 */
-	private var nodesIdSequence : Int;
+	private var nodesIdSequence:Int;
 	/**
-	 * A Hash keeping all component instances indexed by node Brix id.
+	 * A Hash of all UI component instances indexed by node Brix id.
 	 */
-	private var nodeToCmpInstances : Hash<List<brix.component.ui.DisplayObject>>;
+	private var nodeToCmpInstances:Hash<List<brix.component.ui.DisplayObject>>;
+	/**
+	 * A Hash of all global component instances. Keys are the components full classnames.
+	 */
+	private var globalCompInstances:Hash<Dynamic>;
 	/**
 	 * The Brix Apllication root node. Usually, any class used in a Brix application shouldn't use 
 	 * Lib.document.documentElement directly but this variable instead.
 	 */
-	public var htmlRootElement(default,null) : HtmlDom;
+	public var htmlRootElement(default,null):HtmlDom;
 	/**
 	 * The potential arguments passed to the Brix Application class at instanciation.
 	 */
-	public var dataObject(default,null) : Dynamic;
+	public var dataObject(default,null):Dynamic;
 	
 	#if !macro
 	/**
@@ -89,25 +93,28 @@ class Application
 		#end
 	}
 	/**
-	 * A collection of the <script> declared Non UI components with the optionnal data- args passed on the <script> tag.
-	 * Ideally, a component class should at least implement brix.component.IBrixComponent.
+	 * A collection of the <script> declared global components with the optionnal data- args passed on the <script> tag.
+	 * A global component class does not extend brix.component.ui.DisplayObject (otherwise it would be a UI component) but 
+	 * ideally, a global component class should implement brix.component.IBrixComponent if it needs to know its Brix Application.
 	 */
-	public var registeredNonUIComponents(getRegisteredNonUIComponents,null) : Array<RegisteredComponent>;
-	public function getRegisteredNonUIComponents():Array<RegisteredComponent>
+	public var registeredGlobalComponents(getRegisteredGlobalComponents,null) : Array<RegisteredComponent>;
+	public function getRegisteredGlobalComponents():Array<RegisteredComponent>
 	{
 		#if macro
-		if (registeredNonUIComponents == null)
+		if (registeredGlobalComponents == null)
 		{
-			registeredNonUIComponents = new Array();
+			registeredGlobalComponents = new Array();
 		}
-		return registeredNonUIComponents;
+		return registeredGlobalComponents;
 		#else
-		return applicationContext.registeredNonUIComponents;
+		return applicationContext.registeredGlobalComponents;
 		#end
 	}
 
 	/**
 	 * The main entry point in autoStart mode. This function is implemented by the AppBuilder macro.
+	 * If you extend the Application class, you will loose this mecanism (noAutoStart, ...).
+	 * FIXME find a better design
 	 */
 	static public function main()
 	{
@@ -137,7 +144,7 @@ class Application
 
 	/**
 	 * Brix Application constructor.
-	 * @param	?args		optional, args of any nature from outside the Brix application.
+	 * @param	?args	optional, args of any nature from outside the Brix application.
 	 */
 	private function new(id:String, ?args:Dynamic) 
 	{
@@ -145,8 +152,9 @@ class Application
 		this.id = id;
 		this.nodesIdSequence = 0;
 		this.registeredUIComponents = new Array();
-		this.registeredNonUIComponents = new Array();
+		this.registeredGlobalComponents = new Array();
 		this.nodeToCmpInstances = new Hash();
+		this.globalCompInstances = new Hash();
 		//this.metaParameters = new Hash();
 
 		#if !macro
@@ -262,12 +270,12 @@ class Application
 		
 		// register the application components for initialization
 		//registerComponentsforInit();
+		
+		// create the global component instances
+		createGlobalComponents();
 
 		// create the UI components instances
 		initNode(htmlRootElement);
-		
-		// create the non-UI component instances
-		createNonUIComponents();
 	}
 	
 	/**
@@ -423,42 +431,42 @@ class Application
 	}
 	
 	/**
-	 * Instanciates the non UI components.
+	 * Instanciates the global (application wide, in contrary to the UI components that are DOM element-wide) components.
 	 */
-	private function createNonUIComponents():Void
+	private function createGlobalComponents():Void
 	{
-		for (rc in registeredNonUIComponents)
+		for (rc in registeredGlobalComponents)
 		{
 			#if brixdebug
 				trace("Try to create an instance of "+rc.classname+" non visual component");
 			#end
-			
+
 			var componentClass = resolveComponentClass(rc.classname);
-			
+
 			if (componentClass == null)
 			{
 				continue;
 			}
-			
+
 			var cmpInstance = null;
-			
+
 			#if !stopOnError
 			try
 			{
 			#end
-			
+
 				if (rc.args != null)
 					cmpInstance = Type.createInstance( componentClass, [rc.args] );
 				else
 					cmpInstance = Type.createInstance( componentClass, [] );
-				
+
 				#if brixdebug
 					trace("Successfuly created instance of "+rc.classname);
 				#end
-			
+
 			#if !stopOnError
 			}
-			catch (unknown : Dynamic )
+			catch ( unknown : Dynamic )
 			{
 				trace("ERROR while creating "+rc.classname+": "+Std.string(unknown));
 				var excptArr = haxe.Stack.exceptionStack();
@@ -468,12 +476,21 @@ class Application
 				}
 			}
 			#end
-			
-			// if the component is an Brix cmp (and it should be), then try to give him its Brix Application instance id
+
+			// if the component is a Brix cmp (and it should be), then try to give him its Brix Application instance id
 			if (cmpInstance != null && Std.is(cmpInstance, brix.component.IBrixComponent))
 			{
-				cmpInstance.initBrixComponent(id);
+				brix.component.IBrixComponent.BrixComponent.initBrixComponent(cmpInstance, id);
 			}
+			#if brixdebug
+			else
+			{
+				trace("NOTICE: " + rc.classname + " doesn't implement brix.component.IBrixComponent and thus couldn't be passed the application id.");
+			}
+			#end
+
+			// keep a reference to the component instance
+			globalCompInstances.set(rc.classname,cmpInstance);
 		}
 	}
 
@@ -623,7 +640,7 @@ class Application
 	}
 
 	/**
-	 * Returns all the component instances of TypeFilter of the Application.
+	 * Returns all the UI component instances of TypeFilter of the Application.
 	 * @param	typeFilter	a type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
 	 * @return a list of TypeFilter.
 	 */
@@ -643,6 +660,24 @@ class Application
 			}
 		}
 		return l;
+	}
+
+	/**
+	 * Gets a global component instance by its classname.
+	 * @param the component classname.
+	 * @return the component instance or null if not found.
+	 */
+	public function getGlobalComponent(classname:String):Null<Dynamic>
+	{
+		return globalCompInstances.get(classname);
+	}
+	/**
+	 * Gets the list of global components classnames.
+	 * @return List<String>
+	 */
+	public function getGlobalComponentList():List<String>
+	{
+		return Lambda.list( {iterator:globalCompInstances.keys} );
 	}
 
 	/**

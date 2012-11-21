@@ -19,6 +19,24 @@ typedef BoundingBox = {
 	w:Int,
 	h:Int,
 }
+/**
+ * As no constant is defined in haxe/js...
+ */
+class NodeTypes
+{
+    public static inline var ELEMENT_NODE:Int 					= 1;
+	public static inline var ATTRIBUTE_NODE:Int 				= 2;
+	public static inline var TEXT_NODE:Int 						= 3;
+	public static inline var CDATA_SECTION_NODE:Int 			= 4;
+	public static inline var ENTITY_REFERENCE_NODE:Int 			= 5;
+	public static inline var ENTITY_NODE:Int 					= 6;
+	public static inline var PROCESSING_INSTRUCTION_NODE:Int 	= 7;
+	public static inline var COMMENT_NODE:Int 					= 8;
+	public static inline var DOCUMENT_NODE:Int 					= 9;
+	public static inline var DOCUMENT_TYPE_NODE:Int 			= 10;
+	public static inline var DOCUMENT_FRAGMENT_NODE:Int 		= 11;
+	public static inline var NOTATION_NODE:Int 					= 12;
+}
 
 /**
  * Some additional DOM functions extending the standard ones.
@@ -31,7 +49,7 @@ class DomTools
 	 * @param 	callbackFunction	The callback function to be called in the next frame
 	 * @param 	frames	Optional - number of frames to skip, default is 1
 	 */
-	static public function doLater(callbackFunction:Void->Void, frames:Int=1)
+	static public function doLater(callbackFunction:Void->Void, ?frames:Int=1)
 	{
 #if js
 		// interval between frames in ms
@@ -572,5 +590,19 @@ class DomTools
 		}
 #end
 		return base;
+	}
+	/**
+	 * Test the undefined js value.
+	 * @param	value
+	 * @return Bool
+	 */
+	public static inline function isUndefined(value : Dynamic):Bool
+	{
+	#if js
+		var ret:Bool = untyped __js__('"undefined" === typeof value'); // do not remove this variable, it would break the code
+		return ret;
+	#else
+		return false;
+	#end
 	}
 }
