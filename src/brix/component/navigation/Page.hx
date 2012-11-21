@@ -41,6 +41,10 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	public static inline var CONFIG_NAME_ATTR:String = "name";
 	/**
+	 * constant, use deeplink or not, meta tag
+	 */
+	public static inline var CONFIG_USE_DEEPLINK:String = "useDeeplink";
+	/**
 	 * constant, initial page name, meta tag, name attribute
 	 */
 	public static inline var CONFIG_INITIAL_PAGE_NAME:String = "initialPageName";
@@ -90,10 +94,6 @@ class Page extends DisplayObject, implements IGroupable
 	/** 
 	 * Close the page with the given "name" attribute
 	 * This will close only this page
-	 * @param 
-	 * @param 
-	 * @param 
-	 * @param 
 	 */
 	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlDom = null)
 	{ //trace("closePage "+pageName+" root="+root);
@@ -179,20 +179,63 @@ class Page extends DisplayObject, implements IGroupable
 		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
 		if (name == null || name.trim() == "")
 		{
-			throw("Pages must have a non empty 'name' attribute");
+			throw("Pages must have a 'name' attribute");
 		}
+		// listen to the history api changes
+		Lib.window.addEventListener("popstate", onPopState, true);
 	}
 
+	/** 
+	 * callback for the history api
+	 */
+	private function onPopState(e:Event)
+	{
+		// get the typed event object
+		var event:PopStateEvent = cast(e);
+		if (event.state.name == name){
+			trace("onPopState "+event.state.name);
+			open(event.state.transitionDataShow, event.state.transitionDataHide, event.state.doCloseOthers, event.state.preventTransitions, false);
+
+		}
+	}
+	/** 
+	 * init the brix component
+	 */
 	override public function init()
 	{
 		super.init();
 
-		// close if it is not the default page
-		if ( DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
+		trace(Lib.window.location.search);
+
+// workaround window.location not yet implemented in cocktail
+#if js
+		// open if it is the page in history
+		if ((DomTools.getMeta(CONFIG_USE_DEEPLINK) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK) == "true")
+			&& Lib.window.history.state != null)
+		{
+			if (Lib.window.history.state.name == name)
+			{
+				trace("open the recent history");
+				open(null, null, true, true, false);
+			}
+		}
+		// open if it is the page in the deeplink
+		else if (StringTools.startsWith(Lib.window.location.search, "?/"))
+		{
+			if (Lib.window.location.search.substr(2) == name)
+			{
+				trace("open the deeplink");
+				open(null, null, true, true);
+			}
+		}
+		// open if it is the default page and there is no deeplink nor history
+		else if (DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
 			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name )
 		{
+			trace("open the default page");
 			open(null, null, true, true);
 		}
+#end
 	}
 	/** 
 	 * Set the name attribute of the page, i.e. change the name attribute on rootElement
@@ -207,13 +250,25 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
 	 * Also close the other pages if doCloseOthers is true
 	 */
-	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true, preventTransitions:Bool = false) 
+	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true, preventTransitions:Bool = false, recordInHistory:Bool=true) 
 	{ //trace("open - "+doCloseOthers+" - name="+name+" - "+preventTransitions);
 		if (doCloseOthers)
 		{
 			closeOthers(transitionDataHide, preventTransitions);
 		}
 		doOpen(transitionDataShow, preventTransitions);
+
+		// history API
+		if (recordInHistory && (DomTools.getMeta(CONFIG_USE_DEEPLINK) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK) == "true"))
+		{
+			Lib.window.history.pushState({
+					name: name,
+					transitionDataShow: transitionDataShow,
+					transitionDataHide: transitionDataHide,
+					doCloseOthers: doCloseOthers,
+					preventTransitions: preventTransitions,
+				}, name, "?/"+name);
+		} 
 	}
 
 	/**

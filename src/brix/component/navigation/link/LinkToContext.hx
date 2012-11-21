@@ -15,7 +15,7 @@ import brix.util.DomTools;
 
 /**
  * Let you specify a context to display when the user clicks on the component's node
- * All the elements with the context in their class name will be displayed. Initially, you are expected to set ther css style "visibility" to "hidden"
+ * All the elements with the context in their class name will be displayed. Initially, you are expected to set ther css style "visibility" to "hidden".
  */
 @tagNameFilter("a")
 class LinkToContext extends LinkBase
