@@ -94,10 +94,6 @@ class Page extends DisplayObject, implements IGroupable
 	/** 
 	 * Close the page with the given "name" attribute
 	 * This will close only this page
-	 * @param 
-	 * @param 
-	 * @param 
-	 * @param 
 	 */
 	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlDom = null)
 	{ //trace("closePage "+pageName+" root="+root);
@@ -211,7 +207,8 @@ class Page extends DisplayObject, implements IGroupable
 
 		trace(Lib.window.location.search);
 
-
+// workaround window.location not yet implemented in cocktail
+#if js
 		// open if it is the page in history
 		if ((DomTools.getMeta(CONFIG_USE_DEEPLINK) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK) == "true")
 			&& Lib.window.history.state != null)
@@ -238,6 +235,7 @@ class Page extends DisplayObject, implements IGroupable
 			trace("open the default page");
 			open(null, null, true, true);
 		}
+#end
 	}
 	/** 
 	 * Set the name attribute of the page, i.e. change the name attribute on rootElement

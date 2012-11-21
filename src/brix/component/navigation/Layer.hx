@@ -38,12 +38,22 @@ class Layer extends DisplayObject
 	 * constant for the show event, dispatched on the rootElement node when the layer is shown
 	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
 	 */
-	public static inline var EVENT_TYPE_SHOW:String = "onLayerShow";
+	public static inline var EVENT_TYPE_SHOW_START:String = "onLayerShowStart";
 	/**
 	 * constant for the hide event, dispatched on the rootElement node when the layer is hided
 	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
 	 */
-	public static inline var EVENT_TYPE_HIDE:String = "onLayerHide";
+	public static inline var EVENT_TYPE_HIDE_START:String = "onLayerHideStart";
+	/**
+	 * constant for the show event, dispatched on the rootElement node when the layer is shown
+	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 */
+	public static inline var EVENT_TYPE_SHOW_STOP:String = "onLayerShowStop";
+	/**
+	 * constant for the hide event, dispatched on the rootElement node when the layer is hided
+	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 */
+	public static inline var EVENT_TYPE_HIDE_STOP:String = "onLayerHideStop";
 	/**
 	 * array used to store all the children while the layer is hided
 	 */
@@ -98,39 +108,12 @@ class Layer extends DisplayObject
 	//////////////////////////////////////////////////////
 	// Transitions
 	//////////////////////////////////////////////////////
-/*
-with priority to the css classes of the link over the one of the layer
-	private function startTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
-	{
-		if (transitionData == null)
-			transitionData = TransitionTools.getTransitionData(rootElement, type);
-
-		if (transitionData == null){
-			if(onComplete != null)
-				onComplete(null);
-		}
-		else{
-			// set the flag
-			hasTransitionStarted = true;
-			// set the css style
-			DomTools.addClass(rootElement, transitionData.startStyleName);
-			// continue later
-			DomTools.doLater(callback(doStartTransition, transitionData, onComplete));
-		}
-	}
-	private function doStartTransition(transitionData:TransitionData, onComplete:Null<Event->Void>=null) 
-	{
-		// set the css style
-		DomTools.removeClass(rootElement, transitionData.startStyleName);
-		// listen for the transition end event
-		if (onComplete != null){
-			addTransitionEvent(onComplete);
-		}
-		DomTools.addClass(rootElement, transitionData.endStyleName);
-	}
-/*
-with sum of the css classes
-*/	private function startTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
+	/**
+	 * concat the css classes used for transition (in data-*)
+	 * if there is a transition, this will init the transition with the data-*-start style
+	 * and call doStartTransition after a "frame"
+	 */
+ 	private function startTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
 	{
 		// retrieve transition data from the root node
 		var transitionData2 = TransitionTools.getTransitionData(rootElement, type);
@@ -154,7 +137,7 @@ with sum of the css classes
 		}
 		else
 		{
-			// set the fla
+			// set the flag
 			hasTransitionStarted = true;
 			// prevent anim at this stage
 			TransitionTools.setTransitionProperty(rootElement, "transitionDuration", "0");
@@ -165,6 +148,10 @@ with sum of the css classes
 			DomTools.doLater(callback(doStartTransition, sumOfTransitions, onComplete));
 		}
 	}
+	/**
+	 * after init the transition with data-*-start
+	 * this will apply the data-*-end style
+	 */
 	private function doStartTransition(sumOfTransitions:Array<TransitionData>, onComplete:Null<Event->Void>=null) 
 	{
 		// reset the css style
@@ -181,6 +168,9 @@ with sum of the css classes
 		for (transition in sumOfTransitions)
 			DomTools.addClass(rootElement, transition.endStyleName);
 	}
+	/**
+	 * callback for the css transition end
+	 */
 	private function endTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
 	{
 		removeTransitionEvent(onComplete);
@@ -194,8 +184,6 @@ with sum of the css classes
 			DomTools.removeClass(rootElement, transitionData2.endStyleName);
 		}
 	}
-
-/**/
 	/**
 	 * add transition events for all browsers
 	 */
@@ -264,17 +252,12 @@ with sum of the css classes
 			var element = childrenArray.shift();
 			rootElement.appendChild(element);
 		}
-		// play the videos/sounds when entering the page
-		var audioNodes = rootElement.getElementsByTagName("audio");
-		setupAudioElements(cast(audioNodes));
-		var videoNodes = rootElement.getElementsByTagName("video");
-		setupVideoElements(cast(videoNodes));
 
 		// dispatch a custom event on the root element
 		try
 		{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_SHOW, false, false, {
+			event.initCustomEvent(EVENT_TYPE_SHOW_START, false, false, {
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
@@ -320,6 +303,28 @@ with sum of the css classes
 		doShowCallback=null;
 		// update status 
 		status = visible;
+		// play the videos/sounds after transition
+		var audioNodes = rootElement.getElementsByTagName("audio");
+		setupAudioElements(cast(audioNodes));
+		var videoNodes = rootElement.getElementsByTagName("video");
+		setupVideoElements(cast(videoNodes));
+
+		// dispatch a custom event on the root element
+		try
+		{
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_TYPE_SHOW_STOP, false, false, {
+				transitionData : transitionData,
+				target: rootElement,
+				layer: this,
+			});
+			rootElement.dispatchEvent(event);
+		}
+		catch (e:Dynamic)
+		{
+			// android browsers
+			trace("Error: could not dispatch event "+e);
+		}
 	}
 
 	//////////////////////////////////////////////////////
@@ -350,6 +355,28 @@ with sum of the css classes
 		}
 		// update status 
 		status = hideTransition;
+
+		// dispatch a custom event on the root element
+		try
+		{
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_TYPE_HIDE_START, false, false, {
+				transitionData : transitionData,
+				target: rootElement,
+				layer: this,
+			});
+			rootElement.dispatchEvent(event);
+		}
+		catch (e:Dynamic)
+		{
+			// android browsers
+			trace("Error: could not dispatch event "+e);
+		}
+		// stop the videos/sounds during transition
+		var audioNodes = rootElement.getElementsByTagName("audio");
+		cleanupAudioElements(cast(audioNodes));
+		var videoNodes = rootElement.getElementsByTagName("video");
+		cleanupVideoElements(cast(videoNodes));
 
 		// do the transition
 		if (preventTransitions == false)
@@ -390,7 +417,7 @@ with sum of the css classes
 		try
 		{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_HIDE, false, false, {
+			event.initCustomEvent(EVENT_TYPE_HIDE_STOP, false, false, {
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
@@ -402,11 +429,6 @@ with sum of the css classes
 			// android browsers
 			trace("Error: could not dispatch event "+e);
 		}
-		// stop the videos/sounds when leaving the page
-		var audioNodes = rootElement.getElementsByTagName("audio");
-		cleanupAudioElements(cast(audioNodes));
-		var videoNodes = rootElement.getElementsByTagName("video");
-		cleanupVideoElements(cast(videoNodes));
 
 		// remove children 
 		while (rootElement.childNodes.length > 0)

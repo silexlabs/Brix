@@ -562,12 +562,15 @@ class DomTools
 	public static function getBaseUrl():String
 	{
 		var base = getBaseTag();
+// workaround window.location not yet implemented in cocktail
+#if js
 		// defaults to the document location
 		if (base == null)
 		{
 			// todo: use location
 			base = Lib.window.location.href;
 		}
+#end
 		return base;
 	}
 }
