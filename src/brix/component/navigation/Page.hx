@@ -14,6 +14,7 @@ import js.Dom;
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.link.LinkBase;
 import brix.component.navigation.transition.TransitionData;
+import brix.component.navigation.transition.TransitionObserver;
 import brix.util.DomTools;
 import brix.core.Application;
 
@@ -21,6 +22,7 @@ import brix.component.group.IGroupable;
 using brix.component.group.IGroupable.Groupable;
 
 using StringTools;
+
 
 /**
  * This component is linked to a DOM element, which is an anchor
@@ -56,6 +58,22 @@ class Page extends DisplayObject, implements IGroupable
 	 * css class name added to links when their corresponding page is opened
 	 */
 	public static inline var OPENED_PAGE_CSS_CLASS:String = "page-opened";
+	/**
+	 * Event fired when a page opens, before all the layers are shown
+	 */
+	public static inline var EVENT_TYPE_OPEN_START:String = "pageOpenStart";
+	/**
+	 * Event fired when a page opens, after all the layer transitions have ended
+	 */
+	public static inline var EVENT_TYPE_OPEN_STOP:String = "pageOpenStop";
+	/**
+	 * Event fired when a page closes, before all the layers are hidden
+	 */
+	public static inline var EVENT_TYPE_CLOSE_START:String = "pageCloseStart";
+	/**
+	 * Event fired when a page closes, after all the layer transitions have ended
+	 */
+	public static inline var EVENT_TYPE_CLOSE_STOP:String = "pageCloseStop";
 	/**
 	 * Name of the page.
 	 * This is the anchor name to be used as a link/deeplink
@@ -205,8 +223,6 @@ class Page extends DisplayObject, implements IGroupable
 	{
 		super.init();
 
-		trace(Lib.window.location.search);
-
 // workaround window.location not yet implemented in cocktail
 #if js
 		// open if it is the page in history
@@ -229,13 +245,14 @@ class Page extends DisplayObject, implements IGroupable
 			}
 		}
 		// open if it is the default page and there is no deeplink nor history
-		else if (DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
+		else 
+#end
+		if (DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
 			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name )
 		{
 			trace("open the default page");
 			open(null, null, true, true);
 		}
-#end
 	}
 	/** 
 	 * Set the name attribute of the page, i.e. change the name attribute on rootElement
@@ -294,9 +311,13 @@ class Page extends DisplayObject, implements IGroupable
 
 	/**
 	 * Open this page, i.e. show all layers which have the page name in their css class attribute
+	 * 
 	 */
 	public function doOpen(transitionData:TransitionData = null, preventTransitions:Bool = false)
 	{// trace("doOpen "+transitionData+", "+name+" - "+preventTransitions);
+
+		var transitionObserver = new TransitionObserver(this, EVENT_TYPE_OPEN_START, EVENT_TYPE_OPEN_STOP);
+
 		// find all the layers which have the page name in their css class attribute
 		var nodes = Layer.getLayerNodes(name, brixInstanceId, groupElement);
 
@@ -307,7 +328,7 @@ class Page extends DisplayObject, implements IGroupable
 			var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
 			for (layerInstance in layerInstances)
 			{
-					layerInstance.show(transitionData, preventTransitions);
+					layerInstance.show(transitionData, transitionObserver, preventTransitions);
 			}
 		}
 		// add the page-opened css style on links to this page
@@ -331,6 +352,8 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	public function close(transitionData:TransitionData = null, preventCloseByClassName:Null<Array<String>> = null, preventTransitions:Bool = false) 
 	{
+		var transitionObserver = new TransitionObserver(this, EVENT_TYPE_CLOSE_START, EVENT_TYPE_CLOSE_STOP);
+
 		// default value
 		if (preventCloseByClassName == null)
 		{
@@ -357,7 +380,7 @@ class Page extends DisplayObject, implements IGroupable
 				var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
 				for (layerInstance in layerInstances)
 				{
-					cast(layerInstance, Layer).hide(transitionData, preventTransitions);
+					cast(layerInstance, Layer).hide(transitionData, transitionObserver, preventTransitions);
 				}
 			}
 		}

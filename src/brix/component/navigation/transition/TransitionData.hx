@@ -20,7 +20,7 @@ enum TransitionType
 /** 
  * The transition event is a custom javascript event
  * It takes an object of this class as a data object
- * @example 	event.detail.transitionProperty
+ * @example 	event.detail.startStyleName
  */
 typedef TransitionData =
 {
