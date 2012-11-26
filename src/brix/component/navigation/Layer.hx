@@ -62,7 +62,7 @@ class Layer extends DisplayObject
 	/**
 	 * true if the layer is hidden
 	 */
-	private var status(default, setStatus):LayerStatus;
+	public var status(default, setStatus):LayerStatus;
 	/**
 	 * Flag used to detect if a transition has started
 	 */
@@ -96,15 +96,17 @@ class Layer extends DisplayObject
 	/** 
 	 * Retrieve the given layer of this application or group
 	 */
-	static public function getLayerNodes(pageName:String, brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	static public function getLayerNodes(pageName:String="", brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
 	{
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
 			document = Lib.document.documentElement;
-
-		// get the desired layers, i.e. the elements with the page name as class name
-		return document.getElementsByClassName(pageName);
+		if (pageName != "")
+			// get the desired layers, i.e. the elements with the page name as class name
+			return document.getElementsByClassName(pageName);
+		else
+			return document.getElementsByClassName("Layer");
 	}
 	//////////////////////////////////////////////////////
 	// Transitions
@@ -239,7 +241,7 @@ class Layer extends DisplayObject
 	 * This will empty childrenArray
 	 * Start the transition and then show
 	 */
-	public function show(transitionData:Null<TransitionData> = null, transitionObserver:TransitionObserver, preventTransitions:Bool = false) : Void
+	public function show(transitionData:Null<TransitionData> = null, transitionObserver:TransitionObserver=null, preventTransitions:Bool = false) : Void
 	{
 		// reset transition if it is pending
 		if (status == hideTransition)
@@ -271,7 +273,8 @@ class Layer extends DisplayObject
 		}
 
 		// notify the transition observer
-		transitionObserver.addTransition(this);
+		if (transitionObserver!=null)
+			transitionObserver.addTransition(this);
 
 		// dispatch a custom event on the root element
 		try
@@ -349,7 +352,8 @@ class Layer extends DisplayObject
 			trace("Error: could not dispatch event "+e);
 		}
 		// notify the transition observer
-		transitionObserver.removeTransition(this);
+		if (transitionObserver!=null)
+			transitionObserver.removeTransition(this);
 	}
 
 	//////////////////////////////////////////////////////
@@ -358,7 +362,7 @@ class Layer extends DisplayObject
 	/**
 	 * start the transition and then hide
 	 */
-	public function hide(transitionData:Null<TransitionData> = null, transitionObserver:TransitionObserver, preventTransitions:Bool) : Void
+	public function hide(transitionData:Null<TransitionData> = null, transitionObserver:TransitionObserver=null, preventTransitions:Bool=false) : Void
 	{// trace("hide "+preventTransitions);
 		// reset transition if it is pending
 		if (status == hideTransition)
@@ -382,7 +386,8 @@ class Layer extends DisplayObject
 		status = hideTransition;
 
 		// notify the transition observer
-		transitionObserver.addTransition(this);
+		if (transitionObserver!=null)
+			transitionObserver.addTransition(this);
 
 		// dispatch a custom event on the root element
 		try
@@ -460,7 +465,8 @@ class Layer extends DisplayObject
 			trace("Error: could not dispatch event "+e);
 		}
 		// notify the transition observer
-		transitionObserver.removeTransition(this);
+		if (transitionObserver!=null)
+			transitionObserver.removeTransition(this);
 
 
 		// remove children 
