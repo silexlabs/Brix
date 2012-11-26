@@ -14,6 +14,7 @@ import js.Dom;
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.transition.TransitionData;
 import brix.component.navigation.transition.TransitionTools;
+import brix.component.navigation.transition.TransitionObserver;
 import brix.component.sound.SoundOn;
 import brix.util.DomTools;
 
@@ -61,7 +62,7 @@ class Layer extends DisplayObject
 	/**
 	 * true if the layer is hidden
 	 */
-	private var status:LayerStatus;
+	public var status(default, setStatus):LayerStatus;
 	/**
 	 * Flag used to detect if a transition has started
 	 */
@@ -95,19 +96,37 @@ class Layer extends DisplayObject
 	/** 
 	 * Retrieve the given layer of this application or group
 	 */
-	static public function getLayerNodes(pageName:String, brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	static public function getLayerNodes(pageName:String="", brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
 	{
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
 			document = Lib.document.documentElement;
-
-		// get the desired layers, i.e. the elements with the page name as class name
-		return document.getElementsByClassName(pageName);
+		if (pageName != "")
+			// get the desired layers, i.e. the elements with the page name as class name
+			return document.getElementsByClassName(pageName);
+		else
+			return document.getElementsByClassName("Layer");
 	}
 	//////////////////////////////////////////////////////
 	// Transitions
 	//////////////////////////////////////////////////////
+	private static inline var MAX_DELAY_FOR_TRANSITION:Int = 2500;
+	private function setStatus(newStatus:LayerStatus):LayerStatus
+	{trace("setStatus "+newStatus+" - "+rootElement.className);
+		status = newStatus;
+		if(status == showTransition || status == hideTransition){
+			haxe.Timer.delay(checkForNeverEndingTransition, MAX_DELAY_FOR_TRANSITION);
+		}
+		return status;
+	}
+	private function checkForNeverEndingTransition() 
+	{
+		if(status == showTransition || status == hideTransition){
+			trace("Warning, transition is not over. This may be a layer with data-show-start but with a style which does not has CSS transition. Root node with css class: "+rootElement.className);	
+			haxe.Timer.delay(checkForNeverEndingTransition, MAX_DELAY_FOR_TRANSITION);
+		}
+	}
 	/**
 	 * concat the css classes used for transition (in data-*)
 	 * if there is a transition, this will init the transition with the data-*-start style
@@ -172,7 +191,7 @@ class Layer extends DisplayObject
 	 * callback for the css transition end
 	 */
 	private function endTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
-	{
+	{trace("endTransition "+type+" - "+transitionData+" - "+onComplete);
 		removeTransitionEvent(onComplete);
 		if (transitionData != null)
 		{
@@ -222,19 +241,19 @@ class Layer extends DisplayObject
 	 * This will empty childrenArray
 	 * Start the transition and then show
 	 */
-	public function show(transitionData:Null<TransitionData> = null, preventTransitions:Bool = false) : Void
+	public function show(transitionData:Null<TransitionData> = null, transitionObserver:TransitionObserver=null, preventTransitions:Bool = false) : Void
 	{
 		// reset transition if it is pending
 		if (status == hideTransition)
 		{
-			trace("Warning: hide break previous transition hide");
+			trace("Warning: show break previous transition hide");
 			doHideCallback(null);
 			removeTransitionEvent(doHideCallback);
 		}
 		// reset transition if it is pending
 		else if (status == showTransition)
 		{
-			trace("Warning: hide break previous transition show");
+			trace("Warning: show break previous transition show");
 			doShowCallback(null);
 			removeTransitionEvent(doShowCallback);
 		}
@@ -252,6 +271,10 @@ class Layer extends DisplayObject
 			var element = childrenArray.shift();
 			rootElement.appendChild(element);
 		}
+
+		// notify the transition observer
+		if (transitionObserver!=null)
+			transitionObserver.addTransition(this);
 
 		// dispatch a custom event on the root element
 		try
@@ -273,12 +296,14 @@ class Layer extends DisplayObject
 		// do the transition
 		if (preventTransitions == false)
 		{
-			doShowCallback = callback(doShow, transitionData, preventTransitions);
+			doShowCallback = callback(doShow, transitionData, transitionObserver, preventTransitions);
 			startTransition(TransitionType.show, transitionData, doShowCallback);
 		}
 		else
 		{
-			doShow(transitionData, preventTransitions, null);
+			// no transition
+			trace("no trnasition");
+			doShow(transitionData, transitionObserver, preventTransitions, null);
 		}
 		// set or reset style.display
 		//rootElement.style.display=styleAttrDisplay;
@@ -287,8 +312,8 @@ class Layer extends DisplayObject
 	/**
 	 * transition is over
 	 */
-	public function doShow(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
-	{// trace("doShow");
+	public function doShow(transitionData:Null<TransitionData>, transitionObserver:TransitionObserver, preventTransitions:Bool, e:Null<Event>) : Void
+	{trace("doShow");
 		if (e!=null && e.target != rootElement){
 			trace("End transition event from another html element");
 			return;
@@ -326,6 +351,9 @@ class Layer extends DisplayObject
 			// android browsers
 			trace("Error: could not dispatch event "+e);
 		}
+		// notify the transition observer
+		if (transitionObserver!=null)
+			transitionObserver.removeTransition(this);
 	}
 
 	//////////////////////////////////////////////////////
@@ -334,7 +362,7 @@ class Layer extends DisplayObject
 	/**
 	 * start the transition and then hide
 	 */
-	public function hide(transitionData:Null<TransitionData> = null, preventTransitions:Bool) : Void
+	public function hide(transitionData:Null<TransitionData> = null, transitionObserver:TransitionObserver=null, preventTransitions:Bool=false) : Void
 	{// trace("hide "+preventTransitions);
 		// reset transition if it is pending
 		if (status == hideTransition)
@@ -356,6 +384,10 @@ class Layer extends DisplayObject
 		}
 		// update status 
 		status = hideTransition;
+
+		// notify the transition observer
+		if (transitionObserver!=null)
+			transitionObserver.addTransition(this);
 
 		// dispatch a custom event on the root element
 		try
@@ -382,20 +414,22 @@ class Layer extends DisplayObject
 		// do the transition
 		if (preventTransitions == false)
 		{
-			doHideCallback = callback(doHide, transitionData, preventTransitions);
+			doHideCallback = callback(doHide, transitionData, transitionObserver, preventTransitions);
 			startTransition(TransitionType.hide, transitionData, doHideCallback);
 		}
 		else
 		{
-			doHide(transitionData, preventTransitions, null);
+			// no transition
+			trace("no transition");
+			doHide(transitionData, transitionObserver, preventTransitions, null);
 		}
 	}
 
 	/**
 	 * remove children from the DOM and store it in childrenArray
 	 */
-	public function doHide(transitionData:Null<TransitionData>, preventTransitions:Bool, e:Null<Event>) : Void
-	{  //trace("doHide "+preventTransitions);
+	public function doHide(transitionData:Null<TransitionData>, transitionObserver:TransitionObserver, preventTransitions:Bool, e:Null<Event>) : Void
+	{trace("doHide "+preventTransitions);
 		if (e != null && e.target != rootElement)
 		{
 			trace("End transition event from another html element");
@@ -430,6 +464,10 @@ class Layer extends DisplayObject
 			// android browsers
 			trace("Error: could not dispatch event "+e);
 		}
+		// notify the transition observer
+		if (transitionObserver!=null)
+			transitionObserver.removeTransition(this);
+
 
 		// remove children 
 		while (rootElement.childNodes.length > 0)
