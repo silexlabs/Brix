@@ -64,8 +64,6 @@ class ContextManager extends DisplayObject
 	 */
 	public function new(rootElement:HtmlDom, brixId:String)
 	{
-		haxe.Firebug.redirectTraces();
-
 		super(rootElement, brixId);
 
 		// init context list
@@ -104,8 +102,9 @@ class ContextManager extends DisplayObject
 	private function invalidate()
 	{
 		trace("invalidate "+isDirty);
-		if (isDirty == false)
-			DomTools.doLater(refresh);
+//		if (isDirty == false)
+//			DomTools.doLater(refresh);
+refresh();
 		isDirty = true;
 	}
 	////////////////////////////////////////////////////////////
