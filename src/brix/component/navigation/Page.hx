@@ -210,7 +210,7 @@ class Page extends DisplayObject, implements IGroupable
 	{
 		// get the typed event object
 		var event:PopStateEvent = cast(e);
-		if (event.state.name == name){
+		if (event.state != null && event.state.name == name){
 			trace("onPopState "+event.state.name);
 			open(event.state.transitionDataShow, event.state.transitionDataHide, event.state.doCloseOthers, event.state.preventTransitions, false);
 
