@@ -24,6 +24,7 @@ typedef ContextValue = String;
  * The ContextManager component is a component that is in charge to show/hide Layer components when they are in/out of context
  * It takes the parameters data-context-list and data-initial-context in the associated node 
  * It has an invalidation mechanism
+ * Note: I removed invalidation system, it is not required anymore since I changed the ContextManager to use styles instead of layers
  * @example <div class="ContextManager" data-context-list="context1, context2, context3" data-initial-context="context1, context2" />
  */
 class ContextManager extends DisplayObject
@@ -102,9 +103,10 @@ class ContextManager extends DisplayObject
 	private function invalidate()
 	{
 		trace("invalidate "+isDirty);
-//		if (isDirty == false)
-//			DomTools.doLater(refresh);
-refresh();
+		// no more invalidation system is required since I changed the ContextManager to use styles instead of layers
+		//		if (isDirty == false)
+		//			DomTools.doLater(refresh);
+		refresh();
 		isDirty = true;
 	}
 	////////////////////////////////////////////////////////////
