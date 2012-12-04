@@ -439,12 +439,16 @@ class DomTools
 	 * @param	attributeName 	the name of the attribute, of which to return the value
 	 * @example	DomTools.setMeta("description", "A 1st test of Silex publication"); // set the description of the HTML page found in the head tag, i.e. <META name="description" content="A 1st test of Silex publication"></META>
 	 */
-	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content"):Hash<String>{
+	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content", head:HtmlDom=null):Hash<String>{
 		var res:Hash<String> = new Hash();
 		//trace("setConfig META TAG "+metaName+" = " +metaValue);
 
+		// default value for document
+		if (head == null) 
+			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
+
 		// retrieve all config tags (the meta tags)
-		var metaTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("META");
+		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("META");
 
 		// flag to check if metaName exists
 		var found = false;
@@ -468,7 +472,6 @@ class DomTools
 			var node = Lib.document.createElement("meta");
 			node.setAttribute("name", metaName);
 			node.setAttribute("content", metaValue);
-			var head = Lib.document.getElementsByTagName("head")[0];
 			head.appendChild(node);
 			// update config
 			res.set(metaName, metaValue);
