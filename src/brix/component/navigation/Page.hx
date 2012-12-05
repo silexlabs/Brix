@@ -80,6 +80,10 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	public var name(default, null):String;
 	/**
+	 * use the congig in meta
+	 */
+	static public var useDeeplink:Null<Bool>=null;
+	/**
 	 * the group element set by the Group class
 	 * implementation of IGroupable
 	 */
@@ -199,8 +203,15 @@ class Page extends DisplayObject, implements IGroupable
 		{
 			throw("Pages must have a 'name' attribute");
 		}
-		// listen to the history api changes
-		Lib.window.addEventListener("popstate", onPopState, true);
+
+		if (useDeeplink == null)
+			useDeeplink = (DomTools.getMeta(CONFIG_USE_DEEPLINK) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK) == "true");
+
+		if (useDeeplink)
+		{
+			// listen to the history api changes
+			Lib.window.addEventListener("popstate", onPopState, true);
+		}
 	}
 
 	/** 
@@ -226,8 +237,7 @@ class Page extends DisplayObject, implements IGroupable
 // workaround window.location not yet implemented in cocktail
 #if js
 		// open if it is the page in history
-		if ((DomTools.getMeta(CONFIG_USE_DEEPLINK) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK) == "true")
-			&& Lib.window.history.state != null)
+		if (useDeeplink && Lib.window.history.state != null)
 		{
 			if (Lib.window.history.state.name == name)
 			{
@@ -276,7 +286,7 @@ class Page extends DisplayObject, implements IGroupable
 		doOpen(transitionDataShow, preventTransitions);
 
 		// history API
-		if (recordInHistory && (DomTools.getMeta(CONFIG_USE_DEEPLINK) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK) == "true"))
+		if (recordInHistory && useDeeplink)
 		{
 			Lib.window.history.pushState({
 					name: name,
@@ -362,6 +372,8 @@ class Page extends DisplayObject, implements IGroupable
 		// find all the layers which have the page name in their css class attribute
 		var nodes = Layer.getLayerNodes(name, brixInstanceId, groupElement);
 
+		// store the layers which have to be closed
+		var layersToBeClosed:Array<Layer> = new Array();
 		// browse the layers
 		for (idxLayerNode in 0...nodes.length)
 		{
@@ -380,9 +392,14 @@ class Page extends DisplayObject, implements IGroupable
 				var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
 				for (layerInstance in layerInstances)
 				{
-					cast(layerInstance, Layer).hide(transitionData, transitionObserver, preventTransitions);
+					layersToBeClosed.push(layerInstance);
 				}
 			}
+		}
+		// now really close the layers, to prevent the "nodes" list to be updated
+		for (layerInstance in layersToBeClosed)
+		{
+			layerInstance.hide(transitionData, transitionObserver, preventTransitions);
 		}
 		// remove the page-opened css style on links to this page
 		var nodes = DomTools.getElementsByAttribute(groupElement, LinkBase.CONFIG_PAGE_NAME_ATTR, name);

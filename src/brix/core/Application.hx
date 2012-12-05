@@ -370,7 +370,9 @@ class Application
 				}
 				catch ( unknown : Dynamic )
 				{
-					trace("ERROR while creating "+Type.getClassName(componentClass)+": "+Std.string(unknown));
+					trace("ERROR while creating component "+classValue+" - error message: "+Std.string(unknown));
+// throws an exception on android :					trace("ERROR while creating "+Type.getClassName(componentClass)+": "+Std.string(unknown));
+					trace(haxe.Stack.toString(haxe.Stack.callStack()));
 					var excptArr = haxe.Stack.exceptionStack();
 					if ( excptArr.length > 0 )
 					{
@@ -419,7 +421,9 @@ class Application
 			}
 			catch (unknown : Dynamic)
 			{
-				trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
+				trace("ERROR while trying to call init() on a component - error message: "+Std.string(unknown));
+				trace(haxe.Stack.toString(haxe.Stack.callStack()));
+//	throws an exception on android			trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
 				var excptArr = haxe.Stack.exceptionStack();
 				if ( excptArr.length > 0 )
 				{
