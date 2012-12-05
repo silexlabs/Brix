@@ -76,6 +76,10 @@ class ContextManager extends DisplayObject
 		{
 			throw("Error: Context global component needs param "+PARAM_DATA_CONTEXT_LIST);
 		}
+	}
+	override public function init()
+	{
+		super.init();
 
 		// init current context
 		if (rootElement.getAttribute(PARAM_DATA_INITIAL_CONTEXT) != null)
@@ -87,12 +91,12 @@ class ContextManager extends DisplayObject
 			currentContexts = new Array();
 		}
 		// listen to the page open/close in order to refersh the contexts display
-		rootElement.addEventListener(Layer.EVENT_TYPE_SHOW_START, onLayerShow, true);
+		// rootElement.addEventListener(Layer.EVENT_TYPE_SHOW_START, onLayerShow, true);
 	}
 	/** 
 	 * callback for layer show
 	 */
-	private function onLayerShow(e:Event)
+/*	private function onLayerShow(e:Event)
 	{
 		trace("onLayerShow ");
 		invalidate();
