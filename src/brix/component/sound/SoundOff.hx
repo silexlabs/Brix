@@ -20,7 +20,6 @@ class SoundOff extends SoundOn
 	 */
 	override private function onClick(e:Event)
 	{
-		trace("Sound onClick");
 		SoundOn.mute(true);
 	}
 }

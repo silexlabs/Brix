@@ -9,7 +9,8 @@ import brix.util.DomTools;
 import brix.component.group.IGroupable;
 using brix.component.group.IGroupable.Groupable;
 
-enum TouchType{
+enum TouchType
+{
 	swipeLeft; 
 	swipeRight; 
 	swipeUp; 
@@ -21,7 +22,8 @@ enum TouchType{
  * this component listens to touch events and acts like the user clicked on the link when it detect a given gesture
  * when you place this component on a link node, you can provide the data-touch-type parameter with left, right, up, down (swipe) or open, close (pinch)
  */
-class TouchLink extends DisplayObject, implements IGroupable{
+class TouchLink extends DisplayObject, implements IGroupable
+{
 	/**
 	 * the group element set by the Group class
 	 * implementation of IGroupable
@@ -56,7 +58,8 @@ class TouchLink extends DisplayObject, implements IGroupable{
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String){
+	public function new(rootElement:HtmlDom, brixId:String)
+	{
 		super(rootElement, brixId);
 		
 		// implementation of IGroupable
@@ -84,7 +87,8 @@ class TouchLink extends DisplayObject, implements IGroupable{
 		//rootElement.onclick = onClick;
 
 		// retrieve the params
-		switch(rootElement.getAttribute(ATTR_TOUCH_TYPE)){
+		switch(rootElement.getAttribute(ATTR_TOUCH_TYPE))
+		{
 			case "left":
 				touchType = swipeLeft;
 			case "right":
@@ -110,56 +114,60 @@ class TouchLink extends DisplayObject, implements IGroupable{
 	/** 
 	 * callback for the touch event
 	 */
-	private function onTouchStart(e:Event){
+	private function onTouchStart(e:Event)
+	{
 		var event:TouchEvent = cast(e);
 		// event.preventDefault();
 		touchStart = {
 			x: event.touches.item(0).screenX,
 			y: event.touches.item(0).screenY
 		}
-		//DomTools.display("onTouchStart "+touchStart);
 	}
-	private function onClick(e:Event){
-		trace("CLICK ");
+	private function onClick(e:Event)
+	{
 	}
 	/** 
 	 * callback for the touch event
 	 */
-	private function onTouchMove(e:Event){
+	private function onTouchMove(e:Event)
+	{
 		var event:TouchEvent = cast(e);
 		event.preventDefault();
 
 		if (touchStart == null) 
 			return;
 
-		//DomTools.display("onTouchMove "+event);
 		var xOffset = event.touches.item(0).screenX - touchStart.x;
 		var yOffset = event.touches.item(0).screenY - touchStart.y;
-		if (Math.abs(xOffset) > detectDistance){
+		if (Math.abs(xOffset) > detectDistance)
+		{
 			touchStart = null;
-			if (xOffset>0){
-				if (touchType == swipeLeft){
-					// DomTools.display("Left");
+			if (xOffset>0)
+			{
+				if (touchType == swipeLeft)
+				{
 					dispatchClick();
 				}
 			}
-			else{
-				if (touchType == swipeRight){
-					//DomTools.display("Right");
+			else
+			{
+				if (touchType == swipeRight)
+				{
 					dispatchClick();
 				}
 			}
-		}else if (Math.abs(yOffset) > detectDistance){
+		}else if (Math.abs(yOffset) > detectDistance)
+		{
 			touchStart = null;
 			if (yOffset>0){
-				if (touchType == swipeUp){
-					//DomTools.display("Up");
+				if (touchType == swipeUp)
+				{
 					dispatchClick();
 				}
 			}
 			else{
-				if (touchType == swipeDown){
-					//DomTools.display("Down");
+				if (touchType == swipeDown)
+				{
 					dispatchClick();
 				}
 			}
@@ -168,13 +176,14 @@ class TouchLink extends DisplayObject, implements IGroupable{
 	/** 
 	 * callback for the touch event
 	 */
-	private function onTouchEnd(e:Event){
+	private function onTouchEnd(e:Event)
+	{
 		var event:TouchEvent = cast(e);
 		// event.preventDefault();
-		//DomTools.display("onTouchEnd "+event);
 		touchStart = null;
 	}
-	public function dispatchClick(){
+	public function dispatchClick()
+	{
 		var evt = Lib.document.createEvent('MouseEvent');
 		//cast(evt).initMouseEvent('click', true, true);
 		evt.initEvent(

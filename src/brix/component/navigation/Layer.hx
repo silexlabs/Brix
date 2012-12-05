@@ -17,6 +17,7 @@ import brix.component.navigation.transition.TransitionTools;
 import brix.component.navigation.transition.TransitionObserver;
 import brix.component.sound.SoundOn;
 import brix.util.DomTools;
+import brix.core.Application;
 
 enum LayerStatus
 {
@@ -101,7 +102,7 @@ class Layer extends DisplayObject
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document.documentElement;
+			document = Application.get(brixId).htmlRootElement;
 		if (pageName != "")
 			// get the desired layers, i.e. the elements with the page name as class name
 			return document.getElementsByClassName(pageName);
@@ -113,7 +114,7 @@ class Layer extends DisplayObject
 	//////////////////////////////////////////////////////
 	private static inline var MAX_DELAY_FOR_TRANSITION:Int = 2500;
 	private function setStatus(newStatus:LayerStatus):LayerStatus
-	{trace("setStatus "+newStatus+" - "+rootElement.className);
+	{
 		status = newStatus;
 		if(status == showTransition || status == hideTransition){
 			haxe.Timer.delay(checkForNeverEndingTransition, MAX_DELAY_FOR_TRANSITION);
@@ -191,7 +192,7 @@ class Layer extends DisplayObject
 	 * callback for the css transition end
 	 */
 	private function endTransition(type:TransitionType, transitionData:Null<TransitionData> = null, onComplete:Null<Event->Void>=null)
-	{trace("endTransition "+type+" - "+transitionData+" - "+onComplete);
+	{
 		removeTransitionEvent(onComplete);
 		if (transitionData != null)
 		{
@@ -207,7 +208,7 @@ class Layer extends DisplayObject
 	 * add transition events for all browsers
 	 */
 	private function addTransitionEvent(onEndCallback:Event->Void)
-	{// trace("EVENTS SET");
+	{
 		rootElement.addEventListener("transitionend", onEndCallback, false);
 	#if js
 		// only for pure js, not for cocktail compilation
@@ -222,7 +223,7 @@ class Layer extends DisplayObject
 	 * Remove events for all browsers
 	 */
 	private function removeTransitionEvent(onEndCallback:Event->Void)
-	{// trace("EVENTS RESET");
+	{
 		rootElement.removeEventListener("transitionend", onEndCallback, false);
 	#if js
 		// only for pure js, not for cocktail compilation
@@ -302,7 +303,6 @@ class Layer extends DisplayObject
 		else
 		{
 			// no transition
-			trace("no trnasition");
 			doShow(transitionData, transitionObserver, preventTransitions, null);
 		}
 		// set or reset style.display
@@ -313,7 +313,7 @@ class Layer extends DisplayObject
 	 * transition is over
 	 */
 	public function doShow(transitionData:Null<TransitionData>, transitionObserver:TransitionObserver, preventTransitions:Bool, e:Null<Event>) : Void
-	{trace("doShow");
+	{
 		if (e!=null && e.target != rootElement){
 			trace("End transition event from another html element");
 			return;
@@ -363,7 +363,7 @@ class Layer extends DisplayObject
 	 * start the transition and then hide
 	 */
 	public function hide(transitionData:Null<TransitionData> = null, transitionObserver:TransitionObserver=null, preventTransitions:Bool=false) : Void
-	{// trace("hide "+preventTransitions);
+	{
 		// reset transition if it is pending
 		if (status == hideTransition)
 		{
@@ -420,7 +420,6 @@ class Layer extends DisplayObject
 		else
 		{
 			// no transition
-			trace("no transition");
 			doHide(transitionData, transitionObserver, preventTransitions, null);
 		}
 	}
@@ -429,7 +428,7 @@ class Layer extends DisplayObject
 	 * remove children from the DOM and store it in childrenArray
 	 */
 	public function doHide(transitionData:Null<TransitionData>, transitionObserver:TransitionObserver, preventTransitions:Bool, e:Null<Event>) : Void
-	{trace("doHide "+preventTransitions);
+	{
 		if (e != null && e.target != rootElement)
 		{
 			trace("End transition event from another html element");
@@ -562,7 +561,7 @@ class Layer extends DisplayObject
 		for (idx in 0...nodeList.length)
 		{
 			try
-			{				
+			{
 				var element = nodeList[idx];
 				element.pause();
 				element.currentTime = 0;

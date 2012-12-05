@@ -304,8 +304,6 @@ class List<ElementClass> extends DisplayObject
 	 */
 	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> 
 	{
-		//trace("setSelectedItem "+selected+" - "+Type.getClassName(Type.getClass(this)));
-		//DomTools.inspectTrace(selected, "brix.component.list.List"); 
 		if (selected != selectedItem)
 		{
 			if (selected != null)
@@ -340,7 +338,6 @@ class List<ElementClass> extends DisplayObject
 	 */
 	function setSelectedIndex(idx:Int):Int 
 	{
-		//trace("setSelectedIndex "+idx+" - "+Type.getClassName(Type.getClass(this)));
 		if (idx != _selectedIndex)
 		{
 			if (idx >= 0 && dataProvider.length > idx && dataProvider[idx] != null)

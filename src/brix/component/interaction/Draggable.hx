@@ -225,7 +225,6 @@ class Draggable extends DisplayObject, implements IGroupable
 		{
 			var val:String = Reflect.field(rootElement.style, styleName);
 			Reflect.setField(initialStyle, styleName, val);
-			//trace("initRootElementStyle keep style "+styleName+" = "+val);
 		}
 		
 		initialStyle.width = rootElement.style.width;
@@ -252,7 +251,6 @@ class Draggable extends DisplayObject, implements IGroupable
 				var val:String = Reflect.field(refHtmlDom.style, styleName);
 				Reflect.setField(phantom, styleName, val);
 				Reflect.setField(miniPhantom, styleName, val);
-				//trace("initPhantomStyle keep style "+styleName+" = "+val);
 			}
 			catch(e:Dynamic){
 				// some properties are read only
@@ -263,7 +261,6 @@ class Draggable extends DisplayObject, implements IGroupable
 		miniPhantom.className = phantomClassName;
 		phantom.className += " "+refHtmlDom.className;
 		miniPhantom.className += " "+refHtmlDom.className;
-		trace("initPhantomStyle "+phantom.className+" - "+phantom.style.display+" - "+dropZonesClassName);
 
 		phantom.style.width = refHtmlDom.clientWidth + "px";
 		phantom.style.height = refHtmlDom.clientHeight + "px";
@@ -293,7 +290,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * memorize the rootElement style values and prepare it to be moved
 	 */
 	private function startDrag(e:MouseEvent)
-	{trace("startDrag "+state);
+	{
 		if (state == none)
 		{
 			var boundingBox = DomTools.getElementBoundingBox(rootElement);
@@ -376,7 +373,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * look for closest drop zone if there are some
 	 */
 	public function move(e:MouseEvent)
-	{//trace("move "+state+" - "+bestDropZone+" - "+dropZonesClassName+" - "+groupElement.className+" - "+groupElement.getElementsByClassName(dropZonesClassName).length+" - "+Lib.document.body.getElementsByClassName(dropZonesClassName).length);
+	{
 		currentMouseX = e.clientX;
 		currentMouseY = e.clientY;
 		// position of the dragged element under the mouse
@@ -396,7 +393,7 @@ class Draggable extends DisplayObject, implements IGroupable
 		}
 	}
 	private function updateBestDropZone() 
-	{//trace("updateBestDropZone ");
+	{
 		isDirty = false;
 		if (state == dragging)
 		{
@@ -498,7 +495,6 @@ class Draggable extends DisplayObject, implements IGroupable
 	 */
 	public function setAsBestDropZone(zone:DropZone = null)
 	{
-		//DomTools.inspectTrace(zone.parent.style);
 		if (zone == bestDropZone)
 			return;
 		

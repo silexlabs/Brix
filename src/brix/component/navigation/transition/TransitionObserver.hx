@@ -81,7 +81,6 @@ class TransitionObserver{
 	 * dispatch a custom event on the root element with event.detail is a reference to the page
 	 */
 	private function dispatch(eventName:String){
-		trace("TransitionObserver dispatch "+eventName);
 		// dispatch a custom event on the root element
 		try
 		{
