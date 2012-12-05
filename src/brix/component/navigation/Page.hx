@@ -98,7 +98,7 @@ class Page extends DisplayObject, implements IGroupable
 		// default is the whole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document.documentElement;
+			document = Application.get(brixId).htmlRootElement;
 
 		// find the pages to open
 		var page = getPageByName(pageName, brixId, document);
@@ -122,7 +122,7 @@ class Page extends DisplayObject, implements IGroupable
 		// default is the whole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document.documentElement;
+			document = Application.get(brixId).htmlRootElement;
 
 		// find the pages to open
 		var page = getPageByName(pageName, brixId, document);
@@ -146,7 +146,7 @@ class Page extends DisplayObject, implements IGroupable
 		var document:HtmlDom = root;
 		if (root == null)
 		{
-			document = Lib.document.documentElement;
+			document = Application.get(brixId).htmlRootElement;
 		}
 		// get all pages, i.e. all elements with class name "Page"
 		return document.getElementsByClassName(Page.CLASS_NAME);
@@ -160,7 +160,7 @@ class Page extends DisplayObject, implements IGroupable
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document.documentElement;
+			document = Application.get(brixId).htmlRootElement;
 
 		// get all pages, i.e. all element with class name "page"
 		var pages:HtmlCollection<HtmlDom> = getPageNodes(brixId, document);
@@ -193,10 +193,11 @@ class Page extends DisplayObject, implements IGroupable
 
 		// implementation of IGroupable
 		startGroupable();
+
 		// group element is body element by default
 		if (groupElement == null)
 		{
-			groupElement = Lib.document.body; // FIXME shouldn't it be getBrixApplication().htmlRootElement ?
+			groupElement = getBrixApplication().htmlRootElement;
 		}
 		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
 		if (name == null || name.trim() == "")
@@ -205,7 +206,7 @@ class Page extends DisplayObject, implements IGroupable
 		}
 
 		if (useDeeplink == null)
-			useDeeplink = (DomTools.getMeta(CONFIG_USE_DEEPLINK) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK) == "true");
+			useDeeplink = (DomTools.getMeta(CONFIG_USE_DEEPLINK, getBrixApplication().htmlRootElement) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK, getBrixApplication().htmlRootElement) == "true");
 
 		if (useDeeplink)
 		{
@@ -254,7 +255,7 @@ class Page extends DisplayObject, implements IGroupable
 		// open if it is the default page and there is no deeplink nor history
 		else 
 #end
-		if (DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
+		if (DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME, getBrixApplication().htmlRootElement) == name 
 			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name )
 		{
 			open(null, null, true, true);

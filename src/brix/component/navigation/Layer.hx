@@ -17,6 +17,7 @@ import brix.component.navigation.transition.TransitionTools;
 import brix.component.navigation.transition.TransitionObserver;
 import brix.component.sound.SoundOn;
 import brix.util.DomTools;
+import brix.core.Application;
 
 enum LayerStatus
 {
@@ -101,7 +102,7 @@ class Layer extends DisplayObject
 		// default is the hole document
 		var document:Dynamic = root;
 		if (root == null)
-			document = Lib.document.documentElement;
+			document = Application.get(brixId).htmlRootElement;
 		if (pageName != "")
 			// get the desired layers, i.e. the elements with the page name as class name
 			return document.getElementsByClassName(pageName);
@@ -560,7 +561,7 @@ class Layer extends DisplayObject
 		for (idx in 0...nodeList.length)
 		{
 			try
-			{				
+			{
 				var element = nodeList[idx];
 				element.pause();
 				element.currentTime = 0;

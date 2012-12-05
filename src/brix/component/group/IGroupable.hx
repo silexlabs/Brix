@@ -63,6 +63,7 @@ class Groupable
 		}
 		else
 		{
+//			var domElement = groupable.rootElement;
 			// look for a group id in the rootElement's parents
 			var domElement = rootElement;
 			while (domElement != null && !DomTools.hasClass(domElement, groupId))
