@@ -34,7 +34,6 @@ class XmlList extends List<Xml>
 		{
 			dataProvider.push(xmlToObj(item));
 		}
-		trace("dataProvider = "+dataProvider);
 	}
 	/**
 	 * init the component

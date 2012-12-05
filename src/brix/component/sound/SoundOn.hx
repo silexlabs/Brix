@@ -51,7 +51,6 @@ class SoundOn extends DisplayObject
 	 */
 	public static function mute(doMute:Bool)
 	{
-		trace("Sound mute "+doMute);
 		// mute/unmute audio tags
 		#if js
 			var audioTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("audio");

@@ -41,7 +41,6 @@ class LinkContextBase extends LinkBase
 		{
 			linkName = rootElement.getAttribute(CONFIG_ATTR_CONTEXT);
 		}
-		trace("LinkToContext "+linkName);
 		// find the context manager 
 		var node = rootElement;
 		while (node != null && !DomTools.hasClass(node, "ContextManager"))

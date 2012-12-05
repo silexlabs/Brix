@@ -94,7 +94,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * This will close other pages
 	 */
 	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, brixId:String, root:HtmlDom = null)
-	{//trace("openPage ("+pageName+", "+isPopup+", "+brixId+", "+root+")");
+	{
 		// default is the whole document
 		var document:Dynamic = root;
 		if (root == null)
@@ -118,7 +118,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * This will close only this page
 	 */
 	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlDom = null)
-	{ //trace("closePage "+pageName+" root="+root);
+	{ 
 		// default is the whole document
 		var document:Dynamic = root;
 		if (root == null)
@@ -222,7 +222,6 @@ class Page extends DisplayObject, implements IGroupable
 		// get the typed event object
 		var event:PopStateEvent = cast(e);
 		if (event.state != null && event.state.name == name){
-			trace("onPopState "+event.state.name);
 			open(event.state.transitionDataShow, event.state.transitionDataHide, event.state.doCloseOthers, event.state.preventTransitions, false);
 
 		}
@@ -241,7 +240,6 @@ class Page extends DisplayObject, implements IGroupable
 		{
 			if (Lib.window.history.state.name == name)
 			{
-				trace("open the recent history");
 				open(null, null, true, true, false);
 			}
 		}
@@ -250,7 +248,6 @@ class Page extends DisplayObject, implements IGroupable
 		{
 			if (Lib.window.location.search.substr(2) == name)
 			{
-				trace("open the deeplink");
 				open(null, null, true, true);
 			}
 		}
@@ -260,7 +257,6 @@ class Page extends DisplayObject, implements IGroupable
 		if (DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
 			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name )
 		{
-			trace("open the default page");
 			open(null, null, true, true);
 		}
 	}
@@ -278,7 +274,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Also close the other pages if doCloseOthers is true
 	 */
 	public function open(transitionDataShow:TransitionData = null, transitionDataHide:TransitionData = null, doCloseOthers:Bool = true, preventTransitions:Bool = false, recordInHistory:Bool=true) 
-	{ //trace("open - "+doCloseOthers+" - name="+name+" - "+preventTransitions);
+	{ 
 		if (doCloseOthers)
 		{
 			closeOthers(transitionDataHide, preventTransitions);
@@ -302,7 +298,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Close all other pages
 	 */
 	public function closeOthers(transitionData:TransitionData = null, preventTransitions:Bool = false)
-	{ //trace("closeOthers("+transitionData+") - "+preventTransitions);
+	{ 
 		// find all the pages in this application and close them
 		var nodes = getPageNodes(brixInstanceId, groupElement);
 		for (idxPageNode in 0...nodes.length)
@@ -312,7 +308,7 @@ class Page extends DisplayObject, implements IGroupable
 			for (pageInstance in pageInstances)
 			{
 				if (pageInstance != this)
-				{ //trace("closing "+pageInstance.name);
+				{
 					pageInstance.close(transitionData, [name], preventTransitions);
 				}
 			}
@@ -324,7 +320,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * 
 	 */
 	public function doOpen(transitionData:TransitionData = null, preventTransitions:Bool = false)
-	{// trace("doOpen "+transitionData+", "+name+" - "+preventTransitions);
+	{
 
 		var transitionObserver = new TransitionObserver(this, EVENT_TYPE_OPEN_START, EVENT_TYPE_OPEN_STOP);
 
