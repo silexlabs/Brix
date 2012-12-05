@@ -117,7 +117,6 @@ class DomTools
 		for (idx in 0...baseArray.length)
 		{
 			if (urlArray.length < idx || baseArray[idx] != urlArray[idx]){
-				//trace("abs2rel found differenciation idx = "+idx+" ("+urlArray[idx]+" != "+baseArray[idx]+")");
 				// at this point, URLs are different
 				diffIdx = idx;
 				break;
@@ -248,9 +247,6 @@ class DomTools
 	static public function getElementBoundingBox(htmlDom:HtmlDom):BoundingBox{
 		if (htmlDom.nodeType != 1)
 			return null;
-
-		//trace("getElementBoundingBox "+htmlDom+" - "+htmlDom.offsetLeft+", "+htmlDom.offsetWidth);
-
 
 		// add the scroll offset of all container
 		// and the position of all positioned ancecestors
@@ -393,7 +389,6 @@ class DomTools
 	 */
 	static public function hasClass(element:HtmlDom, className:String, ?orderedClassName:Bool=false):Bool
 	{
-		//	trace(haxe.Stack.toString(haxe.Stack.callStack()));
 		if (element.className == null || element.className.trim() == "" || className == null || className.trim() == "") return false;
 
 		if (orderedClassName)
@@ -441,7 +436,6 @@ class DomTools
 	 */
 	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content", head:HtmlDom=null):Hash<String>{
 		var res:Hash<String> = new Hash();
-		//trace("setConfig META TAG "+metaName+" = " +metaValue);
 
 		// default value for document
 		if (head == null) 
@@ -560,7 +554,7 @@ class DomTools
 		// browse all tags in the head section and check if it a base tag is already set
 		var head = Lib.document.getElementsByTagName("head")[0];
 		var baseNodes = Lib.document.getElementsByTagName("base");
-		trace("set base tag "+href+" -> "+DomTools.rel2abs(href));
+
 		href = DomTools.rel2abs(href);
 		if (baseNodes.length > 0){
 			trace("Warning: base tag already set in the head section. Current value (\""+baseNodes[0].getAttribute("href")+"\") will be replaced by \""+href+"\"");

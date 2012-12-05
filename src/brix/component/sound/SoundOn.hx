@@ -4,6 +4,7 @@ import js.Lib;
 import js.Dom;
 
 import brix.component.ui.DisplayObject;
+import brix.util.DomTools;
 
 /**
  * Let you specify a button to switch on/off the sound of the whole app
@@ -32,7 +33,7 @@ class SoundOn extends DisplayObject
 
 	override public function init()
 	{
-		mute(false);
+		DomTools.doLater(callback(mute,false));
 	}
 
 	/**
@@ -51,7 +52,6 @@ class SoundOn extends DisplayObject
 	 */
 	public static function mute(doMute:Bool)
 	{
-		trace("Sound mute "+doMute);
 		// mute/unmute audio tags
 		#if js
 			var audioTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("audio");

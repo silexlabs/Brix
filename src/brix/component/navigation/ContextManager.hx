@@ -66,7 +66,6 @@ class ContextManager extends DisplayObject
 	public function new(rootElement:HtmlDom, brixId:String)
 	{
 		super(rootElement, brixId);
-
 		// init context list
 		if (rootElement.getAttribute(PARAM_DATA_CONTEXT_LIST) != null)
 		{
@@ -98,7 +97,6 @@ class ContextManager extends DisplayObject
 	 */
 /*	private function onLayerShow(e:Event)
 	{
-		trace("onLayerShow ");
 		invalidate();
 	}
 	/** 
@@ -106,7 +104,6 @@ class ContextManager extends DisplayObject
 	 */
 	private function invalidate()
 	{
-		trace("invalidate "+isDirty);
 		// no more invalidation system is required since I changed the ContextManager to use styles instead of layers
 		//		if (isDirty == false)
 		//			DomTools.doLater(refresh);
@@ -121,7 +118,6 @@ class ContextManager extends DisplayObject
 	 */
 	public function setCurrentContexts(contextList:Array<ContextValue>):Array<ContextValue>
 	{
-		trace("setCurrentContexts "+contextList);
 		currentContexts = contextList;
 		invalidate();
 		return contextList;
@@ -131,7 +127,6 @@ class ContextManager extends DisplayObject
 	 */
 	public function addContext(context:ContextValue)
 	{
-		trace("addContext");
 		if (!isContext(context))
 		{
 			throw("Error: unknown context \""+context+"\". It should be defined in the \""+PARAM_DATA_CONTEXT_LIST+"\" parameter of the Context component.");
@@ -150,7 +145,6 @@ class ContextManager extends DisplayObject
 	 */
 	public function removeContext(context:ContextValue)
 	{
-		trace("removeContext "+context);
 		if (!isContext(context))
 		{
 			throw("Error: unknown context \""+context+"\". It should be defined in the \""+PARAM_DATA_CONTEXT_LIST+"\" parameter of the Context component.");
@@ -169,7 +163,6 @@ class ContextManager extends DisplayObject
 	 */
 	public function hasContext(context:ContextValue):Bool
 	{
-		// trace("hasContext "+context+" in "+currentContexts+" gives "+Lambda.has(allContexts, context));
 		return Lambda.has(currentContexts, context);
 	}
 	/**
@@ -177,7 +170,6 @@ class ContextManager extends DisplayObject
 	 */
 	public function isContext(context:ContextValue):Bool
 	{
-		//trace("isContext");
 		return Lambda.has(allContexts, context);
 	}
 	/**
@@ -187,7 +179,6 @@ class ContextManager extends DisplayObject
 	 */
 	public function isInContext(element:HtmlDom):Bool
 	{
-		//trace("isInContext "+element.className);
 		if (element.className != null)
 		{
 			var elementClasses = element.className.split(" ");
@@ -209,7 +200,6 @@ class ContextManager extends DisplayObject
 	 */
 	public function isOutContext(element:HtmlDom):Bool
 	{
-		//trace("isInContext "+element.className);
 		if (element.className != null)
 		{
 			var elementClasses = element.className.split(" ");
@@ -231,11 +221,9 @@ class ContextManager extends DisplayObject
 	 */
 	public function refresh()
 	{
-		trace("refresh "+currentContexts);
-
 		// reset css style
 		if (styleSheet != null){
-			Lib.document.getElementsByTagName("head")[0].removeChild(cast(styleSheet));	
+			getBrixApplication().htmlRootElement.getElementsByTagName("head")[0].removeChild(cast(styleSheet));	
 		}
 		var cssText = "";
 		for (context in allContexts){
@@ -245,7 +233,7 @@ class ContextManager extends DisplayObject
 			cssText += "."+context+" { display : inline; visibility : visible; } ";
 		}
 		// adds the css rules
-		styleSheet = DomTools.addCssRules(cssText);
+		styleSheet = DomTools.addCssRules(cssText, getBrixApplication().htmlRootElement);
 
 /*
 		// find all the layers which have the page name in their css class attribute
