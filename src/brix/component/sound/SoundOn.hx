@@ -33,7 +33,7 @@ class SoundOn extends DisplayObject
 
 	override public function init()
 	{
-		DomTools.doLater(callback(mute,false));
+		mute(false);
 	}
 
 	/**
@@ -43,7 +43,7 @@ class SoundOn extends DisplayObject
 	 */
 	private function onClick(e:Event)
 	{
-		mute(false);
+		DomTools.doLater(callback(mute, false));
 	}
 
 	/**

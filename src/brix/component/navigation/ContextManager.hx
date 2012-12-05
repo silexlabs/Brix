@@ -233,7 +233,7 @@ class ContextManager extends DisplayObject
 			cssText += "."+context+" { display : inline; visibility : visible; } ";
 		}
 		// adds the css rules
-		styleSheet = DomTools.addCssRules(cssText, getBrixApplication().htmlRootElement);
+		styleSheet = DomTools.addCssRules(cssText);
 
 /*
 		// find all the layers which have the page name in their css class attribute

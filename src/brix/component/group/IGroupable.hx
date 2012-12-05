@@ -47,7 +47,7 @@ class Groupable
 		if (rootElement == null)
 		{
 			// look for a unique group id in the whole document
-			var groupElements = groupable.getBrixApplication().htmlRootElement.getElementsByClassName(groupId);
+			var groupElements = groupable.getBrixApplication().body.getElementsByClassName(groupId);
 			// check if we have one and only one group for this ID
 			if ( groupElements.length < 1 )
 			{

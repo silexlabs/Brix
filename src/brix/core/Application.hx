@@ -64,6 +64,11 @@ class Application
 	 */
 	public var htmlRootElement(default,null):HtmlDom;
 	/**
+	 * Use during int of components
+	 * After init all the nodes in body are moved to Lib.document.body
+	 */
+	public var body:HtmlDom;
+	/**
 	 * The potential arguments passed to the Brix Application class at instanciation.
 	 */
 	public var dataObject(default,null):Dynamic;
@@ -72,7 +77,7 @@ class Application
 	/**
 	 * For runtime only: the context containing the list of registered components, the embedded HTML...
 	 */
-	private var applicationContext:ApplicationContext;
+	private var applicationContext:ApplicationContext;	
 	#end
 	
 	/**
@@ -131,12 +136,14 @@ class Application
 				//we need to ensure first that the parent document is ready
 				Lib.window.onload = function(e:Event)
 				{ 
-					newApp.initDom(); 
-					newApp.initComponents(); 
+					newApp.initDom();
+					newApp.initComponents();
+					newApp.attachBody();
 				};
 			#else
-				newApp.initDom(); 
-				newApp.initComponents(); 
+				newApp.initDom();
+				newApp.initComponents();
+				newApp.attachBody();
 			#end
 
 		#end
@@ -156,6 +163,8 @@ class Application
 		this.nodeToCmpInstances = new Hash();
 		this.globalCompInstances = new Hash();
 		//this.metaParameters = new Hash();
+
+		body = Lib.document.createElement("div");
 
 		#if !macro
 		this.applicationContext = new ApplicationContext();
@@ -194,6 +203,23 @@ class Application
 		return newInstance;
 	}
 
+	/**
+	 * attach the content of the temporary body to the DOM
+	 */
+	public function attachBody() 
+	{
+		// attach the content of the temporary body to the DOM
+/* do not work: the group component and other components go up in the dom untill they reach the body, and they store a ref to the body
+		while(body.firstChild != null)
+		{
+			Lib.document.body.appendChild(body.firstChild);
+		}
+*/
+		Lib.document.body.appendChild(body);
+		
+		// update the application body
+		body = Lib.document.body;
+	}
 	/**
 	 * Initialize the application on a given node.
 	 * @param	?appendTo	optional, the parent application's node to which to hook this Brix application. By default or if
@@ -235,15 +261,43 @@ class Application
 		// at macro time, htmlRootElement == Lib.document.documentElement so we already have the source html in 
 		// htmlRootElement.innerHTML
 		#if (!macro && !disableEmbedHtml)
+			// **
+			// split the body and head containers
+			var lowerCaseHtml:String = ApplicationContext.htmlDocumentElement.toLowerCase();
+			// split and remove the content between the body tags
+			var bodyOpenIdx = lowerCaseHtml.indexOf("<body>");
+			if (bodyOpenIdx == -1) bodyOpenIdx = lowerCaseHtml.indexOf("<body ");
+			var bodyCloseIdx = lowerCaseHtml.indexOf("</body>");
+
+			if (bodyOpenIdx <= -1 || bodyCloseIdx <= -1)
+			{
+				throw("Error: body tag not found or malformed.");
+			}
+
+			// look for the first ">" after "<body"
+			var closingTagIdx = lowerCaseHtml.indexOf(">", bodyOpenIdx);
+			
+			// extract the body section
+			var documentString:String = ApplicationContext.htmlDocumentElement.substring(0, bodyOpenIdx);
+			var bodyString:String = ApplicationContext.htmlDocumentElement.substring(closingTagIdx + 1, bodyCloseIdx);
+			documentString += ApplicationContext.htmlDocumentElement.substr(bodyCloseIdx+"</body>".length);
+
+			// **
+			// set the body to the temporary DOM (do not attach to the browser DOM yet)
+			body.innerHTML = bodyString;
+
+			// **
+			// set the head to the document
 			var updateRootRef:Bool = (htmlRootElement == Lib.document.documentElement);
+			htmlRootElement.innerHTML = documentString;
 
-			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
+//			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
 			//htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
-
 			if (updateRootRef)
 			{
 				htmlRootElement = Lib.document.documentElement; // needed for cocktail
 			}
+
 		#end
 	}
 	
@@ -275,9 +329,8 @@ class Application
 		createGlobalComponents();
 
 		// create the UI components instances
-		initNode(htmlRootElement);
+		initNode(body);
 	}
-	
 	/**
 	 * Parses and initializes all declared components on a given node.
 	 * 
@@ -323,7 +376,7 @@ class Application
 			{
 				// we remove this brix id attribute as it has been set before Application
 				// startup (in html src, at compilation or on server side for example)
-				node .removeAttribute(BRIX_ID_ATTR_NAME);
+				node.removeAttribute(BRIX_ID_ATTR_NAME);
 			}
 			else
 			{	// TODO / FIXME we may support calling initNode on a already initialized node
@@ -389,7 +442,6 @@ class Application
 		for (cc in 0...node.childNodes.length)
 		{
 			var res = createUIComponents(node.childNodes[cc]);
-
 			if (res != null)
 			{
 				compsToInit = Lambda.concat( compsToInit, res );
