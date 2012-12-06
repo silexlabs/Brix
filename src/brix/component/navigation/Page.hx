@@ -95,13 +95,13 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, brixId:String, root:HtmlDom = null)
 	{
-		// default is the whole document
-		var document:Dynamic = root;
+		// default is the whole body
+		var body:Dynamic = root;
 		if (root == null)
-			document = Application.get(brixId).htmlRootElement;
+			body = Application.get(brixId).body;
 
 		// find the pages to open
-		var page = getPageByName(pageName, brixId, document);
+		var page = getPageByName(pageName, brixId, body);
 		if (page == null)
 		{
 			// look in the main application
@@ -119,13 +119,13 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlDom = null)
 	{ 
-		// default is the whole document
-		var document:Dynamic = root;
+		// default is the whole body
+		var body:Dynamic = root;
 		if (root == null)
-			document = Application.get(brixId).htmlRootElement;
+			body = Application.get(brixId).body;
 
 		// find the pages to open
-		var page = getPageByName(pageName, brixId, document);
+		var page = getPageByName(pageName, brixId, body);
 		if (page == null)
 		{
 			// look in the main application
@@ -142,14 +142,15 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	static public function getPageNodes(brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
 	{
-		// default is the hole document
-		var document:HtmlDom = root;
+		// default is the hole body
+		var body:HtmlDom = root;
 		if (root == null)
 		{
-			document = Application.get(brixId).htmlRootElement;
+			body = Application.get(brixId).body;
 		}
+
 		// get all pages, i.e. all elements with class name "Page"
-		return document.getElementsByClassName(Page.CLASS_NAME);
+		return body.getElementsByClassName(Page.CLASS_NAME);
 	}
 
 	/** 
@@ -157,13 +158,13 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	static public function getPageByName(pageName:String, brixId:String, root:HtmlDom = null):Null<Page>
 	{
-		// default is the hole document
-		var document:Dynamic = root;
+		// default is the hole body
+		var body:Dynamic = root;
 		if (root == null)
-			document = Application.get(brixId).htmlRootElement;
+			body = Application.get(brixId).body;
 
 		// get all pages, i.e. all element with class name "page"
-		var pages:HtmlCollection<HtmlDom> = getPageNodes(brixId, document);
+		var pages:HtmlCollection<HtmlDom> = getPageNodes(brixId, body);
 		// browse all pages
 		for (pageIdx in 0...pages.length)
 		{
@@ -197,7 +198,7 @@ class Page extends DisplayObject, implements IGroupable
 		// group element is body element by default
 		if (groupElement == null)
 		{
-			groupElement = getBrixApplication().htmlRootElement;
+			groupElement = getBrixApplication().body;
 		}
 		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
 		if (name == null || name.trim() == "")
@@ -206,7 +207,7 @@ class Page extends DisplayObject, implements IGroupable
 		}
 
 		if (useDeeplink == null)
-			useDeeplink = (DomTools.getMeta(CONFIG_USE_DEEPLINK, getBrixApplication().htmlRootElement) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK, getBrixApplication().htmlRootElement) == "true");
+			useDeeplink = (DomTools.getMeta(CONFIG_USE_DEEPLINK) == null || DomTools.getMeta(CONFIG_USE_DEEPLINK) == "true");
 
 		if (useDeeplink)
 		{
@@ -255,7 +256,7 @@ class Page extends DisplayObject, implements IGroupable
 		// open if it is the default page and there is no deeplink nor history
 		else 
 #end
-		if (DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME, getBrixApplication().htmlRootElement) == name 
+		if (DomTools.getMeta(CONFIG_INITIAL_PAGE_NAME) == name 
 			|| groupElement.getAttribute(ATTRIBUTE_INITIAL_PAGE_NAME) == name )
 		{
 			open(null, null, true, true);
@@ -302,6 +303,7 @@ class Page extends DisplayObject, implements IGroupable
 	{ 
 		// find all the pages in this application and close them
 		var nodes = getPageNodes(brixInstanceId, groupElement);
+
 		for (idxPageNode in 0...nodes.length)
 		{
 			var pageNode = nodes[idxPageNode];
