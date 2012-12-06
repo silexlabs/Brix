@@ -263,12 +263,22 @@ class Application
 		#if (!macro && !disableEmbedHtml)
 			// **
 			// split the body and head containers
-			var lowerCaseHtml:String = ApplicationContext.htmlDocumentElement.toLowerCase();
-			// split and remove the content between the body tags
-			var bodyOpenIdx = lowerCaseHtml.indexOf("<body>");
-			if (bodyOpenIdx == -1) bodyOpenIdx = lowerCaseHtml.indexOf("<body ");
-			var bodyCloseIdx = lowerCaseHtml.indexOf("</body>");
+			var htmlString:String = ApplicationContext.htmlDocumentElement;
+			var lowerCaseHtml:String = htmlString.toLowerCase();
 
+			// remove the <html> and </html> tags
+			var htmlOpenIdx = lowerCaseHtml.indexOf("<html");
+			var htmlCloseIdx = lowerCaseHtml.indexOf("</html>");
+			if (htmlOpenIdx > -1 && htmlCloseIdx > -1)
+			{
+				var closingTagIdx = lowerCaseHtml.indexOf(">", htmlOpenIdx);
+				lowerCaseHtml = lowerCaseHtml.substring(closingTagIdx+1, htmlCloseIdx);
+				htmlString = htmlString.substring(closingTagIdx+1, htmlCloseIdx);
+			}
+
+			// split and remove the content between the body tags
+			var bodyOpenIdx = lowerCaseHtml.indexOf("<body");
+			var bodyCloseIdx = lowerCaseHtml.indexOf("</body>");
 			if (bodyOpenIdx <= -1 || bodyCloseIdx <= -1)
 			{
 				throw("Error: body tag not found or malformed.");
@@ -278,9 +288,9 @@ class Application
 			var closingTagIdx = lowerCaseHtml.indexOf(">", bodyOpenIdx);
 			
 			// extract the body section
-			var documentString:String = ApplicationContext.htmlDocumentElement.substring(0, bodyOpenIdx);
-			var bodyString:String = ApplicationContext.htmlDocumentElement.substring(closingTagIdx + 1, bodyCloseIdx);
-			documentString += ApplicationContext.htmlDocumentElement.substr(bodyCloseIdx+"</body>".length);
+			var documentString:String = htmlString.substring(0, closingTagIdx+1);
+			var bodyString:String = htmlString.substring(closingTagIdx + 1, bodyCloseIdx);
+			documentString += htmlString.substr(bodyCloseIdx);
 
 			// **
 			// set the body to the temporary DOM (do not attach to the browser DOM yet)
@@ -290,14 +300,12 @@ class Application
 			// set the head to the document
 			var updateRootRef:Bool = (htmlRootElement == Lib.document.documentElement);
 			htmlRootElement.innerHTML = documentString;
-
-//			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
-			//htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
+			//htmlRootElement.innerHTML = htmlString;
+			//htmlRootElement.outerHTML = htmlString;
 			if (updateRootRef)
 			{
 				htmlRootElement = Lib.document.documentElement; // needed for cocktail
 			}
-
 		#end
 	}
 	
