@@ -123,6 +123,9 @@ class Application
 	 */
 	static public function main()
 	{
+		#if redirectFlashTraces
+			haxe.Firebug.redirectTraces();
+		#end
 		#if !noAutoStart
 
 			#if brixdebug
