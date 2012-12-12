@@ -209,7 +209,7 @@ class Application
 	/**
 	 * attach the content of the temporary body to the DOM
 	 */
-	public function attachBody() 
+	public function attachBody(?appendTo:Null<HtmlDom>) 
 	{
 		// attach the content of the temporary body to the DOM
 /* do not work: the group component and other components go up in the dom untill they reach the body, and they store a ref to the body
@@ -218,10 +218,16 @@ class Application
 			Lib.document.body.appendChild(body.firstChild);
 		}
 */
-		Lib.document.body.appendChild(body);
+		if (appendTo == null)
+		{
+			appendTo = Lib.document.body;
+		}
+		// attache the body to the DOM
+		if (body.parentNode == null)
+			appendTo.appendChild(body);
 		
 		// update the application body
-		body = Lib.document.body;
+		body = appendTo;
 	}
 	/**
 	 * Initialize the application on a given node.
@@ -309,6 +315,8 @@ class Application
 			{
 				htmlRootElement = Lib.document.documentElement; // needed for cocktail
 			}
+		#else
+			body = Lib.document.body;
 		#end
 	}
 	
