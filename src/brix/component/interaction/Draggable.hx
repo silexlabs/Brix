@@ -310,7 +310,7 @@ class Draggable extends DisplayObject, implements IGroupable
 
 			// dispatch event so that other components can change the phantom style
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_DRAG, false, false, {
+			event.initCustomEvent(EVENT_DRAG, true, true, {
 				dropZone : bestDropZone,
 				target: rootElement,
 				draggable: this,
@@ -338,7 +338,7 @@ class Draggable extends DisplayObject, implements IGroupable
 				
 				// dispatch a custom event
 				var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-				event.initCustomEvent(EVENT_DROPPED, false, false, {
+				event.initCustomEvent(EVENT_DROPPED, true, true, {
 					dropZone : bestDropZone,
 					target: bestDropZone.parent,
 					draggable: this,
@@ -348,7 +348,7 @@ class Draggable extends DisplayObject, implements IGroupable
 			}
 			// dispatch a custom event
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_DROPPED, false, false, {
+			event.initCustomEvent(EVENT_DROPPED, true, true, {
 				dropZone : bestDropZone,
 				target: rootElement,
 				draggable: this,
@@ -406,7 +406,7 @@ class Draggable extends DisplayObject, implements IGroupable
 
 			// dispatch a custom event
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_MOVE, false, false, {
+			event.initCustomEvent(EVENT_MOVE, true, true, {
 				dropZone : bestDropZone,
 				target: rootElement,
 				draggable: this,
