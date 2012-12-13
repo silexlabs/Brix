@@ -123,8 +123,16 @@ class Application
 	 */
 	static public function main()
 	{
-		#if redirectFlashTraces
-			haxe.Firebug.redirectTraces();
+		#if redirectTraces
+			if (haxe.Firebug.detect())
+			{
+				haxe.Firebug.redirectTraces();
+				trace("Brix redirect traces to console");
+			}
+			else
+			{
+				trace("Warning: Brix can not redirect traces to console, because no console was found");
+			}
 		#end
 		#if !noAutoStart
 
