@@ -93,6 +93,7 @@ class Layer extends DisplayObject
 		status = notInit;
 		// Store the transition data for use in onEnd
 		styleAttrDisplay = rootElement.style.display;
+		trace("Layer initial display="+styleAttrDisplay);
 	}
 	/** 
 	 * Retrieve the given layer of this application or group
@@ -306,8 +307,7 @@ class Layer extends DisplayObject
 			doShow(transitionData, transitionObserver, preventTransitions, null);
 		}
 		// set or reset style.display
-		//rootElement.style.display=styleAttrDisplay;
-		rootElement.style.display=null;
+		rootElement.style.display=styleAttrDisplay;
 	}
 	/**
 	 * transition is over
