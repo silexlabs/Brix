@@ -155,7 +155,9 @@ class NotificationManager extends DisplayObject
 			}
 			else
 			{
-				requestPermission(callback(sendNotification, e.detail), callback(sendCustomNotification, e.detail));
+				//requestPermission(callback(sendNotification, e.detail), callback(sendCustomNotification, e.detail));
+				requestPermission(null, null);
+				sendCustomNotification(e.detail);
 			}
 		}
 		else
