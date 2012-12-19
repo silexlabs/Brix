@@ -89,7 +89,7 @@ class DomTools
 		// check that we have absolute urls
 		if (idx == -1)
 		{
-			trace("Warning, could not make URL relative because it is relative already - could not find pattern \"://\". Now returns "+initialUrl);
+			//trace("Warning, could not make URL relative because it is relative already - could not find pattern \"://\". Now returns "+initialUrl);
 			return initialUrl;
 		}
 		else
@@ -106,7 +106,7 @@ class DomTools
 		// check that there is a common domain name
 		if (baseArray[0] != urlArray[0])
 		{
-			trace("Warning, could not make URL relative because the url is absolute external url - "+urlArray[0]+" != "+baseArray[0]+". Now returns initial URL "+initialUrl);
+			//trace("Warning, could not make URL relative because the url is absolute external url - "+urlArray[0]+" != "+baseArray[0]+". Now returns initial URL "+initialUrl);
 			// the url is absolute external url
 			return initialUrl;
 		}
