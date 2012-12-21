@@ -39,11 +39,11 @@ class NotificationManager extends DisplayObject
 	/**
 	 * success image 
 	 */
-	public static inline var DEFAULT_SUCCESS_ICON = "../admin/assets/notification-info.png";
+	public static inline var DEFAULT_SUCCESS_ICON = "assets/admin/notification-info.png";
 	/**
 	 * error image 
 	 */
-	public static inline var DEFAULT_ERROR_ICON = "../admin/assets/notification-error.png";
+	public static inline var DEFAULT_ERROR_ICON = "assets/admin/notification-error.png";
 	/**
 	 * class name to set on the node which is the notification zone
 	 */
@@ -123,7 +123,7 @@ class NotificationManager extends DisplayObject
 
 		// for the native notification system
 		initNotificationsCallback = callback(initNotifications);
-		rootElement.addEventListener("click", initNotificationsCallback, false);
+		rootElement.addEventListener("click", cast(initNotificationsCallback), false);
 
 		// listen to the other components events
 		rootElement.addEventListener(NOTIFICATION_EVENT, cast(onNotificationReceived), false);
@@ -136,7 +136,10 @@ class NotificationManager extends DisplayObject
 			trace("initNotifications");
 			requestPermission(null, null);
 		}
-		rootElement.removeEventListener("click", initNotificationsCallback, false);
+		rootElement.removeEventListener("click", cast(initNotificationsCallback), false);
+
+		// in order to not load ::icon:: at start, this will be changed by javascript
+		rootElement.style.display = "inline-block";
 	}
 	/**
 	 * callback for the notificaiton event
@@ -173,14 +176,23 @@ class NotificationManager extends DisplayObject
 	 */
 	private function hasNotification():Bool
 	{
+#if js
 		return untyped window.webkitNotifications != null;
+#else
+		return false;
+#end
+
 	}
 	/**
 	 * check if notification permission is granted
 	 */
 	private function hasPermission():Bool
 	{
+#if js
 		return hasNotification() && untyped window.webkitNotifications.checkPermission() == 0;
+#else
+		return false;
+#end
 	}
 	/**
 	 * callback for the permission request 
@@ -204,6 +216,7 @@ class NotificationManager extends DisplayObject
 	 */
 	private function requestPermission(?acceptCallback:Void->Void=null, ?denyCallback:Void->Void=null) 
 	{
+#if js
 		trace("requestPermission ");
 		if (hasNotification())
 		{
@@ -220,12 +233,14 @@ class NotificationManager extends DisplayObject
 		{
 			trace("NO NOTIFICATION SYSTEM");
 		}
+#end
 	}
 	/**
 	 * send a notification
 	 */
 	private function sendNotification(e:NotificationEvent, ?duration:Int=DEFAULT_MESSAGE_DURATION) 
 	{
+#if js
 		trace("sendNotification "+e);
 		if (!hasNotification())
 		{
@@ -245,6 +260,7 @@ class NotificationManager extends DisplayObject
 		{
 			Timer.delay(callback(destroyNotification,notification), duration);
 		}
+#end
 	}
 	/**
 	 * destroy a previously created notification
