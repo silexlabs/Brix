@@ -563,11 +563,20 @@ class DomTools
 		else{
 			var node = Lib.document.createElement("base");
 			node.setAttribute("href", href);
-			node.setAttribute("target", "_self");
 			if (head.childNodes.length>0)
 				head.insertBefore(node, head.childNodes[0]);
 			else
 				head.appendChild(node);
+		}
+	}
+	/**
+	 * Remove the base tag
+	 */
+	public static function removeBaseTag(){
+		// browse all tags in the head section and check if it a base tag is already set
+		var baseNodes = Lib.document.getElementsByTagName("base");
+		while (baseNodes.length > 0){
+			baseNodes[0].parentNode.removeChild(baseNodes[0]);
 		}
 	}
 	/**
@@ -582,8 +591,11 @@ class DomTools
 		// defaults to the document location
 		if (base == null)
 		{
-			// todo: use location
-			base = Lib.window.location.href;
+			// check if there is a file name in the location, i.e. */*.* pattern 
+			var idxSlash = Lib.window.location.href.lastIndexOf("/");
+			var idxDot = Lib.window.location.href.lastIndexOf(".");
+			if (idxSlash < idxDot) base = base = Lib.window.location.href.substr(0, idxSlash+1);
+			else base = Lib.window.location.href;
 		}
 #end
 		return base;
