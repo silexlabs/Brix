@@ -21,12 +21,9 @@ class LinkAddContext extends LinkContextBase
 	/**
 	 * to be implemented in sub classes
 	 */
-	override public function doContextAction(contextManager : ContextManager) 
+	override public function onClick(e:Event) 
 	{
-		var links = linkName.split("#");
-		for (link in links)
-		{
-			contextManager.addContext(link);
-		}
+		super.onClick(e);
+		dispatchContextEvent(ContextManager.EVENT_ADD_CONTEXTS);
 	}
 }
