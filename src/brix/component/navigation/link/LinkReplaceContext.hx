@@ -21,8 +21,9 @@ class LinkReplaceContext extends LinkContextBase
 	/**
 	 * to be implemented in sub classes
 	 */
-	override public function doContextAction(contextManager : ContextManager) 
+	override public function onClick(e:Event) 
 	{
-		contextManager.setCurrentContexts(linkName.split("#"));
+		super.onClick(e);
+		dispatchContextEvent(ContextManager.EVENT_REPLACE_CONTEXTS);
 	}
 }
