@@ -14,6 +14,7 @@ import Xml;
 
 import brix.util.DomTools;
 import brix.component.navigation.Page;
+import brix.component.navigation.ContextManager;
 import brix.component.ui.DisplayObject;
 
 /**
@@ -49,6 +50,7 @@ class LayoutBase extends DisplayObject
 		Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, false);
 		Lib.document.addEventListener(Page.EVENT_TYPE_OPEN_STOP, redrawCallback, false);
 		Lib.document.addEventListener(Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, false);
+		Lib.document.addEventListener(ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, false);
 	}
 	/**
 	 * init the component
