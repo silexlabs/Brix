@@ -13,6 +13,7 @@ import js.Dom;
 import Xml;
 
 import brix.util.DomTools;
+import brix.component.navigation.Page;
 import brix.component.ui.DisplayObject;
 
 /**
@@ -46,6 +47,8 @@ class LayoutBase extends DisplayObject
 		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
 
 		Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, false);
+		Lib.document.addEventListener(Page.EVENT_TYPE_OPEN_STOP, redrawCallback, false);
+		Lib.document.addEventListener(Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, false);
 	}
 	/**
 	 * init the component
@@ -71,6 +74,7 @@ class LayoutBase extends DisplayObject
 		if (preventRedraw){
 			return;
 		}
+		trace("redraw layout");
 		preventRedraw = true;
 		// dispatch a custom event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
