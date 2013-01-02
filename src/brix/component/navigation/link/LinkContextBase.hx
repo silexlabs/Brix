@@ -8,6 +8,7 @@
  */
 package brix.component.navigation.link;
 
+import brix.component.navigation.ContextManager;
 import brix.core.Application;
 import brix.util.DomTools;
 
