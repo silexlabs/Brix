@@ -186,7 +186,7 @@ class ContextManager extends DisplayObject
 		//			DomTools.doLater(refresh);
 		refresh();
 		isDirty = true;
-
+trace("dispatch change");
 		// dispatch a change event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_CONTEXT_CHANGE, false, false, currentContexts);
