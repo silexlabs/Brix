@@ -306,7 +306,8 @@ class Draggable extends DisplayObject, implements IGroupable
 			Lib.document.body.addEventListener("mousemove", cast(moveCallback), false);
 
 			//rootElement.style.position = "absolute";
-			move(e);
+			//move(e);
+			DomTools.moveTo(rootElement, boundingBox.x, boundingBox.y);
 
 			// dispatch event so that other components can change the phantom style
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
@@ -380,6 +381,14 @@ class Draggable extends DisplayObject, implements IGroupable
 		DomTools.moveTo(rootElement, currentMouseX-initialMouseX, currentMouseY-initialMouseY);
 		invalidateBestDropZone();
 
+		// dispatch a custom event
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_MOVE, true, true, {
+			dropZone : bestDropZone,
+			target: rootElement,
+			draggable: this,
+		});
+		rootElement.dispatchEvent(event);
 	}
 	var currentMouseX:Int;
 	var currentMouseY:Int;
@@ -403,15 +412,6 @@ class Draggable extends DisplayObject, implements IGroupable
 
 			// position of the dragged element under the mouse
 			//DomTools.moveTo(rootElement, elementX, elementY);
-
-			// dispatch a custom event
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_MOVE, true, true, {
-				dropZone : bestDropZone,
-				target: rootElement,
-				draggable: this,
-			});
-			rootElement.dispatchEvent(event);
 		}
 	}
 	/**
