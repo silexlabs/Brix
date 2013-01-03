@@ -61,13 +61,12 @@ class LayoutBase extends DisplayObject
 		super.init();
 
 		// redraw
-		DomTools.doLater(redraw);
+		//DomTools.doLater(redraw);
 	}
 	/**
 	 * call redraw when an event occures
 	 */
 	public function redrawCallback(e:Event){
-		trace("redrawCallback");
 		redraw();
 	}
 
@@ -79,7 +78,6 @@ class LayoutBase extends DisplayObject
 		if (preventRedraw){
 			return;
 		}
-		trace("redraw layout");
 		preventRedraw = true;
 		// dispatch a custom event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
