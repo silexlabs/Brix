@@ -148,7 +148,7 @@ class List<ElementClass> extends DisplayObject
 		{
 			try
 			{
-				listInnerHtml += t.execute(elem, TemplateMacros);
+				listInnerHtml += t.execute(elem, getTemplateMacros());
 			}
 			catch(e:Dynamic){
 				throw("Error: an error occured while interpreting the template - "+listTemplate+" - for the element "+elem);
@@ -289,6 +289,21 @@ class List<ElementClass> extends DisplayObject
 			}
 		}
 	}
+	
+	/**
+	 * Return an object containing functions.Those
+	 * function wil become callable from the haxe template.
+	 * 
+	 * see Macro paragraph here :
+	 * http://haxe.org/doc/cross/template
+	 * 
+	 * Override in inheriting lists to provide own set of methods
+	 */
+	private function getTemplateMacros():Dynamic
+	{
+		return TemplateMacros;
+	}
+	
 	////////////////////////////////////////////////////////////
 	// setter / getter
 	////////////////////////////////////////////////////////////
