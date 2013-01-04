@@ -21,12 +21,9 @@ class LinkRemoveContext extends LinkContextBase
 	/**
 	 * to be implemented in sub classes
 	 */
-	override public function doContextAction(contextManager : ContextManager) 
+	override public function onClick(e:Event) 
 	{
-		var links = linkName.split("#");
-		for (link in links)
-		{
-			contextManager.removeContext(link);
-		}
+		super.onClick(e);
+		dispatchContextEvent(ContextManager.EVENT_REMOVE_CONTEXTS);
 	}
 }

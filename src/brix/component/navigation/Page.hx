@@ -89,6 +89,12 @@ class Page extends DisplayObject, implements IGroupable
 	 */
 	public var groupElement:HtmlDom;
 
+	/**
+	 * holds the query string data contained
+	 * in the link which opened the page
+	 */
+	public var query:Dynamic;
+	
 	/** 
 	 * Open the page with the given "name" attribute
 	 * This will close other pages
@@ -100,15 +106,27 @@ class Page extends DisplayObject, implements IGroupable
 		if (root == null)
 			body = Application.get(brixId).body;
 
+		//split url path and query string if any
+		var pageURL = pageName.split("?");
+			
 		// find the pages to open
-		var page = getPageByName(pageName, brixId, body);
+		var page = getPageByName(pageURL[0], brixId, body);
 		if (page == null)
 		{
 			// look in the main application
-			page = getPageByName(pageName, brixId);
+			page = getPageByName(pageURL[0], brixId);
 			if (page == null)
 				throw("Error, could not find a page with name "+pageName);
 		}
+		
+		//if query string present, update the query
+		//of the opened page
+		page.query = { };
+		if (pageURL[1] != null)
+		{
+			updateQuery(page, pageURL[1]);
+		}
+		
 		// open the page as a page or a popup
 		page.open(transitionDataShow, transitionDataHide, !isPopup);
 	}
@@ -182,6 +200,20 @@ class Page extends DisplayObject, implements IGroupable
 		}
 		return null;
 	}
+	
+	/**
+	 * Parse a query string and set it on the opened
+	 * page
+	 */
+	static function updateQuery(page:Page, queryString:String)
+	{
+		var queryParams = queryString.split("&");
+		for ( i in 0...queryParams.length)
+		{
+			var param = queryParams[i].split("=");
+			Reflect.setField(page.query, param[0], param[1]);
+		}
+	}
 
 	/**
 	 * constructor
@@ -191,7 +223,7 @@ class Page extends DisplayObject, implements IGroupable
 	public function new(rootElement:HtmlDom, brixId:String) 
 	{
 		super(rootElement, brixId);
-
+		
 		// implementation of IGroupable
 		startGroupable();
 

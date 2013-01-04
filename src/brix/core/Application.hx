@@ -123,6 +123,17 @@ class Application
 	 */
 	static public function main()
 	{
+		#if redirectTraces
+			if (haxe.Firebug.detect())
+			{
+				haxe.Firebug.redirectTraces();
+				trace("Brix redirect traces to console");
+			}
+			else
+			{
+				trace("Warning: Brix can not redirect traces to console, because no console was found");
+			}
+		#end
 		#if !noAutoStart
 
 			#if brixdebug
@@ -206,7 +217,7 @@ class Application
 	/**
 	 * attach the content of the temporary body to the DOM
 	 */
-	public function attachBody() 
+	public function attachBody(?appendTo:Null<HtmlDom>) 
 	{
 		// attach the content of the temporary body to the DOM
 /* do not work: the group component and other components go up in the dom untill they reach the body, and they store a ref to the body
@@ -215,10 +226,16 @@ class Application
 			Lib.document.body.appendChild(body.firstChild);
 		}
 */
-		Lib.document.body.appendChild(body);
+		if (appendTo == null)
+		{
+			appendTo = Lib.document.body;
+		}
+		// attache the body to the DOM
+		if (body.parentNode == null)
+			appendTo.appendChild(body);
 		
 		// update the application body
-		body = Lib.document.body;
+		body = appendTo;
 	}
 	/**
 	 * Initialize the application on a given node.
@@ -263,12 +280,22 @@ class Application
 		#if (!macro && !disableEmbedHtml)
 			// **
 			// split the body and head containers
-			var lowerCaseHtml:String = ApplicationContext.htmlDocumentElement.toLowerCase();
-			// split and remove the content between the body tags
-			var bodyOpenIdx = lowerCaseHtml.indexOf("<body>");
-			if (bodyOpenIdx == -1) bodyOpenIdx = lowerCaseHtml.indexOf("<body ");
-			var bodyCloseIdx = lowerCaseHtml.indexOf("</body>");
+			var htmlString:String = ApplicationContext.htmlDocumentElement;
+			var lowerCaseHtml:String = htmlString.toLowerCase();
 
+			// remove the <html> and </html> tags
+			var htmlOpenIdx = lowerCaseHtml.indexOf("<html");
+			var htmlCloseIdx = lowerCaseHtml.indexOf("</html>");
+			if (htmlOpenIdx > -1 && htmlCloseIdx > -1)
+			{
+				var closingTagIdx = lowerCaseHtml.indexOf(">", htmlOpenIdx);
+				lowerCaseHtml = lowerCaseHtml.substring(closingTagIdx+1, htmlCloseIdx);
+				htmlString = htmlString.substring(closingTagIdx+1, htmlCloseIdx);
+			}
+
+			// split and remove the content between the body tags
+			var bodyOpenIdx = lowerCaseHtml.indexOf("<body");
+			var bodyCloseIdx = lowerCaseHtml.indexOf("</body>");
 			if (bodyOpenIdx <= -1 || bodyCloseIdx <= -1)
 			{
 				throw("Error: body tag not found or malformed.");
@@ -278,9 +305,9 @@ class Application
 			var closingTagIdx = lowerCaseHtml.indexOf(">", bodyOpenIdx);
 			
 			// extract the body section
-			var documentString:String = ApplicationContext.htmlDocumentElement.substring(0, bodyOpenIdx);
-			var bodyString:String = ApplicationContext.htmlDocumentElement.substring(closingTagIdx + 1, bodyCloseIdx);
-			documentString += ApplicationContext.htmlDocumentElement.substr(bodyCloseIdx+"</body>".length);
+			var documentString:String = htmlString.substring(0, closingTagIdx+1);
+			var bodyString:String = htmlString.substring(closingTagIdx + 1, bodyCloseIdx);
+			documentString += htmlString.substr(bodyCloseIdx);
 
 			// **
 			// set the body to the temporary DOM (do not attach to the browser DOM yet)
@@ -290,14 +317,14 @@ class Application
 			// set the head to the document
 			var updateRootRef:Bool = (htmlRootElement == Lib.document.documentElement);
 			htmlRootElement.innerHTML = documentString;
-
-//			htmlRootElement.innerHTML = ApplicationContext.htmlDocumentElement;
-			//htmlRootElement.outerHTML = ApplicationContext.htmlDocumentElement;
+			//htmlRootElement.innerHTML = htmlString;
+			//htmlRootElement.outerHTML = htmlString;
 			if (updateRootRef)
 			{
 				htmlRootElement = Lib.document.documentElement; // needed for cocktail
 			}
-
+		#else
+			body = Lib.document.body;
 		#end
 	}
 	
