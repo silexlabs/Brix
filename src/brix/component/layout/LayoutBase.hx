@@ -13,6 +13,8 @@ import js.Dom;
 import Xml;
 
 import brix.util.DomTools;
+import brix.component.navigation.Page;
+import brix.component.navigation.ContextManager;
 import brix.component.ui.DisplayObject;
 
 /**
@@ -45,7 +47,12 @@ class LayoutBase extends DisplayObject
 		// do not compile: Lib.window.addEventListener("resize", redraw, false);
 		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
 
-		Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, false);
+		Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, true);
+		Lib.document.addEventListener(Page.EVENT_TYPE_OPEN_STOP, redrawCallback, true);
+		Lib.document.addEventListener(Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, true);
+		Lib.document.addEventListener(ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, true);
+
+		Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, true);
 	}
 	/**
 	 * init the component
@@ -54,7 +61,7 @@ class LayoutBase extends DisplayObject
 		super.init();
 
 		// redraw
-		DomTools.doLater(redraw);
+		//DomTools.doLater(redraw);
 	}
 	/**
 	 * call redraw when an event occures
@@ -80,14 +87,5 @@ class LayoutBase extends DisplayObject
 		});
 		rootElement.dispatchEvent(event);
 		preventRedraw = false;
-	}
-	/**
-	 * throw a redraw event for the other layouts
-	 */
-	public static function redrawLayouts(){
-		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(EVENT_LAYOUT_REDRAW, true, true, {});
-		Lib.document.dispatchEvent(event);
 	}
 }

@@ -11,6 +11,7 @@ package brix.component.navigation;
 import brix.component.navigation.Layer;
 import brix.component.ui.DisplayObject;
 import brix.util.DomTools;
+import brix.core.Application;
 
 import js.Dom;
 import js.Lib;
@@ -19,6 +20,12 @@ import js.Lib;
  * the value for a context
  */
 typedef ContextValue = String;
+
+/**
+ * the value for the context events
+ * use as event.detail for the add/remove events
+ */
+typedef ContextEventDetail = Array<ContextValue>;
 
 /**
  * The ContextManager component is a component that is in charge to show/hide Layer components when they are in/out of context
@@ -42,6 +49,26 @@ class ContextManager extends DisplayObject
 	 */
 	public static inline var PARAM_DATA_INITIAL_CONTEXT = "data-initial-context";
 	/**
+	 * name of the event dispatched when the context changes
+	 */
+	public static inline var EVENT_CONTEXT_CHANGE = "changeContextEvent";
+	/**
+	 * name of the event which you can dispatch from your components to change the value of the contexts
+	 */
+	public static inline var EVENT_ADD_CONTEXTS = "addContextsEvent";
+	/**
+	 * name of the event which you can dispatch from your components to change the value of the contexts
+	 */
+	public static inline var EVENT_REMOVE_CONTEXTS = "removeContextsEvent";
+	/**
+	 * name of the event which you can dispatch from your components to change the value of the contexts
+	 */
+	public static inline var EVENT_REPLACE_CONTEXTS = "replaceContextsEvent";
+	/**
+	 * name of the event which you can dispatch from your components to change the value of the contexts
+	 */
+	public static inline var EVENT_RESET_CONTEXTS = "resetContextsEvent";
+	/**
 	 * list of contexts
 	 * case incensitive
 	 */
@@ -60,6 +87,9 @@ class ContextManager extends DisplayObject
 	 * Stores the style node with the current context as visible 
 	 */
 	private static var styleSheet:HtmlDom;
+	///////////////////////////////////////////////////////////////
+	// main methods
+	///////////////////////////////////////////////////////////////
 	/**
 	 * Builds the Context with arguments passed in the html node attributes
 	 */
@@ -73,13 +103,29 @@ class ContextManager extends DisplayObject
 		}
 		else
 		{
-			throw("Error: Context global component needs param "+PARAM_DATA_CONTEXT_LIST);
+			throw("Error: Context component needs param in "+PARAM_DATA_CONTEXT_LIST);
 		}
+
+		// listen to other components events
+		rootElement.addEventListener(EVENT_ADD_CONTEXTS, cast(onAddContextEvent), true);
+		rootElement.addEventListener(EVENT_REMOVE_CONTEXTS, cast(onRemoveContextEvent), true);
+		rootElement.addEventListener(EVENT_RESET_CONTEXTS, cast(onResetContextEvent), true);
+		rootElement.addEventListener(EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
 	}
 	override public function init()
 	{
 		super.init();
 
+		// init current context
+		resetContexts();
+		// listen to the page open/close in order to refersh the contexts display
+		// rootElement.addEventListener(Layer.EVENT_TYPE_SHOW_START, onLayerShow, true);
+	}
+	/** 
+	 * reset contexts 
+	 */
+	private function resetContexts()
+	{
 		// init current context
 		if (rootElement.getAttribute(PARAM_DATA_INITIAL_CONTEXT) != null)
 		{
@@ -89,8 +135,39 @@ class ContextManager extends DisplayObject
 		{
 			currentContexts = new Array();
 		}
-		// listen to the page open/close in order to refersh the contexts display
-		// rootElement.addEventListener(Layer.EVENT_TYPE_SHOW_START, onLayerShow, true);
+	}
+	/** 
+	 * callback for a request comming from another brix component
+	 */
+	private function onAddContextEvent(e:CustomEvent)
+	{
+		var contextValues:Array<ContextValue> = cast(e.detail);
+		for (contextValue in contextValues)
+			addContext(contextValue);
+	}
+	/** 
+	 * callback for a request comming from another brix component
+	 */
+	private function onRemoveContextEvent(e:CustomEvent)
+	{
+		var contextValues:Array<ContextValue> = cast(e.detail);
+		for (contextValue in contextValues)
+			removeContext(contextValue);
+	}
+	/** 
+	 * callback for a request comming from another brix component
+	 */
+	private function onReplaceContextsEvent(e:CustomEvent)
+	{
+		var contextValues:Array<ContextValue> = cast(e.detail);
+		setCurrentContexts(contextValues);
+	}
+	/** 
+	 * callback for a request comming from another brix component
+	 */
+	private function onResetContextEvent(e:CustomEvent)
+	{
+		resetContexts();
 	}
 	/** 
 	 * callback for layer show
@@ -109,6 +186,11 @@ class ContextManager extends DisplayObject
 		//			DomTools.doLater(refresh);
 		refresh();
 		isDirty = true;
+trace("dispatch change");
+		// dispatch a change event
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_CONTEXT_CHANGE, false, false, currentContexts);
+		rootElement.dispatchEvent(event);
 	}
 	////////////////////////////////////////////////////////////
 	// The context API
@@ -233,7 +315,7 @@ class ContextManager extends DisplayObject
 			cssText += "."+context+" { display : inline; visibility : visible; } ";
 		}
 		// adds the css rules
-		styleSheet = DomTools.addCssRules(cssText, getBrixApplication().htmlRootElement);
+		styleSheet = DomTools.addCssRules(cssText);
 
 /*
 		// find all the layers which have the page name in their css class attribute

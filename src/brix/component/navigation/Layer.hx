@@ -99,15 +99,15 @@ class Layer extends DisplayObject
 	 */
 	static public function getLayerNodes(pageName:String="", brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
 	{
-		// default is the hole document
-		var document:Dynamic = root;
+		// default is the hole body
+		var body:Dynamic = root;
 		if (root == null)
-			document = Application.get(brixId).htmlRootElement;
+			body = Application.get(brixId).body;
 		if (pageName != "")
 			// get the desired layers, i.e. the elements with the page name as class name
-			return document.getElementsByClassName(pageName);
+			return body.getElementsByClassName(pageName);
 		else
-			return document.getElementsByClassName("Layer");
+			return body.getElementsByClassName("Layer");
 	}
 	//////////////////////////////////////////////////////
 	// Transitions
@@ -116,11 +116,14 @@ class Layer extends DisplayObject
 	private function setStatus(newStatus:LayerStatus):LayerStatus
 	{
 		status = newStatus;
+		#if (!php)
 		if(status == showTransition || status == hideTransition){
 			haxe.Timer.delay(checkForNeverEndingTransition, MAX_DELAY_FOR_TRANSITION);
 		}
+		#end
 		return status;
 	}
+	#if (!php)
 	private function checkForNeverEndingTransition() 
 	{
 		if(status == showTransition || status == hideTransition){
@@ -128,6 +131,7 @@ class Layer extends DisplayObject
 			haxe.Timer.delay(checkForNeverEndingTransition, MAX_DELAY_FOR_TRANSITION);
 		}
 	}
+	#end
 	/**
 	 * concat the css classes used for transition (in data-*)
 	 * if there is a transition, this will init the transition with the data-*-start style
@@ -306,8 +310,7 @@ class Layer extends DisplayObject
 			doShow(transitionData, transitionObserver, preventTransitions, null);
 		}
 		// set or reset style.display
-		//rootElement.style.display=styleAttrDisplay;
-		rootElement.style.display=null;
+		rootElement.style.display=styleAttrDisplay;
 	}
 	/**
 	 * transition is over
