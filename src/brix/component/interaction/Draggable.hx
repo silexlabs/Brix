@@ -85,7 +85,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * used for the invalidation process
 	 * 
 	 */
-	public static inline var DELAY_BETWEEN_DROP_ZONE_CHECKS = 500;
+	public static inline var DELAY_BETWEEN_DROP_ZONE_CHECKS = 100;
 
 	////////////////////////////////////
 	// events
@@ -116,7 +116,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	/**
 	 * div element used to show where the element is about to be dropped
 	 */
-	private var phantom:HtmlDom;
+	public var phantom:HtmlDom;
 	/**
 	 * div element used to compute the best drop zone
 	 * it is placed at every position and its distance to mouse cursor is measured
@@ -196,6 +196,10 @@ class Draggable extends DisplayObject, implements IGroupable
 			groupElement = Lib.document.body;
 		}
 
+		// create the phantom
+		phantom = Lib.document.createElement("div");
+		miniPhantom = Lib.document.createElement("div");
+
 		// init
 		state = none;
 
@@ -220,10 +224,6 @@ class Draggable extends DisplayObject, implements IGroupable
 	override public function init() : Void 
 	{
 		super.init();
-
-		// create the phantom
-		phantom = Lib.document.createElement("div");
-		miniPhantom = Lib.document.createElement("div");
 
 		// retrieve references to the elements
 		dragZone = DomTools.getSingleElement(rootElement, CSS_CLASS_DRAGZONE, false);
