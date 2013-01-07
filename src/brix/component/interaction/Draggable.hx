@@ -23,7 +23,8 @@ enum DraggableState {
 }
 typedef DropZone = {
 	parent:HtmlDom,
-	position:Int
+	position:Int,
+	boundingBox: BoundingBox,
 }
 typedef DraggableEvent = {
 	dropZone : Null<DropZone>,
@@ -184,8 +185,8 @@ class Draggable extends DisplayObject, implements IGroupable
 		super.init();
 
 		// create the phantom
-		phantom = Lib.document.createElement("div");
-		miniPhantom = Lib.document.createElement("div");
+		// in initPhantomStyle : phantom = Lib.document.createElement("div");
+		// in initPhantomStyle : miniPhantom = Lib.document.createElement("div");
 
 		// retrieve references to the elements
 		dragZone = DomTools.getSingleElement(rootElement, CSS_CLASS_DRAGZONE, false);
@@ -244,10 +245,14 @@ class Draggable extends DisplayObject, implements IGroupable
 		if (refHtmlDom == null) 
 			refHtmlDom = rootElement;
 
-miniPhantom.style.cssText= refHtmlDom.style.cssText;
-phantom.style.cssText= refHtmlDom.style.cssText;
+		trace("initPhantomStyle "+refHtmlDom.className+" - "+refHtmlDom.style.position);
+		// reset style
+		phantom = Lib.document.createElement("div");
+		miniPhantom = Lib.document.createElement("div");
 
-
+		// set all inline styles
+		phantom.style.cssText= refHtmlDom.style.cssText;
+		miniPhantom.style.cssText= refHtmlDom.style.cssText;
 
 		phantom.className = phantomClassName;
 		miniPhantom.className = phantomClassName;
@@ -258,7 +263,6 @@ phantom.style.cssText= refHtmlDom.style.cssText;
 		phantom.style.height = refHtmlDom.clientHeight + "px";
 		miniPhantom.style.width = refHtmlDom.clientWidth + "px";
 		miniPhantom.style.height = refHtmlDom.clientHeight + "px";
-
 	}
 	/**
 	 * init phantom according to root element properties
@@ -309,6 +313,9 @@ phantom.style.cssText= refHtmlDom.style.cssText;
 				draggable: this,
 			});
 			rootElement.dispatchEvent(event);
+
+			// init
+			createDropZoneArray();
 		}
 		// prevent default behavior
 		e.preventDefault();
@@ -356,6 +363,8 @@ phantom.style.cssText= refHtmlDom.style.cssText;
 			// Leave the event, in case we miss the mouseup event (happens when the mouse leave the browser window while down)
 			// Lib.document.body.removeEventListener("mouseup", mouseUpCallback, false);
 			setAsBestDropZone(null);
+			// reset 
+			deleteDropZoneArray();
 			// prevent default behavior
 			e.preventDefault();
 		}
@@ -410,7 +419,27 @@ phantom.style.cssText= refHtmlDom.style.cssText;
 	 * the closest drop zone
 	 */
 	public function getBestDropZone(mouseX:Int, mouseY:Int):Null<DropZone>
+	{trace("getBestDropZone "+dropZoneArray);
+		var nearestDropZone:DropZone = null;
+		var nearestDistance = 999999999.0;
+		for(dropZone in dropZoneArray)
+		{
+			var dist = computeDistance(dropZone.boundingBox, mouseX, mouseY);
+			if (dist < nearestDistance)
+			{
+				nearestDistance = dist;
+				nearestDropZone = dropZone;
+			}
+		}
+		return nearestDropZone;
+	}
+	private var dropZoneArray:Array<DropZone>;
+	public function deleteDropZoneArray()
 	{
+		dropZoneArray = null;
+	}
+	public function createDropZoneArray() 
+	{trace("createDropZoneArray "+miniPhantom.style.position+" - "+miniPhantom.className);
 		// retrieve references to the elements
 		var dropZones:List<HtmlDom> = new List();
 		var taggedDropZones = groupElement.getElementsByClassName(dropZonesClassName);
@@ -423,12 +452,10 @@ phantom.style.cssText= refHtmlDom.style.cssText;
 			dropZones.add(rootElement.parentNode);
 		}
 
-		var nearestDistance:Float = 999999999999;
-		var nearestZone:HtmlDom = null;
-		var lastChildIdx:Int = 0;
+		dropZoneArray = new Array();
+
 		for (zone in dropZones)
 		{
-			var bbZone = DomTools.getElementBoundingBox(zone);
 			// if the mouse is in the zone
 			if (zone.style.display != "none")
 			{
@@ -439,33 +466,25 @@ phantom.style.cssText= refHtmlDom.style.cssText;
 					// test the case before this child
 					zone.insertBefore(miniPhantom, child);
 					var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
-					var dist = computeDistance(bbPhantom, mouseX, mouseY);
-					if (dist < nearestDistance)
-					{
-						// new closest position
-						nearestDistance = dist;
-						nearestZone = zone;
-						lastChildIdx = childIdx;
-					}
+					trace ("new boundingBox "+bbPhantom);
+					dropZoneArray.push({
+						parent: zone,
+						position: childIdx,
+						boundingBox: bbPhantom,
+					});
 				}
 
 				// test the case of the last child
 				zone.appendChild(miniPhantom);
 				var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
-				var dist = computeDistance(bbPhantom, mouseX, mouseY);
-				if (dist < nearestDistance)
-				{
-					nearestDistance = dist;
-					nearestZone = zone;
-					lastChildIdx = zone.childNodes.length + 1;
-				}
+				dropZoneArray.push({
+					parent: zone,
+					position: zone.childNodes.length+1,
+					boundingBox: bbPhantom,
+				});
 				zone.removeChild(miniPhantom);
 			}
 		}
-		if (nearestZone != null)
-			return { parent: nearestZone, position: lastChildIdx }
-		else
-			return null;
 	}
 	/**
 	 * compute distance between the center of the bounding box and the mouse cursor
