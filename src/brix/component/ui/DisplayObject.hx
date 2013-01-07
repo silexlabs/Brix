@@ -9,6 +9,7 @@
 package brix.component.ui;
 
 import brix.core.Application;
+import brix.core.EventMap;
 
 import brix.component.IBrixComponent;
 using brix.component.IBrixComponent.BrixComponent;
@@ -54,6 +55,7 @@ class DisplayObject implements IDisplayObject
 {
 	/**
 	 * The id of the containing Brix Application instance.
+	 * FIXME to deprecate
 	 */
 	public var brixInstanceId : String;
 	/**
@@ -61,9 +63,14 @@ class DisplayObject implements IDisplayObject
 	 * components are dispatched to and listened from this DOM element.
 	 */
 	public var rootElement(default, null) : HtmlDom;
+	/**
+	 * The EventMap object managing the component's listeners subscriptions
+	 */
+	private var eventMap:EventMap;
 
 	/**
 	 * Returns the associated running Application instance.
+	 * FIXME to deprecate
 	 * 
 	 * @return	an Application object.
 	 */
@@ -80,17 +87,20 @@ class DisplayObject implements IDisplayObject
 	private function new(rootElement : HtmlDom, brixId:String) 
 	{
 		this.rootElement = rootElement;
+		
+		this.eventMap = new EventMap();
 
+		// FIXME about to be removed
 		initBrixComponent(brixId);
 
-		#if disableFastInit
+		#if disableFastInit // FIXME what if added at runtime ?
 			//check the @tagNameFilter constraints
 			checkFilterOnElt(Type.getClass(this) , rootElement);
 			//check the @requires constraints
 			BrixComponent.checkRequiredParameters(Type.getClass(this) , rootElement);
 		#end
 
-		getBrixApplication().addAssociatedComponent(rootElement, this);
+		getBrixApplication().addAssociatedComponent(rootElement, this); // FIXME about to be removed
 	}
 
 	/**
@@ -100,7 +110,31 @@ class DisplayObject implements IDisplayObject
 	{
 		clean();
 
-		getBrixApplication().removeAssociatedComponent(rootElement,this);
+		getBrixApplication().removeAssociatedComponent(rootElement,this); // FIXME about to be removed
+	}
+
+	/**
+	 * Registers an event listener.
+	 */
+	public function mapListener(dispatcher:Dynamic, type:String, listener:js.Event->Void, ?useCapture:Bool=false):Void
+	{
+		this.eventMap.mapListener(dispatcher, type, listener, useCapture);
+	}
+
+	/**
+	 * Unregisters an event listener.
+	 */
+	public function unmapListener(dispatcher:Dynamic, type:String, listener:js.Event->Void, ?useCapture:Bool=false):Void
+	{
+		this.eventMap.unmapListener(dispatcher, type, listener, useCapture);
+	}
+
+	/**
+	 * Unregister all event listeners registered through mapListener().
+	 */
+	public function unmapListeners():Void
+	{
+		this.eventMap.unmapListeners();
 	}
 
 	/**
