@@ -244,18 +244,10 @@ class Draggable extends DisplayObject, implements IGroupable
 		if (refHtmlDom == null) 
 			refHtmlDom = rootElement;
 
-		// set all inline styles
-		for (styleName in Reflect.fields(refHtmlDom.style))
-		{
-			try{
-				var val:String = Reflect.field(refHtmlDom.style, styleName);
-				Reflect.setField(phantom, styleName, val);
-				Reflect.setField(miniPhantom, styleName, val);
-			}
-			catch(e:Dynamic){
-				// some properties are read only
-			}
-		}
+miniPhantom.style.cssText= refHtmlDom.style.cssText;
+phantom.style.cssText= refHtmlDom.style.cssText;
+
+
 
 		phantom.className = phantomClassName;
 		miniPhantom.className = phantomClassName;
