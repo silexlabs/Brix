@@ -185,8 +185,8 @@ class Draggable extends DisplayObject, implements IGroupable
 		super.init();
 
 		// create the phantom
-		// in initPhantomStyle : phantom = Lib.document.createElement("div");
-		// in initPhantomStyle : miniPhantom = Lib.document.createElement("div");
+		phantom = Lib.document.createElement("div");
+		miniPhantom = Lib.document.createElement("div");
 
 		// retrieve references to the elements
 		dragZone = DomTools.getSingleElement(rootElement, CSS_CLASS_DRAGZONE, false);
@@ -245,20 +245,17 @@ class Draggable extends DisplayObject, implements IGroupable
 		if (refHtmlDom == null) 
 			refHtmlDom = rootElement;
 
-		trace("initPhantomStyle "+refHtmlDom.className+" - "+refHtmlDom.style.position);
-		// reset style
-		phantom = Lib.document.createElement("div");
-		miniPhantom = Lib.document.createElement("div");
-
 		// set all inline styles
 		phantom.style.cssText= refHtmlDom.style.cssText;
 		miniPhantom.style.cssText= refHtmlDom.style.cssText;
 
+		// set css classes
 		phantom.className = phantomClassName;
 		miniPhantom.className = phantomClassName;
 		phantom.className += " "+refHtmlDom.className;
 		miniPhantom.className += " "+refHtmlDom.className;
 
+		// force width and height
 		phantom.style.width = refHtmlDom.clientWidth + "px";
 		phantom.style.height = refHtmlDom.clientHeight + "px";
 		miniPhantom.style.width = refHtmlDom.clientWidth + "px";
@@ -419,7 +416,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * the closest drop zone
 	 */
 	public function getBestDropZone(mouseX:Int, mouseY:Int):Null<DropZone>
-	{trace("getBestDropZone "+dropZoneArray);
+	{
 		var nearestDropZone:DropZone = null;
 		var nearestDistance = 999999999.0;
 		for(dropZone in dropZoneArray)
@@ -439,7 +436,7 @@ class Draggable extends DisplayObject, implements IGroupable
 		dropZoneArray = null;
 	}
 	public function createDropZoneArray() 
-	{trace("createDropZoneArray "+miniPhantom.style.position+" - "+miniPhantom.className);
+	{
 		// retrieve references to the elements
 		var dropZones:List<HtmlDom> = new List();
 		var taggedDropZones = groupElement.getElementsByClassName(dropZonesClassName);
@@ -466,7 +463,6 @@ class Draggable extends DisplayObject, implements IGroupable
 					// test the case before this child
 					zone.insertBefore(miniPhantom, child);
 					var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
-					trace ("new boundingBox "+bbPhantom);
 					dropZoneArray.push({
 						parent: zone,
 						position: childIdx,
