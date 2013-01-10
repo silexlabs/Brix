@@ -85,7 +85,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * used for the invalidation process
 	 * 
 	 */
-	public static inline var DELAY_BETWEEN_DROP_ZONE_CHECKS = 100;
+	public static inline var DELAY_BETWEEN_DROP_ZONE_CHECKS = 10;
 
 	////////////////////////////////////
 	// events
