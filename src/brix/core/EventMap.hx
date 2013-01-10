@@ -53,7 +53,8 @@ class EventMap
 		if (!Lambda.exists(coll.get(dispatcher).get(type), function(l:js.Event->Void) { return Reflect.compareMethods(listener, l); }))
 		{
 			coll.get(dispatcher).get(type).add(listener);
-			dispatcher.addEventListener(type, listener, useCapture);
+
+			crossBrowserAddEventListener(dispatcher, type, listener, useCapture);
 		}
 	}
 
@@ -74,7 +75,8 @@ class EventMap
 			{
 				if (Reflect.compareMethods(listener, l))
 				{
-					dispatcher.removeEventListener(type, l, useCapture);
+					crossBrowserRemoveEventListener(dispatcher, type, l, useCapture);
+
 					coll.get(dispatcher).get(type).remove(l);
 					return;
 				}
@@ -96,7 +98,8 @@ class EventMap
 				{
 					for (l in c.get(d).get(t))
 					{
-						d.removeEventListener(t, l, useCapture);
+						crossBrowserRemoveEventListener(d, t, l, useCapture);
+
 						c.get(d).get(t).remove(l);
 					}
 					c.get(d).remove(t);
@@ -112,5 +115,43 @@ class EventMap
 		if (useCapture)
 			return capturingListeners;
 		return notCapturingListeners;
+	}
+
+	private function crossBrowserAddEventListener(dispatcher:Dynamic, type:String, listener:js.Event->Void, useCapture:Bool)
+	{
+#if js
+		untyped
+		{
+			if ( __js__("dispatcher.addEventListener") )
+			{
+#end
+				dispatcher.addEventListener(type, listener, useCapture);
+#if js
+			}
+			else if ( __js__("dispatcher.attachEvent") ) // IE<9 specific
+			{
+				dispatcher.attachEvent("on"+type, listener);
+			}
+		}
+#end
+	}
+
+	private function crossBrowserRemoveEventListener(dispatcher:Dynamic, type:String, listener:js.Event->Void, useCapture:Bool)
+	{
+#if js
+		untyped
+		{
+			if ( __js__("dispatcher.removeEventListener") )
+			{
+#end
+				dispatcher.removeEventListener(type, listener, useCapture);
+#if js
+			}
+			else if ( __js__("dispatcher.detachEvent") ) // IE<9 specific
+			{
+				dispatcher.detachEvent("on"+type, listener);
+			}
+		}
+#end
 	}
 }
