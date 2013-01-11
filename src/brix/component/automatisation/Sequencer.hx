@@ -8,6 +8,8 @@
  */
 package brix.component.automatisation;
 
+import haxe.Timer;
+
 import js.Lib;
 import js.Dom;
 
@@ -24,14 +26,31 @@ enum SequencerState {
 	// a blocking action is pending
 	waiting;
 }
-typedef Action = {
-	var onStart:Action->Void,
-	var onEnd:Action->Void,
-	var onCancel:Action->Void,
-	var metaData:Null<Dynamic>,
-	var blocking: Bool,
-	var timecode:Int,
+/**
+ * state of an action
+ */
+enum ActionState {
+	queued;
+	started;
+	ended;
 }
+/**
+ * actions data
+ */
+typedef Action = {
+	var onStart:Action->Void;
+	var onEnd:Action->Void;
+	var onCancel:Action->Void;
+	var metaData:Null<Dynamic>;
+	var blocking: Bool;
+	var timecode:Timecode;
+	var state:ActionState;
+}
+/**
+ * type for timecode values
+ * pass it in event.detail of the SET_TIMECODE_REQUEST
+ */
+typedef Timecode = Float;
 
 /**
  * Sequencer class
@@ -46,6 +65,10 @@ class Sequencer extends DisplayObject
 	////////////////////////////////////
 	// constants
 	////////////////////////////////////
+	/**
+	 * delay between 2 checks for the delayed actions
+	 */
+	public static inline var TIMER_DELAY = 250;
 	/**
 	 * name of the event dispatched on rootElement when actions have started/stoped
 	 */
@@ -72,14 +95,34 @@ class Sequencer extends DisplayObject
 	 */
 	public static inline var END_ACTION_REQUEST = "actionEndRequest";
 	/**
+	 * end the current blocking action and start the next
+	 */
+	public static inline var NEXT_ACTION_REQUEST = "actionNextRequest";
+	/**
 	 * name of the event which will provoque the current blocking action to be ended
 	 * this is the default event type, used when you do not provide an event type
 	 */
 	public static inline var CANCEL_ACTION_REQUEST = "actionCancelRequest";
+	/**
+	 * set the current time code 
+	 * by default the current timecode is the system time
+	 */
+	public static inline var SET_TIMECODE_REQUEST = "setTimecodeRequest";
 
 	////////////////////////////////////
 	// properties
 	////////////////////////////////////
+	/**
+	 * current time of the sequencer
+	 * use the event SET_TIMECODE_REQUEST event to set the current time code
+	 * by default the current timecode is the system time
+	 */
+	public var currentTimecode(getCurrentTimecode, null):Timecode;
+	/**
+	 * offset used to compute the timecode from the system current time
+	 * use the event SET_TIMECODE_REQUEST event to set the current time code 
+	 */
+	private var timecodeOffset:Timecode;
 	/**
 	 * state of the sequencer
 	 * @see SequencerState
@@ -93,6 +136,11 @@ class Sequencer extends DisplayObject
 	 * the registered blocking actions 
 	 */
 	private var actionsBlocking:Array<Action>;
+
+
+	////////////////////////////////////
+	// DisplayObject methods
+	////////////////////////////////////
 	/**
 	 * retrieve the appropriate actions array, depending on the type of action - blocking or not
 	 */
@@ -100,6 +148,13 @@ class Sequencer extends DisplayObject
 	{
 		return if(isBlocking) actionsBlocking;
 		else actionsNonBlocking;
+	}
+	/**
+	 * compute the current time code from the current system time and the offset
+	 */
+	private function getCurrentTimecode():Timecode
+	{
+		return Date.now().getTime() + timecodeOffset;
 	}
 
 	////////////////////////////////////
@@ -116,6 +171,16 @@ class Sequencer extends DisplayObject
 		state = stoped;
 		actionsBlocking = new Array();
 		actionsNonBlocking = new Array();
+		timecodeOffset = 0;
+
+		// attach the events
+		mapListener(rootElement, ADD_ACTION_REQUEST, onAddRequest, true);
+		mapListener(rootElement, START_ACTION_REQUEST, onStartRequest, true);
+		mapListener(rootElement, END_ACTION_REQUEST, onEndRequest, true);
+		mapListener(rootElement, CANCEL_ACTION_REQUEST, onCancelRequest, true);
+		mapListener(rootElement, NEXT_ACTION_REQUEST, onNextRequest, true);
+		mapListener(rootElement, SET_TIMECODE_REQUEST, onSetTimecodeRequest, true);
+
 	}
 	/**
 	 * init the component
@@ -124,11 +189,9 @@ class Sequencer extends DisplayObject
 	{
 		super.init();
 
-		// attach the events
-		mapListener(this, ADD_ACTION_REQUEST, onAddRequest, true);
-		mapListener(this, START_ACTION_REQUEST, onStartRequest, true);
-		mapListener(this, END_ACTION_REQUEST, onEndRequest, true);
-		mapListener(this, CANCEL_ACTION_REQUEST, onCancelRequest, true);
+		// timer for delayed events
+		var timer = new Timer(TIMER_DELAY);
+		timer.run = update;
 	}
 
 	////////////////////////////////////
@@ -166,7 +229,22 @@ class Sequencer extends DisplayObject
 		var action:Action = cast(e).detail;
 		cancel(action);
 	}
-	
+	/**
+	 * callback for the event
+	 */
+	public function onNextRequest(e:Event)
+	{
+		next();
+	}
+	/**
+	 * callback for the event
+	 */
+	public function onSetTimecodeRequest(e:Event)
+	{
+		var newTimecode:Timecode = cast(e).detail;
+		timecodeOffset = newTimecode - Date.now().getTime();
+	}
+
 	////////////////////////////////////
 	// Actions management callbacks
 	////////////////////////////////////
@@ -176,9 +254,6 @@ class Sequencer extends DisplayObject
 	 */
 	private function update()
 	{
-		// update time
-		update time
-
 		// start new blocking actions
 		if (state == stoped && actionsBlocking.length > 0)
 		{
@@ -191,9 +266,11 @@ class Sequencer extends DisplayObject
 		// start new non blocking actions
 		for (action in actionsNonBlocking)
 		{
-			if (currentTimecode > action.timecode)
+			if (action.state == queued && currentTimecode > action.timecode)
 			{
 				start(action);
+				// for optimization?
+				// break;
 			}
 		}
 	}
@@ -202,21 +279,29 @@ class Sequencer extends DisplayObject
 	 */
 	public function add(action:Action)
 	{
-		trace("add action "+action);
+		// push the action in the list
 		getActions(action.blocking).push(action);
+
+		// update the action state
+		action.state = queued;
+
+		// check sequences again
+		update();
 	}
 	/**
 	 * dispatch and event for the action start/stop/cancel
 	 */
 	public function start(action:Action)
 	{
-		if (Lambda.has(getActions(action.blocking), action)
+		if (Lambda.has(getActions(action.blocking), action))
 		{
-			// update the state 
+			// update the sequencer state
 			if (action.blocking)
 			{
 				state = waiting;
 			}
+			// update the action state
+			action.state = started;
 
 			// call the action callbacks
 			if(action.onStart != null)
@@ -239,16 +324,19 @@ class Sequencer extends DisplayObject
 	 */
 	public function end(action:Action)
 	{
+		// update the state 
+		if (action.blocking && actionsBlocking.length>0 && actionsBlocking[0]==action)
+		{
+			state = stoped;
+		}
+
 		// remove action 
 		var exists = getActions(action.blocking).remove(action);
 
 		if (exists)
 		{
-			// update the state 
-			if (action.blocking)
-			{
-				state = stoped;
-			}
+			// update the action state
+			action.state = ended;
 
 			// call the action callbacks
 			if(action.onEnd != null)
@@ -284,6 +372,8 @@ class Sequencer extends DisplayObject
 			{
 				state = waiting;
 			}
+			// update the action state
+			action.state = ended;
 
 			// call the action callbacks
 			if(action.onCancel != null)
@@ -302,6 +392,21 @@ class Sequencer extends DisplayObject
 		else
 		{
 			throw("could not cancel action "+action+" since it was not found.");
+		}
+	}
+	/**
+	 * dispatch and event for the action start/stop/cancel
+	 */
+	public function next()
+	{
+		if (actionsBlocking.length>0)
+		{
+			var action:Action = actionsBlocking[0];
+			end(action);
+		}
+		else
+		{
+			throw("could not skip to next action since there is no pending action.");
 		}
 	}
 }
