@@ -80,9 +80,12 @@ class TouchLink extends DisplayObject, implements IGroupable
 			detectDistance = Std.parseInt(attrStr);
 
 		// touch events
-		element.addEventListener("touchmove", onTouchMove, false);
-		element.addEventListener("touchstart", onTouchStart, false);
-		element.addEventListener("touchend", onTouchEnd, false);
+		//element.addEventListener("touchmove", onTouchMove, false);
+		mapListener(element,"touchmove", onTouchMove, false);
+		//element.addEventListener("touchstart", onTouchStart, false);
+		mapListener(element,"touchstart", onTouchStart, false);
+		//element.addEventListener("touchend", onTouchEnd, false);
+		mapListener(element,"touchend", onTouchEnd, false);
 		//rootElement.addEventListener("click", onClick, false);
 		//rootElement.onclick = onClick;
 

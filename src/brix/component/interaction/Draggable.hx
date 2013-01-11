@@ -231,10 +231,12 @@ class Draggable extends DisplayObject, implements IGroupable
 			dragZone = rootElement;
 
 		// attach the events
-		dragZone.addEventListener("mousedown", cast(startDrag), false);
+		//dragZone.addEventListener("mousedown", cast(startDrag), false);
+		mapListener(dragZone,"mousedown", cast(startDrag), false);
 		//dragZone.onmouseup = stopDrag;
-		mouseUpCallback = callback(stopDrag);
-		Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
+		//mouseUpCallback = callback(stopDrag);
+		//Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
+		mapListener(Lib.document.body,"mouseup", stopDrag, false);
 		dragZone.style.cursor = "move";
 	}
 	
@@ -247,8 +249,8 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		super.clean();
 
-		dragZone.removeEventListener("mousedown", cast(startDrag), false);
-		Lib.document.body.removeEventListener("mouseup", cast(mouseUpCallback), false);
+		//dragZone.removeEventListener("mousedown", cast(startDrag), false);
+		//Lib.document.body.removeEventListener("mouseup", cast(mouseUpCallback), false);
 	}
 	
 	////////////////////////////////////
@@ -329,7 +331,8 @@ class Draggable extends DisplayObject, implements IGroupable
 	{
 		// start listening to the mouse move envent
 		moveCallback = callback(move);
-		Lib.document.body.addEventListener("mousemove", cast(moveCallback), false);
+		//Lib.document.body.addEventListener("mousemove", cast(moveCallback), false);
+		mapListener(Lib.document.body, "mousemove", cast(moveCallback), false);
 
 		// prevent default behavior
 		e.preventDefault();
@@ -390,7 +393,8 @@ class Draggable extends DisplayObject, implements IGroupable
 	 */
 	public function stopDrag(e:MouseEvent)
 	{
-		Lib.document.body.removeEventListener("mousemove", cast(moveCallback), false);
+		//Lib.document.body.removeEventListener("mousemove", cast(moveCallback), false);
+		unmapListener(Lib.document.body, "mousemove", cast(moveCallback), false);
 		if (state == dragging)
 		{
 			// change parent node

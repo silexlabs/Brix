@@ -244,7 +244,7 @@ class Page extends DisplayObject, implements IGroupable
 		if (useDeeplink)
 		{
 			// listen to the history api changes
-			Lib.window.addEventListener("popstate", onPopState, true);
+			mapListener(Lib.window, "popstate", onPopState, true);
 		}
 	}
 

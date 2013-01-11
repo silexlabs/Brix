@@ -316,9 +316,12 @@ class Application
 			// **
 			// set the head to the document
 			var updateRootRef:Bool = (htmlRootElement == Lib.document.documentElement);
-			htmlRootElement.innerHTML = documentString;
+
+			//htmlRootElement.innerHTML = documentString;
+			brix.util.DomTools.innerHTML(htmlRootElement, documentString);
 			//htmlRootElement.innerHTML = htmlString;
 			//htmlRootElement.outerHTML = htmlString;
+
 			if (updateRootRef)
 			{
 				htmlRootElement = Lib.document.documentElement; // needed for cocktail

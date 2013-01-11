@@ -79,7 +79,8 @@ class LinkBase extends DisplayObject, implements IGroupable
 		startGroupable();
 		
 		// catch the click
-		rootElement.addEventListener("click", onClick, false);
+		//rootElement.addEventListener("click", onClick, false);
+		mapListener(rootElement,"click", onClick, false);
 		// show that it is clickable
 		rootElement.style.cursor = "pointer";
 
