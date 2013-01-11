@@ -318,6 +318,12 @@ class Page extends DisplayObject, implements IGroupable
 		// history API
 		if (recordInHistory && useDeeplink)
 		{
+#if js
+			untyped
+			{
+				if ( __js__("window.history.pushState") )
+				{
+#end
 			Lib.window.history.pushState({
 					name: name,
 					transitionDataShow: transitionDataShow,
@@ -325,7 +331,11 @@ class Page extends DisplayObject, implements IGroupable
 					doCloseOthers: doCloseOthers,
 					preventTransitions: preventTransitions,
 				}, name, "?/"+name);
-		} 
+#if js
+				}
+			}
+#end
+		}
 	}
 
 	/**
