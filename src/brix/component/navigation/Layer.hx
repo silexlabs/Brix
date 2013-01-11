@@ -213,13 +213,18 @@ class Layer extends DisplayObject
 	 */
 	private function addTransitionEvent(onEndCallback:Event->Void)
 	{
-		rootElement.addEventListener("transitionend", onEndCallback, false);
+		//rootElement.addEventListener("transitionend", onEndCallback, false);
+		mapListener(rootElement, "transitionend", onEndCallback, false);
 	#if js
 		// only for pure js, not for cocktail compilation
-		rootElement.addEventListener("transitionEnd", onEndCallback, false);
-		rootElement.addEventListener("webkitTransitionEnd", onEndCallback, false);
-		rootElement.addEventListener("oTransitionEnd", onEndCallback, false);
-		rootElement.addEventListener("MSTransitionEnd", onEndCallback, false);
+		//rootElement.addEventListener("transitionEnd", onEndCallback, false);
+		mapListener(rootElement, "transitionEnd", onEndCallback, false);
+		//rootElement.addEventListener("webkitTransitionEnd", onEndCallback, false);
+		mapListener(rootElement, "webkitTransitionEnd", onEndCallback, false);
+		//rootElement.addEventListener("oTransitionEnd", onEndCallback, false);
+		mapListener(rootElement, "oTransitionEnd", onEndCallback, false);
+		//rootElement.addEventListener("MSTransitionEnd", onEndCallback, false);
+		mapListener(rootElement, "MSTransitionEnd", onEndCallback, false);
 	#end
 	}
 
@@ -228,13 +233,18 @@ class Layer extends DisplayObject
 	 */
 	private function removeTransitionEvent(onEndCallback:Event->Void)
 	{
-		rootElement.removeEventListener("transitionend", onEndCallback, false);
+		//rootElement.removeEventListener("transitionend", onEndCallback, false);
+		unmapListener(rootElement,"transitionend", onEndCallback, false);
 	#if js
 		// only for pure js, not for cocktail compilation
-		rootElement.removeEventListener("transitionEnd", onEndCallback, false);
-		rootElement.removeEventListener("webkitTransitionEnd", onEndCallback, false);
-		rootElement.removeEventListener("oTransitionEnd", onEndCallback, false);
-		rootElement.removeEventListener("MSTransitionEnd", onEndCallback, false);
+		//rootElement.removeEventListener("transitionEnd", onEndCallback, false);
+		unmapListener(rootElement,"transitionEnd", onEndCallback, false);
+		//rootElement.removeEventListener("webkitTransitionEnd", onEndCallback, false);
+		unmapListener(rootElement,"webkitTransitionEnd", onEndCallback, false);
+		//rootElement.removeEventListener("oTransitionEnd", onEndCallback, false);
+		unmapListener(rootElement,"oTransitionEnd", onEndCallback, false);
+		//rootElement.removeEventListener("MSTransitionEnd", onEndCallback, false);
+		unmapListener(rootElement,"MSTransitionEnd", onEndCallback, false);
 	#end
 	}
 

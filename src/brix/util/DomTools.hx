@@ -614,4 +614,102 @@ class DomTools
 		return false;
 	#end
 	}
+
+	/**
+	 * Cross-browser innerHTML accessor for DOM nodes
+	 * @param node HtmlDom
+	 * @param optional, a value to set
+	 * @return String
+	 */
+	static public function innerHTML(node:HtmlDom, ?content:String=null):String
+	{
+#if js
+		if (content!=null && node.nodeName == "HTML" && Lib.window.navigator.userAgent.toLowerCase().indexOf("msie")>-1) //IE specific
+		{
+			content=StringTools.replace(content, "<HEAD>", "<BRIXHEAD>");
+			content=StringTools.replace(content, "</HEAD>", "</BRIXHEAD>");
+			content=StringTools.replace(content, "<BODY>", "<BRIXBODY>");
+			content=StringTools.replace(content, "</BODY>", "</BRIXBODY>");
+			var tempNode = Lib.document.createElement("DIV");
+			tempNode.innerHTML = content;
+
+			//clean existing DOM tree
+			while (node.attributes.length>0)
+			{
+				node.removeAttribute(node.attributes[0].nodeName);
+			}
+			var head = node.getElementsByTagName("HEAD");
+			if (head.length > 0)
+			{
+				while (head[0].hasChildNodes())
+				{
+					head[0].removeChild(head[0].firstChild);
+				}
+			}
+			var body = node.getElementsByTagName("BODY");
+			if (body.length > 0)
+			{
+				while (body[0].attributes.length>0)
+				{
+					body[0].removeAttribute(body[0].attributes[0].nodeName);
+				}
+				while (body[0].hasChildNodes())
+				{
+					body[0].removeChild(body[0].firstChild);
+				}
+			}
+
+			//assemble new DOM tree
+			while (tempNode.attributes.length>0)
+			{
+				node.setAttribute(tempNode.attributes[0].nodeName, tempNode.attributes[0].nodeValue);
+				tempNode.removeAttribute(tempNode.attributes[0].nodeName);
+			}
+			var tempHead = tempNode.getElementsByTagName("BRIXHEAD");
+			var head = node.getElementsByTagName("HEAD");
+			if (tempHead.length > 0)
+			{
+				if (head.length == 0)
+				{
+					if (node.hasChildNodes())
+					{
+						node.insertBefore( Lib.document.createElement("HEAD"), node.firstChild );
+					}
+					else
+					{
+						node.appendChild( Lib.document.createElement("HEAD") );
+					}
+				}
+				while (tempHead[0].hasChildNodes())
+				{
+					head[0].appendChild(tempHead[0].removeChild(tempHead[0].childNodes[0]));
+				}
+			}
+			var tempBody = tempNode.getElementsByTagName("BRIXBODY");
+			var body = node.getElementsByTagName("BODY");
+			if (tempBody.length > 0)
+			{
+				if (body.length == 0)
+				{
+					node.appendChild( Lib.document.createElement("BODY") );
+				}
+				while (tempBody[0].attributes.length>0)
+				{
+					body[0].setAttribute(tempBody[0].attributes[0].nodeName, tempBody[0].attributes[0].nodeValue);
+					tempBody[0].removeAttribute(tempBody[0].attributes[0].nodeName);
+				}
+				while (tempBody[0].hasChildNodes())
+				{
+					body[0].appendChild(tempBody[0].removeChild(tempBody[0].childNodes[0]));
+				}
+			}
+			return node.innerHTML;
+		}
+#end
+		if (content != null)
+		{
+			node.innerHTML = content;
+		}
+		return node.innerHTML;
+	}	
 }
