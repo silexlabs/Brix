@@ -186,7 +186,6 @@ class ContextManager extends DisplayObject
 		//			DomTools.doLater(refresh);
 		refresh();
 		isDirty = true;
-trace("dispatch change");
 		// dispatch a change event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_CONTEXT_CHANGE, false, false, currentContexts);
@@ -219,7 +218,7 @@ trace("dispatch change");
 			invalidate();
 		}
 		else{
-			trace("Warning: Could not add the context \""+context+"\" to the current context, because it is allready in the currentContexts array.");
+			//trace("Warning: Could not add the context \""+context+"\" to the current context, because it is allready in the currentContexts array.");
 		}
 	}
 	/**
@@ -237,7 +236,7 @@ trace("dispatch change");
 			invalidate();
 		}
 		else{
-			trace("Warning: Could not remove the context \""+context+"\" from the current context, because it is not in the currentContexts array.");
+			//trace("Warning: Could not remove the context \""+context+"\" from the current context, because it is not in the currentContexts array.");
 		}
 	}
 	/**
