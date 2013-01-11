@@ -14,7 +14,6 @@ import brix.component.interaction.Draggable;
 
 import brix.util.DomTools;
 
-import brix.component.ui.DisplayObject;
 import brix.component.template.TemplateMacros;
 
 /**
@@ -28,11 +27,12 @@ import brix.component.template.TemplateMacros;
  * 	selected indexes / items
  */
 @tagNameFilter("ul")
-class List<ElementClass> extends DisplayObject
+class List<ElementClass> extends Repeater<ElementClass>
 {
+	/**
+	 * css class applyed to the selected item in the DOM
+	 */
 	public static inline var LIST_SELECTED_ITEM_CSS_CLASS:String = "listSelectedItem";
-	public static inline var DATA_ATTR_LIST_ITEM_INDEX:String = "data-list-item-idx";
-
 	/**
 	 * event dispatched when the selection changes
 	 */
@@ -45,16 +45,6 @@ class List<ElementClass> extends DisplayObject
 	 * event dispatched when an item is hovered
 	 */
 	public static inline var EVENT_ROLL_OVER:String = "listRollOver";
-
-	/**
-	 * list elements template
-	 * @example 	&lt;li&gt;::displayName::&lt;/li&gt;
-	 */
-	public var listTemplate:String;
-	/**
-	 * data store
-	 */
-	public var dataProvider:Array<ElementClass>;
 	/**
 	 * selected item if any
 	 */
@@ -62,21 +52,14 @@ class List<ElementClass> extends DisplayObject
 	/**
 	 * selected item index, in the dataProvider array, or -1 of there is no selected index
 	 */
-	public var selectedIndex(getSelectedIndex, setSelectedIndex):Int;
-	private var _selectedIndex:Int;
+	public var selectedIndex(default, setSelectedIndex):Int;
 	/**
 	 * constructor
 	 */
 	public function new(rootElement:HtmlDom, brixId:String)
 	{
 		super(rootElement, brixId);
-		_selectedIndex = -1;
-		dataProvider = [];
-
-		// store the template
-		listTemplate = rootElement.innerHTML;
-		// and clear the rootElement contents
-		rootElement.innerHTML = "";
+		selectedIndex = -1;
 	}
 	/**
 	 * init the component
@@ -88,130 +71,9 @@ class List<ElementClass> extends DisplayObject
 		// init the parent class
 		super.init();
 
-		rootElement.addEventListener("click", click, false);
-		rootElement.addEventListener("rollOver", rollOver, false);
-		rootElement.addEventListener(Draggable.EVENT_DROPPED, listDOMChanged, false);
-	}
-
-	/**
-	 * Cleans the list object before removal.
-	 */
-	override public function clean() : Void
-	{
-		super.clean();
-
-		rootElement.removeEventListener("click", click, false);
-		rootElement.removeEventListener("rollOver", rollOver, false);
-		rootElement.removeEventListener(Draggable.EVENT_DROPPED, listDOMChanged, false);
-	}
-
-	/**
-	 * redraw the list, i.e. reload the dataProvider( ... )
-	 * this method calls reloadData which then calls doRedraw
-	 */ 
-	public function redraw()
-	{
-		// refresh list data
-		reloadData();
-	}
-	/**
-	 * Triggered when the list's DOM tree has changed.
-	 */
-	public function listDOMChanged(?e:Event):Void
-	{
-		e.stopPropagation();
-		var newDataProvider:Array<ElementClass> = new Array();
-		// re-order the items in the dataprovider according to the DOM
-		for (i in 0...rootElement.childNodes.length)
-		{
-			if (rootElement.childNodes[i].nodeType != rootElement.nodeType || 
-				rootElement.childNodes[i].getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
-			{
-				continue;
-			}
-			// TODO support new elts with no DATA_ATTR_LIST_ITEM_INDEX attribute yet (need retro-template for that)
-			newDataProvider.push(dataProvider[Std.parseInt(rootElement.childNodes[i].getAttribute(DATA_ATTR_LIST_ITEM_INDEX))]);
-		}
-		dataProvider = newDataProvider;
-		// reset the item ids
-		setItemIds(true);
-	}
-	/**
-	 * redraw the list without calling reloadData
-	 */
-	public function doRedraw()
-	{
-		// redraw list content
-		var listInnerHtml:String = "";
-		var t = new haxe.Template(listTemplate);
-		for (elem in dataProvider)
-		{
-			try
-			{
-				listInnerHtml += t.execute(elem, TemplateMacros);
-			}
-			catch(e:Dynamic){
-				throw("Error: an error occured while interpreting the template - "+listTemplate+" - for the element "+elem);
-			}
-		}
-
-		for (i in 0...rootElement.childNodes.length)
-		{
-			getBrixApplication().cleanNode(rootElement.childNodes[i]);
-		}
-
-		rootElement.innerHTML = listInnerHtml;
-
-		for (i in 0...rootElement.childNodes.length)
-		{
-			getBrixApplication().initNode(rootElement.childNodes[i]);
-		}
-
-		setItemIds();
-		updateSelectionDisplay([selectedItem]);
-	}
-	/**
-	 * refreh list data, and then redraw the display by calling doRedraw
-	 * to be overriden to handle the model or do nothing if you manipulate the list and dataProvider by composition
-	 * if you override this, either call super.reloadData() to redraw immediately, or call doRedraw() when the data is ready
-	 */
-	public function reloadData():Void
-	{
-		doRedraw();
-	}
-	/**
-	 * Set ids on the items.
-	 */
-	private function setItemIds(?reset=false):Void
-	{
-		var idx = 0;
-		for (i in 0...rootElement.childNodes.length)
-		{
-			if (rootElement.childNodes[i].nodeType != rootElement.nodeType ||
-				reset && rootElement.childNodes[i].getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
-			{
-				continue;
-			}
-			rootElement.childNodes[i].setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
-			idx++;
-		}
-	}
-
-	/**
-	 * retrieves the id of the item containing a given node
-	 * @param the given DOM node
-	 */
-	public function getItemIdx(childElement:HtmlDom):Int
-	{
-		if (childElement == rootElement || childElement == null)
-		{
-			throw("Error, could not find the element clicked in the list.");
-		}
-		if (childElement.nodeType != rootElement.nodeType || childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
-		{
-			return getItemIdx(childElement.parentNode);
-		}
-		return Std.parseInt(childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX));
+		mapListener(rootElement, "click", click, false);
+		mapListener(rootElement, "rollOver", rollOver, false);
+		mapListener(rootElement, Draggable.EVENT_DROPPED, listDOMChanged, false);
 	}
 	/**
 	 * handle click in the list
@@ -248,6 +110,15 @@ class List<ElementClass> extends DisplayObject
 		});
 		rootElement.dispatchEvent(event);
 	}
+	/**
+	 * redraw the list without calling reloadData
+	 */
+	override public function doRedraw()
+	{
+		super.doRedraw();
+		updateSelectionDisplay([selectedItem]);
+	}
+
 	/**
 	 * handle a selection change
 	 * call onChange if defined
@@ -297,7 +168,7 @@ class List<ElementClass> extends DisplayObject
 	 */
 	function getSelectedItem():Null<ElementClass> 
 	{
-		return dataProvider[_selectedIndex];
+		return dataProvider[selectedIndex];
 	}
 	/**
 	 * getter/setter
@@ -331,22 +202,22 @@ class List<ElementClass> extends DisplayObject
 	 */
 	function getSelectedIndex():Int 
 	{
-		return _selectedIndex;
+		return selectedIndex;
 	}
 	/**
 	 * getter/setter
 	 */
 	function setSelectedIndex(idx:Int):Int 
 	{
-		if (idx != _selectedIndex)
+		if (idx != selectedIndex)
 		{
 			if (idx >= 0 && dataProvider.length > idx && dataProvider[idx] != null)
 			{
-				_selectedIndex = idx;
+				selectedIndex = idx;
 			}
 			else
 			{
-				_selectedIndex = -1;
+				selectedIndex = -1;
 			}
 			updateSelectionDisplay([selectedItem]);
 

@@ -1,0 +1,9 @@
+-js bin/test.js
+
+-main brix.core.Application
+--macro brix.core.Builder.create('test.html')
+
+-cp ../../../../Brix/src
+-cp ../../../../Cocktail/src
+-cp ../../../src
+-D stopOnError

@@ -187,5 +187,9 @@ class DisplayObject implements IDisplayObject
 	/**
 	 * Override this method if you need some special logic on your component when removing it.
 	 */
-	public function clean() : Void { }
+	public function clean() : Void 
+	{
+		// release the event listeners
+		unmapListeners();
+	}
 }

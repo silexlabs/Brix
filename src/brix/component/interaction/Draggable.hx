@@ -23,7 +23,8 @@ enum DraggableState {
 }
 typedef DropZone = {
 	parent:HtmlDom,
-	position:Int
+	position:Int,
+	boundingBox: BoundingBox,
 }
 typedef DraggableEvent = {
 	dropZone : Null<DropZone>,
@@ -36,6 +37,13 @@ typedef DraggableEvent = {
  * Attach mouse events to a "drag zone" and make it drag/drop the "Draggable" node
  * If drop zones are provided, display the best drop zone found and enable only these zones to be parents
  * define the drop zones with a "drop-zone" class name on the elements, or by setting the dropZones attribute
+ * 
+ * We use two divs called phantoms and mini phantoms:
+ * - the phantom is placed where the dragged element is about to be inserted, when a "best drop zone" was found
+ * - the mini-phantom is placed consecutively at each position in the DOM where the element can be droped, and its bounding box is computed, this is used to compute the best drop zone
+ * The phantoms have all the same css classes and inline style as the rootElement, so that computation of the best drop zone is accurate
+ * 
+ * there is an invalidation process to limit the number of search for a better drop zone to one every x seconds
  * FIXME: Not compatible with android native browser because of custom events
  */
 class Draggable extends DisplayObject, implements IGroupable
@@ -47,7 +55,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	public var groupElement:HtmlDom;
 
 	////////////////////////////////////
-	// events
+	// constants
 	////////////////////////////////////
 	/**
 	 * class name to set on the node which is the drag zone (knob or header)
@@ -73,7 +81,15 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * the dropZonesClassName class name is to be set on the nodes which accept drops
 	 */
 	public static inline var ATTR_DROPZONE = "data-dropzones-class-name";
+	/**
+	 * used for the invalidation process
+	 * 
+	 */
+	public static inline var DELAY_BETWEEN_DROP_ZONE_CHECKS = 10;
 
+	////////////////////////////////////
+	// events
+	////////////////////////////////////
 	/**
 	 * name of the event dispatched on rootElement when an the element starts to be dragged
 	 */
@@ -86,6 +102,9 @@ class Draggable extends DisplayObject, implements IGroupable
 	 * name of the event dispatched on rootElement when the dragged element is moved
 	 */
 	public static inline var EVENT_MOVE = "dragEventMove";
+	////////////////////////////////////
+	// properties
+	////////////////////////////////////
 	/**
 	 * callback used to add/remove events to the html body
 	 */
@@ -97,7 +116,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	/**
 	 * div element used to show where the element is about to be dropped
 	 */
-	private var phantom:HtmlDom;
+	public var phantom:HtmlDom;
 	/**
 	 * div element used to compute the best drop zone
 	 * it is placed at every position and its distance to mouse cursor is measured
@@ -144,6 +163,25 @@ class Draggable extends DisplayObject, implements IGroupable
 	 */
 	private var initialMouseY:Int;
 	/**
+	 * current mouse position
+	 */
+	private var currentMouseX:Int;
+	/**
+	 * current mouse position
+	 */
+	private var currentMouseY:Int;
+	/**
+	 * dirty flag used for the invalidation process
+	 */
+	private var isDirty = false;
+	/**
+	 * array of the drop zones which are computed on mouse down, thanks to the mini-phantom
+	 */
+	private var dropZoneArray:Array<DropZone>;
+	////////////////////////////////////
+	// DisplayObject methods
+	////////////////////////////////////
+	/**
 	 * constructor
 	 * init properties
 	 * retrieve atributes of the html dom node
@@ -157,6 +195,10 @@ class Draggable extends DisplayObject, implements IGroupable
 		if (groupElement == null){
 			groupElement = Lib.document.body;
 		}
+
+		// create the phantom
+		phantom = Lib.document.createElement("div");
+		miniPhantom = Lib.document.createElement("div");
 
 		// init
 		state = none;
@@ -182,10 +224,6 @@ class Draggable extends DisplayObject, implements IGroupable
 	override public function init() : Void 
 	{
 		super.init();
-
-		// create the phantom
-		phantom = Lib.document.createElement("div");
-		miniPhantom = Lib.document.createElement("div");
 
 		// retrieve references to the elements
 		dragZone = DomTools.getSingleElement(rootElement, CSS_CLASS_DRAGZONE, false);
@@ -213,6 +251,9 @@ class Draggable extends DisplayObject, implements IGroupable
 		Lib.document.body.removeEventListener("mouseup", cast(mouseUpCallback), false);
 	}
 	
+	////////////////////////////////////
+	// styles of the phantoms
+	////////////////////////////////////
 	/**
 	 * set all properties of root element with absolute values 
 	 */
@@ -245,28 +286,20 @@ class Draggable extends DisplayObject, implements IGroupable
 			refHtmlDom = rootElement;
 
 		// set all inline styles
-		for (styleName in Reflect.fields(refHtmlDom.style))
-		{
-			try{
-				var val:String = Reflect.field(refHtmlDom.style, styleName);
-				Reflect.setField(phantom, styleName, val);
-				Reflect.setField(miniPhantom, styleName, val);
-			}
-			catch(e:Dynamic){
-				// some properties are read only
-			}
-		}
+		phantom.style.cssText= refHtmlDom.style.cssText;
+		miniPhantom.style.cssText= refHtmlDom.style.cssText;
 
+		// set css classes
 		phantom.className = phantomClassName;
 		miniPhantom.className = phantomClassName;
 		phantom.className += " "+refHtmlDom.className;
 		miniPhantom.className += " "+refHtmlDom.className;
 
+		// force width and height
 		phantom.style.width = refHtmlDom.clientWidth + "px";
 		phantom.style.height = refHtmlDom.clientHeight + "px";
 		miniPhantom.style.width = refHtmlDom.clientWidth + "px";
 		miniPhantom.style.height = refHtmlDom.clientHeight + "px";
-
 	}
 	/**
 	 * init phantom according to root element properties
@@ -284,12 +317,29 @@ class Draggable extends DisplayObject, implements IGroupable
 			}
 		}
 	}
+	////////////////////////////////////
+	// drag and drop methods
+	////////////////////////////////////
 	/**
 	 * start dragging
 	 * attach an onmousemove event to the body
 	 * memorize the rootElement style values and prepare it to be moved
 	 */
 	private function startDrag(e:MouseEvent)
+	{
+		// start listening to the mouse move envent
+		moveCallback = callback(move);
+		Lib.document.body.addEventListener("mousemove", cast(moveCallback), false);
+
+		// prevent default behavior
+		e.preventDefault();
+	}
+	/**
+	 * move during dragging
+	 * move the root element
+	 * look for closest drop zone if there are some
+	 */
+	public function move(e:MouseEvent)
 	{
 		if (state == none)
 		{
@@ -300,10 +350,6 @@ class Draggable extends DisplayObject, implements IGroupable
 			initRootElementStyle();
 			initPhantomStyle();
 			//initialStylePosition = rootElement.style.position;
-
-			//Lib.document.onmousemove = function(e){move(e);};
-			moveCallback = callback(move);
-			Lib.document.body.addEventListener("mousemove", cast(moveCallback), false);
 
 			//rootElement.style.position = "absolute";
 			//move(e);
@@ -317,9 +363,24 @@ class Draggable extends DisplayObject, implements IGroupable
 				draggable: this,
 			});
 			rootElement.dispatchEvent(event);
+
+			// init
+			createDropZoneArray();
 		}
-		// prevent default behavior
-		e.preventDefault();
+		currentMouseX = e.clientX;
+		currentMouseY = e.clientY;
+		// position of the dragged element under the mouse
+		DomTools.moveTo(rootElement, currentMouseX-initialMouseX, currentMouseY-initialMouseY);
+		invalidateBestDropZone();
+
+		// dispatch a custom event
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(EVENT_MOVE, true, true, {
+			dropZone : bestDropZone,
+			target: rootElement,
+			draggable: this,
+		});
+		rootElement.dispatchEvent(event);
 	}
 	/**
 	 * stop dragging
@@ -329,6 +390,7 @@ class Draggable extends DisplayObject, implements IGroupable
 	 */
 	public function stopDrag(e:MouseEvent)
 	{
+		Lib.document.body.removeEventListener("mousemove", cast(moveCallback), false);
 		if (state == dragging)
 		{
 			// change parent node
@@ -360,45 +422,28 @@ class Draggable extends DisplayObject, implements IGroupable
 			state = none;
 			//rootElement.style.position = initialStylePosition;
 			resetRootElementStyle();
-			Lib.document.body.removeEventListener("mousemove", cast(moveCallback), false);
 			// Leave the event, in case we miss the mouseup event (happens when the mouse leave the browser window while down)
 			// Lib.document.body.removeEventListener("mouseup", mouseUpCallback, false);
 			setAsBestDropZone(null);
+			// reset 
+			deleteDropZoneArray();
 			// prevent default behavior
 			e.preventDefault();
 		}
 	}
+	////////////////////////////////////
+	// best drop zone methods
+	////////////////////////////////////
 	/**
-	 * move during dragging
-	 * move the root element
-	 * look for closest drop zone if there are some
+	 * invalidation pattern
+	 * limits the number of search for a better drop zone to one every x seconds
 	 */
-	public function move(e:MouseEvent)
-	{
-		currentMouseX = e.clientX;
-		currentMouseY = e.clientY;
-		// position of the dragged element under the mouse
-		DomTools.moveTo(rootElement, currentMouseX-initialMouseX, currentMouseY-initialMouseY);
-		invalidateBestDropZone();
-
-		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(EVENT_MOVE, true, true, {
-			dropZone : bestDropZone,
-			target: rootElement,
-			draggable: this,
-		});
-		rootElement.dispatchEvent(event);
-	}
-	var currentMouseX:Int;
-	var currentMouseY:Int;
-	var isDirty = false;
 	public function invalidateBestDropZone() 
 	{
 		if (isDirty == false)
 		{
 			isDirty = true;
-			haxe.Timer.delay(updateBestDropZone, 50);
+			haxe.Timer.delay(updateBestDropZone, DELAY_BETWEEN_DROP_ZONE_CHECKS);
 		}
 	}
 	private function updateBestDropZone() 
@@ -419,6 +464,39 @@ class Draggable extends DisplayObject, implements IGroupable
 	 */
 	public function getBestDropZone(mouseX:Int, mouseY:Int):Null<DropZone>
 	{
+		// check that the drop zone array has been prevoiusly initialized
+		if (dropZoneArray==null)
+		{
+			throw ("The drop zones must have been computed before you can get the best drop zone. Call Draggable::createDropZoneArray method first.");
+		}
+		// browse all drop zones and check which one is the closest to the dragged element
+		var nearestDropZone:DropZone = null;
+		var nearestDistance = 999999999.0;
+		for(dropZone in dropZoneArray)
+		{
+			var dist = computeDistance(dropZone.boundingBox, mouseX, mouseY);
+			if (dist < nearestDistance)
+			{
+				nearestDistance = dist;
+				nearestDropZone = dropZone;
+			}
+		}
+		return nearestDropZone;
+	}
+	/**
+	 * reset the drop zone array
+	 */
+	public function deleteDropZoneArray()
+	{
+		dropZoneArray = null;
+	}
+	/**
+	 * create the drop zone array
+	 * use the mini phantom
+	 * place the mini phantom at each possible drop positions and store the bounding boxes
+	 */
+	public function createDropZoneArray() 
+	{
 		// retrieve references to the elements
 		var dropZones:List<HtmlDom> = new List();
 		var taggedDropZones = groupElement.getElementsByClassName(dropZonesClassName);
@@ -431,12 +509,10 @@ class Draggable extends DisplayObject, implements IGroupable
 			dropZones.add(rootElement.parentNode);
 		}
 
-		var nearestDistance:Float = 999999999999;
-		var nearestZone:HtmlDom = null;
-		var lastChildIdx:Int = 0;
+		dropZoneArray = new Array();
+
 		for (zone in dropZones)
 		{
-			var bbZone = DomTools.getElementBoundingBox(zone);
 			// if the mouse is in the zone
 			if (zone.style.display != "none")
 			{
@@ -447,38 +523,29 @@ class Draggable extends DisplayObject, implements IGroupable
 					// test the case before this child
 					zone.insertBefore(miniPhantom, child);
 					var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
-					var dist = computeDistance(bbPhantom, mouseX, mouseY);
-					if (dist < nearestDistance)
-					{
-						// new closest position
-						nearestDistance = dist;
-						nearestZone = zone;
-						lastChildIdx = childIdx;
-					}
+					dropZoneArray.push({
+						parent: zone,
+						position: childIdx,
+						boundingBox: bbPhantom,
+					});
 				}
 
 				// test the case of the last child
 				zone.appendChild(miniPhantom);
 				var bbPhantom = DomTools.getElementBoundingBox(miniPhantom);
-				var dist = computeDistance(bbPhantom, mouseX, mouseY);
-				if (dist < nearestDistance)
-				{
-					nearestDistance = dist;
-					nearestZone = zone;
-					lastChildIdx = zone.childNodes.length + 1;
-				}
+				dropZoneArray.push({
+					parent: zone,
+					position: zone.childNodes.length+1,
+					boundingBox: bbPhantom,
+				});
 				zone.removeChild(miniPhantom);
 			}
 		}
-		if (nearestZone != null)
-			return { parent: nearestZone, position: lastChildIdx }
-		else
-			return null;
 	}
 	/**
 	 * compute distance between the center of the bounding box and the mouse cursor
 	 */
-	private function computeDistance(boundingBox1:BoundingBox,mouseX:Int, mouseY:Int) :Float
+	public function computeDistance(boundingBox1:BoundingBox,mouseX:Int, mouseY:Int) :Float
 	{
 		var centerBox1X = boundingBox1.x + (boundingBox1.w/2.0);
 		var centerBox1Y = boundingBox1.y + (boundingBox1.h/2.0);
