@@ -68,6 +68,8 @@ class ScriptContainer extends DisplayObject
 
 		// inject the js.Lib
 		interp.variables.set("js_Lib", Lib);
+		// inject the DisplayObject object
+		interp.variables.set("this", this);
 		// inject the global components
 		for (cn in getBrixApplication().getGlobalComponentList())
 		{
@@ -91,7 +93,7 @@ class ScriptContainer extends DisplayObject
 	 */
 	public function interprete():Dynamic
 	{
-		var program = parser.parseString(rootElement.innerHTML); trace("script inner content: "+rootElement.innerHTML);
+		var program = parser.parseString(rootElement.innerHTML);
 		return interp.execute(program);
 	}
 }
