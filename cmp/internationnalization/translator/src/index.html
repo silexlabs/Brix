@@ -10,7 +10,8 @@
 <body>
 <script class="ScriptContainer" type="text/hscript">
 	var flagImg = js_Lib.document.getElementById("flag");
-	flagImg.onclick = function(e) {
+	
+	var onclick = function(e) { 
 						if (js_Lib.document.documentElement.getAttribute( "lang" ) == "en")
 						{
 							brix_component_internationalization_Translator.translate(js_Lib.document.documentElement, "fr");
@@ -22,8 +23,10 @@
 							brix_component_internationalization_Translator.translate(js_Lib.document.documentElement, "en");
 							flagImg.setAttribute( "src", "images/fr.gif" );
 							flagImg.setAttribute( "alt", "Version Française" );
-						}
+						} 
 					};
+	
+	this.mapListener(flagImg, "click", onclick, false);
 </script>
 <div id="container">
 
