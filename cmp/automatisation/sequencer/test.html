@@ -1,0 +1,89 @@
+<!-- This page is used to compile bin/libs/silex/silex.js -->
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+		<meta name="initialPageName" content="page1" />
+
+		<script data-brix-use="brix.component.group.Group"></script>
+		<script data-brix-use="brix.component.navigation.Page"></script>
+		<script data-brix-use="brix.component.navigation.Layer"></script>
+		<script data-brix-use="brix.component.navigation.link.LinkToPage"></script>
+		<script data-brix-use="brix.component.automatisation.Sequencer"></script>
+
+		<script data-brix-use="Test"></script>
+<!--		
+-->
+		
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			.Page{
+				display: none;
+			}
+			.Layer{
+				background-color:#b0c4de;
+			}
+			a{
+				font-size: 25pt;
+			}
+		</style>
+		
+	</head>
+	<body>
+		<div class="Sequencer">
+			<a name="page1" class="Page">page1</a>
+			<a name="page2" class="Page">page2</a>
+			<a name="page3" class="Page">page3</a>
+			<hr />
+			<div class="Layer Group page1">
+				<h1>Page 1</h1>
+				<br />
+				<div style="width: 100%; height: 300px; background-color:red; top:10px; left:10px;">
+				</div>
+			</div>
+			<hr />
+			<div class="Layer page2">
+				<h1>Page 2</h1>
+			</div>
+			<hr />
+			<div class="Layer page3">
+				<h1>Page 3</h1>
+			</div>
+			<br />
+			<br />
+
+			<hr />
+
+			<br />
+			<br />
+			<a class="Test" href="#"
+				data-action="add-blocking">Add blocking action</a>
+			<br />
+			<br />
+			<a class="Test" href="#"
+				data-action="add-non-blocking">Add non blocking action</a>
+			<br />
+			<br />
+			<a class="Test" href="#"
+				data-action="reset-timer">Reset timer</a>
+			<br />
+			<br />
+
+			<hr />
+
+			<nav>
+				<a href="#page1" class="LinkToPage">page1</a>
+				<br />
+				<br />
+				<a href="#page2" class="LinkToPage">page2</a>
+				<br />
+				<br />
+				<a href="#page3" class="LinkToPage">page3</a>
+				<br />
+				<br />
+			</nav>
+		</div>
+	</body>
+</html>
