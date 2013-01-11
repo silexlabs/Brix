@@ -38,9 +38,9 @@ enum ActionState {
  * actions data
  */
 typedef Action = {
-	var onStart:Action->Void;
-	var onEnd:Action->Void;
-	var onCancel:Action->Void;
+	var onStart:Sequencer->Action->Void;
+	var onEnd:Sequencer->Action->Void;
+	var onCancel:Sequencer->Action->Void;
 	var metaData:Null<Dynamic>;
 	var blocking: Bool;
 	var timecode:Timecode;
@@ -303,16 +303,16 @@ class Sequencer extends DisplayObject
 			// update the action state
 			action.state = started;
 
-			// call the action callbacks
-			if(action.onStart != null)
-			{
-				action.onStart(action);
-			}
-			
 			// dispatch the event to other components on the same node
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_ACTION_STARTED, true, true, action);
 			rootElement.dispatchEvent(event);
+
+			// call the action callbacks
+			if(action.onStart != null)
+			{
+				action.onStart(this, action);
+			}
 		}
 		else
 		{
@@ -338,16 +338,16 @@ class Sequencer extends DisplayObject
 			// update the action state
 			action.state = ended;
 
-			// call the action callbacks
-			if(action.onEnd != null)
-			{
-				action.onEnd(action);
-			}
-
 			// dispatch the event to other components on the same node
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_ACTION_ENDED, true, true, action);
 			rootElement.dispatchEvent(event);
+
+			// call the action callbacks
+			if(action.onEnd != null)
+			{
+				action.onEnd(this, action);
+			}
 
 			// check sequences again
 			update();
@@ -378,7 +378,7 @@ class Sequencer extends DisplayObject
 			// call the action callbacks
 			if(action.onCancel != null)
 			{
-				action.onCancel(action);
+				action.onCancel(this, action);
 			}
 
 			// dispatch the event to other components on the same node
