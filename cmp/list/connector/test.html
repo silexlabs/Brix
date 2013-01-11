@@ -1,0 +1,51 @@
+<!-- This page is used to compile bin/libs/silex/silex.js -->
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+
+		<script data-brix-use="brix.component.list.Repeater"></script>
+		<script data-brix-use="brix.component.list.JsonConnector"></script>
+
+		<script data-brix-use="brix.component.navigation.Page"></script>
+		<script data-brix-use="brix.component.navigation.Layer"></script>
+		<script data-brix-use="brix.component.navigation.link.LinkToPage"></script>
+		<meta name="initialPageName" content="page1" />
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			.Page{
+				display: none;
+			}
+			.Layer{
+				background-color:#b0c4de;
+			}
+		</style>
+		
+	</head>
+	<body>
+		<a name="page1" class="Page">page1</a>
+		<a name="page2" class="Page">page2</a>
+		<a name="page3" class="Page">page3</a>
+		<a href="#page1" class="LinkToPage">page1</a>
+		<a href="#page2" class="LinkToPage">page2</a>
+		<a href="#page3" class="LinkToPage">page3</a>
+		<div class="Layer page1">
+			<h1>Page 1</h1>
+			<ul class="Repeater JsonConnector"
+				data-connector-url="http://demos.silexlabs.org/silex/cgi/scripts/proxy.php?url=http://fakester.biz/json?n=100"
+			>
+				<li>
+					::name::
+				</li>
+			</ul>
+		</div>
+		<div class="Layer page2">
+			<h1>Page 2</h1>
+		</div>
+		<div class="Layer page3">
+			<h1>Page 3</h1>
+		</div>
+	</body>
+</html>
