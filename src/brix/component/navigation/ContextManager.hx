@@ -107,10 +107,14 @@ class ContextManager extends DisplayObject
 		}
 
 		// listen to other components events
-		rootElement.addEventListener(EVENT_ADD_CONTEXTS, cast(onAddContextEvent), true);
-		rootElement.addEventListener(EVENT_REMOVE_CONTEXTS, cast(onRemoveContextEvent), true);
-		rootElement.addEventListener(EVENT_RESET_CONTEXTS, cast(onResetContextEvent), true);
-		rootElement.addEventListener(EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
+		//rootElement.addEventListener(EVENT_ADD_CONTEXTS, cast(onAddContextEvent), true);
+		mapListener(rootElement, EVENT_ADD_CONTEXTS, cast(onAddContextEvent), true);
+		//rootElement.addEventListener(EVENT_REMOVE_CONTEXTS, cast(onRemoveContextEvent), true);
+		mapListener(rootElement, EVENT_REMOVE_CONTEXTS, cast(onRemoveContextEvent), true);
+		//rootElement.addEventListener(EVENT_RESET_CONTEXTS, cast(onResetContextEvent), true);
+		mapListener(rootElement, EVENT_RESET_CONTEXTS, cast(onResetContextEvent), true);
+		//rootElement.addEventListener(EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
+		mapListener(rootElement, EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
 	}
 	override public function init()
 	{

@@ -41,18 +41,24 @@ class LayoutBase extends DisplayObject
 	public function new(rootElement:HtmlDom, BrixId:String){
 		super(rootElement, BrixId);
 
-		Lib.window.addEventListener('resize', redrawCallback, false);
+		//Lib.window.addEventListener('resize', redrawCallback, false);
+		mapListener(Lib.window,'resize', redrawCallback, false);
 
 		// do not work: Lib.document.addEventListener("resize", redraw, false);
 		// do not compile: Lib.window.addEventListener("resize", redraw, false);
 		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
 
-		Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, true);
-		Lib.document.addEventListener(Page.EVENT_TYPE_OPEN_STOP, redrawCallback, true);
-		Lib.document.addEventListener(Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, true);
-		Lib.document.addEventListener(ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, true);
+		//Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, true);
+		mapListener(Lib.document,EVENT_LAYOUT_REDRAW, redrawCallback, true);
+		//Lib.document.addEventListener(Page.EVENT_TYPE_OPEN_STOP, redrawCallback, true);
+		mapListener(Lib.document,Page.EVENT_TYPE_OPEN_STOP, redrawCallback, true);
+		//Lib.document.addEventListener(Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, true);
+		mapListener(Lib.document,Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, true);
+		//Lib.document.addEventListener(ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, true);
+		mapListener(Lib.document,ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, true);
 
-		Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, true);
+		//Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, true);
+		mapListener(Lib.document,EVENT_LAYOUT_REDRAW, redrawCallback, true);
 	}
 	/**
 	 * init the component

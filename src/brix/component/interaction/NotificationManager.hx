@@ -123,10 +123,12 @@ class NotificationManager extends DisplayObject
 
 		// for the native notification system
 		initNotificationsCallback = callback(initNotifications);
-		rootElement.addEventListener("click", cast(initNotificationsCallback), false);
+		//rootElement.addEventListener("click", cast(initNotificationsCallback), false);
+		mapListener(rootElement, "click", cast(initNotificationsCallback), false);
 
 		// listen to the other components events
-		rootElement.addEventListener(NOTIFICATION_EVENT, cast(onNotificationReceived), false);
+		//rootElement.addEventListener(NOTIFICATION_EVENT, cast(onNotificationReceived), false);
+		mapListener(rootElement,NOTIFICATION_EVENT, cast(onNotificationReceived), false);
 	}
 	private var initNotificationsCallback:MouseEvent->Void;
 	private function initNotifications(e:MouseEvent) 
@@ -136,7 +138,8 @@ class NotificationManager extends DisplayObject
 			trace("initNotifications");
 			requestPermission(null, null);
 		}
-		rootElement.removeEventListener("click", cast(initNotificationsCallback), false);
+		//rootElement.removeEventListener("click", cast(initNotificationsCallback), false);
+		unmapListener(rootElement, "click", cast(initNotificationsCallback), false);
 
 		// in order to not load ::icon:: at start, this will be changed by javascript
 		rootElement.style.display = "inline-block";
