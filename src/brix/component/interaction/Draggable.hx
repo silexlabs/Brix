@@ -236,7 +236,7 @@ class Draggable extends DisplayObject, implements IGroupable
 		//dragZone.onmouseup = stopDrag;
 		//mouseUpCallback = callback(stopDrag);
 		//Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
-		mapListener(Lib.document.body,"mouseup", stopDrag, false);
+		mapListener(Lib.document.body,"mouseup", cast(stopDrag), false);
 		dragZone.style.cursor = "move";
 	}
 	
