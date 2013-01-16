@@ -254,6 +254,7 @@ class Sequencer extends DisplayObject
 	 */
 	private function update()
 	{
+		//trace("Sequencer, computer time is "+Date.now().toString()+", and corrected time is "+Date.fromTime(currentTimecode).toString());
 		// start new blocking actions
 		if (state == stoped && actionsBlocking.length > 0)
 		{

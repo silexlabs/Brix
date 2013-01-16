@@ -12,6 +12,7 @@ import js.Lib;
 import js.Dom;
 import haxe.Http;
 import haxe.Json;
+import haxe.Timer;
 
 import brix.component.interaction.Draggable;
 
@@ -26,28 +27,82 @@ import brix.component.template.TemplateMacros;
  */
 class JsonConnector extends DisplayObject
 {
+	////////////////////////////////////
+	// constants
+	////////////////////////////////////
 	/**
 	 * attribute to set on the root element to specify an url
 	 */
 	static inline var ATTR_URL = "data-connector-url";
 	/**
+	 * attribute to set the polling frequency, in ms
+	 */
+	static inline var ATTR_POLL_FREQ = "data-connector-poll-frequency";
+	/**
+	 * attribute to allow the component to load data automatically, e.g. when the layer is shown
+	 * by default it is true, set it to false in the html to prevent auto data loading
+	 */
+	static inline var ATTR_AUTO_LOAD = "data-connector-auto-load";
+	////////////////////////////////////
+	// properties
+	////////////////////////////////////
+	private var timer:Timer;
+	////////////////////////////////////
+	// DisplayObject methods
+	////////////////////////////////////
+	/**
 	 * constructor
 	 */
 	public function new(rootElement:HtmlDom, brixId:String)
-	{
-		trace("new JsonConnector");
+	{trace("new connector");
 		super(rootElement, brixId);
 
 		// listen to the Layer class event, in order to loadData when the page opens
-		var tmpHtmlDom = rootElement;
-		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
-		{
-			tmpHtmlDom = tmpHtmlDom.parentNode;
+		if (rootElement.getAttribute(ATTR_AUTO_LOAD) != "false")
+		{trace("listen to layer open");
+			var tmpHtmlDom = rootElement;
+			while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
+			{
+				tmpHtmlDom = tmpHtmlDom.parentNode;
+			}
+			if (tmpHtmlDom!=null)
+			{
+				// tmpHtmlDom is the layer node
+				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
+			}
+			var pollingFreqStr = rootElement.getAttribute(ATTR_POLL_FREQ);
+			if (pollingFreqStr != null)
+			{
+				var pollingFreq = Std.parseInt(pollingFreqStr);
+				if (pollingFreq!=null && pollingFreq>0)
+				{
+					startPolling(pollingFreq);
+				}
+			}
 		}
-		if (tmpHtmlDom!=null)
+	}
+	/**
+	 * start/stop polling
+	 */
+	public function startPolling(pollingFreq:Int) 
+	{
+		if (timer!=null)
 		{
-			// tmpHtmlDom is the layer node
-			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
+			timer.run = null;
+			timer = null;
+		}
+		timer = new Timer(pollingFreq);
+		timer.run = callback(loadData, null);
+	}
+	/**
+	 * start/stop polling
+	 */
+	public function stopPolling() 
+	{
+		if (timer!=null)
+		{
+			timer.run = null;
+			timer = null;
 		}
 	}
 	/**
@@ -62,11 +117,15 @@ class JsonConnector extends DisplayObject
 	 * load the json data
 	 */ 
 	public function loadData(?url:Null<String>=null)
-	{
+	{trace("loadData");
 		// default value
 		if (url == null)
 		{
 			url = rootElement.getAttribute(ATTR_URL);
+			if (url == null)
+			{
+				throw("Error: no url provided, aborting http request. I will not load data. Connector "+rootElement.className);
+			}
 		}
 		// call the service
 		var http = new Http(url);
@@ -79,8 +138,6 @@ class JsonConnector extends DisplayObject
 	 */ 
 	public function onData(data:String)
 	{
-		trace("onData "+data);
-
 		var objectData = Json.parse(data);
 
 		// dispatch a custom event
