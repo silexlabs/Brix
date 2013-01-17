@@ -27,6 +27,13 @@ enum LayerStatus
 	hidden;
 	notInit;
 }
+typedef LayerEventDetail =
+{
+	var transitionObserver : TransitionObserver;
+	var transitionData : TransitionData;
+	var target: HtmlDom;
+	var layer: Layer;
+}
 
 /**
  * This component is linked to a DOM element, wich is the view of a layer. 
@@ -38,24 +45,35 @@ class Layer extends DisplayObject
 {
 	/**
 	 * constant for the show event, dispatched on the rootElement node when the layer is shown
-	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 * the event have this object in event.detail: {transitionObserver:transitionObserver, transitionData:transitionData,target:rootElement,layer: this,}	
 	 */
 	public static inline var EVENT_TYPE_SHOW_START:String = "onLayerShowStart";
 	/**
 	 * constant for the hide event, dispatched on the rootElement node when the layer is hided
-	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 * the event have this object in event.detail: {transitionObserver:transitionObserver, transitionData:transitionData,target:rootElement,layer: this,}	
 	 */
 	public static inline var EVENT_TYPE_HIDE_START:String = "onLayerHideStart";
 	/**
 	 * constant for the show event, dispatched on the rootElement node when the layer is shown
-	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 * the event have this object in event.detail: {transitionObserver:transitionObserver, transitionData:transitionData,target:rootElement,layer: this,}	
 	 */
 	public static inline var EVENT_TYPE_SHOW_STOP:String = "onLayerShowStop";
 	/**
 	 * constant for the hide event, dispatched on the rootElement node when the layer is hided
-	 * the event have this object in event.detail: {transitionData:transitionData,target:rootElement,layer: this,}	
+	 * the event have this object in event.detail: {transitionObserver:transitionObserver, transitionData:transitionData,target:rootElement,layer: this,}	
 	 */
 	public static inline var EVENT_TYPE_HIDE_STOP:String = "onLayerHideStop";
+	/**
+	 * constant for the show event, dispatched on the rootElement node when the layer is shown and it was allready visible
+	 * it is useful for the TemplateRenderer component to redraw itself when a page is re-opened with different query data
+	 * the event have this object in event.detail: {transitionObserver:transitionObserver, transitionData:transitionData,target:rootElement,layer: this,}	
+	 */
+	public static inline var EVENT_TYPE_SHOW_AGAIN:String = "onLayerShowAgain";
+	/**
+	 * constant for the hide event, dispatched on the rootElement node when the layer is hiden, and it was allready hidden
+	 * the event have this object in event.detail: {transitionObserver:transitionObserver, transitionData:transitionData,target:rootElement,layer: this,}	
+	 */
+	public static inline var EVENT_TYPE_HIDE_AGAIN:String = "onLayerHideAgain";
 	/**
 	 * array used to store all the children while the layer is hided
 	 */
@@ -274,7 +292,15 @@ class Layer extends DisplayObject
 		}
 		if (status != hidden && status != notInit)
 		{
-			// trace("Warning: can not show the layer, since it has the status '"+status+"'");
+			//trace("Warning: can not show the layer, since it has the status '"+status+"'");
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_TYPE_SHOW_AGAIN, false, false, {
+				transitionObserver : transitionObserver,
+				transitionData : transitionData,
+				target: rootElement,
+				layer: this,
+			});
+			rootElement.dispatchEvent(event);
 			return;
 		}
 		// update status 
@@ -296,6 +322,7 @@ class Layer extends DisplayObject
 		{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_TYPE_SHOW_START, false, false, {
+				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
@@ -353,6 +380,7 @@ class Layer extends DisplayObject
 		{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_TYPE_SHOW_STOP, false, false, {
+				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
@@ -393,6 +421,14 @@ class Layer extends DisplayObject
 		}
 		if (status != visible && status != notInit){
 			// trace("Warning, can not hide the layer, since it has the status '"+status+"'");
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(EVENT_TYPE_HIDE_AGAIN, false, false, {
+				transitionObserver : transitionObserver,
+				transitionData : transitionData,
+				target: rootElement,
+				layer: this,
+			});
+			rootElement.dispatchEvent(event);
 			return;
 		}
 		// update status 
@@ -407,6 +443,7 @@ class Layer extends DisplayObject
 		{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_TYPE_HIDE_START, false, false, {
+				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
@@ -465,6 +502,7 @@ class Layer extends DisplayObject
 		{
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_TYPE_HIDE_STOP, false, false, {
+				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,

@@ -20,7 +20,6 @@ import brix.util.DomTools;
 
 import brix.component.navigation.Layer;
 import brix.component.ui.DisplayObject;
-import brix.component.template.TemplateMacros;
 
 /**
  * load json data, parse it and dispatch a 
@@ -30,6 +29,10 @@ class JsonConnector extends DisplayObject
 	////////////////////////////////////
 	// constants
 	////////////////////////////////////
+	/**
+	 * event to request data change 
+	 */
+	public static inline var ON_DATA_RECEIVED = "onDataReceived";
 	/**
 	 * attribute to set on the root element to specify an url
 	 */
@@ -67,7 +70,7 @@ class JsonConnector extends DisplayObject
 
 		// listen to the Layer class event, in order to loadData when the page opens
 		if (rootElement.getAttribute(ATTR_AUTO_LOAD) != "false")
-		{trace("listen to layer open");
+		{
 			var tmpHtmlDom = rootElement;
 			while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
 			{
@@ -128,6 +131,7 @@ class JsonConnector extends DisplayObject
 	 */ 
 	public function onLayerHide(e:Event)
 	{
+		rootElement.innerHTML = "";
 		// stop polling
 		if (pollingFreq!=null && pollingFreq>0)
 		{
@@ -191,7 +195,7 @@ class JsonConnector extends DisplayObject
 
 		// dispatch a custom event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(Repeater.SET_DATA_REQUEST, false, false, objectData);
+		event.initCustomEvent(ON_DATA_RECEIVED, false, false, objectData);
 		rootElement.dispatchEvent(event);
 	}
 	/**

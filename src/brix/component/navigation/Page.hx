@@ -256,8 +256,8 @@ class Page extends DisplayObject, implements IGroupable
 		// get the typed event object
 		var event:PopStateEvent = cast(e);
 		if (event.state != null && event.state.name == name){
+			query = event.state.query;
 			open(event.state.transitionDataShow, event.state.transitionDataHide, event.state.doCloseOthers, event.state.preventTransitions, false);
-
 		}
 	}
 	/** 
@@ -330,6 +330,7 @@ class Page extends DisplayObject, implements IGroupable
 					transitionDataHide: transitionDataHide,
 					doCloseOthers: doCloseOthers,
 					preventTransitions: preventTransitions,
+					query: query,
 				}, name, "?/"+name);
 #if js
 				}
@@ -379,7 +380,7 @@ class Page extends DisplayObject, implements IGroupable
 			var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
 			for (layerInstance in layerInstances)
 			{
-					layerInstance.show(transitionData, transitionObserver, preventTransitions);
+				layerInstance.show(transitionData, transitionObserver, preventTransitions);
 			}
 		}
 		// add the page-opened css style on links to this page
