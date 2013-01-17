@@ -35,6 +35,12 @@ class JsonConnector extends DisplayObject
 	 */
 	static inline var ATTR_URL = "data-connector-url";
 	/**
+	 * path of the object to use as root for the data
+	 * @example		a value of "resource.list" 
+	 * 				will look for the obect list in the data received: {resource:{list:[{title:a},{title:b}]}}
+	 */
+	static inline var ATTR_ROOT = "data-connector-root";
+	/**
 	 * attribute to set the polling frequency, in ms
 	 */
 	static inline var ATTR_POLL_FREQ = "data-connector-poll-frequency";
@@ -47,6 +53,8 @@ class JsonConnector extends DisplayObject
 	// properties
 	////////////////////////////////////
 	private var timer:Timer;
+	private var pollingFreq:Null<Int>;
+
 	////////////////////////////////////
 	// DisplayObject methods
 	////////////////////////////////////
@@ -69,15 +77,12 @@ class JsonConnector extends DisplayObject
 			{
 				// tmpHtmlDom is the layer node
 				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
+				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
 			}
 			var pollingFreqStr = rootElement.getAttribute(ATTR_POLL_FREQ);
 			if (pollingFreqStr != null)
 			{
-				var pollingFreq = Std.parseInt(pollingFreqStr);
-				if (pollingFreq!=null && pollingFreq>0)
-				{
-					startPolling(pollingFreq);
-				}
+				pollingFreq = Std.parseInt(pollingFreqStr);
 			}
 		}
 	}
@@ -112,12 +117,28 @@ class JsonConnector extends DisplayObject
 	{
 		// refresh list data
 		loadData();
+		// stat polling
+		if (pollingFreq!=null && pollingFreq>0)
+		{
+			startPolling(pollingFreq);
+		}
+	}
+	/**
+	 * the layer is being hidden
+	 */ 
+	public function onLayerHide(e:Event)
+	{
+		// stop polling
+		if (pollingFreq!=null && pollingFreq>0)
+		{
+			stopPolling();
+		}
 	}
 	/**
 	 * load the json data
 	 */ 
 	public function loadData(?url:Null<String>=null)
-	{trace("loadData");
+	{
 		// default value
 		if (url == null)
 		{
@@ -127,6 +148,7 @@ class JsonConnector extends DisplayObject
 				throw("Error: no url provided, aborting http request. I will not load data. Connector "+rootElement.className);
 			}
 		}
+		trace("loadData "+url);
 		// call the service
 		var http = new Http(url);
 		http.onError = onError;
@@ -138,7 +160,34 @@ class JsonConnector extends DisplayObject
 	 */ 
 	public function onData(data:String)
 	{
-		var objectData = Json.parse(data);
+		var objectData:Dynamic = null;
+		try
+		{
+			objectData = Json.parse(data);
+		}
+		catch(e:Dynamic)
+		{
+			trace("Error parsing json string \""+data+"\". Error message: "+e);
+		}
+
+		// get data root
+		var root = rootElement.getAttribute(ATTR_ROOT);
+		if (root!=null && objectData!=null)
+		{
+			try
+			{
+				var path = root.split(".");
+				for (idx in 0...path.length)
+				{
+					var objName = path[idx];
+					objectData = Reflect.field(objectData, objName);
+				}
+			}
+			catch(e:Dynamic)
+			{
+				trace("Error while looking for the data root object \""+root+"\" in \""+data+"\". Error message: "+e);
+			}
+		}
 
 		// dispatch a custom event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
