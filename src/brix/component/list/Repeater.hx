@@ -14,7 +14,6 @@ import brix.component.interaction.Draggable;
 
 import brix.util.DomTools;
 
-import brix.component.navigation.Layer;
 import brix.component.ui.DisplayObject;
 import brix.component.template.TemplateMacros;
 
@@ -27,14 +26,6 @@ import brix.component.template.TemplateMacros;
  */
 class Repeater<ElementClass> extends DisplayObject
 {
-	/**
-	 * event to request data change 
-	 */
-	public static inline var SET_DATA_REQUEST = "setData";
-	/**
-	 * event to request data change 
-	 */
-	public static inline var ADD_DATA_REQUEST = "addData";
 	/**
 	 * attribute used to store the index of the cell in the generated DOM
 	 */
@@ -69,26 +60,16 @@ class Repeater<ElementClass> extends DisplayObject
 		rootElement.innerHTML = "";
 
 		// attach the events
-		mapListener(rootElement, SET_DATA_REQUEST, onSetDataRequest, true);
-		mapListener(rootElement, ADD_DATA_REQUEST, onAddDataRequest, true);
+		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, true);
 
 	}
 	/**
 	 * callback for the event
 	 */
-	public function onSetDataRequest(e:Event)
+	public function onDataReceived(e:Event)
 	{
 		var newData:Array<ElementClass> = cast(e).detail;
 		dataProvider = newData;
-		redraw();
-	}
-	/**
-	 * callback for the event
-	 */
-	public function onAddDataRequest(e:Event)
-	{
-		var newData:Array<ElementClass> = cast(e).detail;
-		dataProvider = dataProvider.concat(newData);
 		redraw();
 	}
 	/**

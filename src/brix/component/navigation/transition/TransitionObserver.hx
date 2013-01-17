@@ -21,13 +21,13 @@ import js.Dom;
  * @see 
  */
 class TransitionObserver{
-	private var hasStarted:Bool = false;
-	private var hasStoped:Bool = false;
-	private var pendingTransitions:Int = 0;
+	public var hasStarted:Bool = false;
+	public var hasStoped:Bool = false;
+	public var pendingTransitions:Int = 0;
 
-	private var page:Page;
-	private var startEvent:String;
-	private var stopEvent:String;
+	public var page:Page;
+	public var startEvent:String;
+	public var stopEvent:String;
 	/**
 	 * store all the useful references
 	 * @param 	page 		the Page which initiated the transitions
