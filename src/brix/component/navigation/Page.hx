@@ -124,7 +124,8 @@ class Page extends DisplayObject, implements IGroupable
 		page.query = { };
 		if (pageURL[1] != null)
 		{
-			updateQuery(page, pageURL[1]);
+			var queryString = StringTools.htmlUnescape(pageURL[1]);
+			updateQuery(page, queryString);
 		}
 		
 		// open the page as a page or a popup
@@ -206,13 +207,14 @@ class Page extends DisplayObject, implements IGroupable
 	 * page
 	 */
 	static function updateQuery(page:Page, queryString:String)
-	{
+	{trace("updateQuery "+queryString);
 		var queryParams = queryString.split("&");
 		for ( i in 0...queryParams.length)
 		{
 			var param = queryParams[i].split("=");
 			Reflect.setField(page.query, param[0], param[1]);
 		}
+		trace("updateQuery "+queryParams.length);
 	}
 
 	/**

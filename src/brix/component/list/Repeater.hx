@@ -60,7 +60,7 @@ class Repeater<ElementClass> extends DisplayObject
 		rootElement.innerHTML = "";
 
 		// attach the events
-		mapListener(rootElement, JsonCOnnector.ON_DATA_RECEIVED, onDataReceived, true);
+		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, true);
 
 	}
 	/**

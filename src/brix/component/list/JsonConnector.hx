@@ -22,7 +22,7 @@ import brix.component.navigation.Layer;
 import brix.component.ui.DisplayObject;
 
 /**
- * load json data, parse it and dispatch a 
+ * load json data, parse it and dispatch an event for the consumers
  */
 class JsonConnector extends DisplayObject
 {
@@ -65,7 +65,7 @@ class JsonConnector extends DisplayObject
 	 * constructor
 	 */
 	public function new(rootElement:HtmlDom, brixId:String)
-	{trace("new connector");
+	{
 		super(rootElement, brixId);
 
 		// listen to the Layer class event, in order to loadData when the page opens
@@ -131,7 +131,6 @@ class JsonConnector extends DisplayObject
 	 */ 
 	public function onLayerHide(e:Event)
 	{
-		rootElement.innerHTML = "";
 		// stop polling
 		if (pollingFreq!=null && pollingFreq>0)
 		{
