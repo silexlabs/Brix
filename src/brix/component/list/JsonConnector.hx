@@ -79,6 +79,7 @@ class JsonConnector extends DisplayObject
 			if (tmpHtmlDom!=null)
 			{
 				// tmpHtmlDom is the layer node
+				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
 				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
 				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
 			}
@@ -87,6 +88,7 @@ class JsonConnector extends DisplayObject
 			{
 				pollingFreq = Std.parseInt(pollingFreqStr);
 			}
+			loadData();
 		}
 	}
 	/**
