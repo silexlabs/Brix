@@ -53,7 +53,7 @@ class TemplateRenderer extends DisplayObject
 		rootElement.innerHTML = "";
 
 		// attach the events
-		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, true);
+		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, false);
 
 		// listen to the layer events
 		var tmpHtmlDom = rootElement;
@@ -121,7 +121,6 @@ class TemplateRenderer extends DisplayObject
 	 */
 	public function doRedraw()
 	{
-		trace("doRedraw ");
 		for (nodeIdx in 0...rootElement.childNodes.length)
 		{
 			var node = rootElement.childNodes[nodeIdx];
