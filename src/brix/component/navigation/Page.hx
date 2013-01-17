@@ -124,7 +124,8 @@ class Page extends DisplayObject, implements IGroupable
 		page.query = { };
 		if (pageURL[1] != null)
 		{
-			updateQuery(page, pageURL[1]);
+			var queryString = StringTools.htmlUnescape(pageURL[1]);
+			updateQuery(page, queryString);
 		}
 		
 		// open the page as a page or a popup
@@ -206,13 +207,14 @@ class Page extends DisplayObject, implements IGroupable
 	 * page
 	 */
 	static function updateQuery(page:Page, queryString:String)
-	{
+	{trace("updateQuery "+queryString);
 		var queryParams = queryString.split("&");
 		for ( i in 0...queryParams.length)
 		{
 			var param = queryParams[i].split("=");
 			Reflect.setField(page.query, param[0], param[1]);
 		}
+		trace("updateQuery "+queryParams.length);
 	}
 
 	/**
@@ -256,8 +258,8 @@ class Page extends DisplayObject, implements IGroupable
 		// get the typed event object
 		var event:PopStateEvent = cast(e);
 		if (event.state != null && event.state.name == name){
+			query = event.state.query;
 			open(event.state.transitionDataShow, event.state.transitionDataHide, event.state.doCloseOthers, event.state.preventTransitions, false);
-
 		}
 	}
 	/** 
@@ -330,6 +332,7 @@ class Page extends DisplayObject, implements IGroupable
 					transitionDataHide: transitionDataHide,
 					doCloseOthers: doCloseOthers,
 					preventTransitions: preventTransitions,
+					query: query,
 				}, name, "?/"+name);
 #if js
 				}
@@ -379,7 +382,7 @@ class Page extends DisplayObject, implements IGroupable
 			var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
 			for (layerInstance in layerInstances)
 			{
-					layerInstance.show(transitionData, transitionObserver, preventTransitions);
+				layerInstance.show(transitionData, transitionObserver, preventTransitions);
 			}
 		}
 		// add the page-opened css style on links to this page
