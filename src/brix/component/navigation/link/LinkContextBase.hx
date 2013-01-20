@@ -42,12 +42,8 @@ class LinkContextBase extends LinkBase
 		if (rootElement.getAttribute(CONFIG_ATTR_CONTEXT) != null)
 		{
 			linkName = rootElement.getAttribute(CONFIG_ATTR_CONTEXT);
-			links = linkName.split("#");
 		}
-		else
-		{
-			links = [];
-		}
+		links = linkName.split("#");
 	}
 	/**
 	 * user clicked the link

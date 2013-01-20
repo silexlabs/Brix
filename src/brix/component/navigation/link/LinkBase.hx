@@ -56,7 +56,7 @@ class LinkBase extends DisplayObject, implements IGroupable
 	/**
 	 * value of the href attribute without the #
 	 */
-	public var linkName:String;
+	public var linkName:Null<String>;
 	/**
 	 * value of the target attribute 
 	 */
