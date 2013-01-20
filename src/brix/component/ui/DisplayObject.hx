@@ -138,6 +138,21 @@ class DisplayObject implements IDisplayObject
 	}
 
 	/**
+	 * Dispatches a CustomEvent on the specified node, holding Dynamic data.
+	 * @param	eventType the event type
+	 * @param	?data, the data to attach to the event object (event.detail)
+	 * @param	?dispatcher the dispatching node.
+	 */
+	public function dispatch(eventType:String, ?data:Dynamic=null, ?dispatcher:HtmlDom=null):Void
+	{
+		if (dispatcher == null)
+			dispatcher = rootElement;
+		var event : CustomEvent = cast js.Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(eventType, false, false, data);
+		dispatcher.dispatchEvent(event);
+	}
+
+	/**
 	 * Tells if a given class is a DisplayObject.
 	 * TODO cannot simply use Std.is here ?
 	 * 
