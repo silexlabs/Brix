@@ -28,10 +28,10 @@ typedef ContextValue = String;
 typedef ContextEventDetail = Array<ContextValue>;
 
 /**
- * The ContextManager component is a component that is in charge to show/hide Layer components when they are in/out of context
+ * The ContextManager component is a component that is in charge to show/hide DOM elements when they are in/out of context
  * It takes the parameters data-context-list and data-initial-context in the associated node 
- * It has an invalidation mechanism
- * Note: I removed invalidation system, it is not required anymore since I changed the ContextManager to use styles instead of layers
+ * When the context XXX is added/removed to the current context, this components shows/hide all the DOM elements wich have XXX in theyre css class name
+ * This is done by adding/removing the style definition .XXX{ display : none; visibility : hidden; } to the html head
  * @example <div class="ContextManager" data-context-list="context1, context2, context3" data-initial-context="context1, context2" />
  */
 class ContextManager extends DisplayObject
@@ -144,7 +144,7 @@ class ContextManager extends DisplayObject
 	 * callback for a request comming from another brix component
 	 */
 	private function onAddContextEvent(e:CustomEvent)
-	{
+	{trace("onAddContextEvent"+e.detail);
 		var contextValues:Array<ContextValue> = cast(e.detail);
 		for (contextValue in contextValues)
 			addContext(contextValue);
@@ -153,7 +153,7 @@ class ContextManager extends DisplayObject
 	 * callback for a request comming from another brix component
 	 */
 	private function onRemoveContextEvent(e:CustomEvent)
-	{
+	{trace("onRemoveContextEvent"+e.detail);
 		var contextValues:Array<ContextValue> = cast(e.detail);
 		for (contextValue in contextValues)
 			removeContext(contextValue);
@@ -162,7 +162,7 @@ class ContextManager extends DisplayObject
 	 * callback for a request comming from another brix component
 	 */
 	private function onReplaceContextsEvent(e:CustomEvent)
-	{
+	{trace("onReplaceContextsEvent"+e.detail);
 		var contextValues:Array<ContextValue> = cast(e.detail);
 		setCurrentContexts(contextValues);
 	}
@@ -192,7 +192,7 @@ class ContextManager extends DisplayObject
 		isDirty = true;
 		// dispatch a change event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(EVENT_CONTEXT_CHANGE, false, false, currentContexts);
+		event.initCustomEvent(EVENT_CONTEXT_CHANGE, true, true, this);
 		rootElement.dispatchEvent(event);
 	}
 	////////////////////////////////////////////////////////////

@@ -15,6 +15,7 @@ import Xml;
 import brix.util.DomTools;
 import brix.component.navigation.Page;
 import brix.component.navigation.ContextManager;
+import brix.component.navigation.StateManager;
 import brix.component.ui.DisplayObject;
 
 /**
@@ -48,17 +49,14 @@ class LayoutBase extends DisplayObject
 		// do not compile: Lib.window.addEventListener("resize", redraw, false);
 		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
 
-		//Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, true);
-		mapListener(Lib.document,EVENT_LAYOUT_REDRAW, redrawCallback, true);
-		//Lib.document.addEventListener(Page.EVENT_TYPE_OPEN_STOP, redrawCallback, true);
-		mapListener(Lib.document,Page.EVENT_TYPE_OPEN_STOP, redrawCallback, true);
-		//Lib.document.addEventListener(Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, true);
-		mapListener(Lib.document,Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, true);
-		//Lib.document.addEventListener(ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, true);
-		mapListener(Lib.document,ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, true);
+		mapListener(Lib.document.body, EVENT_LAYOUT_REDRAW, redrawCallback, true);
+		mapListener(Lib.document.body, Page.EVENT_TYPE_OPEN_STOP, redrawCallback, true);
+		mapListener(Lib.document.body, Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, true);
+		mapListener(Lib.document.body, ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, true);
+		mapListener(Lib.document.body, StateManager.EVENT_STATE_CHANGE, redrawCallback, true);
 
-		//Lib.document.addEventListener(EVENT_LAYOUT_REDRAW, redrawCallback, true);
-		mapListener(Lib.document,EVENT_LAYOUT_REDRAW, redrawCallback, true);
+		// other layouts event
+		mapListener(Lib.document.body, EVENT_LAYOUT_REDRAW, redrawCallback, true);
 	}
 	/**
 	 * init the component
