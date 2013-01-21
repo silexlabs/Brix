@@ -176,28 +176,36 @@ class JsonConnector extends DisplayObject
 		}
 
 		// get data root
-		var root = rootElement.getAttribute(ATTR_ROOT);
-		if (root!=null && objectData!=null)
+		if (objectData!=null)
 		{
-			try
+			var root = rootElement.getAttribute(ATTR_ROOT);
+			if (root!=null)
 			{
-				var path = root.split(".");
-				for (idx in 0...path.length)
+				try
 				{
-					var objName = path[idx];
-					objectData = Reflect.field(objectData, objName);
+					var path = root.split(".");
+					for (idx in 0...path.length)
+					{
+						var objName = path[idx];
+						objectData = Reflect.field(objectData, objName);
+					}
+				}
+				catch(e:Dynamic)
+				{
+					trace("Error while looking for the data root object \""+root+"\" in \""+data+"\". Error message: "+e);
 				}
 			}
-			catch(e:Dynamic)
-			{
-				trace("Error while looking for the data root object \""+root+"\" in \""+data+"\". Error message: "+e);
-			}
-		}
 
-		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(ON_DATA_RECEIVED, false, false, objectData);
-		rootElement.dispatchEvent(event);
+			// dispatch a custom event
+			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			event.initCustomEvent(ON_DATA_RECEIVED, false, false, objectData);
+			rootElement.dispatchEvent(event);
+		}
+		else
+		{
+			// todo: dispatch an error event
+			trace("Warning: no data received.");
+		}
 	}
 	/**
 	 * callback for the http request
