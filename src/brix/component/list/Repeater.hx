@@ -69,8 +69,11 @@ class Repeater<ElementClass> extends DisplayObject
 	public function onDataReceived(e:Event)
 	{
 		var newData:Array<ElementClass> = cast(e).detail;
-		dataProvider = newData;
-		redraw();
+		if (newData != null)
+		{
+			dataProvider = newData;
+			redraw();
+		}
 	}
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
