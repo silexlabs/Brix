@@ -98,7 +98,7 @@ class JsonConnector extends DisplayObject
 	{
 		if (timer!=null)
 		{
-			timer.run = null;
+			timer.stop();
 			timer = null;
 		}
 		timer = new Timer(pollingFreq);
@@ -111,7 +111,7 @@ class JsonConnector extends DisplayObject
 	{
 		if (timer!=null)
 		{
-			timer.run = null;
+			timer.stop();
 			timer = null;
 		}
 	}
@@ -163,8 +163,17 @@ class JsonConnector extends DisplayObject
 	/**
 	 * callback for the http request
 	 */ 
+	private var latestData:String = "";
 	public function onData(data:String)
 	{
+		// small optim
+		if (data == latestData)
+		{
+			trace("no new data");
+			return;
+		}
+		latestData = data;
+		// parse string to json
 		var objectData:Dynamic = null;
 		try
 		{
