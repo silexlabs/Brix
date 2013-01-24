@@ -73,7 +73,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 
 		mapListener(rootElement, "click", click, false);
 		mapListener(rootElement, "rollOver", rollOver, false);
-		mapListener(rootElement, Draggable.EVENT_DROPPED, listDOMChanged, false);
+		//mapListener(rootElement, Draggable.EVENT_DROPPED, listDOMChanged, false);
 	}
 	/**
 	 * handle click in the list
