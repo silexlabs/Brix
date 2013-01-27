@@ -56,7 +56,7 @@ class TemplateRenderer extends DisplayObject
 		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, false);
 
 		// listen to the layer events
-		var tmpHtmlDom = rootElement;
+/*		var tmpHtmlDom = rootElement;
 		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
 		{
 			tmpHtmlDom = tmpHtmlDom.parentNode;
@@ -68,7 +68,7 @@ class TemplateRenderer extends DisplayObject
 			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
 			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
 		}
-	}
+*/	}
 	/**
 	 * callback for the event
 	 */
@@ -80,7 +80,7 @@ class TemplateRenderer extends DisplayObject
 	}
 	/**
 	 * the layer is being showed
-	 */ 
+	 *
 	public function onLayerShow(e:Event)
 	{
 		var layerEvent: LayerEventDetail = cast(e).detail;
