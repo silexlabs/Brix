@@ -27,14 +27,6 @@ import brix.component.ui.DisplayObject;
 class PageQueryConnector extends DisplayObject
 {
 	////////////////////////////////////
-	// constants
-	////////////////////////////////////
-	/**
-	 * event to request data change 
-	 */
-	public static inline var ON_DATA_RECEIVED = "onDataReceived";
-
-	////////////////////////////////////
 	// DisplayObject methods
 	////////////////////////////////////
 	/**
@@ -54,6 +46,11 @@ class PageQueryConnector extends DisplayObject
 		{
 			// tmpHtmlDom is the layer node
 			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
+			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
+		}
+		else
+		{
+			throw("Error: could not find the layer");
 		}
 	}
 	/**
@@ -70,8 +67,9 @@ class PageQueryConnector extends DisplayObject
 		{
 			data = layerEvent.transitionObserver.page.query;
 		}
+		trace("onLayerShow "+data);
 		// refresh list data
-		onData(data);
+		DomTools.doLater(callback(onData, data));
 	}
 	/**
 	 * callback for the http request
@@ -80,7 +78,7 @@ class PageQueryConnector extends DisplayObject
 	{
 		// dispatch a custom event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(ON_DATA_RECEIVED, false, false, data);
+		event.initCustomEvent(JsonConnector.ON_DATA_RECEIVED, false, false, data);
 		rootElement.dispatchEvent(event);
 	}
 }
