@@ -86,7 +86,7 @@ class ContextManager extends DisplayObject
 	/**
 	 * Stores the style node with the current context as visible 
 	 */
-	private static var styleSheet:HtmlDom;
+	//private static var styleSheet:HtmlDom;
 	///////////////////////////////////////////////////////////////
 	// main methods
 	///////////////////////////////////////////////////////////////
@@ -307,7 +307,7 @@ class ContextManager extends DisplayObject
 	public function refresh()
 	{
 		// reset css style
-		if (styleSheet != null){
+/*		if (styleSheet != null){
 			getBrixApplication().htmlRootElement.getElementsByTagName("head")[0].removeChild(cast(styleSheet));	
 		}
 		var cssText = "";
