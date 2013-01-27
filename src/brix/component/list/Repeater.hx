@@ -117,12 +117,13 @@ class Repeater<ElementClass> extends DisplayObject
 	{
 		//trace("doRedraw "+dataProvider.length+" elements");
 
+/*
 		// remove from dom for performance saving
 		var rootElementIdx = DomTools.getElementIndex(rootElement);
 		var rootElementParent = rootElement.parentNode;
 		rootElementParent.removeChild(rootElement);
 
-	 	// generate the html for each dataProvider element
+*/	 	// generate the html for each dataProvider element
 		var newElementsHtml:Array<String> = new Array();
 		var t = new haxe.Template(htmlTemplate);
 		for (idx in 0...dataProvider.length)
@@ -235,7 +236,7 @@ class Repeater<ElementClass> extends DisplayObject
 		//setItemIds(true);
 
 		// back in the dom
-		if (rootElementIdx < rootElementParent.childNodes.length)
+/*		if (rootElementIdx < rootElementParent.childNodes.length)
 		{
 			// insert at the desired position
 			rootElementParent.insertBefore(rootElement, rootElementParent.childNodes[rootElementIdx]);
