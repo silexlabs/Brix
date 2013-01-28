@@ -191,8 +191,15 @@ class Repeater<ElementClass> extends DisplayObject
 							throw("doRedraw could not find node with id="+htmlIdx);
 						}
 						var node = nodes[0];
-						// will never occure since we start at 1st: if (idx == rootElement.childNodes.length)
-						rootElement.insertBefore(node, rootElement.childNodes[idx]);
+						try
+						{
+							// will never occure since we start at 1st: if (idx == rootElement.childNodes.length)
+							rootElement.insertBefore(node, rootElement.childNodes[idx]);
+						}
+						catch(e:Dynamic){
+							trace("Error: an error occured while moving a node in the dom: "+node+" - with the data "+element+" - "+e);
+							throw("Error: an error occured while moving a node in the dom: "+node+" - with the data "+element+" - "+e);
+						}
 
 						// update id in the dom
 						node.setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
@@ -203,26 +210,40 @@ class Repeater<ElementClass> extends DisplayObject
 			// create a new node if needed
 			if(!found)
 			{
-				tmpDiv.innerHTML = newElementsHtml[idx];
+				try
+				{
+					//newElementsHtml[idx] = StringTools.replace(newElementsHtml[idx], '"', '%22');
+					tmpDiv.innerHTML = newElementsHtml[idx];
+				}
+				catch(e:Dynamic){
+					trace("Error: an error occured while creating a container for the node with data "+element+" and html="+newElementsHtml[idx]+" - "+e);
+				}
 				for (nodeIdx in 0...tmpDiv.childNodes.length)
 				{
 					var node = tmpDiv.childNodes[nodeIdx];
 					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
 					{
-						if (idx < rootElement.childNodes.length-1)
+						getBrixApplication().initNode(node);
+
+						try
 						{
-							// insert at the desired position
-							rootElement.insertBefore(node, rootElement.childNodes[idx]);
+							if (idx < rootElement.childNodes.length-1)
+							{
+								// insert at the desired position
+								rootElement.insertBefore(node, rootElement.childNodes[idx]);
+							}
+							else
+							{
+								// insert at the end
+								rootElement.appendChild(node);
+							}
 						}
-						else
-						{
-							// insert at the end
-							rootElement.appendChild(node);
+						catch(e:Dynamic){
+							trace("Error: an error occured while adding a node to the dom: "+node+" - with the data "+element+" - "+e);
+							throw("Error: an error occured while adding a node to the dom: "+node+" - with the data "+element+" - "+e);
 						}
 						// update id in the dom
 						node.setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
-
-						getBrixApplication().initNode(node);
 
 						break;
 					}
