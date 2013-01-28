@@ -808,7 +808,7 @@ class Application
 				componentClassAttrValues.push(rc.classname);
 			}
 
-			if (!Lambda.exists(componentClassAttrValues, function(s:String) { return s == className; } ))
+			if (!exists(componentClassAttrValues, className))
 			{
 				continue;
 			}
@@ -829,6 +829,24 @@ class Application
 			return componentClass;
 		}
 		return null;
+	}
+	
+	/**
+	 * Return wether the element is found in the
+	 * array
+	 */
+	private function exists(array:Array<String>, element:String):Bool
+	{
+		var length:Int = array.length;
+		for (i in 0...length)
+		{
+			if (array[i] == element)
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**
