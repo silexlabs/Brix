@@ -333,7 +333,9 @@ class Repeater<ElementClass> extends DisplayObject
 	{
 		if (childElement == rootElement || childElement == null)
 		{
-			throw("Error, could not find the element clicked in the list.");
+			// this happens for example when the list catches a click on an element inside a cell and do not wish to take it into account 
+			trace("Warning: could not find the element clicked in the list.");
+			return -1;
 		}
 		if (childElement.nodeType != rootElement.nodeType || childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
 		{
