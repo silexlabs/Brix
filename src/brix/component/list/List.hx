@@ -14,8 +14,6 @@ import brix.component.interaction.Draggable;
 
 import brix.util.DomTools;
 
-import brix.component.template.TemplateMacros;
-
 /**
  * list component
  * display items in a list, according to a template and a dataProvider

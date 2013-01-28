@@ -47,6 +47,7 @@ class JsonConnector extends DisplayObject
 	 * attribute to set the polling frequency, in ms
 	 */
 	static inline var ATTR_POLL_FREQ = "data-connector-poll-frequency";
+	static inline var ATTR_STARTUP_DELAY = "data-connector-startup-delay";
 	/**
 	 * attribute to allow the component to load data automatically, e.g. when the layer is shown
 	 * by default it is true, set it to false in the html to prevent auto data loading
@@ -88,7 +89,15 @@ class JsonConnector extends DisplayObject
 			{
 				pollingFreq = Std.parseInt(pollingFreqStr);
 			}
-			loadData();
+			var startupDelay = rootElement.getAttribute(ATTR_STARTUP_DELAY);
+			if (startupDelay != null)
+			{
+				Timer.delay(callback(loadData, null), Std.parseInt(startupDelay));
+			}
+			else
+			{
+				loadData();
+			}
 		}
 	}
 	/**
@@ -177,6 +186,11 @@ class JsonConnector extends DisplayObject
 		var objectData:Dynamic = null;
 		try
 		{
+			// escape quotes because the jeson parser will turn "name":"value with \"quotes\"" into anbject with name set to "value with "qotes""
+			//data = StringTools.replace(data, "\\\"", "%5C%22");
+			//data = StringTools.replace(data, "\\\"", "&quot;");
+			//data = StringTools.replace(data, "\\\"", "\\\\\\\"");
+			data = StringTools.replace(data, "\\\"", "'");
 			objectData = Json.parse(data);
 		}
 		catch(e:Dynamic)
