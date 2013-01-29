@@ -767,30 +767,6 @@ class Application
 	}
 
 	/**
-	 * Determine a class tag value for a component that won't be conflicting with other components.
-	 * 
-	 * @param	displayObjectClassName
-	 * @return	a tag class value for the given component class name that will not conflict with other components classnames / class tags.
-	 */
-	public function getUnconflictedClassTag(displayObjectClassName : String) : String
-	{
-		var classTag = displayObjectClassName;
-
-		if (classTag.indexOf(".") != -1)
-			classTag = classTag.substr(classTag.lastIndexOf(".") + 1);
-
-		for (rc in registeredUIComponents)
-		{
-			if (rc.classname != displayObjectClassName && classTag == rc.classname.substr(classTag.lastIndexOf(".") + 1))
-			{
-				return displayObjectClassName;
-			}
-		}
-
-		return classTag;
-	}
-
-	/**
 	 * Tries to resolve a UI component Class from a class name (can be full class name or short class name without packages)
 	 * @param the class name to resolve
 	 * @param optional, a type filter (for example: brix.component.ui.DisplayObject, ... or an interface like : brix.component.group.IGroupable ).
@@ -801,7 +777,7 @@ class Application
 		for (rc in registeredUIComponents)
 		{
 			// the possible class attr values for this component
-			var componentClassAttrValues:Array<String> = [getUnconflictedClassTag(rc.classname)]; // TODO FIXME, this could probably be stored somewhere to avoid doing it all the time ?
+			var componentClassAttrValues:Array<String> = [rc.unconflictedClassTag]; // TODO FIXME, this could probably be stored somewhere to avoid doing it all the time ?
 
 			if (componentClassAttrValues[0] != rc.classname)
 			{
@@ -883,5 +859,6 @@ class Application
 typedef RegisteredComponent = 
 {
 	var classname : String;
+	var unconflictedClassTag : String;
 	var args : Null<Hash<String>>;
 }
