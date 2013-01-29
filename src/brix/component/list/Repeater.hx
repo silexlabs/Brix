@@ -68,6 +68,7 @@ class Repeater<ElementClass> extends DisplayObject
 	 */
 	public function onDataReceived(e:Event)
 	{
+		trace("onDataReceived "+cast(e).detail);
 		var newData:Array<ElementClass> = cast(e).detail;
 		if (newData != null)
 		{
@@ -87,7 +88,7 @@ class Repeater<ElementClass> extends DisplayObject
 	/**
 	 * Call this when the list's DOM tree has changed, and you want the dataProvider to be updated accoringly
 	 */
-	public function domChanged(?e:Event):Void
+/*	public function domChanged(?e:Event):Void
 	{
 		var newDataProvider:Array<ElementClass> = new Array();
 		// re-order the items in the dataprovider according to the DOM
@@ -165,7 +166,7 @@ class Repeater<ElementClass> extends DisplayObject
 		for (node in toBeRemoved)
 		{
 			getBrixApplication().cleanNode(node);
-			rootElement.removeChild(node);
+			removeChild(node);
 		}
 		// temp container
 		var tmpDiv = Lib.document.createElement("div");
@@ -194,7 +195,7 @@ class Repeater<ElementClass> extends DisplayObject
 						try
 						{
 							// will never occure since we start at 1st: if (idx == rootElement.childNodes.length)
-							rootElement.insertBefore(node, rootElement.childNodes[idx]);
+							insertAt(node, idx);
 						}
 						catch(e:Dynamic){
 							trace("Error: an error occured while moving a node in the dom: "+node+" - with the data "+element+" - "+e);
@@ -225,23 +226,7 @@ class Repeater<ElementClass> extends DisplayObject
 					{
 						getBrixApplication().initNode(node);
 
-						try
-						{
-							if (idx < rootElement.childNodes.length-1)
-							{
-								// insert at the desired position
-								rootElement.insertBefore(node, rootElement.childNodes[idx]);
-							}
-							else
-							{
-								// insert at the end
-								rootElement.appendChild(node);
-							}
-						}
-						catch(e:Dynamic){
-							trace("Error: an error occured while adding a node to the dom: "+node+" - with the data "+element+" - "+e);
-							throw("Error: an error occured while adding a node to the dom: "+node+" - with the data "+element+" - "+e);
-						}
+						insertAt(node, idx);
 						// update id in the dom
 						node.setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
 
@@ -299,6 +284,38 @@ class Repeater<ElementClass> extends DisplayObject
 		setItemIds();
 */
 	}
+	private function getChildAt(idx:Int):HtmlDom
+	{
+		return rootElement.childNodes[idx];
+	}
+	private function getNumChildren():Int
+	{
+		return rootElement.childNodes.length;
+	}
+	private function removeChild(node:HtmlDom) 
+	{
+		rootElement.removeChild(node);
+	}
+	private function insertAt(node:HtmlDom, idx:Int) 
+	{
+		try
+		{
+			if (idx < rootElement.childNodes.length-1)
+			{
+				// insert at the desired position
+				rootElement.insertBefore(node, rootElement.childNodes[idx]);
+			}
+			else
+			{
+				// insert at the end
+				rootElement.appendChild(node);
+			}
+		}
+		catch(e:Dynamic){
+			trace("Error: an error occured while adding a node to the dom: "+node+" - "+e);
+			throw("Error: an error occured while adding a node to the dom: "+node+" - "+e);
+		}
+	}
 	/**
 	 * refreh list data, and then redraw the display by calling doRedraw
 	 * to be overriden to handle the model or do nothing if you manipulate the list and dataProvider by composition
@@ -314,14 +331,15 @@ class Repeater<ElementClass> extends DisplayObject
 	private function setItemIds(?reset=false):Void
 	{
 		var idx = 0;
-		for (i in 0...rootElement.childNodes.length)
+		for (i in 0...getNumChildren())
 		{
-			if (rootElement.childNodes[i].nodeType != rootElement.nodeType ||
-				(reset && rootElement.childNodes[i].getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null))
+			var node = getChildAt(i);
+			if (node.nodeType != rootElement.nodeType ||
+				(reset && node.getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null))
 			{
 				continue;
 			}
-			rootElement.childNodes[i].setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
+			node.setAttribute(DATA_ATTR_LIST_ITEM_INDEX, Std.string(idx));
 			idx++;
 		}
 	}

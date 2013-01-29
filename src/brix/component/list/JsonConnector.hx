@@ -36,28 +36,28 @@ class JsonConnector extends DisplayObject
 	/**
 	 * attribute to set on the root element to specify an url
 	 */
-	static inline var ATTR_URL = "data-connector-url";
+	public static inline var ATTR_URL = "data-connector-url";
 	/**
 	 * path of the object to use as root for the data
 	 * @example		a value of "resource.list" 
 	 * 				will look for the obect list in the data received: {resource:{list:[{title:a},{title:b}]}}
 	 */
-	static inline var ATTR_ROOT = "data-connector-root";
+	public static inline var ATTR_ROOT = "data-connector-root";
 	/**
 	 * attribute to set the polling frequency, in ms
 	 */
-	static inline var ATTR_POLL_FREQ = "data-connector-poll-frequency";
-	static inline var ATTR_STARTUP_DELAY = "data-connector-startup-delay";
+	public static inline var ATTR_POLL_FREQ = "data-connector-poll-frequency";
+	public static inline var ATTR_STARTUP_DELAY = "data-connector-startup-delay";
 	/**
 	 * attribute to allow the component to load data automatically, e.g. when the layer is shown
 	 * by default it is true, set it to false in the html to prevent auto data loading
 	 */
-	static inline var ATTR_AUTO_LOAD = "data-connector-auto-load";
+	public static inline var ATTR_AUTO_LOAD = "data-connector-auto-load";
 	////////////////////////////////////
 	// properties
 	////////////////////////////////////
-	private var timer:Timer;
 	private var pollingFreq:Null<Int>;
+	private var isPolling:Bool=false;
 
 	////////////////////////////////////
 	// DisplayObject methods
@@ -105,24 +105,14 @@ class JsonConnector extends DisplayObject
 	 */
 	public function startPolling(pollingFreq:Int) 
 	{
-		if (timer!=null)
-		{
-			timer.stop();
-			timer = null;
-		}
-		timer = new Timer(pollingFreq);
-		timer.run = callback(loadData, null);
+		isPolling = true;
 	}
 	/**
 	 * start/stop polling
 	 */
 	public function stopPolling() 
 	{
-		if (timer!=null)
-		{
-			timer.stop();
-			timer = null;
-		}
+		isPolling = false;
 	}
 	/**
 	 * the layer is being showed
@@ -175,6 +165,10 @@ class JsonConnector extends DisplayObject
 	private var latestData:String = "";
 	public function onData(data:String)
 	{
+		if (isPolling && pollingFreq!=null)
+		{
+			Timer.delay(callback(loadData, null), pollingFreq);
+		}
 		// small optim
 		if (data == latestData)
 		{
@@ -218,11 +212,7 @@ class JsonConnector extends DisplayObject
 					trace("Error while looking for the data root object \""+root+"\" in \""+data+"\". Error message: "+e);
 				}
 			}
-
-			// dispatch a custom event
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(ON_DATA_RECEIVED, false, false, objectData);
-			rootElement.dispatchEvent(event);
+			onDataReceived(objectData);
 		}
 		else
 		{
@@ -236,5 +226,15 @@ class JsonConnector extends DisplayObject
 	public function onError(message:String)
 	{
 		trace("onError "+message);
+	}
+	/**
+	 * dispatch an event with the new data
+	 */ 
+	public function onDataReceived(objectData:Dynamic)
+	{
+		// dispatch a custom event
+		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(ON_DATA_RECEIVED, false, false, objectData);
+		rootElement.dispatchEvent(event);
 	}
 }
