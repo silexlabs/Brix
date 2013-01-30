@@ -301,6 +301,12 @@ class Layer extends DisplayObject
 				layer: this,
 			});
 			rootElement.dispatchEvent(event);
+
+			// notify the transition observer
+			if (transitionObserver!=null){
+				transitionObserver.alreadyOpen(this);
+			}
+
 			return;
 		}
 		// update status 
