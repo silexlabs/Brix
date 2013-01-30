@@ -21,14 +21,89 @@ class TemplateMacros
 	//public function new(){}
 	/**
 	 * make dates readable
-	 * @param 	date can be a Date or String
+	 * @param 	date can be a Date or String or timestamp
 	 */
+	public static function durationFromTimestamp(resolve:String->Dynamic, timestamp:Float, numMax:Int=999, 
+		yearsText:String="years", monthsText:String="months", weeksText:String="weeks", daysText:String="days", 
+		hoursText:String="hours", minutesText:String="minutes", secondsText:String="seconds"):String
+	{//trace("durationFromTimestamp "+(Date.now().getTime())+"-"+(timestamp*1000)+" - "+(Date.now().getTime()-(timestamp*1000)));
+		var date:Date;
+		date = Date.fromTime(Date.now().getTime()-(timestamp*1000));
+		var zero = Date.fromTime(0);
+
+		var num = 0;
+		var res:String = "";
+		var d = date.getFullYear()-zero.getFullYear();
+		if (d > 0)
+		{
+			res += d + " " + yearsText + " ";
+			if (++num>=numMax)
+				return res;
+		}
+		var d = date.getMonth()-zero.getMonth();
+		if (d > 0)
+		{
+			res += d + " " + monthsText + " ";
+			if (++num>=numMax)
+				return res;
+		}
+		var d = date.getDay()-zero.getDay();
+		var week = d/7;
+		if (week > 1)
+			res += Math.round(week) + " " + weeksText + " ";
+		else if (d > 0)
+		{
+			res += d + " " + daysText + " ";
+			if (++num>=numMax)
+				return res;
+		}
+		var d = date.getHours()-zero.getHours();
+		if (d > 0)
+		{
+			res += d + " " + hoursText + " ";
+			if (++num>=numMax)
+				return res;
+		}
+		var d = date.getMinutes()-zero.getMinutes();
+		if (d > 0)
+		{
+			res += d + " " + minutesText + " ";
+			if (++num>=numMax)
+				return res;
+		}
+		var d = date.getSeconds()-zero.getSeconds();
+		if (d > 0)
+		{
+			res += d + " " + secondsText + " ";
+			if (++num>=numMax)
+				return res;
+		}
+		
+
+		trace("returns "+res);
+		return res;
+	}
+	/**
+	 * make dates readable
+	 * @param 	date can be a Date or String or timestamp
+	 */
+	public static function makeDateReadableFromTimestamp(resolve:String->Dynamic, timestamp:Float, format:String="%Y/%m/%d %H:%M"):String
+	{//trace("makeDateReadable "+Type.typeof(dateOrString)+" - "+format);
+
+		var date:Date;
+		date = Date.fromTime(timestamp);
+
+		var res:String = DateTools.format(date, format);
+		trace("makeDateReadable returns "+res);
+		return res;
+	}
 	public static function makeDateReadable(resolve:String->Dynamic, dateOrString:Dynamic, format:String="%Y/%m/%d %H:%M"):String
-	{
+	{//trace("makeDateReadable "+Type.typeof(dateOrString)+" - "+format);
+
 		var date:Date;
 		if (Std.is(dateOrString, String)){
+			trace("makeDateReadable string ");
 			date = Date.fromString(cast(dateOrString));
-			trace("makeDateReadable string "+dateOrString);
 		}
 		else if (Std.is(dateOrString, Date)){
 			trace("makeDateReadable date ");
