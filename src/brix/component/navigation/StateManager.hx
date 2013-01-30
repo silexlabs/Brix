@@ -49,6 +49,9 @@ class StateManager extends DisplayObject
 	{
 		super(rootElement, brixId);
 		currentCssClassNames = new Array();
+	}
+	override public function init()
+	{
 		// listen to other components events
 		mapListener(Lib.document.body, Page.EVENT_TYPE_OPEN_STOP, cast(onPageOpened), true);
 		mapListener(Lib.document.body, ContextManager.EVENT_CONTEXT_CHANGE, cast(onContextChanged), true);

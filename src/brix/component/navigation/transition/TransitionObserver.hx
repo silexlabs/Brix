@@ -41,21 +41,46 @@ class TransitionObserver{
 		this.stopEvent = stopEvent;
 	}
 	/**
+	 * start the transition observer process
+	 */
+	public function startProcess(){
+		if (hasStoped){
+			trace("Error: the watcher has allready been used and all transitions have finished. Canot reuse watchers.");
+			//throw("Error: the watcher has allready been used and all transitions have finished. Canot reuse watchers.");
+			return;
+		}
+		hasStarted = true;
+		dispatch(startEvent);
+	}
+	/**
+	 * stop the transition observer process
+	 */
+	public function stopProcess(){
+		if (hasStoped){
+			trace("Error: the watcher has allready been used and all transitions have finished. Canot reuse watchers.");
+			//throw("Error: the watcher has allready been used and all transitions have finished. Canot reuse watchers.");
+			return;
+		}
+		hasStoped = true;
+		dispatch(stopEvent);
+	}
+	/**
 	 * call this when a layer transition has started
 	 */
 	public function addTransition(layer:Layer){
 		// check if an event must be dispatched
 		if (pendingTransitions == 0){
-			if (hasStoped){
-				trace("Error: the watcher has allready been used and all transitions have finished. Canot reuse watchers.");
-				//throw("Error: the watcher has allready been used and all transitions have finished. Canot reuse watchers.");
-				return;
-			}
-			hasStarted = true;
-			dispatch(startEvent);
+			startProcess();
 		}
 		// keep track of the number of pending transitions
 		pendingTransitions++;
+	}
+	/**
+	 * call this when a layer is already opened
+	 */
+	public function alreadyOpen(layer:Layer){
+		addTransition(layer);
+		removeTransition(layer);
 	}
 	/**
 	 * call this when a layer transition has ended
@@ -64,17 +89,11 @@ class TransitionObserver{
 		DomTools.doLater(doRemoveTransition);
 	}
 	public function doRemoveTransition(){
-		if (hasStoped){
-			trace("Error: the watcher has allready been used and all transitions have finished. Canot reuse watchers.");
-			//throw("Error: the watcher has allready been used and all transitions have finished. Canot reuse watchers.");
-			return;
-		}
 		// keep track of the number of pending transitions
 		pendingTransitions--;
 		// check if an event must be dispatched
 		if (pendingTransitions == 0){
-			hasStoped = true;
-			dispatch(stopEvent);
+			stopProcess();
 		}
 	}
 	/** 

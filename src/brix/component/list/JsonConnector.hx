@@ -126,6 +126,7 @@ class JsonConnector extends DisplayObject
 		{
 			startPolling(pollingFreq);
 		}
+		latestData = "";
 	}
 	/**
 	 * the layer is being hidden

@@ -120,7 +120,7 @@ class TemplateRenderer extends DisplayObject
 	 * redraw the data without calling reloadData
 	 */
 	public function doRedraw()
-	{
+	{trace("WatPlayerManager doRedraw");
 		for (nodeIdx in 0...rootElement.childNodes.length)
 		{
 			var node = rootElement.childNodes[nodeIdx];
