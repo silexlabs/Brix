@@ -545,6 +545,7 @@ class Builder
 			}
 		}
 	}
+
 	
 	/**
 	 * Embeds the HTML content in the ApplicationContext class.
@@ -609,11 +610,12 @@ class Builder
 				}
 			}
 			var cmpClassNameExpr = { expr:EConst(CString(cmpClassName)), pos:pos };
+			var unconflictedClassTagExpr = { expr:EConst(CString(getUnconflictedClassTag(cmpClassName))), pos:pos };
 			var registerCompExpr;
 			
 			if ( cmpClassType.is("brix.component.ui.DisplayObject") )
 			{
-				registerCompExpr = macro registeredUIComponents.push( { classname:$cmpClassNameExpr, args:$argsExpr } );
+				registerCompExpr = macro registeredUIComponents.push( { classname:$cmpClassNameExpr, args:$argsExpr, unconflictedClassTag:$unconflictedClassTagExpr } );
 				//macroApplication.getRegisteredUIComponents().push( { classname:cmpClassName, args:null } ); // FIXME pass the args
 
 				#if brixdebug
@@ -622,7 +624,7 @@ class Builder
 			}
 			else
 			{
-				registerCompExpr = macro registeredGlobalComponents.push({classname:$cmpClassNameExpr, args:$argsExpr});
+				registerCompExpr = macro registeredGlobalComponents.push({classname:$cmpClassNameExpr, args:$argsExpr, unconflictedClassTag:$unconflictedClassTagExpr});
 				//macroApplication.getRegisteredNonUIComponents().push( { classname:cmpClassName, args:null } ); // FIXME pass the args
 
 				#if brixdebug
@@ -848,6 +850,34 @@ class Builder
 			return { expr : EField( generateImportPackagePath(path), lastPathElt), pos : Context.currentPos() };
 		}
 		return { expr : EConst(CIdent(path[0])), pos : Context.currentPos() };
+	}
+	
+	/**
+	 * Determine a class tag value for a component that won't be conflicting with other components.
+	 * 
+	 * NOTE : fix by Yannick, this method now called at macro time, could probably reuse "getUnconflictedClassTags"
+	 * instead of this one, but I didn't fully understood it
+	 */
+	static private function getUnconflictedClassTag(className : String) : String
+	{
+		var classTag = className;
+
+		if (classTag.indexOf(".") != -1)
+			classTag = classTag.substr(classTag.lastIndexOf(".") + 1);
+			
+		var declaredCmpsClassNames = declaredComponents.keys();
+		
+		while (declaredCmpsClassNames.hasNext())
+		{
+			var declaredComponentClassName = declaredCmpsClassNames.next();
+			
+			if ( declaredComponentClassName != className && classTag == declaredComponentClassName.substr(classTag.lastIndexOf(".") + 1) )
+			{
+				return className;
+			}
+		}
+
+		return classTag;
 	}
 	
 	/**
