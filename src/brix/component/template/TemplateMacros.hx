@@ -80,7 +80,7 @@ class TemplateMacros
 		}
 		
 
-		trace("returns "+res);
+		//trace("returns "+res);
 		return res;
 	}
 	/**
@@ -94,29 +94,36 @@ class TemplateMacros
 		date = Date.fromTime(timestamp);
 
 		var res:String = DateTools.format(date, format);
-		trace("makeDateReadable returns "+res);
+		//trace("makeDateReadable returns "+res);
 		return res;
 	}
 	public static function makeDateReadable(resolve:String->Dynamic, dateOrString:Dynamic, format:String="%Y/%m/%d %H:%M"):String
 	{//trace("makeDateReadable "+Type.typeof(dateOrString)+" - "+format);
+		try
+		{
+			var date:Date;
+			if (Std.is(dateOrString, String)){
+				//trace("makeDateReadable string ");
+				date = Date.fromString(cast(dateOrString));
+			}
+			else if (Std.is(dateOrString, Date)){
+				//trace("makeDateReadable date ");
+				date = cast(dateOrString);
+			}
+			else{
+				date = null;
+				throw("Error, the parameter is supposed to be String or Date");
+			}
 
-		var date:Date;
-		if (Std.is(dateOrString, String)){
-			trace("makeDateReadable string ");
-			date = Date.fromString(cast(dateOrString));
+			var res:String = DateTools.format(date, format);
+			//trace("makeDateReadable returns "+res);
+			return res;
 		}
-		else if (Std.is(dateOrString, Date)){
-			trace("makeDateReadable date ");
-			date = cast(dateOrString);
+		catch(e:Dynamic)
+		{
+			//trace("Error, could not convert "+dateOrString+" to Date");
 		}
-		else{
-			date = null;
-			throw("Error, the parameter is supposed to be String or Date");
-		}
-
-		var res:String = DateTools.format(date, format);
-		trace("makeDateReadable returns "+res);
-		return res;
+		return dateOrString;
 	}
 	/**
 	 * trace for the templates
