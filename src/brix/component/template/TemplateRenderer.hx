@@ -37,6 +37,9 @@ class TemplateRenderer extends DisplayObject
 	 */
 	public var htmlTemplate:String;
 	/**
+	 */
+	public var lastRenderedHtml:String="";
+	/**
 	 * constructor
 	 */
 	public function new(rootElement:HtmlDom, brixId:String)
@@ -56,7 +59,7 @@ class TemplateRenderer extends DisplayObject
 		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, false);
 
 		// listen to the layer events
-/*		var tmpHtmlDom = rootElement;
+/**/		var tmpHtmlDom = rootElement;
 		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
 		{
 			tmpHtmlDom = tmpHtmlDom.parentNode;
@@ -68,7 +71,7 @@ class TemplateRenderer extends DisplayObject
 			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
 			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
 		}
-*/	}
+/**/	}
 	/**
 	 * callback for the event
 	 */
@@ -80,16 +83,12 @@ class TemplateRenderer extends DisplayObject
 	}
 	/**
 	 * the layer is being showed
-	 *
+	 */
 	public function onLayerShow(e:Event)
 	{
-		var layerEvent: LayerEventDetail = cast(e).detail;
-		if (layerEvent.transitionObserver != null 
-			&& layerEvent.transitionObserver.page != null 
-			&& layerEvent.transitionObserver.page.query != null)
-		{
-			data = layerEvent.transitionObserver.page.query;
-		}
+		if (lastRenderedHtml != "")
+			data = lastRenderedHtml;
+		trace("onLayerShow "+data);
 		redraw();
 	}
 	/**
@@ -97,7 +96,8 @@ class TemplateRenderer extends DisplayObject
 	 */ 
 	public function onLayerHide(e:Event)
 	{
-		rootElement.innerHTML = "";
+		//rootElement.innerHTML = "";
+		//lastRenderedHtml = "";
 	}
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
@@ -133,7 +133,19 @@ class TemplateRenderer extends DisplayObject
 		try
 		{
 			var t = new haxe.Template(htmlTemplate);
-			rootElement.innerHTML = t.execute(data, TemplateMacros);
+			var res = t.execute(data, TemplateMacros);
+			if (rootElement.innerHTML == "" || lastRenderedHtml != res)
+			{
+				trace("render IS different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+				lastRenderedHtml = res;
+				rootElement.innerHTML = res;
+				trace("render => "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+			}
+			else
+			{
+
+				trace("render not different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+			}
 		}
 		catch(e:Dynamic)
 		{
