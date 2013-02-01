@@ -177,6 +177,11 @@ class JsonConnector extends DisplayObject
 			trace("no new data");
 			return;
 		}
+		else
+		{
+			trace("new data ");
+			trace(rootElement.className);
+		}
 		latestData = data;
 		// parse string to json
 		var objectData:Dynamic = null;
