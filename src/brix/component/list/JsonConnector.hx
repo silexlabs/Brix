@@ -148,9 +148,10 @@ class JsonConnector extends DisplayObject
 		if (url == null)
 		{
 			url = rootElement.getAttribute(ATTR_URL);
-			if (url == null)
+			if (url == null || url == "")
 			{
-				throw("Error: no url provided, aborting http request. I will not load data. Connector "+rootElement.className);
+				trace("Error: no url provided, aborting http request. I will not load data. Connector "+rootElement.className);
+				return;
 			}
 		}
 		trace("loadData "+url);

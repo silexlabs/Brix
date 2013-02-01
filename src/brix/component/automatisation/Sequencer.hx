@@ -243,6 +243,7 @@ class Sequencer extends DisplayObject
 	{
 		var newTimecode:Timecode = cast(e).detail;
 		timecodeOffset = newTimecode - Date.now().getTime();
+		trace("onSetTimecodeRequest new timecode is "+newTimecode);
 	}
 
 	////////////////////////////////////
