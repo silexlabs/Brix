@@ -135,7 +135,7 @@ class Repeater<ElementClass> extends DisplayObject
 				newElementsHtml.push(t.execute(element, TemplateMacros));
 			}
 			catch(e:Dynamic){
-				throw("Error: an error occured while interpreting the template - "+htmlTemplate+" - for the element "+element);
+				trace("Error: an error occured while interpreting the template - "+htmlTemplate+" - for the element "+element);
 			}
 		}
 	 	// browse the current dom and remove the nodes which have no equivalent in the dataProvider
@@ -151,7 +151,7 @@ class Repeater<ElementClass> extends DisplayObject
 				var nodes = DomTools.getElementsByAttribute(rootElement, DATA_ATTR_LIST_ITEM_INDEX, Std.string(htmlIdx));
 				if (nodes.length == 0 )
 				{
-					throw("doRedraw could not find node with id="+htmlIdx);
+					trace("Error: doRedraw could not find node with id="+htmlIdx);
 				}
 				var node = nodes[0];
 				toBeRemoved.push(node);
