@@ -165,8 +165,15 @@ class Repeater<ElementClass> extends DisplayObject
 		// remove the useless nodes
 		for (node in toBeRemoved)
 		{
-			getBrixApplication().cleanNode(node);
-			removeChild(node);
+			try
+			{			
+				getBrixApplication().cleanNode(node);
+				removeChild(node);
+			}
+			catch(e:Dynamic)
+			{
+				trace("Error while removing node: "+e);
+			}
 		}
 		// temp container
 		var tmpDiv = Lib.document.createElement("div");
