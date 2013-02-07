@@ -126,6 +126,34 @@ class TemplateMacros
 		return dateOrString;
 	}
 	/**
+	 * url encode/decode
+	 */
+	public static function urlEncode(resolve:String->Dynamic, str:String):String
+	{
+		return StringTools.urlEncode(str);
+	}
+	/**
+	 * url encode/decode
+	 */
+	public static function urlDecode(resolve:String->Dynamic, str:String):String
+	{
+		return StringTools.urlDecode(str);
+	}
+	/**
+	 * Escape/unsecape HTML special characters of the string.
+	 */
+	public static function htmlEscape(resolve:String->Dynamic, str:String):String
+	{
+		return StringTools.htmlEscape(str);
+	}
+	/**
+	 * Escape/unsecape HTML special characters of the string.
+	 */
+	public static function htmlUnescape(resolve:String->Dynamic, str:String):String
+	{
+		return StringTools.htmlUnescape(str);
+	}
+	/**
 	 * trace for the templates
 	 */
 	public static function trace(resolve:String->Dynamic, obj):String
