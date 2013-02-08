@@ -51,13 +51,11 @@ class DomTools
 	 */
 	static public function doLater(callbackFunction:Void->Void, ?frames:Int=1)
 	{
-#if js
-		// interval between frames in ms
 		var frameInterval = 200;
+#if (flash || nme || js)
+		// interval between frames in ms
 		haxe.Timer.delay(callbackFunction, frames*frameInterval);
-#elseif (flash || nme)
-		haxe.Timer.delay(callbackFunction, frames);
-#else
+#else // php for example
 		callbackFunction();
 #end
 	}
