@@ -294,7 +294,7 @@ class Layer extends DisplayObject
 		{
 			//trace("Warning: can not show the layer, since it has the status '"+status+"'");
 			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_SHOW_AGAIN, false, false, {
+			event.initCustomEvent(EVENT_TYPE_SHOW_AGAIN, true, true, {
 				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
