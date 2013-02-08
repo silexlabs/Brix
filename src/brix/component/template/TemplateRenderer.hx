@@ -86,8 +86,6 @@ class TemplateRenderer extends DisplayObject
 	 */
 	public function onLayerShow(e:Event)
 	{
-		if (lastRenderedHtml != "")
-			data = lastRenderedHtml;
 		trace("onLayerShow "+data);
 		redraw();
 	}
@@ -97,7 +95,7 @@ class TemplateRenderer extends DisplayObject
 	public function onLayerHide(e:Event)
 	{
 		//rootElement.innerHTML = "";
-		//lastRenderedHtml = "";
+		// lastRenderedHtml = "";
 	}
 	/**
 	 * redraw the list, i.e. reload the dataProvider( ... )
@@ -121,25 +119,33 @@ class TemplateRenderer extends DisplayObject
 	 */
 	public function doRedraw()
 	{trace("WatPlayerManager doRedraw");
-		for (nodeIdx in 0...rootElement.childNodes.length)
-		{
-			var node = rootElement.childNodes[nodeIdx];
-			if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
-			{
-				getBrixApplication().cleanNode(node);
-			}
-		}
 	 	// generate the html for the element
 		try
 		{
 			var t = new haxe.Template(htmlTemplate);
 			var res = t.execute(data, TemplateMacros);
-			if (rootElement.innerHTML == "" || lastRenderedHtml != res)
+			if (lastRenderedHtml != res)
 			{
 				trace("render IS different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+				for (nodeIdx in 0...rootElement.childNodes.length)
+				{
+					var node = rootElement.childNodes[nodeIdx];
+					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
+					{
+						getBrixApplication().cleanNode(node);
+					}
+				}
 				lastRenderedHtml = res;
 				rootElement.innerHTML = res;
 				trace("render => "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+				for (nodeIdx in 0...rootElement.childNodes.length)
+				{
+					var node = rootElement.childNodes[nodeIdx];
+					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
+					{
+						getBrixApplication().initNode(node);
+					}
+				}
 			}
 			else
 			{
@@ -150,14 +156,6 @@ class TemplateRenderer extends DisplayObject
 		catch(e:Dynamic)
 		{
 			trace("Error: could not render template "+htmlTemplate+" with data "+data+". Error message: "+e);
-		}
-		for (nodeIdx in 0...rootElement.childNodes.length)
-		{
-			var node = rootElement.childNodes[nodeIdx];
-			if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
-			{
-				getBrixApplication().initNode(node);
-			}
 		}
 	}
 	/**
