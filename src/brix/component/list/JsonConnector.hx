@@ -58,6 +58,7 @@ class JsonConnector extends DisplayObject
 	////////////////////////////////////
 	private var pollingFreq:Null<Int>;
 	private var isPolling:Bool=false;
+	private var latestData:String = "";
 
 	////////////////////////////////////
 	// DisplayObject methods
@@ -164,7 +165,6 @@ class JsonConnector extends DisplayObject
 	/**
 	 * callback for the http request
 	 */ 
-	private var latestData:String = "";
 	public function onData(data:String)
 	{
 		if (isPolling && pollingFreq!=null)
