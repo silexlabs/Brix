@@ -17,6 +17,9 @@ import brix.util.DomTools;
 import brix.component.ui.DisplayObject;
 import brix.component.template.TemplateMacros;
 
+#if continuation
+import com.dongxiguo.continuation.Continuation;
+
 /**
  * list component
  * display items in a template and expose a data provider interface
@@ -24,6 +27,8 @@ import brix.component.template.TemplateMacros;
  * 	template
  * 	datapovider
  */
+@:build(com.dongxiguo.continuation.Continuation.cpsByMeta("cps"))
+#end
 class Repeater<ElementClass> extends DisplayObject
 {
 	/**
@@ -114,10 +119,13 @@ class Repeater<ElementClass> extends DisplayObject
 	 * - browse all items of the dataProvider, and if it is in the DOM, move it, otherwise create a node
 	 * handles the case where several items have the same html rendering
 	 */
+	static function sleepOneFrame(handler:Void->Void):Void
+	{
+		//    haxe.Timer.delay(handler, 1000);
+		DomTools.doLater(handler, 3);
+	}
 	public function doRedraw()
 	{
-		//trace("doRedraw "+dataProvider.length+" elements");
-
 /*
 		// remove from dom for performance saving
 		var rootElementIdx = DomTools.getElementIndex(rootElement);
@@ -125,6 +133,7 @@ class Repeater<ElementClass> extends DisplayObject
 		rootElementParent.removeChild(rootElement);
 
 */	 	// generate the html for each dataProvider element
+
 		var newElementsHtml:Array<String> = new Array();
 		var t = new haxe.Template(htmlTemplate);
 		for (idx in 0...dataProvider.length)
@@ -142,6 +151,8 @@ class Repeater<ElementClass> extends DisplayObject
 	 	// tmpElementsHtml is used to handle the case of multiple elements having the same html rendering
 	 	var tmpElementsHtml = newElementsHtml.copy();
 	 	var toBeRemoved:Array<HtmlDom> = new Array();
+
+
 		for (htmlIdx in 0...elementsHtml.length)
 		{
 			// check if the node is still in the DP
@@ -162,6 +173,7 @@ class Repeater<ElementClass> extends DisplayObject
 				var tmp = tmpElementsHtml.remove(elementsHtml[htmlIdx]);
 			}
 		}
+
 		// remove the useless nodes
 		for (node in toBeRemoved)
 		{
@@ -175,11 +187,31 @@ class Repeater<ElementClass> extends DisplayObject
 				trace("Error while removing node: "+e);
 			}
 		}
+#if continuation
+		doRedrawContinuation(newElementsHtml, function()
+	    {
+	      trace("Handler without continuation.");
+	    });
+	}
+	@cps public function doRedrawContinuation(newElementsHtml:Array<String>)
+	{trace("doRedrawContinuation  "+newElementsHtml.length);
+
+#end
+		var time = Date.now().getTime();
 		// temp container
 		var tmpDiv = Lib.document.createElement("div");
+		var numContinuation = 0;
 	 	// browse all items of the dataProvider, and if it is in the DOM, move it, otherwise create a node
 		for (idx in 0...dataProvider.length)
 		{
+#if continuation
+			if (numContinuation++>2)
+			{
+				trace("doRedrawContinuation MAKE A PAUSE 1 FRAME "+idx+"/"+newElementsHtml.length);
+				numContinuation = 0;
+				sleepOneFrame().async();
+			}
+#end
 			var element = dataProvider[idx];
 			var found = false;
 			// browse all nodes and check if it is our element
@@ -245,6 +277,8 @@ class Repeater<ElementClass> extends DisplayObject
 		// store the new raw initial html
 		elementsHtml = newElementsHtml;
 
+trace("elapsed time: "+(Date.now().getTime() - time));
+
 		// reset the item ids
 		//setItemIds(true);
 
@@ -259,38 +293,7 @@ class Repeater<ElementClass> extends DisplayObject
 			// insert at the end
 			rootElementParent.appendChild(rootElement);
 		}
-/*
-	old "replace all" strategy:
-
-		// redraw list content
-		var newInnerHTML:String = "";
-		var t = new haxe.Template(htmlTemplate);
-		for (elem in dataProvider)
-		{
-			try
-			{
-				newInnerHTML += t.execute(elem, TemplateMacros);
-			}
-			catch(e:Dynamic){
-				throw("Error: an error occured while interpreting the template - "+htmlTemplate+" - for the element "+elem);
-			}
-		}
-
-		for (i in 0...rootElement.childNodes.length)
-		{
-			getBrixApplication().cleanNode(rootElement.childNodes[i]);
-		}
-
-		rootElement.innerHTML = newInnerHTML;
-
-		for (i in 0...rootElement.childNodes.length)
-		{
-			getBrixApplication().initNode(rootElement.childNodes[i]);
-		}
-
-		setItemIds();
-*/
-	}
+*/	}
 	private function getChildAt(idx:Int):HtmlDom
 	{
 		return rootElement.childNodes[idx];
