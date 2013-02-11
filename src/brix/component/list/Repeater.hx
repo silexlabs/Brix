@@ -49,6 +49,9 @@ class Repeater<ElementClass> extends DisplayObject
 	 * data store
 	 */
 	public var dataProvider:Array<ElementClass>;
+
+	private var stopContinuationFlag:Bool = false;
+	private var isContinuationPending:Bool = false;
 	/**
 	 * constructor
 	 */
@@ -79,6 +82,8 @@ class Repeater<ElementClass> extends DisplayObject
 		{
 			dataProvider = newData;
 			redraw();
+			if (isContinuationPending)
+				stopContinuationFlag = true;
 		}
 	}
 	/**
@@ -133,6 +138,8 @@ class Repeater<ElementClass> extends DisplayObject
 		rootElementParent.removeChild(rootElement);
 
 */	 	// generate the html for each dataProvider element
+
+		stopContinuationFlag = false;
 
 		var newElementsHtml:Array<String> = new Array();
 		var t = new haxe.Template(htmlTemplate);
@@ -191,6 +198,7 @@ class Repeater<ElementClass> extends DisplayObject
 		doRedrawContinuation(newElementsHtml, function()
 	    {
 	      trace("Handler without continuation.");
+				isContinuationPending = false;
 	    });
 	}
 	@cps public function doRedrawContinuation(newElementsHtml:Array<String>)
@@ -204,9 +212,16 @@ class Repeater<ElementClass> extends DisplayObject
 	 	// browse all items of the dataProvider, and if it is in the DOM, move it, otherwise create a node
 		for (idx in 0...dataProvider.length)
 		{
+			if (stopContinuationFlag==true)
+			{
+				stopContinuationFlag = false;
+				trace("stop pending continuation");
+				return;
+			}
 #if continuation
 			if (numContinuation++>2)
 			{
+				isContinuationPending = true;
 				trace("doRedrawContinuation MAKE A PAUSE 1 FRAME "+idx+"/"+newElementsHtml.length);
 				numContinuation = 0;
 				sleepOneFrame().async();
