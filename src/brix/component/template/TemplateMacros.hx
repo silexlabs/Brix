@@ -25,55 +25,73 @@ class TemplateMacros
 	 */
 	public static function durationFromTimestamp(resolve:String->Dynamic, timestamp:Float, numMax:Int=999, 
 		yearsText:String="years", monthsText:String="months", weeksText:String="weeks", daysText:String="days", 
-		hoursText:String="hours", minutesText:String="minutes", secondsText:String="seconds"):String
+		hoursText:String="hours", minutesText:String="minutes", secondsText:String="seconds", ?unit="ms"):String
 	{//trace("durationFromTimestamp "+(Date.now().getTime())+"-"+(timestamp*1000)+" - "+(Date.now().getTime()-(timestamp*1000)));
-		var date:Date;
-		date = Date.fromTime(Date.now().getTime()-(timestamp*1000));
-		var zero = Date.fromTime(0);
+		if (StringTools.trim(unit) == "s")
+		{
+			trace("durationFromTimestamp SECONDS");
+			timestamp *= 1000;
+		}
+		var elapsed:Float = Date.now().getTime()-timestamp;
 
+		trace("durationFromTimestamp elapsed "+elapsed);
 		var num = 0;
 		var res:String = "";
-		var d = date.getFullYear()-zero.getFullYear();
+		var d = Math.floor(elapsed/31536000000);
+		trace("durationFromTimestamp year = "+d);
 		if (d > 0)
 		{
+			elapsed -= d*31536000000;
 			res += d + " " + yearsText + " ";
 			if (++num>=numMax)
 				return res;
 		}
-		var d = date.getMonth()-zero.getMonth();
+		var d = Math.floor(elapsed/2592000000);
+		trace("durationFromTimestamp month = "+d);
 		if (d > 0)
 		{
+			elapsed -= d*2592000000;
 			res += d + " " + monthsText + " ";
 			if (++num>=numMax)
 				return res;
 		}
-		var d = date.getDay()-zero.getDay();
+		var d = Math.floor(elapsed/86400000);
+		elapsed -= d*86400000;
+		trace("durationFromTimestamp days = "+d);
+		
 		var week = d/7;
+		trace("durationFromTimestamp week = "+week);
 		if (week > 1)
-			res += Math.round(week) + " " + weeksText + " ";
+			res += Math.floor(week) + " " + weeksText + " ";
 		else if (d > 0)
 		{
 			res += d + " " + daysText + " ";
 			if (++num>=numMax)
 				return res;
 		}
-		var d = date.getHours()-zero.getHours();
+		var d = Math.floor(elapsed/3600000);
+		trace("durationFromTimestamp hours = "+d);
 		if (d > 0)
 		{
+			elapsed -= d*3600000;
 			res += d + " " + hoursText + " ";
 			if (++num>=numMax)
 				return res;
 		}
-		var d = date.getMinutes()-zero.getMinutes();
+		var d = Math.floor(elapsed/60000);
+		trace("durationFromTimestamp minutes = "+d);
 		if (d > 0)
 		{
+			elapsed -= d*60000;
 			res += d + " " + minutesText + " ";
 			if (++num>=numMax)
 				return res;
 		}
-		var d = date.getSeconds()-zero.getSeconds();
+		var d = Math.floor(elapsed/1000);
+		trace("durationFromTimestamp seconds = "+d);
 		if (d > 0)
 		{
+			elapsed -= d*1000;
 			res += d + " " + secondsText + " ";
 			if (++num>=numMax)
 				return res;
@@ -85,10 +103,16 @@ class TemplateMacros
 	}
 	/**
 	 * make dates readable
-	 * @param 	date can be a Date or String or timestamp
+	 * @param 	timestamp in milliseconds or seconds
+	 * @param 	unit can be "s" or "ms"
 	 */
-	public static function makeDateReadableFromTimestamp(resolve:String->Dynamic, timestamp:Float, format:String="%Y/%m/%d %H:%M"):String
-	{//trace("makeDateReadable "+Type.typeof(dateOrString)+" - "+format);
+	public static function makeDateReadableFromTimestamp(resolve:String->Dynamic, timestamp:Float, format:String="%Y/%m/%d %H:%M", ?unit:String="ms"):String
+	{
+		if (StringTools.trim(unit) == "s")
+		{
+		trace("makeDateReadableFromTimestamp "+timestamp+" - "+format+" - "+unit);
+			timestamp *= 1000;
+		}
 
 		var date:Date;
 		date = Date.fromTime(timestamp);
