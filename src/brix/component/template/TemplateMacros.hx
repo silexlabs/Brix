@@ -29,16 +29,13 @@ class TemplateMacros
 	{//trace("durationFromTimestamp "+(Date.now().getTime())+"-"+(timestamp*1000)+" - "+(Date.now().getTime()-(timestamp*1000)));
 		if (StringTools.trim(unit) == "s")
 		{
-			trace("durationFromTimestamp SECONDS");
 			timestamp *= 1000;
 		}
 		var elapsed:Float = Date.now().getTime()-timestamp;
 
-		trace("durationFromTimestamp elapsed "+elapsed);
 		var num = 0;
 		var res:String = "";
 		var d = Math.floor(elapsed/31536000000);
-		trace("durationFromTimestamp year = "+d);
 		if (d > 0)
 		{
 			elapsed -= d*31536000000;
@@ -47,7 +44,6 @@ class TemplateMacros
 				return res;
 		}
 		var d = Math.floor(elapsed/2592000000);
-		trace("durationFromTimestamp month = "+d);
 		if (d > 0)
 		{
 			elapsed -= d*2592000000;
@@ -57,10 +53,8 @@ class TemplateMacros
 		}
 		var d = Math.floor(elapsed/86400000);
 		elapsed -= d*86400000;
-		trace("durationFromTimestamp days = "+d);
 		
 		var week = d/7;
-		trace("durationFromTimestamp week = "+week);
 		if (week > 1)
 			res += Math.floor(week) + " " + weeksText + " ";
 		else if (d > 0)
@@ -70,7 +64,6 @@ class TemplateMacros
 				return res;
 		}
 		var d = Math.floor(elapsed/3600000);
-		trace("durationFromTimestamp hours = "+d);
 		if (d > 0)
 		{
 			elapsed -= d*3600000;
@@ -79,7 +72,6 @@ class TemplateMacros
 				return res;
 		}
 		var d = Math.floor(elapsed/60000);
-		trace("durationFromTimestamp minutes = "+d);
 		if (d > 0)
 		{
 			elapsed -= d*60000;
@@ -88,7 +80,6 @@ class TemplateMacros
 				return res;
 		}
 		var d = Math.floor(elapsed/1000);
-		trace("durationFromTimestamp seconds = "+d);
 		if (d > 0)
 		{
 			elapsed -= d*1000;
