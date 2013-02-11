@@ -37,7 +37,11 @@ class StateManager extends DisplayObject
 	/**
 	 * css classes added to rootElement.className
 	 */
-	public var currentCssClassNames:Array<String>;
+	public var currentCssClassNamesContexts:Array<String>;
+	/**
+	 * css classes added to rootElement.className
+	 */
+	public var currentCssClassNamesPages:Array<String>;
 
 	///////////////////////////////////////////////////////////////
 	// main methods
@@ -48,7 +52,8 @@ class StateManager extends DisplayObject
 	public function new(rootElement:HtmlDom, brixId:String)
 	{
 		super(rootElement, brixId);
-		currentCssClassNames = new Array();
+		currentCssClassNamesContexts = new Array();
+		currentCssClassNamesPages = new Array();
 	}
 	override public function init()
 	{
@@ -64,7 +69,7 @@ class StateManager extends DisplayObject
 		// retrieve the context manager
 		var contextManager:ContextManager = e.detail;
 		// update the state
-		update(contextManager.currentContexts);
+		update(contextManager.currentContexts, currentCssClassNamesContexts);
 	}
 	/** 
 	 * callback for page events
@@ -75,12 +80,12 @@ class StateManager extends DisplayObject
 		var page:Page = e.detail;
 
 		// update the state
-		update([page.name]);
+		update([page.name], currentCssClassNamesPages);
 	}
 	/**
 	 * apply the css style corresponding to a state
 	 */
-	private function update(states:Array<String>) 
+	private function update(states:Array<String>, currentCssClassNames:Array<String>) 
 	{trace("update "+states);
 		var isDirty = false;
 
