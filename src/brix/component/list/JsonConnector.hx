@@ -90,6 +90,10 @@ class JsonConnector extends DisplayObject
 			{
 				pollingFreq = Std.parseInt(pollingFreqStr);
 			}
+			else
+			{
+				pollingFreq = 0;
+			}
 			var startupDelay = rootElement.getAttribute(ATTR_STARTUP_DELAY);
 			if (startupDelay != null)
 			{
@@ -167,7 +171,7 @@ class JsonConnector extends DisplayObject
 	 */ 
 	public function onData(data:String)
 	{
-		if (isPolling && pollingFreq!=null)
+		if (isPolling && pollingFreq!=null && pollingFreq>0)
 		{
 			Timer.delay(callback(loadData, null), pollingFreq);
 		}
