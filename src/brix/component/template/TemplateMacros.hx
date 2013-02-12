@@ -88,8 +88,6 @@ class TemplateMacros
 				return res;
 		}
 		
-
-		//trace("returns "+res);
 		return res;
 	}
 	/**
@@ -101,7 +99,6 @@ class TemplateMacros
 	{
 		if (StringTools.trim(unit) == "s")
 		{
-		trace("makeDateReadableFromTimestamp "+timestamp+" - "+format+" - "+unit);
 			timestamp *= 1000;
 		}
 
@@ -109,7 +106,6 @@ class TemplateMacros
 		date = Date.fromTime(timestamp);
 
 		var res:String = DateTools.format(date, format);
-		//trace("makeDateReadable returns "+res);
 		return res;
 	}
 	public static function makeDateReadable(resolve:String->Dynamic, dateOrString:Dynamic, format:String="%Y/%m/%d %H:%M"):String
@@ -118,11 +114,9 @@ class TemplateMacros
 		{
 			var date:Date;
 			if (Std.is(dateOrString, String)){
-				//trace("makeDateReadable string ");
 				date = Date.fromString(cast(dateOrString));
 			}
 			else if (Std.is(dateOrString, Date)){
-				//trace("makeDateReadable date ");
 				date = cast(dateOrString);
 			}
 			else{
@@ -131,12 +125,11 @@ class TemplateMacros
 			}
 
 			var res:String = DateTools.format(date, format);
-			//trace("makeDateReadable returns "+res);
 			return res;
 		}
 		catch(e:Dynamic)
 		{
-			//trace("Error, could not convert "+dateOrString+" to Date");
+			trace("Error, could not convert "+dateOrString+" to Date");
 		}
 		return dateOrString;
 	}
