@@ -102,6 +102,12 @@ class LinkBase extends DisplayObject, implements IGroupable
 				trace("Warning: the link has no href atribute ("+rootElement+")");
 			}
 		}
+		var pageURL = linkName.split("?");
+		if (pageURL[1] != null)
+		{
+			pageURL[1] = StringTools.urlEncode(StringTools.htmlUnescape(pageURL[1]));
+			linkName = pageURL.join("?");
+		}
 
 		// retrieve the target attr of our link 
 		if (rootElement.getAttribute(CONFIG_TARGET_ATTR) != null && rootElement.getAttribute(CONFIG_TARGET_ATTR).trim() != "")

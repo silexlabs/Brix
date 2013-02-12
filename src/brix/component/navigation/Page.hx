@@ -124,8 +124,9 @@ class Page extends DisplayObject, implements IGroupable
 		page.query = { };
 		if (pageURL[1] != null)
 		{
-			var queryString = StringTools.htmlUnescape(pageURL[1]);
+			var queryString = pageURL[1];
 			queryString = StringTools.urlDecode(queryString);
+			queryString = StringTools.htmlUnescape(queryString);
 			updateQuery(page, queryString);
 		}
 		
