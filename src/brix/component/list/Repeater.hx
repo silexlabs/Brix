@@ -80,9 +80,10 @@ class Repeater<ElementClass> extends DisplayObject
 		var newData:Array<ElementClass> = cast(e).detail;
 		if (newData != null)
 		{
+			var stopContinuation = isContinuationPending;
 			dataProvider = newData;
 			redraw();
-			if (isContinuationPending)
+			if (stopContinuation)
 				stopContinuationFlag = true;
 		}
 	}
