@@ -526,12 +526,14 @@ class Layer extends DisplayObject
 
 
 		// remove children 
+/*
 		while (rootElement.childNodes.length > 0)
 		{
 			var element:HtmlDom = rootElement.childNodes[0];
 			rootElement.removeChild(element);
 			childrenArray.push(element);
 		}
+/**/
 		// set or reset style.display
 		rootElement.style.display = "none";
 	}
