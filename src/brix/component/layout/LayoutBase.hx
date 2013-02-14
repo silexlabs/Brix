@@ -49,11 +49,10 @@ class LayoutBase extends DisplayObject
 		// do not compile: Lib.window.addEventListener("resize", redraw, false);
 		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
 
-		mapListener(Lib.document.body, EVENT_LAYOUT_REDRAW, redrawCallback, true);
-		mapListener(Lib.document.body, Page.EVENT_TYPE_OPEN_STOP, redrawCallback, true);
-		mapListener(Lib.document.body, Page.EVENT_TYPE_CLOSE_STOP, redrawCallback, true);
-		mapListener(Lib.document.body, ContextManager.EVENT_CONTEXT_CHANGE, redrawCallback, true);
-		mapListener(Lib.document.body, StateManager.EVENT_STATE_CHANGE, redrawCallback, true);
+		mapListener(Lib.document.body, Page.EVENT_TYPE_OPEN_STOP, navigationCallback, true);
+		mapListener(Lib.document.body, Page.EVENT_TYPE_CLOSE_STOP, navigationCallback, true);
+		mapListener(Lib.document.body, ContextManager.EVENT_CONTEXT_CHANGE, navigationCallback, true);
+		mapListener(Lib.document.body, StateManager.EVENT_STATE_CHANGE, navigationCallback, true);
 
 		// other layouts event
 		mapListener(Lib.document.body, EVENT_LAYOUT_REDRAW, redrawCallback, true);
@@ -66,6 +65,12 @@ class LayoutBase extends DisplayObject
 
 		// redraw
 		//DomTools.doLater(redraw);
+	}
+	/**
+	 * call redraw when an event occures
+	 */
+	public function navigationCallback(e:Event){
+		DomTools.doLater(redraw);
 	}
 	/**
 	 * call redraw when an event occures
