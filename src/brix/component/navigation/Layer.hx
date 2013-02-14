@@ -526,7 +526,7 @@ class Layer extends DisplayObject
 
 
 		// remove children 
-/*
+/**/
 		while (rootElement.childNodes.length > 0)
 		{
 			var element:HtmlDom = rootElement.childNodes[0];
