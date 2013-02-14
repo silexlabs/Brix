@@ -155,7 +155,7 @@ class TemplateRenderer extends DisplayObject
 		}
 		catch(e:Dynamic)
 		{
-			trace("Error: could not render template "+htmlTemplate+" with data "+data+". Error message: "+e);
+			trace("Error: could not render template "+htmlTemplate+". Error message: "+e);
 		}
 	}
 	/**
