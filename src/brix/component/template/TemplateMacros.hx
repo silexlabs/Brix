@@ -25,8 +25,9 @@ class TemplateMacros
 	 */
 	public static function durationFromTimestamp(resolve:String->Dynamic, timestamp:Float, numMax:Int=999, 
 		yearsText:String="years", monthsText:String="months", weeksText:String="weeks", daysText:String="days", 
-		hoursText:String="hours", minutesText:String="minutes", secondsText:String="seconds", ?unit="ms"):String
+		hoursText:String="hours", minutesText:String="minutes", secondsText:String="seconds", ?unit="ms", ?prefix:String="", ?suffix:String=""):String
 	{//trace("durationFromTimestamp "+(Date.now().getTime())+"-"+(timestamp*1000)+" - "+(Date.now().getTime()-(timestamp*1000)));
+		var initialTimestamp = timestamp;
 		if (StringTools.trim(unit) == "s")
 		{
 			timestamp *= 1000;
@@ -39,56 +40,107 @@ class TemplateMacros
 		if (d > 0)
 		{
 			elapsed -= d*31536000000;
-			res += d + " " + yearsText + " ";
-			if (++num>=numMax)
-				return res;
+			if (yearsText != null && yearsText != "")
+			{
+				res += d + yearsText + " ";
+				if (++num>=numMax)
+					return prefix+res+suffix;
+			}
+			else
+			{
+				return makeDateReadableFromTimestamp(resolve, initialTimestamp, null, unit);
+			}
 		}
 		var d = Math.floor(elapsed/2592000000);
 		if (d > 0)
 		{
 			elapsed -= d*2592000000;
-			res += d + " " + monthsText + " ";
-			if (++num>=numMax)
-				return res;
+			if (monthsText != null && monthsText != "")
+			{
+				res += d + monthsText + " ";
+				if (++num>=numMax)
+					return prefix+res+suffix;
+			}
+			else
+			{
+				return makeDateReadableFromTimestamp(resolve, initialTimestamp, null, unit);
+			}
 		}
 		var d = Math.floor(elapsed/86400000);
 		elapsed -= d*86400000;
 		
 		var week = d/7;
 		if (week > 1)
-			res += Math.floor(week) + " " + weeksText + " ";
+		{
+			if (weeksText != null && weeksText != "")
+			{
+				res += Math.floor(week) + weeksText + " ";
+			}
+			else
+			{
+				return makeDateReadableFromTimestamp(resolve, initialTimestamp, null, unit);
+			}
+		}
 		else if (d > 0)
 		{
-			res += d + " " + daysText + " ";
-			if (++num>=numMax)
-				return res;
+			if (daysText != null && daysText != "")
+			{
+				res += d + daysText + " ";
+				if (++num>=numMax)
+					return prefix+res+suffix;
+			}
+			else
+			{
+				return makeDateReadableFromTimestamp(resolve, initialTimestamp, null, unit);
+			}
 		}
 		var d = Math.floor(elapsed/3600000);
 		if (d > 0)
 		{
 			elapsed -= d*3600000;
-			res += d + " " + hoursText + " ";
-			if (++num>=numMax)
-				return res;
+			if (hoursText != null && hoursText != "")
+			{
+				res += d + hoursText + " ";
+				if (++num>=numMax)
+					return prefix+res+suffix;
+			}
+			else
+			{
+				return makeDateReadableFromTimestamp(resolve, initialTimestamp, null, unit);
+			}
 		}
 		var d = Math.floor(elapsed/60000);
 		if (d > 0)
 		{
 			elapsed -= d*60000;
-			res += d + " " + minutesText + " ";
-			if (++num>=numMax)
-				return res;
+			if (minutesText != null && minutesText != "")
+			{
+				res += d + minutesText + " ";
+				if (++num>=numMax)
+					return prefix+res+suffix;
+			}
+			else
+			{
+				return makeDateReadableFromTimestamp(resolve, initialTimestamp, null, unit);
+			}
 		}
 		var d = Math.floor(elapsed/1000);
 		if (d > 0)
 		{
 			elapsed -= d*1000;
-			res += d + " " + secondsText + " ";
-			if (++num>=numMax)
-				return res;
+			if (secondsText != null && secondsText != "")
+			{
+				res += d + secondsText + " ";
+				if (++num>=numMax)
+					return prefix+res+suffix;
+			}
+			else
+			{
+				return makeDateReadableFromTimestamp(resolve, initialTimestamp, null, unit);
+			}
 		}
 		
-		return res;
+		return prefix+res+suffix;
 	}
 	/**
 	 * make dates readable
