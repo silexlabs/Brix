@@ -86,7 +86,6 @@ class TemplateRenderer extends DisplayObject
 	 */
 	public function onLayerShow(e:Event)
 	{
-		trace("onLayerShow "+data);
 		redraw();
 	}
 	/**
@@ -118,7 +117,7 @@ class TemplateRenderer extends DisplayObject
 	 * redraw the data without calling reloadData
 	 */
 	public function doRedraw()
-	{trace("WatPlayerManager doRedraw");
+	{
 	 	// generate the html for the element
 		try
 		{
@@ -126,7 +125,7 @@ class TemplateRenderer extends DisplayObject
 			var res = t.execute(data, TemplateMacros);
 			if (lastRenderedHtml != res)
 			{
-				trace("render IS different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+				//trace("render IS different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
 				for (nodeIdx in 0...rootElement.childNodes.length)
 				{
 					var node = rootElement.childNodes[nodeIdx];
@@ -137,7 +136,7 @@ class TemplateRenderer extends DisplayObject
 				}
 				lastRenderedHtml = res;
 				rootElement.innerHTML = res;
-				trace("render => "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+				//trace("render => "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
 				for (nodeIdx in 0...rootElement.childNodes.length)
 				{
 					var node = rootElement.childNodes[nodeIdx];

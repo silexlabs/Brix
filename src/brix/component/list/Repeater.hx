@@ -217,12 +217,12 @@ class Repeater<ElementClass> extends DisplayObject
 #if continuation
 		doRedrawContinuation(newElementsHtml, function()
 	    {
-	      trace("Handler without continuation.");
+	      // trace("Continuation has ended.");
 				isContinuationPending = false;
 	    });
 	}
 	@cps public function doRedrawContinuation(newElementsHtml:Array<String>)
-	{trace("doRedrawContinuation  "+newElementsHtml.length);
+	{// trace("doRedrawContinuation  "+newElementsHtml.length);
 
 #end
 		var time = Date.now().getTime();
@@ -242,7 +242,7 @@ class Repeater<ElementClass> extends DisplayObject
 			if (numContinuation++>2)
 			{
 				isContinuationPending = true;
-				trace("doRedrawContinuation MAKE A PAUSE 1 FRAME "+idx+"/"+newElementsHtml.length);
+				// trace("doRedrawContinuation MAKE A PAUSE 1 FRAME "+idx+"/"+newElementsHtml.length);
 				numContinuation = 0;
 				sleepOneFrame().async();
 			}
@@ -312,7 +312,7 @@ class Repeater<ElementClass> extends DisplayObject
 		// store the new raw initial html
 		elementsHtml = newElementsHtml;
 
-trace("elapsed time: "+(Date.now().getTime() - time));
+// trace("elapsed time: "+(Date.now().getTime() - time));
 
 		// reset the item ids
 		//setItemIds(true);
