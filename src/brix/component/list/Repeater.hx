@@ -16,6 +16,7 @@ import brix.util.DomTools;
 
 import brix.component.ui.DisplayObject;
 import brix.component.template.TemplateMacros;
+import brix.component.navigation.Layer;
 
 #if continuation
 import com.dongxiguo.continuation.Continuation;
@@ -70,6 +71,24 @@ class Repeater<ElementClass> extends DisplayObject
 		// attach the events
 		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, true);
 
+		var tmpHtmlDom = rootElement;
+		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
+		{
+			tmpHtmlDom = tmpHtmlDom.parentNode;
+		}
+		if (tmpHtmlDom!=null)
+		{
+			// tmpHtmlDom is the layer node
+			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
+		}
+	}
+	/**
+	 * callback for the event
+	 */
+	public function onLayerHide(e:Event)
+	{
+		if (isContinuationPending)
+			stopContinuationFlag = true;
 	}
 	/**
 	 * callback for the event
@@ -198,12 +217,12 @@ class Repeater<ElementClass> extends DisplayObject
 #if continuation
 		doRedrawContinuation(newElementsHtml, function()
 	    {
-	      trace("Handler without continuation.");
+	      // trace("Continuation has ended.");
 				isContinuationPending = false;
 	    });
 	}
 	@cps public function doRedrawContinuation(newElementsHtml:Array<String>)
-	{trace("doRedrawContinuation  "+newElementsHtml.length);
+	{// trace("doRedrawContinuation  "+newElementsHtml.length);
 
 #end
 		var time = Date.now().getTime();
@@ -223,7 +242,7 @@ class Repeater<ElementClass> extends DisplayObject
 			if (numContinuation++>2)
 			{
 				isContinuationPending = true;
-				trace("doRedrawContinuation MAKE A PAUSE 1 FRAME "+idx+"/"+newElementsHtml.length);
+				// trace("doRedrawContinuation MAKE A PAUSE 1 FRAME "+idx+"/"+newElementsHtml.length);
 				numContinuation = 0;
 				sleepOneFrame().async();
 			}
@@ -293,7 +312,7 @@ class Repeater<ElementClass> extends DisplayObject
 		// store the new raw initial html
 		elementsHtml = newElementsHtml;
 
-trace("elapsed time: "+(Date.now().getTime() - time));
+// trace("elapsed time: "+(Date.now().getTime() - time));
 
 		// reset the item ids
 		//setItemIds(true);

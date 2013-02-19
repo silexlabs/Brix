@@ -65,7 +65,7 @@ class StateManager extends DisplayObject
 	 * callback for page events
 	 */
 	private function onContextChanged(e:CustomEvent)
-	{trace("onContextChanged");
+	{// trace("onContextChanged");
 		// retrieve the context manager
 		var contextManager:ContextManager = e.detail;
 		// update the state
@@ -75,7 +75,7 @@ class StateManager extends DisplayObject
 	 * callback for page events
 	 */
 	private function onPageOpened(e:CustomEvent)
-	{trace("onPageOpened");
+	{// trace("onPageOpened");
 		// retrieve the opened page
 		var page:Page = e.detail;
 
@@ -86,7 +86,7 @@ class StateManager extends DisplayObject
 	 * apply the css style corresponding to a state
 	 */
 	private function update(states:Array<String>, currentCssClassNames:Array<String>) 
-	{trace("update "+states);
+	{// trace("update "+states);
 		var isDirty = false;
 
 		// remove the previously added css class
