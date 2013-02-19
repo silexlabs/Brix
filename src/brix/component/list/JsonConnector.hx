@@ -159,7 +159,7 @@ class JsonConnector extends DisplayObject
 				return;
 			}
 		}
-		trace("loadData "+url);
+		//trace("loadData "+url);
 		// call the service
 		var http = new Http(url);
 		http.onError = onError;
@@ -178,13 +178,13 @@ class JsonConnector extends DisplayObject
 		// small optim
 		if (data == latestData)
 		{
-			trace("no new data");
+			//trace("no new data");
 			return;
 		}
 		else
 		{
-			trace("new data ");
-			trace(rootElement.className);
+			//trace("new data ");
+			//trace(rootElement.className);
 		}
 		latestData = data;
 		// parse string to json
