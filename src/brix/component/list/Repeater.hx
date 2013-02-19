@@ -16,6 +16,7 @@ import brix.util.DomTools;
 
 import brix.component.ui.DisplayObject;
 import brix.component.template.TemplateMacros;
+import brix.component.navigation.Layer;
 
 #if continuation
 import com.dongxiguo.continuation.Continuation;
@@ -70,6 +71,24 @@ class Repeater<ElementClass> extends DisplayObject
 		// attach the events
 		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, true);
 
+		var tmpHtmlDom = rootElement;
+		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
+		{
+			tmpHtmlDom = tmpHtmlDom.parentNode;
+		}
+		if (tmpHtmlDom!=null)
+		{
+			// tmpHtmlDom is the layer node
+			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
+		}
+	}
+	/**
+	 * callback for the event
+	 */
+	public function onLayerHide(e:Event)
+	{
+		if (isContinuationPending)
+			stopContinuationFlag = true;
 	}
 	/**
 	 * callback for the event
