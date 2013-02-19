@@ -24,8 +24,11 @@ class TemplateMacros
 	 * @param 	date can be a Date or String or timestamp
 	 */
 	public static function makeDurationReadable(resolve:String->Dynamic, duration:Float, numMax:Int=999, 
-		yearsText:String="years", monthsText:String="months", weeksText:String="weeks", daysText:String="days", 
-		hoursText:String="hours", minutesText:String="minutes", secondsText:String="seconds", ?unit="ms", ?prefix:String="", ?suffix:String="", ?defaultValue:String="Very old."):String
+		yearsText:String="year", monthsText:String="month", weeksText:String="week", daysText:String="day", 
+		hoursText:String="hour", minutesText:String="minute", secondsText:String="second", 
+		yearsTextPlural:String="years", monthsTextPlural:String="months", weeksTextPlural:String="weeks", daysTextPlural:String="days", 
+		hoursTextPlural:String="hours", minutesTextPlural:String="minutes", secondsTextPlural:String="seconds", 
+		?unit="ms", ?prefix:String="", ?suffix:String="", ?defaultValue:String="Very old."):String
 	{//trace("makeDurationReadable "+duration);
 		if (StringTools.trim(unit) == "s")
 		{
@@ -39,6 +42,9 @@ class TemplateMacros
 			duration -= d*31536000000;
 			if (yearsText != null && yearsText != "")
 			{
+				if (d>1 && yearsTextPlural != null && yearsTextPlural != "")
+					res += d + yearsTextPlural + " ";
+				else
 				res += d + yearsText + " ";
 				if (++num>=numMax)
 					return prefix+res+suffix;
@@ -54,6 +60,9 @@ class TemplateMacros
 			duration -= d*2592000000;
 			if (monthsText != null && monthsText != "")
 			{
+				if (d>1 && monthsTextPlural != null && monthsTextPlural != "")
+					res += d + monthsTextPlural + " ";
+				else
 				res += d + monthsText + " ";
 				if (++num>=numMax)
 					return prefix+res+suffix;
@@ -67,21 +76,19 @@ class TemplateMacros
 		duration -= d*86400000;
 		
 		var week = d/7;
-		if (week > 1)
+		if (week > 1 && weeksText != null && weeksText != "")
 		{
-			if (weeksText != null && weeksText != "")
-			{
-				res += Math.floor(week) + weeksText + " ";
-			}
-			else
-			{
-				return defaultValue;
-			}
+			res += Math.floor(week) + weeksText + " ";
+			if (++num>=numMax)
+				return prefix+res+suffix;
 		}
 		else if (d > 0)
 		{
 			if (daysText != null && daysText != "")
 			{
+				if (d>1 && daysTextPlural != null && daysTextPlural != "")
+					res += d + daysTextPlural + " ";
+				else
 				res += d + daysText + " ";
 				if (++num>=numMax)
 					return prefix+res+suffix;
@@ -97,6 +104,9 @@ class TemplateMacros
 			duration -= d*3600000;
 			if (hoursText != null && hoursText != "")
 			{
+				if (d>1 && hoursTextPlural != null && hoursTextPlural != "")
+					res += d + hoursTextPlural + " ";
+				else
 				res += d + hoursText + " ";
 				if (++num>=numMax)
 					return prefix+res+suffix;
@@ -112,6 +122,9 @@ class TemplateMacros
 			duration -= d*60000;
 			if (minutesText != null && minutesText != "")
 			{
+				if (d>1 && minutesTextPlural != null && minutesTextPlural != "")
+					res += d + minutesTextPlural + " ";
+				else
 				res += d + minutesText + " ";
 				if (++num>=numMax)
 					return prefix+res+suffix;
@@ -127,6 +140,9 @@ class TemplateMacros
 			duration -= d*1000;
 			if (secondsText != null && secondsText != "")
 			{
+				if (d>1 && secondsTextPlural != null && secondsTextPlural != "")
+					res += d + secondsTextPlural + " ";
+				else
 				res += d + secondsText + " ";
 				if (++num>=numMax)
 					return prefix+res+suffix;
@@ -144,8 +160,11 @@ class TemplateMacros
 	 * @param 	date can be a Date or String or timestamp
 	 */
 	public static function durationFromTimestamp(resolve:String->Dynamic, timestamp:Float, numMax:Int=999, 
-		yearsText:String="years", monthsText:String="months", weeksText:String="weeks", daysText:String="days", 
-		hoursText:String="hours", minutesText:String="minutes", secondsText:String="seconds", ?unit="ms", ?prefix:String="", ?suffix:String=""):String
+		yearsText:String="year", monthsText:String="month", weeksText:String="week", daysText:String="day", 
+		hoursText:String="hour", minutesText:String="minute", secondsText:String="second", 
+		yearsTextPlural:String="years", monthsTextPlural:String="months", weeksTextPlural:String="weeks", daysTextPlural:String="days", 
+		hoursTextPlural:String="hours", minutesTextPlural:String="minutes", secondsTextPlural:String="seconds", 
+		?unit="ms", ?prefix:String="", ?suffix:String=""):String
 	{//trace("durationFromTimestamp "+(Date.now().getTime())+"-"+(timestamp*1000)+" - "+(Date.now().getTime()-(timestamp*1000)));
 		var initialTimestamp = timestamp;
 		if (StringTools.trim(unit) == "s")
@@ -153,8 +172,12 @@ class TemplateMacros
 			timestamp *= 1000;
 		}
 		var elapsed:Float = Date.now().getTime()-timestamp;
-		return makeDurationReadable(resolve, elapsed, numMax, yearsText, monthsText, weeksText, daysText, 
-			hoursText, minutesText, secondsText, "ms", prefix, suffix, 
+		return makeDurationReadable(resolve, elapsed, numMax, 
+			yearsText, monthsText, weeksText, daysText, 
+			hoursText, minutesText, secondsText, 
+			yearsTextPlural, monthsTextPlural, weeksTextPlural, daysTextPlural, 
+			hoursTextPlural, minutesTextPlural, secondsTextPlural, 
+			"ms", prefix, suffix, 
 			makeDateReadableFromTimestamp(resolve, initialTimestamp, null, unit));
 	}
 	/**
