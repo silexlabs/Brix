@@ -142,14 +142,15 @@ class DisplayObject implements IDisplayObject
 	 * @param	eventType the event type
 	 * @param	?data, the data to attach to the event object (event.detail)
 	 * @param	?dispatcher the dispatching node.
+	 * @param	?direction 	up or down the DOM.
 	 */
-	public function dispatch(eventType:String, ?data:Dynamic=null, ?dispatcher:HtmlDom=null):Void
+	public function dispatch(eventType:String, ?data:Dynamic=null, ?dispatcher:HtmlDom=null, ?cancelable:Bool=true, ?direction:EventDirection=null):Void
 	{
 		if (dispatcher == null)
 			dispatcher = rootElement;
-		var event : CustomEvent = cast js.Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(eventType, false, false, data);
-		dispatcher.dispatchEvent(event);
+		if (direction == null)
+			direction = up;
+		eventMap.dispatch(eventType, data, dispatcher, cancelable, direction);
 	}
 
 	/**
