@@ -28,9 +28,13 @@ enum EventDirection
 	 */
 	down;
 	/**
+	 * dispatch up and down
+	 */
+	both;
+	/**
 	 * dispatch on the node only
 	 */
-	local;
+	none;
 }
 /**
  * The EventMap object offers an alternative way to register an event listener. Using EventMap, 
@@ -137,14 +141,14 @@ class EventMap
 	 */
 	public function dispatch(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool, direction:EventDirection):Void
 	{
-		if (direction == down)
-		{
-			dispatchDownRecursive(eventType, data, dispatcher, cancelable);
-		}
-		else
+		if (direction != down)
 		{
 			// use native dispatcher
-			dispatchCustomEvent(eventType, data, dispatcher, cancelable, direction==up);
+			dispatchCustomEvent(eventType, data, dispatcher, cancelable, direction == up || direction == both);
+		}
+		if (direction == down || direction == both)
+		{
+			dispatchDownRecursive(eventType, data, dispatcher, cancelable);
 		}
 	}
 
