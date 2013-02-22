@@ -9,15 +9,34 @@
 package brix.core;
 
 import brix.util.haxe.ObjectHash;
+import brix.util.DomTools;
 
 import js.Lib;
 import js.Dom;
 
 /**
+ * event dispach direction
+ */
+enum EventDirection 
+{
+	/**
+	 * dispatch to the parents
+	 */
+	up;
+	/**
+	 * dispatch to the children
+	 */
+	down;
+	/**
+	 * dispatch on the node only
+	 */
+	local;
+}
+/**
  * The EventMap object offers an alternative way to register an event listener. Using EventMap, 
  * you do not have to worry about keeping your listener references to unregister them later.
  * 
- * @author Thomas Fétiveau
+ * @author Thomas Fétiveau and lexoyo
  */
 class EventMap 
 {
@@ -108,6 +127,45 @@ class EventMap
 			}
 			useCapture = false;
 		}
+	}
+	/**
+	 * Dispatches a CustomEvent on the specified node, holding Dynamic data.
+	 * @param	eventType the event type
+	 * @param	?data, the data to attach to the event object (event.detail)
+	 * @param	?dispatcher the dispatching node.
+	 * @param	?direction 	up or down the DOM.
+	 */
+	public function dispatch(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool, direction:EventDirection):Void
+	{
+		if (direction == down)
+		{
+			dispatchDownRecursive(eventType, data, dispatcher, cancelable);
+		}
+		else
+		{
+			// use native dispatcher
+			dispatchCustomEvent(eventType, data, dispatcher, cancelable, direction==up);
+		}
+	}
+
+	private function dispatchDownRecursive(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool)
+	{
+		for (i in 0...dispatcher.childNodes.length)
+		{
+			var node = dispatcher.childNodes[i];
+			if (node.nodeType == NodeTypes.ELEMENT_NODE)
+			{
+				dispatchCustomEvent(eventType, data, node, cancelable, false);
+				dispatchDownRecursive(eventType, data, node, cancelable);
+			}
+		}
+	}
+
+	private function dispatchCustomEvent(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool, canBubble:Bool)
+	{
+		var event : CustomEvent = cast js.Lib.document.createEvent("CustomEvent");
+		event.initCustomEvent(eventType, canBubble, cancelable, data);
+		dispatcher.dispatchEvent(event);
 	}
 
 	private function getListeners(useCapture:Bool):ObjectHash<Dynamic,Hash<List<js.Event->Void>>>
