@@ -146,6 +146,11 @@ class EventMap
 			// use native dispatcher
 			dispatchCustomEvent(eventType, data, dispatcher, cancelable, direction == up || direction == both);
 		}
+		else
+		{
+			// for down only dispatch on the node itself 
+			dispatchCustomEvent(eventType, data, dispatcher, cancelable, false);
+		}
 		if (direction == down || direction == both)
 		{
 			dispatchDownRecursive(eventType, data, dispatcher, cancelable);
@@ -159,7 +164,6 @@ class EventMap
 			var node = dispatcher.childNodes[i];
 			if (node.nodeType == NodeTypes.ELEMENT_NODE)
 			{
-				dispatchCustomEvent(eventType, data, node, cancelable, false);
 				dispatchDownRecursive(eventType, data, node, cancelable);
 			}
 		}
