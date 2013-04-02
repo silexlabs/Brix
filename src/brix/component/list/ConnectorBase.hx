@@ -131,7 +131,7 @@ class ConnectorBase extends DisplayObject
 		}
 	}
 	/**
-	 * load the json data
+	 * load the data
 	 */ 
 	public function loadData(?url:Null<String>=null)
 	{
