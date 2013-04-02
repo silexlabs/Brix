@@ -8,21 +8,10 @@
  */
 package brix.component.list;
 
-import js.Lib;
-import js.Dom;
-import haxe.Http;
-import haxe.Json;
-import haxe.Timer;
-
-import brix.component.interaction.Draggable;
-
-import brix.util.DomTools;
-
-import brix.component.navigation.Layer;
 import brix.component.ui.DisplayObject;
 
 /**
- * load json data, parse it and dispatch an event for the consumers
+ * Connector base
  */
 class ConnectorBase extends DisplayObject
 {
@@ -38,4 +27,6 @@ class ConnectorBase extends DisplayObject
 	 * by default it is true, set it to false in the html to prevent auto data loading
 	 */
 	public static inline var ATTR_AUTO_LOAD = "data-connector-auto-load";
+	
+	
 }

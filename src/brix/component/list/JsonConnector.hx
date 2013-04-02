@@ -8,18 +8,11 @@
  */
 package brix.component.list;
 
-import js.Lib;
 import js.Dom;
 import haxe.Http;
-import haxe.Json;
 import haxe.Timer;
 
-import brix.component.interaction.Draggable;
-
-import brix.util.DomTools;
-
 import brix.component.navigation.Layer;
-import brix.component.ui.DisplayObject;
 
 /**
  * load json data, parse it and dispatch an event for the consumers
@@ -174,12 +167,12 @@ class JsonConnector extends ConnectorBase
 		var objectData:Dynamic = null;
 		try
 		{
-			// escape quotes because the jeson parser will turn "name":"value with \"quotes\"" into anbject with name set to "value with "qotes""
+			// escape quotes because the json parser will turn "name":"value with \"quotes\"" into an object with name set to "value with "qotes""
 			//data = StringTools.replace(data, "\\\"", "%5C%22");
 			//data = StringTools.replace(data, "\\\"", "&quot;");
 			//data = StringTools.replace(data, "\\\"", "\\\\\\\"");
 			data = StringTools.replace(data, "\\\"", "'");
-			objectData = Json.parse(data);
+			objectData = haxe.Json.parse(data);
 		}
 		catch(e:Dynamic)
 		{
