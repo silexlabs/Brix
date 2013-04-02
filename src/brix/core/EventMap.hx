@@ -140,11 +140,16 @@ class EventMap
 	 * @param	?direction 	up or down the DOM.
 	 */
 	public function dispatch(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool, direction:EventDirection):Void
-	{
+	{//trace("dispatch "+eventType+" on "+dispatcher);
 		if (direction != down)
 		{
 			// use native dispatcher
 			dispatchCustomEvent(eventType, data, dispatcher, cancelable, direction == up || direction == both);
+		}
+		else
+		{
+			// for down only dispatch on the node itself 
+			dispatchCustomEvent(eventType, data, dispatcher, cancelable, false);
 		}
 		if (direction == down || direction == both)
 		{
@@ -153,7 +158,7 @@ class EventMap
 	}
 
 	private function dispatchDownRecursive(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool)
-	{
+	{//trace("dispatchDownRecursive "+eventType+" on "+dispatcher);
 		for (i in 0...dispatcher.childNodes.length)
 		{
 			var node = dispatcher.childNodes[i];
@@ -166,7 +171,7 @@ class EventMap
 	}
 
 	private function dispatchCustomEvent(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool, canBubble:Bool)
-	{
+	{//trace("dispatchCustomEvent "+eventType+" on "+dispatcher.className);
 		var event : CustomEvent = cast js.Lib.document.createEvent("CustomEvent");
 		event.initCustomEvent(eventType, canBubble, cancelable, data);
 		dispatcher.dispatchEvent(event);
