@@ -1,0 +1,87 @@
+<!-- This page is used to compile bin/libs/silex/silex.js -->
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+
+		<script data-brix-use="brix.component.template.TemplateRenderer"></script>
+		<script data-brix-use="brix.component.list.DomConnector"></script>
+
+		<script data-brix-use="brix.component.navigation.Page"></script>
+		<script data-brix-use="brix.component.navigation.Layer"></script>
+		<script data-brix-use="brix.component.navigation.link.LinkToPage"></script>
+		<meta name="initialPageName" content="page1" />
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			.Page{
+				display: none;
+			}
+			.Layer{
+				background-color:#b0c4de;
+			}
+		</style>
+		
+	</head>
+	<body class="">
+		<a name="page1" class="Page">page1</a>
+		<a name="page2" class="Page">page2</a>
+		<a name="page3" class="Page">page3</a>
+		<a href="#page1" class="LinkToPage">page1</a>
+		<a href="#page2" class="LinkToPage">page2</a>
+		<a href="#page3" class="LinkToPage">page3</a>
+		<div class="Layer page1 ">
+			<h1>Tree 1</h1>
+			<div class="TemplateRenderer DomConnector"
+				data-connector-root="container-class"
+			>
+				::foreach __current__::
+				<ul>
+					<li>
+						<p>$$getAttribute(::node::,data-title)</p>
+						<div>
+							$$loop(::children::)
+						</div>
+					</li>
+				</ul>
+				::end::
+			</div>
+		</div>
+		<div class="Layer page2">
+			<h1>Page 2</h1>
+		</div>
+		<div class="Layer page3">
+			<h1>Page 3</h1>
+		</div>
+		<div>
+			<h1>Data</h1>
+			<ul class="container-class">
+				<li data-title="Item 1">
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+				</li>
+				<li data-title="Item 2">
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+				</li>
+				<li data-title="Item 3">
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+				</li>
+				<li data-title="Item 4">
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item ">Sub Item</p>
+				</li>
+			</ul>
+		</div>
+	</body>
+</html>
