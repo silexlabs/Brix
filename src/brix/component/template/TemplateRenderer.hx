@@ -17,7 +17,7 @@ import brix.util.DomTools;
 import brix.component.navigation.Layer;
 import brix.component.ui.DisplayObject;
 import brix.component.template.TemplateMacros;
-import brix.component.list.JsonConnector;
+import brix.component.list.ConnectorBase;
 
 /**
  * template renderer component
@@ -56,7 +56,7 @@ class TemplateRenderer extends DisplayObject
 		rootElement.innerHTML = "";
 
 		// attach the events
-		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, false);
+		mapListener(rootElement, ConnectorBase.ON_DATA_RECEIVED, onDataReceived, false);
 
 		// listen to the layer events
 /**/		var tmpHtmlDom = rootElement;
@@ -76,7 +76,7 @@ class TemplateRenderer extends DisplayObject
 	 * callback for the event
 	 */
 	public function onDataReceived(e:Event)
-	{
+	{trace("onDataReceived");
 		var newData:Dynamic = cast(e).detail;
 		data = newData;
 		redraw();
@@ -86,7 +86,7 @@ class TemplateRenderer extends DisplayObject
 	 */
 	public function onLayerShow(e:Event)
 	{
-		redraw();
+		//redraw();
 	}
 	/**
 	 * the layer is being hidden
@@ -114,6 +114,27 @@ class TemplateRenderer extends DisplayObject
 		throw("not implemented yet");
 	}
 	/**
+	 * expose additional macros to the templates
+	 * resolve a template with the given data
+	 */
+	public function resolve(dynamicData:Dynamic)
+	{//trace("resolve "+dynamicData);
+		var t = new haxe.Template(htmlTemplate);
+		var templateMacros = new TemplateMacros();
+		templateMacros.loop = loop;
+		return t.execute(dynamicData, templateMacros);
+	}
+	/**
+	 * exposed to the templates to make recursive templates
+	 * @example $$loop(::children::)
+	 */
+	function loop (context : String -> Dynamic, dynamicData : Dynamic){
+		//trace("loop "+dynamicData+" - "+context);
+		if (dynamicData != null)
+			return resolve(dynamicData);
+		else return "";
+	}
+	/**
 	 * redraw the data without calling reloadData
 	 */
 	public function doRedraw()
@@ -121,8 +142,8 @@ class TemplateRenderer extends DisplayObject
 	 	// generate the html for the element
 		try
 		{
-			var t = new haxe.Template(htmlTemplate);
-			var res = t.execute(data, TemplateMacros);
+			var res = resolve(data);
+
 			if (lastRenderedHtml != res)
 			{
 				//trace("render IS different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);

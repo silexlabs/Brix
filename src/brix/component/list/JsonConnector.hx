@@ -24,15 +24,11 @@ import brix.component.ui.DisplayObject;
 /**
  * load json data, parse it and dispatch an event for the consumers
  */
-class JsonConnector extends DisplayObject
+class JsonConnector extends ConnectorBase
 {
 	////////////////////////////////////
 	// constants
 	////////////////////////////////////
-	/**
-	 * event to request data change 
-	 */
-	public static inline var ON_DATA_RECEIVED = "onDataReceived";
 	/**
 	 * attribute to set on the root element to specify an url
 	 */
@@ -48,11 +44,6 @@ class JsonConnector extends DisplayObject
 	 */
 	public static inline var ATTR_POLL_FREQ = "data-connector-poll-frequency";
 	public static inline var ATTR_STARTUP_DELAY = "data-connector-startup-delay";
-	/**
-	 * attribute to allow the component to load data automatically, e.g. when the layer is shown
-	 * by default it is true, set it to false in the html to prevent auto data loading
-	 */
-	public static inline var ATTR_AUTO_LOAD = "data-connector-auto-load";
 	////////////////////////////////////
 	// properties
 	////////////////////////////////////
@@ -71,20 +62,12 @@ class JsonConnector extends DisplayObject
 		super(rootElement, brixId);
 
 		// listen to the Layer class event, in order to loadData when the page opens
-		if (rootElement.getAttribute(ATTR_AUTO_LOAD) != "false")
+		if (rootElement.getAttribute(ConnectorBase.ATTR_AUTO_LOAD) != "false")
 		{
-			var tmpHtmlDom = rootElement;
-			while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
-			{
-				tmpHtmlDom = tmpHtmlDom.parentNode;
-			}
-			if (tmpHtmlDom!=null)
-			{
-				// tmpHtmlDom is the layer node
-				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
-				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
-				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
-			}
+			mapListener(rootElement, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
+			mapListener(rootElement, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
+			mapListener(rootElement, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
+
 			var pollingFreqStr = rootElement.getAttribute(ATTR_POLL_FREQ);
 			if (pollingFreqStr != null)
 			{
@@ -244,8 +227,6 @@ class JsonConnector extends DisplayObject
 	public function onDataReceived(objectData:Dynamic)
 	{
 		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(ON_DATA_RECEIVED, false, false, objectData);
-		rootElement.dispatchEvent(event);
+		dispatch(ConnectorBase.ON_DATA_RECEIVED, objectData, rootElement, false, both);
 	}
 }

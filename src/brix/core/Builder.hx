@@ -336,7 +336,7 @@ class Builder
 					#end
 				}
 				
-				neko.Lib.println( sourceFilePath+" line "+scriptElt.getLineNumber()+": WARNING You should not include nor put any script in your HTML source file as it's not cross platform.\n" );
+				//neko.Lib.println( sourceFilePath+" line "+scriptElt.getLineNumber()+": WARNING You should not include nor put any script in your HTML source file as it's not cross platform.\n" );
 				
 				//just remove the declare part but leave it as there may be an associated script.
 				scriptElt.removeAttribute( BRIX_USE_ATTR_NAME );
