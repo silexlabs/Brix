@@ -36,16 +36,14 @@
 			<div class="TemplateRenderer DomConnector"
 				data-connector-root="container-class"
 			>
-				::foreach __current__::
 				<ul>
+				::foreach __current__::
 					<li>
 						<p>$$getAttribute(::node::,data-title)</p>
-						<div>
-							$$loop(::children::)
-						</div>
+						$$loop(::children::)
 					</li>
-				</ul>
 				::end::
+				</ul>
 			</div>
 		</div>
 		<div class="Layer page2">
@@ -58,28 +56,28 @@
 			<h1>Data</h1>
 			<ul class="container-class">
 				<li data-title="Item 1">
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item 1">Sub Item</p>
+					<p data-title="Sub Item 2">Sub Item</p>
+					<p data-title="Sub Item 3">Sub Item</p>
+					<p data-title="Sub Item 4">Sub Item</p>
 				</li>
 				<li data-title="Item 2">
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item 1">Sub Item</p>
+					<p data-title="Sub Item 2">Sub Item</p>
+					<p data-title="Sub Item 3">Sub Item</p>
+					<p data-title="Sub Item 4">Sub Item</p>
 				</li>
 				<li data-title="Item 3">
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item 1">Sub Item</p>
+					<p data-title="Sub Item 2">Sub Item</p>
+					<p data-title="Sub Item 3">Sub Item</p>
+					<p data-title="Sub Item 4">Sub Item</p>
 				</li>
 				<li data-title="Item 4">
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
-					<p data-title="Sub Item ">Sub Item</p>
+					<p data-title="Sub Item 1">Sub Item</p>
+					<p data-title="Sub Item 2">Sub Item</p>
+					<p data-title="Sub Item 3">Sub Item</p>
+					<p data-title="Sub Item 4">Sub Item</p>
 				</li>
 			</ul>
 		</div>
