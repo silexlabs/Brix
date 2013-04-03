@@ -19,7 +19,6 @@ import brix.component.navigation.Layer;
  */
 class JsonConnector extends ConnectorBase
 {
-
 	/**
 	 * callback for the http request
 	 */ 

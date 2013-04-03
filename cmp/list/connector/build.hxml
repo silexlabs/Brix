@@ -7,3 +7,4 @@
 -cp ../../../../Cocktail
 -cp ../../../src
 -D stopOnError
+-debug
