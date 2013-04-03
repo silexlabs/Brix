@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Francetv info - Découverte</title>
+    <description>Francetv info - Découverte</description>
+    <pubDate>Thu, 15 Dec 2011 10:30:05 +0100</pubDate>
+    <generator>Zend_Feed_Writer 1.11.3 (http://framework.zend.com)</generator>
+    <link>http://www.francetv.fr/info/decouverte/</link>
+
+    <atom:link rel="self" type="application/rss+xml" href="http://www.francetv.fr/info/decouverte.rss"/>
+    <item>
+      <title>A Budapest, un défilé de pères Noël en slip</title>
+      <description><![CDATA[En Hongrie, une course traditionnelle de pères Noël presque nus a eu lieu dans la capitale dimanche. Ils étaient plus d'une centaine d'hommes et de femmes.]]></description>
+      <pubDate>Thu, 15 Dec 2011 09:54:23 +0100</pubDate>
+      <link>http://www.francetv.fr/info/a-budapest-un-defile-de-peres-noel-en-slip_38365.html</link>
+      <guid>http://www.francetv.fr/info/a-budapest-un-defile-de-peres-noel-en-slip_38365.html</guid>
+
+      <enclosure type="image/png" length="20875" url="http://www.francetv.fr/info/image/500/281/180023.png"/>
+    </item>
+    <item>
+      <title>Le boson de Higgs, une énigme de la physique en passe d'être résolue</title>
+      <description><![CDATA[L'Organisation européenne pour la recherche nucléaire a annoncé mardi avoir identifié des signaux qui pourraient trahir l'existence de la seule particule élémentaire encore non identifiée. ]]></description>
+      <pubDate>Thu, 15 Dec 2011 08:06:12 +0100</pubDate>
+      <link>http://www.francetv.fr/info/le-boson-de-higgs-une-enigme-de-la-physique-en-passe-d-etre-resolue_38945.html</link>
+
+      <guid>http://www.francetv.fr/info/le-boson-de-higgs-une-enigme-de-la-physique-en-passe-d-etre-resolue_38945.html</guid>
+      <enclosure type="image/jpeg" length="26746" url="http://www.francetv.fr/info/image/500/281/184103.jpg"/>
+    </item>
+   </channel>
+</rss>

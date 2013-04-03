@@ -5,6 +5,9 @@
 
 		<script data-brix-use="brix.component.list.Repeater"></script>
 		<script data-brix-use="brix.component.list.JsonConnector"></script>
+		<script data-brix-use="brix.component.list.XmlConnector"></script>
+		<script data-brix-use="brix.component.list.RssConnector"></script>
+		<script data-brix-use="brix.component.list.XmlList"></script>
 
 		<script data-brix-use="brix.component.navigation.Page"></script>
 		<script data-brix-use="brix.component.navigation.Layer"></script>
@@ -25,27 +28,39 @@
 		
 	</head>
 	<body>
-		<a name="page1" class="Page">page1</a>
-		<a name="page2" class="Page">page2</a>
-		<a name="page3" class="Page">page3</a>
-		<a href="#page1" class="LinkToPage">page1</a>
-		<a href="#page2" class="LinkToPage">page2</a>
-		<a href="#page3" class="LinkToPage">page3</a>
+		<a name="page1" class="Page">JSON</a>
+		<a name="page2" class="Page">XML</a>
+		<a name="page3" class="Page">RSS</a>
+		<a href="#page1" class="LinkToPage">JSON</a>
+		<a href="#page2" class="LinkToPage">XML</a>
+		<a href="#page3" class="LinkToPage">RSS</a>
 		<div class="Layer page1">
-			<h1>Page 1</h1>
+			<h1>JSON</h1>
 			<ul class="Repeater JsonConnector"
-				data-connector-url="http://demos.silexlabs.org/silex/cgi/scripts/proxy.php?url=http://fakester.biz/json?n=100"
-			>
+				data-connector-url="http://demos.silexlabs.org/silex/cgi/scripts/proxy.php?url=http://fakester.biz/json?n=100">
 				<li>
 					::name::
 				</li>
 			</ul>
 		</div>
 		<div class="Layer page2">
-			<h1>Page 2</h1>
+			<h1>XML</h1>
+			<ul class="Repeater XmlConnector"
+				data-connector-url="http://demos.silexlabs.org/silex/cgi/scripts/proxy.php?url=http://demos.silexlabs.org/tests/test.xml"
+				data-connector-root="user">
+				<li>
+					::attributes.name:: - ::phone.number::
+				</li>
+			</ul>
 		</div>
 		<div class="Layer page3">
-			<h1>Page 3</h1>
+			<h1>RSS</h1>
+			<ul class="Repeater RssConnector"
+				data-connector-url="http://demos.silexlabs.org/silex/cgi/scripts/proxy.php?url=http://demos.silexlabs.org/tests/test.rss">
+				<li>
+					::title::
+				</li>
+			</ul>
 		</div>
 	</body>
 </html>
