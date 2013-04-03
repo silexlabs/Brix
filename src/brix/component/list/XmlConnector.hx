@@ -70,7 +70,6 @@ class XmlConnector extends ConnectorBase
 		try
 		{
 			objectData = Xml2Dynamic(Xml.parse(data));
-			trace(objectData);
 		}
 		catch(e:Dynamic)
 		{
@@ -97,6 +96,7 @@ class XmlConnector extends ConnectorBase
 				}
 			}
 			onDataReceived(objectData);
+			trace(objectData);
 		}
 		else
 		{
@@ -252,9 +252,12 @@ class XmlConnector extends ConnectorBase
 				var nodeStrValue:String = "";
 				for(node in xml)
 				{
-						nodeStrValue += node.nodeValue;
+						nodeStrValue = node.nodeValue;
 				}
 				
+				// escape the string, useful for the rss description node which is often using html entities.
+				// the &quot part is used as it is not correctly escaped in Haxe 2.10
+				//return StringTools.htmlUnescape(nodeStrValue).split("&quot;").join('"');
 				return nodeStrValue;
 			}
 		}

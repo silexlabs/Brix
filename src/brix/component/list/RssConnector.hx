@@ -30,6 +30,7 @@ class RssConnector extends XmlConnector
 	 */ 
 	override public function init():Void
 	{
+		trace("RssConnector loaded");
 		dataRootNode = ROOT_NODE;
 	}
 
