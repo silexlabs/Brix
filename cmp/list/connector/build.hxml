@@ -4,6 +4,7 @@
 --macro brix.core.Builder.create('test.html')
 
 -cp ../../../../Brix/src
--cp ../../../../Cocktail/src
+-cp ../../../../Cocktail
 -cp ../../../src
 -D stopOnError
+-debug
