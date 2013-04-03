@@ -78,7 +78,7 @@ class PageQueryConnector extends DisplayObject
 	{
 		// dispatch a custom event
 		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-		event.initCustomEvent(JsonConnector.ON_DATA_RECEIVED, false, false, data);
+		event.initCustomEvent(ConnectorBase.ON_DATA_RECEIVED, false, false, data);
 		rootElement.dispatchEvent(event);
 	}
 }
