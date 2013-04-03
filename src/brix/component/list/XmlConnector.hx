@@ -69,7 +69,8 @@ class XmlConnector extends ConnectorBase
 		var objectData = {};
 		try
 		{
-			objectData = Xml2Dynamic(Xml.parse(data));	
+			objectData = Xml2Dynamic(Xml.parse(data));
+			trace(objectData);
 		}
 		catch(e:Dynamic)
 		{
@@ -223,7 +224,6 @@ class XmlConnector extends ConnectorBase
 
 		// call recursive loop
 		var generatedXml:Dynamic = xml2DynamicRecursive(firstElement,firstElement.nodeName.toLowerCase() == 'rss');
-		trace(firstElement.nodeName);
 		
 		return generatedXml;
 	}
