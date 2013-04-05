@@ -8,30 +8,71 @@
  */
 package brix.component.list;
 
-import js.Dom;
-import haxe.Http;
-import haxe.Timer;
-
-import brix.component.navigation.Layer;
-
 /**
  * load rss data, parse it and dispatch an event for the consumers
+ * 
+ * @author Raphael Harmel
  */
-class RssConnector extends XmlConnector
-{
 
+import js.Dom;
+import js.Lib;
+
+class RssConnector extends ConnectorBase
+{
 	/**
-	 * The rss root node
+	 * Parse RSS String to object
+	 * 
+	 * @param	data
+	 * @return
 	 */
-	static inline private var ROOT_NODE:String = "channel.item";
+	override public function parseData2Object(data:String):Dynamic
+	{
+		return rss2object(Xml.parse(data));
+	}
 	
 	/**
-	 * init
-	 */ 
-	override public function init():Void
+	 * Converts a rss to an Array of object
+	 * 
+	 * @param	rss
+	 * @return
+	 */
+	public static function rss2object(rss:Xml):Dynamic
 	{
-		trace("RssConnector loaded");
-		dataRootNode = ROOT_NODE;
-	}
+		// init items Array
+		var items:Array<Dynamic> = new Array<Dynamic>();
 
+		// set channel node
+		var channelNode:Xml = rss.firstElement().firstElement();
+		
+		// exit if no data
+		if (channelNode == null)
+			return items;
+		
+		// get the rss data
+		for ( channelChild in channelNode.elements() )
+		{
+			if (channelChild.nodeName == "item")
+			{
+				var item:Dynamic = {};
+				
+				// for each node
+				for (itemParam in channelChild.elements())
+				{
+					// Build the item object. Only add data for nodes having value. The try/catch is used for this.
+					try {
+						Reflect.setField(item, itemParam.nodeName, itemParam.firstChild().nodeValue);
+					}
+					catch(e:Dynamic) {
+						//trace("No rss value for " + itemParam.nodeName + ". Error message: " + e);
+					}
+				}
+				
+				// add item to item array
+				items.push(item);
+			}
+		}
+
+		return items;
+	}
+	
 }
