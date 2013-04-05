@@ -89,7 +89,7 @@ class Repeater<ElementClass> extends DisplayObject
 	 */
 	public function onDataReceived(e:Event)
 	{
-		trace("onDataReceived "+cast(e).detail);
+		//trace("onDataReceived "+cast(e).detail);
 		var newData:Array<ElementClass> = cast(e).detail;
 		if (newData != null)
 		{
