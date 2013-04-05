@@ -47,6 +47,11 @@ class ConnectorBase extends DisplayObject
 	 */
 	public static inline var ATTR_POLL_FREQ = "data-connector-poll-frequency";
 	public static inline var ATTR_STARTUP_DELAY = "data-connector-startup-delay";
+	/**
+	 * The rss root node
+	 */
+	private var dataRootNode:String = "";
+	
 	////////////////////////////////////
 	// properties
 	////////////////////////////////////
@@ -63,6 +68,8 @@ class ConnectorBase extends DisplayObject
 	public function new(rootElement:HtmlDom, brixId:String)
 	{
 		super(rootElement, brixId);
+
+		init();
 
 		// listen to the Layer class event, in order to loadData when the page opens
 		if (rootElement.getAttribute(ConnectorBase.ATTR_AUTO_LOAD) != "false")
@@ -89,6 +96,15 @@ class ConnectorBase extends DisplayObject
 			{
 				loadData();
 			}
+		}
+	}
+	/**
+	 * init
+	 */ 
+	override public function init():Void
+	{
+		if (rootElement.getAttribute(ConnectorBase.ATTR_ROOT) != null) {
+			dataRootNode = rootElement.getAttribute(ConnectorBase.ATTR_ROOT);
 		}
 	}
 	/**
@@ -152,13 +168,69 @@ class ConnectorBase extends DisplayObject
 		http.onData  = onData;
 		http.request(false);
 	}
+	
 	/**
 	 * callback for the http request
 	 */ 
 	public function onData(data:String)
 	{
-		
+		if (isPolling && pollingFreq!=null && pollingFreq>0)
+		{
+			Timer.delay(callback(loadData, null), pollingFreq);
+		}
+		// small optim
+		if (data == latestData)
+		{
+			//trace("no new data");
+			return;
+		}
+		else
+		{
+			//trace("new data ");
+			//trace(rootElement.className);
+		}
+		latestData = data;
+		// parse data to object
+		var objectData:Dynamic = {};
+		try
+		{
+			objectData = parseData2Object(data);
+			//trace(objectData);
+		}
+		catch(e:Dynamic)
+		{
+			trace("Error parsing string data \""+data+"\". Error message: "+e);
+		}
+
+		// get data root
+		if (objectData!=null)
+		{
+			//var dataRootNode = rootElement.getAttribute(ConnectorBase.ATTR_ROOT);
+			if (dataRootNode!="")
+			{
+				try
+				{
+					var path = dataRootNode.split(".");
+					for (idx in 0...path.length)
+					{
+						var objName = path[idx];
+						objectData = Reflect.field(objectData, objName);
+					}
+				}
+				catch(e:Dynamic)
+				{
+					trace("Error while looking for the data root object \""+dataRootNode+"\" in \""+data+"\". Error message: "+e);
+				}
+			}
+			onDataReceived(objectData);
+		}
+		else
+		{
+			// todo: dispatch an error event
+			trace("Warning: no data received.");
+		}
 	}
+	
 	/**
 	 * callback for the http request
 	 */ 
@@ -173,5 +245,17 @@ class ConnectorBase extends DisplayObject
 	{
 		// dispatch a custom event
 		dispatch(ConnectorBase.ON_DATA_RECEIVED, objectData, rootElement, false, both);
+	}
+	
+	/**
+	 * parse the connector data to object.
+	 * to be overrriden in extending classes
+	 * 
+	 * @param	data
+	 * @return
+	 */
+	public function parseData2Object(data:String):Dynamic
+	{
+		
 	}
 }
