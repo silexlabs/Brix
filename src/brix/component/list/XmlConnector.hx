@@ -21,88 +21,14 @@ class XmlConnector extends ConnectorBase
 {
 	
 	/**
-	 * The rss root node
+	 * Parse XML String to object
+	 * 
+	 * @param	data
+	 * @return
 	 */
-	private var dataRootNode:String = "";
-	
-	/**
-	 * constructor
-	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	override public function parseData2Object(data:String):Dynamic
 	{
-		super(rootElement, brixId);
-		init();
-	}
-	
-	/**
-	 * init
-	 */ 
-	override public function init():Void
-	{
-		if (rootElement.getAttribute(ConnectorBase.ATTR_ROOT) != null) {
-			dataRootNode = rootElement.getAttribute(ConnectorBase.ATTR_ROOT);
-		}
-	}
-	
-	/**
-	 * callback for the http request
-	 */ 
-	override public function onData(data:String)
-	{
-		if (isPolling && pollingFreq!=null && pollingFreq>0)
-		{
-			Timer.delay(callback(loadData, null), pollingFreq);
-		}
-		// small optim
-		if (data == latestData)
-		{
-			//trace("no new data");
-			return;
-		}
-		else
-		{
-			//trace("new data ");
-			//trace(rootElement.className);
-		}
-		latestData = data;
-		// parse string to xml
-		var objectData = {};
-		try
-		{
-			objectData = Xml2Dynamic(Xml.parse(data));
-		}
-		catch(e:Dynamic)
-		{
-			trace("Error parsing xml string \""+data+"\". Error message: "+e);
-		}
-
-		// get data root
-		if (objectData!=null)
-		{
-			if (dataRootNode!=null)
-			{
-				try
-				{
-					var path = dataRootNode.split(".");
-					for (idx in 0...path.length)
-					{
-						var objName = path[idx];
-						objectData = Reflect.field(objectData, objName);
-					}
-				}
-				catch(e:Dynamic)
-				{
-					trace("Error while looking for the data root object \""+dataRootNode+"\" in \""+data+"\". Error message: "+e);
-				}
-			}
-			onDataReceived(objectData);
-			trace(objectData);
-		}
-		else
-		{
-			// todo: dispatch an error event
-			trace("Warning: no data received.");
-		}
+		return Xml2Dynamic(Xml.parse(data));
 	}
 	
 	/**
