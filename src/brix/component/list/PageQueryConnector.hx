@@ -45,7 +45,7 @@ class PageQueryConnector extends DisplayObject
 		if (tmpHtmlDom!=null)
 		{
 			// tmpHtmlDom is the layer node
-			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
+			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_START, onLayerShow, false);
 			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
 		}
 		else
