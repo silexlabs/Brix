@@ -14,7 +14,6 @@ package brix.component.list;
  * @author Raphael Harmel
  */
 
-import haxe.Utf8;
 import js.Dom;
 import js.Lib;
 
