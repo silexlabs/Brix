@@ -30,7 +30,14 @@ class RssConnector extends ConnectorBase
 	 */
 	override public function parseData2Object(data:String):Dynamic
 	{
-		return rss2object(Xml.parse(data));
+		var xml:Xml = Xml.createDocument();
+		try {
+			xml = Xml.parse(data);
+		}
+		catch (e:Dynamic) {
+			trace("Error parsing xml config: " + e);
+		}
+		return rss2object(xml);
 	}
 	
 	/**
