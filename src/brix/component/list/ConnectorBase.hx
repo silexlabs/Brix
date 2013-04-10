@@ -191,7 +191,7 @@ class ConnectorBase extends DisplayObject
 			Timer.delay(callback(loadData, null), pollingFreq);
 		}
 		// small optim
-		if (data == latestData)
+		if (hasNoMoreDataToLoad(data))
 		{
 			onNoMoreData(objectData);
 			//trace("no new data");
@@ -280,5 +280,17 @@ class ConnectorBase extends DisplayObject
 	public function parseData2Object(data:String):Dynamic
 	{
 		
+	}
+	
+	/**
+	 * check wether new loaded data are the same
+	 * as old loaded data.
+	 * 
+	 * to be overriden to implement behaviour 
+	 * specific to a connector
+	 */
+	public function hasNoMoreDataToLoad(data:String):Bool
+	{
+		return data == latestData;
 	}
 }
