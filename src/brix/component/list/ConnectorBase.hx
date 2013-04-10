@@ -27,6 +27,17 @@ class ConnectorBase extends DisplayObject
 	 * event to request data change
 	 */
 	public static inline var ON_DATA_RECEIVED = "onDataReceived";
+	
+	/**
+	 * event when there was an error while fetching data
+	 */
+	public static inline var ON_DATA_ERROR = "onDataError";
+	
+	/**
+	 * event when all data from the url has been fetched
+	 */
+	public static inline var ON_NO_MORE_DATA = "onNoMoreData";
+	
 	/**
 	 * attribute to allow the component to load data automatically, e.g. when the layer is shown
 	 * by default it is true, set it to false in the html to prevent auto data loading
@@ -58,6 +69,7 @@ class ConnectorBase extends DisplayObject
 	private var pollingFreq:Null<Int>;
 	private var isPolling:Bool=false;
 	private var latestData:String = "";
+	private var objectData:Dynamic;
 
 	////////////////////////////////////
 	// DisplayObject methods
@@ -181,6 +193,7 @@ class ConnectorBase extends DisplayObject
 		// small optim
 		if (data == latestData)
 		{
+			onNoMoreData(objectData);
 			//trace("no new data");
 			return;
 		}
@@ -189,9 +202,9 @@ class ConnectorBase extends DisplayObject
 			//trace("new data ");
 			//trace(rootElement.className);
 		}
+
 		latestData = data;
 		// parse data to object
-		var objectData:Dynamic = {};
 		try
 		{
 			objectData = parseData2Object(data);
@@ -236,7 +249,8 @@ class ConnectorBase extends DisplayObject
 	 */ 
 	public function onError(message:String)
 	{
-		trace("onError "+message);
+		trace("onError " + message);
+		dispatch(ConnectorBase.ON_DATA_ERROR, null, rootElement, false, both);
 	}
 	/**
 	 * dispatch an event with the new data
@@ -245,6 +259,15 @@ class ConnectorBase extends DisplayObject
 	{
 		// dispatch a custom event
 		dispatch(ConnectorBase.ON_DATA_RECEIVED, objectData, rootElement, false, both);
+	}
+	
+	/**
+	 * dispatch an event with the data
+	 * to signal there is no more to load
+	 */
+	public function onNoMoreData(objectData:Dynamic)
+	{
+		dispatch(ConnectorBase.ON_NO_MORE_DATA, objectData, rootElement, false, both);
 	}
 	
 	/**
