@@ -58,13 +58,13 @@ class RssConnector extends ConnectorBase
 			{
 				var item:Dynamic = {};
 				
-				// for each node
+				// for each item parameter
 				for (itemParam in channelChild.elements())
 				{
 					// Build the item object. Only add data for nodes having value.
 					try {
-						//if (itemParam.firstChild() != null)
-						//{
+						if (itemParam.firstChild() != null)
+						{
 							var key:String = itemParam.nodeName;
 							var value:String = itemParam.firstChild().nodeValue;
 							
@@ -74,7 +74,7 @@ class RssConnector extends ConnectorBase
 							}
 							
 							Reflect.setField(item, key, value);
-						//}
+						}
 					}
 					catch(e:Dynamic)
 					{
@@ -86,7 +86,7 @@ class RssConnector extends ConnectorBase
 				items.push(item);
 			}
 		}
-
+		//trace(items);
 		return items;
 	}
 	
@@ -94,6 +94,7 @@ class RssConnector extends ConnectorBase
 	 * Process the value of a key. The process depends on the key.
 	 * to be overriden in children classes
 	 * 
+	 * @param	item
 	 * @param	key
 	 * @param	value
 	 * @return
