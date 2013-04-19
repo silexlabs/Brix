@@ -1,0 +1,14 @@
+<root>
+	<user name="john">
+		<phone>
+			<number>0000</number>
+			<number>111</number>
+		</phone>
+	</user>
+	<user name="raph">
+		<phone>
+			<number>0000</number>
+			<number>111</number>
+		</phone>
+	</user>
+</root>

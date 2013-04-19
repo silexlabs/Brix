@@ -61,6 +61,10 @@ class ContextManager extends DisplayObject
 	 */
 	public static inline var EVENT_REMOVE_CONTEXTS = "removeContextsEvent";
 	/**
+	 * name of the event which you can dispatch from your components to toggle the value of the contexts
+	 */
+	public static inline var EVENT_TOGGLE_CONTEXTS = "toggleContextsEvent";
+	/**
 	 * name of the event which you can dispatch from your components to change the value of the contexts
 	 */
 	public static inline var EVENT_REPLACE_CONTEXTS = "replaceContextsEvent";
@@ -115,6 +119,7 @@ class ContextManager extends DisplayObject
 		mapListener(rootElement, EVENT_RESET_CONTEXTS, cast(onResetContextEvent), true);
 		//rootElement.addEventListener(EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
 		mapListener(rootElement, EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
+		mapListener(rootElement, EVENT_TOGGLE_CONTEXTS, cast(onToggleContextsEvent), true);
 	}
 	override public function init()
 	{
@@ -165,6 +170,13 @@ class ContextManager extends DisplayObject
 	{trace("onReplaceContextsEvent"+e.detail);
 		var contextValues:Array<ContextValue> = cast(e.detail);
 		setCurrentContexts(contextValues);
+	}
+	
+	private function onToggleContextsEvent(e:CustomEvent)
+	{trace("onToggleContextEvent"+e.detail);
+		var contextValues:Array<ContextValue> = cast(e.detail);
+		for (contextValue in contextValues)
+			toggleContext(contextValue);
 	}
 	/** 
 	 * callback for a request comming from another brix component
@@ -243,6 +255,27 @@ class ContextManager extends DisplayObject
 			//trace("Warning: Could not remove the context \""+context+"\" from the current context, because it is not in the currentContexts array.");
 		}
 	}
+	
+	/**
+	 * toggle (remove if present, add if not) a context from the
+	 * current contexts list currentContexts
+	 */
+	public function toggleContext(context:ContextValue)
+	{
+		if (!isContext(context))
+		{
+			throw("Error: unknown context \""+context+"\". It should be defined in the \""+PARAM_DATA_CONTEXT_LIST+"\" parameter of the Context component.");
+		}
+		if (hasContext(context))
+		{
+			removeContext(context);
+		}
+		else
+		{
+			addContext(context);
+		}
+	}
+	
 	/**
 	 * check if the given context value is part of the currentContexts list
 	 */
