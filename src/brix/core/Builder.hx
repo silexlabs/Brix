@@ -691,7 +691,7 @@ class Builder
 				neko.Lib.println("Saving "+outputFilePath);
 			#end
 
-			sys.io.File.saveContent( outputFilePath , cocktail.Lib.document.innerHTML );
+			sys.io.File.saveContent( outputFilePath , "<!DOCTYPE HTML>\n" + cocktail.Lib.document.innerHTML );
 		}
 		
 		// specific js-target application packaging
