@@ -70,21 +70,25 @@ class JsonConnector extends DisplayObject
 	{
 		super(rootElement, brixId);
 
+		var layer = getLayer();
+
+		// if the layer is already open or there is no layer
+		// then start polling if needed
+		if (layer == null || layer.status == visible)
+		{
+			isPolling = true;
+		}
 		// listen to the Layer class event, in order to loadData when the page opens
 		if (rootElement.getAttribute(ATTR_AUTO_LOAD) != "false")
 		{
-			var tmpHtmlDom = rootElement;
-			while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
+			if (layer!=null)
 			{
-				tmpHtmlDom = tmpHtmlDom.parentNode;
+				// layer.rootElement is the layer node
+				mapListener(layer.rootElement, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
+				mapListener(layer.rootElement, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
+				mapListener(layer.rootElement, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
 			}
-			if (tmpHtmlDom!=null)
-			{
-				// tmpHtmlDom is the layer node
-				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
-				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
-				mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
-			}
+			// 
 			var pollingFreqStr = rootElement.getAttribute(ATTR_POLL_FREQ);
 			if (pollingFreqStr != null)
 			{
@@ -104,6 +108,30 @@ class JsonConnector extends DisplayObject
 				loadData();
 			}
 		}
+		else
+		{
+			if (layer!=null)
+			{
+				// still we must stop polling when the layer hides
+				mapListener(layer.rootElement, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
+			}
+		}
+	}
+	/**
+	 * retrieve the layer in which this component is defined
+	 */
+	private function getLayer() : Null<Layer>
+	{
+		var tmpHtmlDom = rootElement;
+		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
+		{
+			tmpHtmlDom = tmpHtmlDom.parentNode;
+		}
+		if (tmpHtmlDom!=null)
+		{
+			return getBrixApplication().getAssociatedComponents(tmpHtmlDom, Layer).first();
+		}
+		return null;
 	}
 	/**
 	 * start/stop polling
@@ -124,6 +152,8 @@ class JsonConnector extends DisplayObject
 	 */ 
 	public function onLayerShow(e:Event)
 	{
+		if (isPolling==true) return;
+
 		// refresh list data
 		loadData();
 		// stat polling
