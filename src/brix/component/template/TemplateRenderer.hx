@@ -121,20 +121,25 @@ class TemplateRenderer extends DisplayObject
 	 	// generate the html for the element
 		try
 		{
+			trace("create template");
 			var t = new haxe.Template(htmlTemplate);
+			trace("execute template");
 			var res = t.execute(data, TemplateMacros);
+			trace("execute template OK");
 			if (lastRenderedHtml != res)
 			{
-				//trace("render IS different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+				trace("render IS different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
 				for (nodeIdx in 0...rootElement.childNodes.length)
 				{
 					var node = rootElement.childNodes[nodeIdx];
 					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
 					{
+						trace("call cleanNode");
 						getBrixApplication().cleanNode(node);
 					}
 				}
 				lastRenderedHtml = res;
+				trace("add template to the dom");
 				rootElement.innerHTML = res;
 				//trace("render => "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
 				for (nodeIdx in 0...rootElement.childNodes.length)
@@ -149,12 +154,13 @@ class TemplateRenderer extends DisplayObject
 			else
 			{
 
-				trace("render not different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
+				trace("render not different "+rootElement.className);
+				// throws an error "XML parser failure: element is malformed." : trace("render not different "+rootElement.innerHTML);
 			}
 		}
 		catch(e:Dynamic)
 		{
-			trace("Error: could not render template "+htmlTemplate+". Error message: "+e);
+			trace("Error: could not render template "+rootElement.className+". Error message: "+e);
 		}
 	}
 	/**
