@@ -121,27 +121,20 @@ class TemplateRenderer extends DisplayObject
 	 	// generate the html for the element
 		try
 		{
-			trace("create template");
 			var t = new haxe.Template(htmlTemplate);
-			trace("execute template");
 			var res = t.execute(data, TemplateMacros);
-			trace("execute template OK");
 			if (lastRenderedHtml != res)
 			{
-				trace("render IS different "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
 				for (nodeIdx in 0...rootElement.childNodes.length)
 				{
 					var node = rootElement.childNodes[nodeIdx];
 					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
 					{
-						trace("call cleanNode");
 						getBrixApplication().cleanNode(node);
 					}
 				}
 				lastRenderedHtml = res;
-				trace("add template to the dom");
 				rootElement.innerHTML = res;
-				//trace("render => "+rootElement.className+" - "+lastRenderedHtml.length+"--"+res.length+"--"+rootElement.innerHTML.length);
 				for (nodeIdx in 0...rootElement.childNodes.length)
 				{
 					var node = rootElement.childNodes[nodeIdx];
