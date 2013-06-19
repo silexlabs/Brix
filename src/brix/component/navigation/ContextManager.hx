@@ -107,13 +107,9 @@ class ContextManager extends DisplayObject
 		}
 
 		// listen to other components events
-		//rootElement.addEventListener(EVENT_ADD_CONTEXTS, cast(onAddContextEvent), true);
 		mapListener(rootElement, EVENT_ADD_CONTEXTS, cast(onAddContextEvent), true);
-		//rootElement.addEventListener(EVENT_REMOVE_CONTEXTS, cast(onRemoveContextEvent), true);
 		mapListener(rootElement, EVENT_REMOVE_CONTEXTS, cast(onRemoveContextEvent), true);
-		//rootElement.addEventListener(EVENT_RESET_CONTEXTS, cast(onResetContextEvent), true);
 		mapListener(rootElement, EVENT_RESET_CONTEXTS, cast(onResetContextEvent), true);
-		//rootElement.addEventListener(EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
 		mapListener(rootElement, EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
 	}
 	override public function init()
@@ -145,6 +141,7 @@ class ContextManager extends DisplayObject
 	 */
 	private function onAddContextEvent(e:CustomEvent)
 	{trace("onAddContextEvent"+e.detail);
+		//e.stopPropagation();
 		var contextValues:Array<ContextValue> = cast(e.detail);
 		for (contextValue in contextValues)
 			addContext(contextValue);
@@ -154,6 +151,7 @@ class ContextManager extends DisplayObject
 	 */
 	private function onRemoveContextEvent(e:CustomEvent)
 	{trace("onRemoveContextEvent"+e.detail);
+		//e.stopPropagation();
 		var contextValues:Array<ContextValue> = cast(e.detail);
 		for (contextValue in contextValues)
 			removeContext(contextValue);
@@ -163,6 +161,7 @@ class ContextManager extends DisplayObject
 	 */
 	private function onReplaceContextsEvent(e:CustomEvent)
 	{trace("onReplaceContextsEvent"+e.detail);
+		//e.stopPropagation();
 		var contextValues:Array<ContextValue> = cast(e.detail);
 		setCurrentContexts(contextValues);
 	}
@@ -171,6 +170,7 @@ class ContextManager extends DisplayObject
 	 */
 	private function onResetContextEvent(e:CustomEvent)
 	{
+		//e.stopPropagation();
 		resetContexts();
 	}
 	/** 
@@ -214,7 +214,7 @@ class ContextManager extends DisplayObject
 	{
 		if (!isContext(context))
 		{
-			throw("Error: unknown context \""+context+"\". It should be defined in the \""+PARAM_DATA_CONTEXT_LIST+"\" parameter of the Context component.");
+			trace("Error: unknown context \""+context+"\". It should be defined in the \""+PARAM_DATA_CONTEXT_LIST+"\" parameter of the Context component.");
 		}
 		if (!hasContext(context))
 		{
@@ -232,7 +232,7 @@ class ContextManager extends DisplayObject
 	{
 		if (!isContext(context))
 		{
-			throw("Error: unknown context \""+context+"\". It should be defined in the \""+PARAM_DATA_CONTEXT_LIST+"\" parameter of the Context component.");
+			trace("Error: unknown context \""+context+"\". It should be defined in the \""+PARAM_DATA_CONTEXT_LIST+"\" parameter of the Context component.");
 		}
 		if (hasContext(context))
 		{
