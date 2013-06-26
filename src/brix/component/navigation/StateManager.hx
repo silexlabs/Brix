@@ -14,8 +14,8 @@ import brix.component.ui.DisplayObject;
 import brix.util.DomTools;
 import brix.core.Application;
 
-import js.Dom;
-import js.Lib;
+import js.html.HtmlElement;
+import js.html.CustomEvent;
 
 /**
  * The StateManager component is a component that is in charge to show/hide HTML elements in function of the currrent opened page or the contexts
@@ -49,7 +49,7 @@ class StateManager extends DisplayObject
 	/**
 	 * Builds the Context with arguments passed in the html node attributes
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		currentCssClassNamesContexts = new Array();

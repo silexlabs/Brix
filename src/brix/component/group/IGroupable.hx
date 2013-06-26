@@ -12,8 +12,7 @@ import brix.core.Application;
 import brix.util.DomTools;
 import brix.component.ui.DisplayObject;
 
-import js.Dom;
-import js.Lib;
+import js.html.HtmlElement;
 
 /**
  * Makes a component groupable (ie: gives it a common object - the Group node - to listen to and dispatch events with its group mates).
@@ -23,9 +22,9 @@ import js.Lib;
  * 
  * You'll also have to dispatch and listen to the events on groupElement manually in your component implementation.
  */
-interface IGroupable implements IDisplayObject
+interface IGroupable extends IDisplayObject
 {
-	var groupElement : HtmlDom;
+	var groupElement : HtmlElement;
 }
 
 /**
@@ -36,7 +35,7 @@ class Groupable
 	/**
 	 * Simply retrieves the group element by calling getElementsByClassName on the application root element.
 	 */ 
-	static public function startGroupable( groupable : IGroupable, rootElement : HtmlDom = null ) : Void
+	static public function startGroupable( groupable : IGroupable, rootElement : HtmlElement = null ) : Void
 	{
 		// retrieve the group ID in the node's attributes
 		var groupId = groupable.rootElement.getAttribute("data-group-id");

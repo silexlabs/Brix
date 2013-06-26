@@ -8,8 +8,7 @@
  */
 package brix.component.layout;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 import Xml;
 
 import brix.util.DomTools;
@@ -17,6 +16,8 @@ import brix.component.navigation.Page;
 import brix.component.navigation.ContextManager;
 import brix.component.navigation.StateManager;
 import brix.component.ui.DisplayObject;
+
+import js.html.Event;
 
 /**
  * LayoutBase class
@@ -39,7 +40,7 @@ class LayoutBase extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String){
+	public function new(rootElement:HtmlElement, BrixId:String){
 		super(rootElement, BrixId);
 
 		//Lib.window.addEventListener('resize', redrawCallback, false);

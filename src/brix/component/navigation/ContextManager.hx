@@ -13,8 +13,8 @@ import brix.component.ui.DisplayObject;
 import brix.util.DomTools;
 import brix.core.Application;
 
-import js.Dom;
-import js.Lib;
+import js.html.HtmlElement;
+import js.html.CustomEvent;
 
 /**
  * the value for a context
@@ -90,14 +90,14 @@ class ContextManager extends DisplayObject
 	/**
 	 * Stores the style node with the current context as visible 
 	 */
-	//private static var styleSheet:HtmlDom;
+	//private static var styleSheet:HtmlElement;
 	///////////////////////////////////////////////////////////////
 	// main methods
 	///////////////////////////////////////////////////////////////
 	/**
 	 * Builds the Context with arguments passed in the html node attributes
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		// init context list
@@ -295,7 +295,7 @@ class ContextManager extends DisplayObject
 	 * for each css class of the node, check if it is a context
 	 * and then if this context is in the current context
 	 */
-	public function isInContext(element:HtmlDom):Bool
+	public function isInContext(element:HtmlElement):Bool
 	{
 		if (element.className != null)
 		{
@@ -316,7 +316,7 @@ class ContextManager extends DisplayObject
 	 * for each css class of the node, check if it is a context
 	 * and then if this context is in the current context
 	 */
-	public function isOutContext(element:HtmlDom):Bool
+	public function isOutContext(element:HtmlElement):Bool
 	{
 		if (element.className != null)
 		{

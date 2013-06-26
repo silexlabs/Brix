@@ -8,8 +8,7 @@
  */
 package brix.component.layout;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 import Xml;
 
 import brix.util.DomTools;
@@ -62,20 +61,20 @@ class Panel extends LayoutBase
 	/**
 	 * html elment instance
 	 */
-	public var body:HtmlDom;
+	public var body:HtmlElement;
 	/**
 	 * html elment instance
 	 */
-	public var header:HtmlDom;
+	public var header:HtmlElement;
 	/**
 	 * html elment instance
 	 */
-	public var footer:HtmlDom;
+	public var footer:HtmlElement;
 
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 

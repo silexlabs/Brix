@@ -8,8 +8,9 @@
  */
 package brix.component.navigation;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.Event;
+import js.html.NodeList;
 
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.transition.TransitionData;
@@ -31,7 +32,7 @@ typedef LayerEventDetail =
 {
 	var transitionObserver : TransitionObserver;
 	var transitionData : TransitionData;
-	var target: HtmlDom;
+	var target: HtmlElement;
 	var layer: Layer;
 }
 
@@ -77,7 +78,7 @@ class Layer extends DisplayObject
 	/**
 	 * array used to store all the children while the layer is hided
 	 */
-	private var childrenArray:Array<HtmlDom>;
+	private var childrenArray:Array<HtmlElement>;
 	/**
 	 * true if the layer is hidden
 	 */
@@ -104,7 +105,7 @@ class Layer extends DisplayObject
 	 * constructor
 	 * removes all children from the DOM
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		childrenArray = new Array();
@@ -115,7 +116,7 @@ class Layer extends DisplayObject
 	/** 
 	 * Retrieve the given layer of this application or group
 	 */
-	static public function getLayerNodes(pageName:String="", brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	static public function getLayerNodes(pageName:String="", brixId:String, root:HtmlElement = null):NodeList
 	{
 		// default is the hole body
 		var body:Dynamic = root;
@@ -517,7 +518,7 @@ class Layer extends DisplayObject
 /**/
 		while (rootElement.childNodes.length > 0)
 		{
-			var element:HtmlDom = rootElement.childNodes[0];
+			var element:HtmlElement = rootElement.childNodes[0];
 			rootElement.removeChild(element);
 			childrenArray.push(element);
 		}
@@ -531,7 +532,7 @@ class Layer extends DisplayObject
 	/**
 	 * play the videos/sounds when entering the page
 	 */ 
-	private function setupAudioElements(nodeList:HtmlCollection<Audio>) 
+	private function setupAudioElements(nodeList:NodeList) 
 	{
 		for (idx in 0...nodeList.length)
 		{
@@ -556,7 +557,7 @@ class Layer extends DisplayObject
 	/**
 	 * play the videos/sounds when entering the page
 	 */ 
-	private function setupVideoElements(nodeList:HtmlCollection<Video>) 
+	private function setupVideoElements(nodeList:NodeList) 
 	{
 		for (idx in 0...nodeList.length)
 		{
@@ -581,7 +582,7 @@ class Layer extends DisplayObject
 	/**
 	 * stop the videos/sounds when leaving the page
 	 */ 
-	private function cleanupAudioElements(nodeList:HtmlCollection<Audio>) 
+	private function cleanupAudioElements(nodeList:NodeList) 
 	{
 		for (idx in 0...nodeList.length)
 		{
@@ -603,7 +604,7 @@ class Layer extends DisplayObject
 	/**
 	 * stop the videos/sounds when leaving the page
 	 */ 
-	private function cleanupVideoElements(nodeList:HtmlCollection<Video>) 
+	private function cleanupVideoElements(nodeList:NodeList) 
 	{
 		for (idx in 0...nodeList.length)
 		{

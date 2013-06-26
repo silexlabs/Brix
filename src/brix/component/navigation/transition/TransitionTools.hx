@@ -1,7 +1,6 @@
 package brix.component.navigation.transition;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 
 import brix.component.navigation.transition.TransitionData;
 import brix.util.DomTools;
@@ -24,7 +23,7 @@ class TransitionTools
 	 * @return the default transition data, i.e. these attributes defined on the root node: (data-show-start-style and data-show-end-style) or (data-hide-start-style and data-hide-end-style)
 	 * @return null if these attributes are not defined on the root node: (data-show-start-style and data-show-end-style) or (data-hide-start-style and data-hide-end-style)
 	 */
-	public static function getTransitionData(rootElement:HtmlDom, type:TransitionType) : Null<TransitionData> 
+	public static function getTransitionData(rootElement:HtmlElement, type:TransitionType) : Null<TransitionData> 
 	{
 		var res:TransitionData = null;
 
@@ -62,7 +61,7 @@ class TransitionTools
 	 * @param	name
 	 * @param	value
 	 */
-	public static function setTransitionProperty(rootElement:HtmlDom, name, value) 
+	public static function setTransitionProperty(rootElement:HtmlElement, name, value) 
 	{
 		Reflect.setProperty(rootElement.style, name, value);
 	// only for pure js, not for cocktail compilation

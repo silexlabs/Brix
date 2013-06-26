@@ -8,8 +8,7 @@
  */
 package brix.component.navigation;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.link.LinkBase;
@@ -32,7 +31,7 @@ using StringTools;
  * When the page is to be opened/closed, then all the layers which have the page deeplink as a class name are shown/hidden
  */
 @tagNameFilter("a")
-class Page extends DisplayObject, implements IGroupable
+class Page extends DisplayObject implements IGroupable
 {
 	/**
 	 * constant, name of this class
@@ -87,7 +86,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * the group element set by the Group class
 	 * implementation of IGroupable
 	 */
-	public var groupElement:HtmlDom;
+	public var groupElement:HtmlElement;
 
 	/**
 	 * holds the query string data contained
@@ -99,7 +98,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open the page with the given "name" attribute
 	 * This will close other pages
 	 */
-	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, brixId:String, root:HtmlDom = null)
+	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, brixId:String, root:HtmlElement = null)
 	{
 		// default is the whole body
 		var body:Dynamic = root;
@@ -139,7 +138,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Close the page with the given "name" attribute
 	 * This will close only this page
 	 */
-	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlDom = null)
+	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlElement = null)
 	{ 
 		// default is the whole body
 		var body:Dynamic = root;
@@ -162,10 +161,10 @@ class Page extends DisplayObject, implements IGroupable
 	/** 
 	 * Retrieve all the pages of this application or group
 	 */
-	static public function getPageNodes(brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	static public function getPageNodes(brixId:String, root:HtmlElement = null):HtmlCollection<HtmlElement>
 	{
 		// default is the hole body
-		var body:HtmlDom = root;
+		var body:HtmlElement = root;
 		if (root == null)
 		{
 			body = Application.get(brixId).body;
@@ -178,7 +177,7 @@ class Page extends DisplayObject, implements IGroupable
 	/** 
 	 * Retrieve the page whose "name" attribute is pageName
 	 */
-	static public function getPageByName(pageName:String, brixId:String, root:HtmlDom = null):Null<Page>
+	static public function getPageByName(pageName:String, brixId:String, root:HtmlElement = null):Null<Page>
 	{
 		// default is the hole body
 		var body:Dynamic = root;
@@ -186,7 +185,7 @@ class Page extends DisplayObject, implements IGroupable
 			body = Application.get(brixId).body;
 
 		// get all pages, i.e. all element with class name "page"
-		var pages:HtmlCollection<HtmlDom> = getPageNodes(brixId, body);
+		var pages:HtmlCollection<HtmlElement> = getPageNodes(brixId, body);
 		// browse all pages
 		for (pageIdx in 0...pages.length)
 		{
@@ -225,7 +224,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Init the attributes
 	 * Close the page
 	 */
-	public function new(rootElement:HtmlDom, brixId:String) 
+	public function new(rootElement:HtmlElement, brixId:String) 
 	{
 		super(rootElement, brixId);
 		

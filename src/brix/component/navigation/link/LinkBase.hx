@@ -8,8 +8,7 @@
  */
 package brix.component.navigation.link;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 
 import brix.core.Application;
 import brix.component.ui.DisplayObject;
@@ -28,7 +27,7 @@ using StringTools;
  * Virtual class, it is supposed to be overriden to implement a behavior on click (override the onClick method)
  */
 @tagNameFilter("a" ,"div")
-class LinkBase extends DisplayObject, implements IGroupable
+class LinkBase extends DisplayObject implements IGroupable
 {
 	/**
 	 * constant, name of attribute href
@@ -52,7 +51,7 @@ class LinkBase extends DisplayObject, implements IGroupable
 	 * the group element set by the Group class
 	 * implementation of IGroupable
 	 */
-	public var groupElement:HtmlDom;
+	public var groupElement:HtmlElement;
 	/**
 	 * value of the href attribute without the #
 	 */
@@ -71,7 +70,7 @@ class LinkBase extends DisplayObject, implements IGroupable
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 

@@ -10,8 +10,7 @@ package brix.component.navigation.transition;
 
 import brix.util.DomTools;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 
 /**
  * this class is passed to the layers when a page opens or closes

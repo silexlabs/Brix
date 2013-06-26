@@ -1,7 +1,7 @@
 package brix.component.sound;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.Event;
 
 import brix.component.ui.DisplayObject;
 import brix.util.DomTools;
@@ -25,7 +25,7 @@ class SoundOn extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		rootElement.onclick = onClick;
@@ -54,7 +54,7 @@ class SoundOn extends DisplayObject
 	{
 		// mute/unmute audio tags
 		#if js
-			var audioTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("audio");
+			var audioTags:HtmlCollection<HtmlElement> = Lib.document.getElementsByTagName("audio");
 			for (idx in 0...audioTags.length)
 			{
 				cast(audioTags[idx]).muted = doMute;
@@ -73,8 +73,8 @@ class SoundOn extends DisplayObject
 		isMuted = doMute;
 
 		// get all the "sound on/off" button(s)
-		var soundOffButtons:HtmlCollection<HtmlDom> = Lib.document.getElementsByClassName(SoundOff.CLASS_NAME);
-		var soundOnButtons:HtmlCollection<HtmlDom> = Lib.document.getElementsByClassName(SoundOn.CLASS_NAME);
+		var soundOffButtons:HtmlCollection<HtmlElement> = Lib.document.getElementsByClassName(SoundOff.CLASS_NAME);
+		var soundOnButtons:HtmlCollection<HtmlElement> = Lib.document.getElementsByClassName(SoundOn.CLASS_NAME);
 
 		// display/hide the sound on/off buttons
 		for (idx in 0...soundOffButtons.length)
