@@ -2,6 +2,7 @@ package brix.component.sound;
 
 
 import js.html.HtmlElement;
+import js.html.Event;
 
 /**
  * Let you specify a button to switch on/off the sound of the whole app

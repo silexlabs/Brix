@@ -11,6 +11,8 @@ package brix.component.navigation;
 import js.html.HtmlElement;
 import js.html.Event;
 import js.html.NodeList;
+import js.html.AudioElement;
+import js.html.VideoElement;
 
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.transition.TransitionData;
@@ -188,7 +190,7 @@ class Layer extends DisplayObject
 			for (transition in sumOfTransitions)
 				DomTools.addClass(rootElement, transition.startStyleName);//
 			// continue later
-			DomTools.doLater(callback(doStartTransition, sumOfTransitions, onComplete));
+			DomTools.doLater(doStartTransition.bind(sumOfTransitions, onComplete));
 		}
 	}
 	/**
@@ -341,7 +343,7 @@ class Layer extends DisplayObject
 		// do the transition
 		if (preventTransitions == false)
 		{
-			doShowCallback = callback(doShow, transitionData, transitionObserver, preventTransitions);
+			doShowCallback = doShow.bind(transitionData, transitionObserver, preventTransitions);
 			startTransition(TransitionType.show, transitionData, doShowCallback);
 		}
 		else
@@ -461,7 +463,7 @@ class Layer extends DisplayObject
 		// do the transition
 		if (preventTransitions == false)
 		{
-			doHideCallback = callback(doHide, transitionData, transitionObserver, preventTransitions);
+			doHideCallback = doHide.bind(transitionData, transitionObserver, preventTransitions);
 			startTransition(TransitionType.hide, transitionData, doHideCallback);
 		}
 		else
@@ -518,7 +520,7 @@ class Layer extends DisplayObject
 /**/
 		while (rootElement.childNodes.length > 0)
 		{
-			var element:HtmlElement = rootElement.childNodes[0];
+			var element:HtmlElement = cast rootElement.childNodes[0];
 			rootElement.removeChild(element);
 			childrenArray.push(element);
 		}
@@ -538,7 +540,7 @@ class Layer extends DisplayObject
 		{
 			try
 			{				
-				var element = nodeList[idx];
+				var element:AudioElement = cast nodeList[idx];
 				if (element.autoplay == true)
 				{
 					element.currentTime = 0;
@@ -563,7 +565,7 @@ class Layer extends DisplayObject
 		{
 			try
 			{				
-				var element = nodeList[idx];
+				var element:VideoElement = cast nodeList[idx];
 				if (element.autoplay == true)
 				{
 					element.currentTime = 0;
@@ -588,7 +590,7 @@ class Layer extends DisplayObject
 		{
 			try
 			{				
-				var element = nodeList[idx];
+				var element:AudioElement = cast nodeList[idx];
 				element.pause();
 				element.currentTime = 0;
 			}
@@ -610,7 +612,7 @@ class Layer extends DisplayObject
 		{
 			try
 			{
-				var element = nodeList[idx];
+				var element:VideoElement = cast nodeList[idx];
 				element.pause();
 				element.currentTime = 0;
 			}

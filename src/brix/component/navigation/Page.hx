@@ -11,6 +11,8 @@ package brix.component.navigation;
 import js.html.HtmlElement;
 import js.html.NodeList;
 import js.html.Event;
+import js.html.PopStateEvent;
+import js.Browser;
 
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.link.LinkBase;
@@ -169,7 +171,7 @@ class Page extends DisplayObject implements IGroupable
 		var body:HtmlElement = root;
 		if (root == null)
 		{
-			body = Application.get(brixId).body;
+			body = cast Application.get(brixId).body;
 		}
 
 		// get all pages, i.e. all elements with class name "Page"
@@ -187,7 +189,7 @@ class Page extends DisplayObject implements IGroupable
 			body = Application.get(brixId).body;
 
 		// get all pages, i.e. all element with class name "page"
-		var pages:HtmlCollection<HtmlElement> = getPageNodes(brixId, body);
+		var pages:NodeList = getPageNodes(brixId, body);
 		// browse all pages
 		for (pageIdx in 0...pages.length)
 		{
@@ -236,7 +238,7 @@ class Page extends DisplayObject implements IGroupable
 		// group element is body element by default
 		if (groupElement == null)
 		{
-			groupElement = getBrixApplication().body;
+			groupElement = cast getBrixApplication().body;
 		}
 		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
 		if (name == null || name.trim() == "")
@@ -250,7 +252,7 @@ class Page extends DisplayObject implements IGroupable
 		if (useDeeplink)
 		{
 			// listen to the history api changes
-			mapListener(Lib.window, "popstate", onPopState, true);
+			mapListener(Browser.window, "popstate", onPopState, true);
 		}
 	}
 
@@ -276,17 +278,17 @@ class Page extends DisplayObject implements IGroupable
 // workaround window.location not yet implemented in cocktail
 #if js
 		// open if it is the page in history
-		if (useDeeplink && Lib.window.history.state != null)
+		if (useDeeplink && Browser.window.history.state != null)
 		{
-			if (Lib.window.history.state.name == name)
+			if (Browser.window.history.state.name == name)
 			{
 				open(null, null, true, true, false);
 			}
 		}
 		// open if it is the page in the deeplink
-		else if (StringTools.startsWith(Lib.window.location.search, "?/"))
+		else if (StringTools.startsWith(Browser.window.location.search, "?/"))
 		{
-			if (Lib.window.location.search.substr(2) == name)
+			if (Browser.window.location.search.substr(2) == name)
 			{
 				open(null, null, true, true);
 			}
@@ -330,7 +332,7 @@ class Page extends DisplayObject implements IGroupable
 				if ( __js__("window.history.pushState") )
 				{
 #end
-			Lib.window.history.pushState({
+			Browser.window.history.pushState({
 					name: name,
 					transitionDataShow: transitionDataShow,
 					transitionDataHide: transitionDataHide,
@@ -356,7 +358,7 @@ class Page extends DisplayObject implements IGroupable
 		for (idxPageNode in 0...nodes.length)
 		{
 			var pageNode = nodes[idxPageNode];
-			var pageInstances:List<Page> = getBrixApplication().getAssociatedComponents(pageNode, Page);
+			var pageInstances:List<Page> = getBrixApplication().getAssociatedComponents(cast pageNode, Page);
 			for (pageInstance in pageInstances)
 			{
 				if (pageInstance != this)
@@ -383,7 +385,7 @@ class Page extends DisplayObject implements IGroupable
 		for (idxLayerNode in 0...nodes.length)
 		{
 			var layerNode = nodes[idxLayerNode];
-			var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
+			var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(cast layerNode, Layer);
 			for (layerInstance in layerInstances)
 			{
 				layerInstance.show(transitionData, transitionObserver, preventTransitions);
@@ -430,14 +432,14 @@ class Page extends DisplayObject implements IGroupable
 			var hasForbiddenClass = false;
 			for (className in preventCloseByClassName)
 			{
-				if (DomTools.hasClass(layerNode, className))
+				if (DomTools.hasClass(cast layerNode, className))
 				{
 					hasForbiddenClass = true;
 				}
 			}
 			if (!hasForbiddenClass)
 			{
-				var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
+				var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(cast layerNode, Layer);
 				for (layerInstance in layerInstances)
 				{
 					layersToBeClosed.push(layerInstance);
