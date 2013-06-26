@@ -8,6 +8,9 @@
  */
 package brix.component.template;
 
+import js.Lib;
+import js.Dom;
+
 /**
  * This class is made to be exposed to the components templates
  * For example when the List component populate itself with data, it duplicates the template found in the HTML DOM. 
@@ -16,14 +19,14 @@ package brix.component.template;
  * @example 	template.execute(item, TemplateMacros);
  * @example		in the macro you can write $$makeDateReadable(::item.date::)
  */
-class TemplateMacros
+class TemplateMacros implements Dynamic
 {
-	//public function new(){}
+	public function new(){}
 	/**
 	 * make dates readable
 	 * @param 	date can be a Date or String or timestamp
 	 */
-	public static function makeDurationReadable(resolve:String->Dynamic, duration:Float, numMax:Int=999, 
+	public function makeDurationReadable(resolve:String->Dynamic, duration:Float, numMax:Int=999, 
 		yearsText:String="year", monthsText:String="month", weeksText:String="week", daysText:String="day", 
 		hoursText:String="hour", minutesText:String="minute", secondsText:String="second", 
 		yearsTextPlural:String="years", monthsTextPlural:String="months", weeksTextPlural:String="weeks", daysTextPlural:String="days", 
@@ -159,7 +162,7 @@ class TemplateMacros
 	 * make dates readable
 	 * @param 	date can be a Date or String or timestamp
 	 */
-	public static function durationFromTimestamp(resolve:String->Dynamic, timestamp:Float, numMax:Int=999, 
+	public function durationFromTimestamp(resolve:String->Dynamic, timestamp:Float, numMax:Int=999, 
 		yearsText:String="year", monthsText:String="month", weeksText:String="week", daysText:String="day", 
 		hoursText:String="hour", minutesText:String="minute", secondsText:String="second", 
 		yearsTextPlural:String="years", monthsTextPlural:String="months", weeksTextPlural:String="weeks", daysTextPlural:String="days", 
@@ -185,7 +188,7 @@ class TemplateMacros
 	 * @param 	timestamp in milliseconds or seconds
 	 * @param 	unit can be "s" or "ms"
 	 */
-	public static function makeDateReadableFromTimestamp(resolve:String->Dynamic, timestamp:Float, format:String="%Y/%m/%d %H:%M", ?unit:String="ms"):String
+	public function makeDateReadableFromTimestamp(resolve:String->Dynamic, timestamp:Float, format:String="%Y/%m/%d %H:%M", ?unit:String="ms"):String
 	{
 		if (StringTools.trim(unit) == "s")
 		{
@@ -198,7 +201,7 @@ class TemplateMacros
 		var res:String = DateTools.format(date, format);
 		return res;
 	}
-	public static function makeDateReadable(resolve:String->Dynamic, dateOrString:Dynamic, format:String="%Y/%m/%d %H:%M"):String
+	public function makeDateReadable(resolve:String->Dynamic, dateOrString:Dynamic, format:String="%Y/%m/%d %H:%M"):String
 	{//trace("makeDateReadable "+Type.typeof(dateOrString)+" - "+format);
 		try
 		{
@@ -226,35 +229,43 @@ class TemplateMacros
 	/**
 	 * url encode/decode
 	 */
-	public static function urlEncode(resolve:String->Dynamic, str:String):String
+	public function urlEncode(resolve:String->Dynamic, str:String):String
 	{
 		return StringTools.urlEncode(str);
 	}
 	/**
 	 * url encode/decode
 	 */
-	public static function urlDecode(resolve:String->Dynamic, str:String):String
+	public function urlDecode(resolve:String->Dynamic, str:String):String
 	{
 		return StringTools.urlDecode(str);
 	}
 	/**
 	 * Escape/unsecape HTML special characters of the string.
 	 */
-	public static function htmlEscape(resolve:String->Dynamic, str:String):String
+	public function htmlEscape(resolve:String->Dynamic, str:String):String
 	{
 		return StringTools.htmlEscape(str);
 	}
 	/**
 	 * Escape/unsecape HTML special characters of the string.
 	 */
-	public static function htmlUnescape(resolve:String->Dynamic, str:String):String
+	public function htmlUnescape(resolve:String->Dynamic, str:String):String
 	{
 		return StringTools.htmlUnescape(str);
 	}
 	/**
+	 * 
+	 */
+	public function getAttribute (resolve:String->Dynamic, element:HtmlDom, attr:String):String
+	{
+		if (element == null) return null;
+		return element.getAttribute(attr);
+	}
+	/**
 	 * trace for the templates
 	 */
-	public static function trace(resolve:String->Dynamic, obj):String
+	public function trace(resolve:String->Dynamic, obj):String
 	{
 		trace(obj);
 		return "";

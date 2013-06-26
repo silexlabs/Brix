@@ -293,14 +293,12 @@ class Layer extends DisplayObject
 		if (status != hidden && status != notInit)
 		{
 			//trace("Warning: can not show the layer, since it has the status '"+status+"'");
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_SHOW_AGAIN, true, true, {
+			dispatch(EVENT_TYPE_SHOW_AGAIN, {
 				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
-			});
-			rootElement.dispatchEvent(event);
+			}, rootElement, true, down);
 
 			// notify the transition observer
 			if (transitionObserver!=null){
@@ -327,14 +325,12 @@ class Layer extends DisplayObject
 		// dispatch a custom event on the root element
 		try
 		{
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_SHOW_START, false, false, {
+			dispatch(EVENT_TYPE_SHOW_START, {
 				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
-			});
-			rootElement.dispatchEvent(event);
+			}, rootElement, true, down);
 		}
 		catch (e:Dynamic)
 		{
@@ -385,14 +381,12 @@ class Layer extends DisplayObject
 		// dispatch a custom event on the root element
 		try
 		{
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_SHOW_STOP, false, false, {
+			dispatch(EVENT_TYPE_SHOW_STOP, {
 				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
-			});
-			rootElement.dispatchEvent(event);
+			}, rootElement, true, down);
 		}
 		catch (e:Dynamic)
 		{
@@ -428,14 +422,12 @@ class Layer extends DisplayObject
 		}
 		if (status != visible && status != notInit){
 			// trace("Warning, can not hide the layer, since it has the status '"+status+"'");
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_HIDE_AGAIN, false, false, {
+			dispatch(EVENT_TYPE_HIDE_AGAIN, {
 				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
-			});
-			rootElement.dispatchEvent(event);
+			}, rootElement, true, down);
 			return;
 		}
 		// update status 
@@ -448,14 +440,12 @@ class Layer extends DisplayObject
 		// dispatch a custom event on the root element
 		try
 		{
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_HIDE_START, false, false, {
+			dispatch(EVENT_TYPE_HIDE_START, {
 				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
-			});
-			rootElement.dispatchEvent(event);
+			}, rootElement, true, down);
 		}
 		catch (e:Dynamic)
 		{
@@ -507,14 +497,12 @@ class Layer extends DisplayObject
 		// dispatch a custom event on the root element
 		try
 		{
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
-			event.initCustomEvent(EVENT_TYPE_HIDE_STOP, false, false, {
+			dispatch(EVENT_TYPE_HIDE_STOP, {
 				transitionObserver : transitionObserver,
 				transitionData : transitionData,
 				target: rootElement,
 				layer: this,
-			});
-			rootElement.dispatchEvent(event);
+			}, rootElement, true, down);
 		}
 		catch (e:Dynamic)
 		{

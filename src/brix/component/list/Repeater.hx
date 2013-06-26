@@ -10,6 +10,9 @@ package brix.component.list;
 
 import js.Lib;
 import js.Dom;
+
+import haxe.Template;
+
 import brix.component.interaction.Draggable;
 
 import brix.util.DomTools;
@@ -69,18 +72,9 @@ class Repeater<ElementClass> extends DisplayObject
 		rootElement.innerHTML = "";
 
 		// attach the events
-		mapListener(rootElement, JsonConnector.ON_DATA_RECEIVED, onDataReceived, true);
+		mapListener(rootElement, ConnectorBase.ON_DATA_RECEIVED, onDataReceived, true);
 
-		var tmpHtmlDom = rootElement;
-		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
-		{
-			tmpHtmlDom = tmpHtmlDom.parentNode;
-		}
-		if (tmpHtmlDom!=null)
-		{
-			// tmpHtmlDom is the layer node
-			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
-		}
+		mapListener(rootElement, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
 	}
 	/**
 	 * callback for the event
@@ -115,6 +109,15 @@ class Repeater<ElementClass> extends DisplayObject
 		// refresh list data
 		reloadData();
 	}
+	/**
+	 * resolve the template
+	 * may be overriden to change the way a template is resolved
+	 */ 
+	private function resolveItem(element: ElementClass, t:Template)
+	{
+		return t.execute(element, new TemplateMacros());
+	}
+
 	/**
 	 * Call this when the list's DOM tree has changed, and you want the dataProvider to be updated accoringly
 	 */
@@ -162,13 +165,13 @@ class Repeater<ElementClass> extends DisplayObject
 		stopContinuationFlag = false;
 
 		var newElementsHtml:Array<String> = new Array();
-		var t = new haxe.Template(htmlTemplate);
+		var t = new Template(htmlTemplate);
 		for (idx in 0...dataProvider.length)
 		{
 			var element = dataProvider[idx];
 			try
 			{
-				newElementsHtml.push(t.execute(element, TemplateMacros));
+				newElementsHtml.push(resolveItem(element, t));
 			}
 			catch(e:Dynamic){
 				trace("Error: an error occured while interpreting the template - "+htmlTemplate+" - for the element "+element);
