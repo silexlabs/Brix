@@ -82,7 +82,7 @@ class Layer extends DisplayObject
 	/**
 	 * true if the layer is hidden
 	 */
-	public var status(default, setStatus):LayerStatus;
+	public var status(default, set):LayerStatus;
 	/**
 	 * Flag used to detect if a transition has started
 	 */
@@ -132,7 +132,7 @@ class Layer extends DisplayObject
 	// Transitions
 	//////////////////////////////////////////////////////
 	private static inline var MAX_DELAY_FOR_TRANSITION:Int = 2500;
-	private function setStatus(newStatus:LayerStatus):LayerStatus
+	private function set_status(newStatus:LayerStatus):LayerStatus
 	{
 		status = newStatus;
 		#if (!php)

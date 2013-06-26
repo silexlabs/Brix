@@ -33,7 +33,7 @@ class Group extends DisplayObject
 	 * @param	rootElement
 	 * @param	BrixId
 	 */
-	private function new(rootElement : HtmlDom, brixId:String)
+	private function new(rootElement : HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 
@@ -64,9 +64,9 @@ class Group extends DisplayObject
 	 * @param the HTML element to search in.
 	 * @return a List of elements associated with at list one groupable component.
 	 */
-	private function discoverGroupableChilds( elt:HtmlDom ) : List<HtmlDom>
+	private function discoverGroupableChilds( elt:HtmlElement ) : List<HtmlElement>
 	{
-		var groupables : List<HtmlDom> = new List();
+		var groupables : List<HtmlElement> = new List();
 
 		for (childCnt in 0...elt.childNodes.length)
 		{

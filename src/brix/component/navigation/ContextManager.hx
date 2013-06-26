@@ -15,6 +15,7 @@ import brix.core.Application;
 
 import js.html.HtmlElement;
 import js.html.CustomEvent;
+import js.Browser;
 
 /**
  * the value for a context
@@ -81,7 +82,7 @@ class ContextManager extends DisplayObject
 	 * current contexts
 	 * case incensitive
 	 */
-	public var currentContexts(default, setCurrentContexts): Array<ContextValue>;
+	public var currentContexts(default, set): Array<ContextValue>;
 	/**
 	 * flag used to implement invalidation mechanism
 	 * 
@@ -169,7 +170,7 @@ class ContextManager extends DisplayObject
 	private function onReplaceContextsEvent(e:CustomEvent)
 	{trace("onReplaceContextsEvent"+e.detail);
 		var contextValues:Array<ContextValue> = cast(e.detail);
-		setCurrentContexts(contextValues);
+		currentContexts = contextValues;
 	}
 	
 	private function onToggleContextsEvent(e:CustomEvent)
@@ -203,7 +204,7 @@ class ContextManager extends DisplayObject
 		refresh();
 		isDirty = true;
 		// dispatch a change event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_CONTEXT_CHANGE, true, true, this);
 		rootElement.dispatchEvent(event);
 	}
@@ -213,7 +214,7 @@ class ContextManager extends DisplayObject
 	/**
 	 * replace the current context
 	 */
-	public function setCurrentContexts(contextList:Array<ContextValue>):Array<ContextValue>
+	public function set_currentContexts(contextList:Array<ContextValue>):Array<ContextValue>
 	{
 		currentContexts = contextList;
 		invalidate();

@@ -8,8 +8,7 @@
  */
 package brix.component.list;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 import brix.component.list.List;
 import brix.util.DomTools;
 
@@ -24,7 +23,7 @@ class XmlList extends List<Xml>
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		var attr = rootElement.getAttribute(ATTR_ITEMS);

@@ -8,7 +8,7 @@
  */
 package brix.component.list;
 
-import js.Dom;
+import js.html.HtmlElement;
 import haxe.Http;
 import haxe.Timer;
 
@@ -77,7 +77,7 @@ class ConnectorBase extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 

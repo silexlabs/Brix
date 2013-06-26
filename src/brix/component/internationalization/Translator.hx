@@ -12,7 +12,7 @@ import brix.component.IBrixComponent;
 import brix.core.Application;
 import brix.util.DomTools;
 
-import js.Dom;
+import js.html.HtmlElement;
 
 // FIXME for the moment, import manually all Adapters
 // but as soon as it will be possible to resolve classes at 
@@ -176,7 +176,7 @@ class Translator implements IBrixComponent
 	 * @param	toLocale		specify the locale to translate to
 	 * @param	parentLocale	(optional) the locale of the parent node if known
 	 */
-	public function translate(node:HtmlDom, ?toLocale:String=null, ?parentLocale:String=null, ?useIds:Bool=false):Void
+	public function translate(node:HtmlElement, ?toLocale:String=null, ?parentLocale:String=null, ?useIds:Bool=false):Void
 	{
 		if (toLocale == null)
 		{
@@ -233,7 +233,7 @@ class Translator implements IBrixComponent
 	 * @param	node
 	 * @return
 	 */
-	public function getNodeLang(node:HtmlDom):String
+	public function getNodeLang(node:HtmlElement):String
 	{
 		if (!DomTools.isUndefined(node.lang) && node.lang != "")
 		{

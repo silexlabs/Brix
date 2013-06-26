@@ -8,8 +8,9 @@
  */
 package brix.component.list;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.Event;
+
 import brix.component.interaction.Draggable;
 
 import brix.util.DomTools;
@@ -46,15 +47,15 @@ class List<ElementClass> extends Repeater<ElementClass>
 	/**
 	 * selected item if any
 	 */
-	public var selectedItem(getSelectedItem, setSelectedItem):Null<ElementClass>;
+	public var selectedItem(get, set):Null<ElementClass>;
 	/**
 	 * selected item index, in the dataProvider array, or -1 of there is no selected index
 	 */
-	public var selectedIndex(default, setSelectedIndex):Int;
+	public var selectedIndex(default, set):Int;
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		selectedIndex = -1;
@@ -97,7 +98,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 	 */
 	private function rollOver(e:Event)
 	{
-		var element:HtmlDom = cast(e.target);
+		var element:HtmlElement = cast(e.target);
 		var idx = getItemIdx(element);
 
 		// dispatch a custom event
@@ -164,14 +165,14 @@ class List<ElementClass> extends Repeater<ElementClass>
 	/**
 	 * getter/setter
 	 */
-	function getSelectedItem():Null<ElementClass> 
+	function get_selectedItem():Null<ElementClass> 
 	{
 		return dataProvider[selectedIndex];
 	}
 	/**
 	 * getter/setter
 	 */
-	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> 
+	function set_selectedItem(selected:Null<ElementClass>):Null<ElementClass> 
 	{
 		if (selected != selectedItem)
 		{
@@ -198,14 +199,14 @@ class List<ElementClass> extends Repeater<ElementClass>
 	/**
 	 * getter/setter
 	 */
-	function getSelectedIndex():Int 
+	function get_selectedIndex():Int 
 	{
 		return selectedIndex;
 	}
 	/**
 	 * getter/setter
 	 */
-	function setSelectedIndex(idx:Int):Int 
+	function set_selectedIndex(idx:Int):Int 
 	{
 		if (idx != selectedIndex)
 		{

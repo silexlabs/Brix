@@ -9,6 +9,8 @@
 package brix.component.navigation;
 
 import js.html.HtmlElement;
+import js.html.NodeList;
+import js.html.Event;
 
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.link.LinkBase;
@@ -161,7 +163,7 @@ class Page extends DisplayObject implements IGroupable
 	/** 
 	 * Retrieve all the pages of this application or group
 	 */
-	static public function getPageNodes(brixId:String, root:HtmlElement = null):HtmlCollection<HtmlElement>
+	static public function getPageNodes(brixId:String, root:HtmlElement = null):NodeList
 	{
 		// default is the hole body
 		var body:HtmlElement = root;

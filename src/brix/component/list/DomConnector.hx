@@ -8,8 +8,8 @@
  */
 package brix.component.list;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 import haxe.Http;
 import haxe.Json;
 import haxe.Timer;
@@ -22,7 +22,7 @@ import brix.component.navigation.Layer;
 import brix.component.ui.DisplayObject;
 
 typedef DomObject = {
-	node:HtmlDom,
+	node:HtmlElement,
 	children:Array<DomObject>,
 }
 
@@ -51,7 +51,7 @@ class DomConnector extends ConnectorBase
 	/**
 	 * 
 	 */
-	private var connectorRoot:HtmlDom;
+	private var connectorRoot:HtmlElement;
 
 	////////////////////////////////////
 	// DisplayObject methods
@@ -59,7 +59,7 @@ class DomConnector extends ConnectorBase
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 	}
@@ -117,7 +117,7 @@ class DomConnector extends ConnectorBase
 
 		onDataReceived(domToObj(connectorRoot).children);
 	}
-	private function domToObj(htmlDom:HtmlDom):DomObject
+	private function domToObj(htmlDom:HtmlElement):DomObject
 	{//trace("domToObj on "+htmlDom);
 		var children:Array<DomObject> = [];
 		for (i in 0...htmlDom.childNodes.length)

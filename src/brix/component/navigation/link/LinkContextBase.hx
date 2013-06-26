@@ -12,8 +12,8 @@ import brix.component.navigation.ContextManager;
 import brix.core.Application;
 import brix.util.DomTools;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 
 /**
  * Let you specify the list of contexts to display when the user clicks on the component's node
@@ -35,7 +35,7 @@ class LinkContextBase extends LinkBase
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		// retrieve the name of our link in data-context instead of href

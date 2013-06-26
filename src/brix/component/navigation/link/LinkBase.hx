@@ -9,6 +9,7 @@
 package brix.component.navigation.link;
 
 import js.html.HtmlElement;
+import js.html.Event;
 
 import brix.core.Application;
 import brix.component.ui.DisplayObject;

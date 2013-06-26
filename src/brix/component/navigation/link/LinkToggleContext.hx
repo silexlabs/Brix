@@ -8,8 +8,8 @@
  */
 package brix.component.navigation.link;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 
 /**
  * Let you specify a context to toggle when the user clicks on the component's node

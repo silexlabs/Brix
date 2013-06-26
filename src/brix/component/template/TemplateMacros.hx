@@ -8,8 +8,8 @@
  */
 package brix.component.template;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 
 /**
  * This class is made to be exposed to the components templates
@@ -257,7 +257,7 @@ class TemplateMacros implements Dynamic
 	/**
 	 * 
 	 */
-	public function getAttribute (resolve:String->Dynamic, element:HtmlDom, attr:String):String
+	public function getAttribute (resolve:String->Dynamic, element:HtmlElement, attr:String):String
 	{
 		if (element == null) return null;
 		return element.getAttribute(attr);

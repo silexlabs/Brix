@@ -13,8 +13,8 @@ import brix.component.ui.DisplayObject;
 import hscript.Interp;
 import hscript.Parser;
 
-import js.Dom;
-import js.Lib;
+import js.html.HtmlElement;
+
 
 /**
  * The ScriptContainer allows you to add hscript in <script> HTML elements before or at runtime.
@@ -50,7 +50,7 @@ class ScriptContainer extends DisplayObject
 	/**
 	 * Builds the ScriptContainer component.
 	 */
-	public function new(rootElement:HtmlDom, brixId:String) 
+	public function new(rootElement:HtmlElement, brixId:String) 
 	{
 		super(rootElement, brixId);
 

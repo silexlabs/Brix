@@ -8,8 +8,8 @@
  */
 package brix.component.template;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 import brix.component.interaction.Draggable;
 
 import brix.util.DomTools;
@@ -42,7 +42,7 @@ class TemplateRenderer extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 

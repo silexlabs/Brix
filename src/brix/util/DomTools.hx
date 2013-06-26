@@ -9,6 +9,8 @@
 package brix.util;
 
 using StringTools;
+import js.html.HtmlElement;
+import haxe.ds.StringMap;
 
 typedef BoundingBox = {
 	x:Int,
@@ -194,12 +196,12 @@ class DomTools
 	 * @param	elt the DOM element
 	 * @param	attr the attr name to search for
 	 * @param	value the attr value to search for, specifying '*' means "any value"
-	 * @return an Array<HtmlDom>
+	 * @return an Array<HtmlElement>
 	 */
-	static public function getElementsByAttribute(elt : HtmlDom, attr:String, value:String):Array<HtmlDom>
+	static public function getElementsByAttribute(elt : HtmlElement, attr:String, value:String):Array<HtmlElement>
 	{
 		var childElts = elt.getElementsByTagName('*');
-		var filteredChildElts:Array<HtmlDom> = new Array();
+		var filteredChildElts:Array<HtmlElement> = new Array();
 		
 		for (cCount in 0...childElts.length)
 		{
@@ -214,7 +216,7 @@ class DomTools
 	 * The element is supposed to be the only one with this css class
 	 * If the element is not found, returns null or throws an error, depending on the param "required"
 	 */
-	public static function getSingleElement(rootElement:HtmlDom, className:String, required:Bool = true):Null<HtmlDom>
+	public static function getSingleElement(rootElement:HtmlElement, className:String, required:Bool = true):Null<HtmlElement>
 	{
 		var domElements = rootElement.getElementsByClassName(className);
 		
@@ -235,12 +237,12 @@ class DomTools
 		}
 	}
 	/**
-	 * Compute the htmlDom element size and position, taking margins, paddings and borders into account, and also the parents ones
-	 * @param	htmlDom 	HtmlDom element of which we want to know the size 
+	 * Compute the HtmlElement element size and position, taking margins, paddings and borders into account, and also the parents ones
+	 * @param	htmlElement 	HtmlElement element of which we want to know the size 
 	 * @return 	the BoundingBox object
 	 */
-	static public function getElementBoundingBox(htmlDom:HtmlDom):BoundingBox{
-		if (htmlDom.nodeType != 1)
+	static public function getElementBoundingBox(htmlElement:HtmlElement):BoundingBox{
+		if (htmlElement.nodeType != 1)
 			return null;
 
 		// add the scroll offset of all container
@@ -249,7 +251,7 @@ class DomTools
 		var offsetLeft = 0;
 		var offsetWidth = 0.0;
 		var offsetHeight = 0.0;
-		var element = htmlDom;
+		var element = htmlElement;
 		while (element != null
 			//&& element.tagName.toLowerCase() != "body" 
 			//&& element.style.position != "relative" && element.style.position != "absolute" && element.style.position != "fixed"
@@ -277,14 +279,14 @@ class DomTools
 		return {
 			x:Math.round(offsetLeft),
 			y:Math.round(offsetTop),
-			w:Math.round(htmlDom.offsetWidth + offsetWidth),
-			h:Math.round(htmlDom.offsetHeight + offsetHeight)
+			w:Math.round(htmlElement.offsetWidth + offsetWidth),
+			h:Math.round(htmlElement.offsetHeight + offsetHeight)
 		};
 	}
 	/**
 	 * retrieve the postion of a node in its parent's children
 	 */
-	public static function getElementIndex(childNode:HtmlDom):Int
+	public static function getElementIndex(childNode:HtmlElement):Int
 	{
 		var i = 0;
 		var child = childNode;
@@ -295,26 +297,26 @@ class DomTools
 	/**
 	 * position the given element at the given position
 	 * apply an offest instead of an absolut position, in order to handle the case of the container being position absolute or relative
-	 * @param 	htmlDom 	the elment to move
+	 * @param 	htmlElement 	the elment to move
 	 * @param 	x 			the position in the window global coordinate system
 	 * @param 	y 			the position in the window global coordinate system
 	 */
-	static public function moveTo(htmlDom: HtmlDom, x:Null<Int>, y:Null<Int>) 
+	static public function moveTo(htmlElement: HtmlElement, x:Null<Int>, y:Null<Int>) 
 	{
 		// retrieve the bounding boxes
-		var elementBox = DomTools.getElementBoundingBox(htmlDom);
+		var elementBox = DomTools.getElementBoundingBox(htmlElement);
 
 		if (x != null){
 			// apply the offset between the 2 positions
-			var newPosX = htmlDom.offsetLeft + (x - elementBox.x);
+			var newPosX = htmlElement.offsetLeft + (x - elementBox.x);
 			// move the element to the position
-			htmlDom.style.left = Math.round(newPosX) + "px";
+			htmlElement.style.left = Math.round(newPosX) + "px";
 		}
 		if (y != null){
 			// apply the offset between the 2 positions
-			var newPosY = htmlDom.offsetTop + (y - elementBox.y);
+			var newPosY = htmlElement.offsetTop + (y - elementBox.y);
 			// move the element to the position
-			htmlDom.style.top = Math.round(newPosY) + "px";
+			htmlElement.style.top = Math.round(newPosY) + "px";
 		}
 	}
 	/**
@@ -334,7 +336,7 @@ class DomTools
 	/**
 	 * add a css class to a node if it is not already in the class name
 	 */
-	static public function toggleClass(element:HtmlDom, className:String) 
+	static public function toggleClass(element:HtmlElement, className:String) 
 	{
 		if(hasClass(element, className))
 			removeClass(element, className);
@@ -347,7 +349,7 @@ class DomTools
 	 * @param the DOM element to consider.
 	 * @param the class name(s) to add.
 	 */
-	static public function addClass(element:HtmlDom, className:String):Void
+	static public function addClass(element:HtmlElement, className:String):Void
 	{
 		if (element.className == null) element.className = "";
 
@@ -359,7 +361,7 @@ class DomTools
 	 * @param the DOM element to consider.
 	 * @param the class name(s) to remove. Several class names can be passed, separated by a white space, ie: "myClass1 myClass2".
 	 */
-	static public function removeClass(element:HtmlDom, className:String):Void
+	static public function removeClass(element:HtmlElement, className:String):Void
 	{
 		if (element.className == null || element.className.trim() == "") return;
 
@@ -382,7 +384,7 @@ class DomTools
 	 * 																				 => hasClass(node, "class2 class1", true) => true
 	 * @return true if className found, else false.
 	 */
-	static public function hasClass(element:HtmlDom, className:String, ?orderedClassName:Bool=false):Bool
+	static public function hasClass(element:HtmlElement, className:String, ?orderedClassName:Bool=false):Bool
 	{
 		if (element.className == null || element.className.trim() == "" || className == null || className.trim() == "") return false;
 
@@ -429,15 +431,15 @@ class DomTools
 	 * @param	attributeName 	the name of the attribute, of which to return the value
 	 * @example	DomTools.setMeta("description", "A 1st test of Silex publication"); // set the description of the HTML page found in the head tag, i.e. <META name="description" content="A 1st test of Silex publication"></META>
 	 */
-	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content", head:HtmlDom=null):Hash<String>{
-		var res:Hash<String> = new Hash();
+	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content", head:HtmlElement=null):StringMap<String>{
+		var res:StringMap<String> = new StringMap();
 
 		// default value for document
 		if (head == null) 
 			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
 
 		// retrieve all config tags (the meta tags)
-		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("META");
+		var metaTags:HtmlCollection<HtmlElement> = head.getElementsByTagName("META");
 
 		// flag to check if metaName exists
 		var found = false;
@@ -474,13 +476,13 @@ class DomTools
 	 * @param	attributeName 	the name of the attribute, of which to return the value
 	 * @example	DomTools.getMeta("description", "content"); // returns the description of the HTML page found in the head tag, e.g. <META name="description" content="A 1st test of Silex publication"></META>
 	 */
-	static public function getMeta(name:String, attributeName:String="content", head:HtmlDom=null):Null<String>{
+	static public function getMeta(name:String, attributeName:String="content", head:HtmlElement=null):Null<String>{
 		// default value for document
 		if (head == null) 
 			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
 
 		// retrieve all config tags (the meta tags)
-		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("meta");
+		var metaTags:HtmlCollection<HtmlElement> = head.getElementsByTagName("meta");
 
 		// for each config element, store the name/value pair
 		for (idxNode in 0...metaTags.length){
@@ -495,10 +497,10 @@ class DomTools
 	/**
 	 * Add a css tag with the given CSS rules in it
 	 * @param	css 		String containing the CSS rules
-	 * @param	head 		An optional HtmlDom which is the <head> tag of the document. Default: use Lib.document.getElementsByTagName("head") to retrieve it
+	 * @param	head 		An optional HtmlElement which is the <head> tag of the document. Default: use Lib.document.getElementsByTagName("head") to retrieve it
 	 * @returns the created node for the css style tag
 	 */
-	static public function addCssRules(css:String, head:HtmlDom=null):HtmlDom{
+	static public function addCssRules(css:String, head:HtmlElement=null):HtmlElement{
 		// default value for document
 		if (head == null) 
 			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
@@ -514,7 +516,7 @@ class DomTools
 	 * Add a script tag with the given src param
 	 * @param	src 			String containing the URL of the script to embed
 	 */
-	static public function embedScript(src:String):HtmlDom{
+	static public function embedScript(src:String):HtmlElement{
 		var head = Lib.document.getElementsByTagName("head")[0];
 		var scriptNodes = Lib.document.getElementsByTagName("script");
 		for (idxNode in 0...scriptNodes.length){
@@ -612,11 +614,11 @@ class DomTools
 
 	/**
 	 * Cross-browser innerHTML accessor for DOM nodes
-	 * @param node HtmlDom
+	 * @param node HtmlElement
 	 * @param optional, a value to set
 	 * @return String
 	 */
-	static public function innerHTML(node:HtmlDom, ?content:String=null):String
+	static public function innerHTML(node:HtmlElement, ?content:String=null):String
 	{
 #if js
 		if (content!=null && node.nodeName == "HTML" && Lib.window.navigator.userAgent.toLowerCase().indexOf("msie")>-1) //IE specific
