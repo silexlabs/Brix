@@ -16,8 +16,10 @@ import haxe.macro.Context;
 
 using brix.util.MacroTools;
 
-import cocktail.Dom;
-import cocktail.Lib;
+import cocktail.html.Document;
+import cocktail.html.HtmlElement;
+import haxe.ds.StringMap;
+import cocktail.Browser;
 
 using StringTools;
 using Lambda;
@@ -40,8 +42,7 @@ class Builder
 	/**
 	 * The Brix-reserved flags which should be set as compiler flags
 	 */
-	static inline public var BRIX_COMPILER_FLAGS = ["noAutoStart", "disableEmbedHtml", "disableFastInit", 
-	"keepComments", "minimizeHtml"];
+	static public var BRIX_COMPILER_FLAGS = ["noAutoStart", "disableEmbedHtml", "disableFastInit", "keepComments", "minimizeHtml"];
 	/**
 	 * The value (<meta name=key content=value />) to give a meta tag to make it a compiler flag
 	 */
@@ -70,12 +71,12 @@ class Builder
 	/**
 	 * A collection of custom name => content <meta> header parameters from the source HTML page.
 	 */
-	static private var metaParameters : Hash<String> = new Hash();
+	static private var metaParameters : StringMap<String> = new StringMap();
 	/**
-	 * A [<component name> => <component args>, ...] Hash containing the components declared in the application.
+	 * A [<component name> => <component args>, ...] Map containing the components declared in the application.
 	 * FIXME find a way to expose in read only mode
 	 */
-	static public var declaredComponents : Hash<Hash<String>> = new Hash();
+	static public var declaredComponents : Map<String, Map<String, String>> = new Map();
 	
 	/**
 	 * TODO add comments
@@ -89,7 +90,7 @@ class Builder
 	/**
 	 * The list of HTML nodes to remove before packing.
 	 */
-	static private var nodesToRemove : List<HtmlDom> = new List();
+	static private var nodesToRemove : List<HtmlElement> = new List();
 	
 	//////////////////////
 	// SET AT COMPILE TIME
@@ -116,7 +117,7 @@ class Builder
 	 * @param	htmlOutputPath	The path to the generated output HTML file when using the disableEmbedHtml 
 	 * option. By default, will be the same as the js/swf/... output file but with the .html extension.
 	 */
-	@:macro static public function create(?htmlSourcePath:String="index.html", ?htmlOutputPath:Null<String>) : Void
+	macro static public function create(?htmlSourcePath:String="index.html", ?htmlOutputPath:Null<String>) : Void
 	{
 		//try
 		//{
@@ -134,11 +135,11 @@ class Builder
 			//instantiate a cocktail instance and fill it with an empty html doc
 			var cocktailView : CocktailView = new CocktailView();
 			cocktailView.loadHTML("<!DOCTYPE html><html><head></head><body></body></html>");
-			//set the cocktail instance as static (accessible through Lib)
-			Lib.init(cocktailView.document);
+			//set the cocktail instance as static (accessible through Browser)
+			Browser.init(cocktailView.document);
 			
 			//init the DOM tree from source HTML file content
-			cocktail.Lib.document.innerHTML = htmlSource;
+			cocktail.Browser.document.innerHTML = htmlSource;
 			
 			//init a copy of the source DOM tree
 			sourceHTMLDocument = new Document();
@@ -166,7 +167,7 @@ class Builder
 	 * 
 	 * @return Array<Field>	the fields of the application main class.
 	 */
-	@:macro static public function build() : Array<Field>
+	macro static public function build() : Array<Field>
 	{
 		//init fields var
 		var fields = haxe.macro.Context.getBuildFields();
@@ -226,7 +227,7 @@ class Builder
 	 */
 	static private function parseMetas() : Void
 	{
-		var metaElts = cocktail.Lib.document.getElementsByTagName("meta");
+		var metaElts = cocktail.Browser.document.getElementsByTagName("meta");
 		
 		for (metaElt in metaElts)
 		{
@@ -284,7 +285,7 @@ class Builder
 	 */
 	static private function parseScripts() : Void
 	{
-		var scriptElts = cocktail.Lib.document.getElementsByTagName("script");
+		var scriptElts = cocktail.Browser.document.getElementsByTagName("script");
 		
 		//flag telling if we've found the inclusion script tag for the application (js target with no embedHtml only)
 		var appScriptInclusionFound = false;
@@ -300,7 +301,7 @@ class Builder
 			if (cmpDeclarations != null && cmpDeclarations.trim() != "" )
 			{
 				//extract data- attributes
-				var scriptEltAttrs : Hash<String> = new Hash();
+				var scriptEltAttrs : StringMap<String> = new StringMap();
 				
 				for (itCnt in 0...scriptElt.attributes.length)
 				{
@@ -353,9 +354,9 @@ class Builder
 		if ( Context.defined('js') && Context.defined('disableEmbedHtml') && !appScriptInclusionFound )
 		{
 			//Add the <script src="<application .js file>" /> in js/disableEmbedHtml mode.
-			var appScriptInclusionTag = cocktail.Lib.document.createElement("script");
+			var appScriptInclusionTag = cocktail.Browser.document.createElement("script");
 			appScriptInclusionTag.setAttribute( "src" , applicationFileName );
-			cocktail.Lib.document.getElementsByTagName("head")[0].appendChild(appScriptInclusionTag);
+			cocktail.Browser.document.getElementsByTagName("head")[0].appendChild(appScriptInclusionTag);
 			
 			#if brixdebug
 				neko.Lib.println("Adding <script src='"+applicationFileName+"'></script>");
@@ -410,11 +411,11 @@ class Builder
 					{
 						var tagsToSearchFor = getUnconflictedClassTags(cmpClassName);
 						
-						var taggedElts : Array<cocktail.Dom.HtmlDom> = new Array();
+						var taggedElts : Array<HtmlElement> = new Array();
 						
 						for (tagToSearchFor in tagsToSearchFor)
 						{
-							taggedElts = taggedElts.concat(cocktail.Lib.document.body.getElementsByClassName(tagToSearchFor));
+							taggedElts = taggedElts.concat(cocktail.Browser.document.body.getElementsByClassName(tagToSearchFor));
 							taggedElts = taggedElts.concat(sourceHTMLDocument.body.getElementsByClassName(tagToSearchFor));
 						}
 						
@@ -568,13 +569,13 @@ class Builder
 		//add the _htmlDocumentElement static var to ApplicationContext
 		var documentInnerHtml = haxe.Serializer.run("");
 
-		var innerHtml:String = cocktail.Lib.document.innerHTML;
+		var innerHtml:String = cocktail.Browser.document.innerHTML;
 		if (innerHtml != null)
 		{
 			documentInnerHtml = haxe.Serializer.run(innerHtml);
 		}
 
-		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EType({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
+		var htmlDocumentElementFieldValue = { expr : ECall({ expr : EField({ expr : EField({ expr : EConst(CIdent("haxe")), pos : pos }, "Unserializer"), pos : pos }, "run"), pos : pos },[{ expr : EConst(CString(documentInnerHtml)), pos : pos }]), pos : pos };
 
 		fields.push( { name : "htmlDocumentElement", doc : null, meta : [], access : [APublic, AStatic], kind : FVar(null, htmlDocumentElementFieldValue), pos : pos } );
 
@@ -597,7 +598,7 @@ class Builder
 			
 			var cmpArgs = declaredComponents.get(cmpClassName);
 			
-			var cmpClassType = switch( Context.getType(cmpClassName) ) { case TInst( classRef , params ): classRef.get(); default: };
+			var cmpClassType : Null<haxe.macro.ClassType> = switch( Context.getType(cmpClassName) ) { case TInst( classRef , params ): classRef.get(); default: };
 			
 			var argsExpr = macro null;
 			
@@ -606,7 +607,7 @@ class Builder
 				//case the component has data-arguments on its script tag
 				var argsArrayName = cmpClassName.replace( "." , "_" ) + "Args";
 				
-				registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Hash", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Hash", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
+				registerComponentsforInitExprs.push( { expr : EVars([ { expr : { expr : ENew( { name : "Map", pack : [], params : [], sub : null }, []), pos : pos }, name : argsArrayName, type : TPath( { name : "Map", pack : [], params : [TPType(TPath( { name : "String", pack : [], params : [], sub : null } ))], sub : null } ) } ]), pos : pos } );
 				
 				argsExpr = { expr : EConst(CIdent(argsArrayName)), pos : pos };
 				
@@ -652,13 +653,13 @@ class Builder
 		// keepComments option
 		if ( !Context.defined('keepComments') )
 		{
-			removeComments(Lib.document.documentElement);
+			removeComments(cocktail.Browser.document.documentElement);
 		}
 		
 		// minimizeHtml option
 		if ( Context.defined('minimizeHtml') )
 		{
-			minimizeHtml(Lib.document.documentElement);
+			minimizeHtml(cocktail.Browser.document.documentElement);
 		}
 		
 		// clean DOM by removing useless nodes
@@ -666,7 +667,7 @@ class Builder
 		{
 			if (n.parentNode != null)
 			{
-				var parent : HtmlDom = n.parentNode;
+				var parent : HtmlElement = n.parentNode;
 				
 				parent.removeChild(n);
 			}
@@ -698,7 +699,7 @@ class Builder
 				neko.Lib.println("Saving "+outputFilePath);
 			#end
 
-			sys.io.File.saveContent( outputFilePath , "<!DOCTYPE HTML>\n" + cocktail.Lib.document.innerHTML );
+			sys.io.File.saveContent( outputFilePath , "<!DOCTYPE HTML>\n" + cocktail.Browser.document.innerHTML );
 		}
 		
 		// specific js-target application packaging
@@ -757,11 +758,11 @@ class Builder
 	}
 	
 	/**
-	 * Adds to the nodes-to-remove-list the comments in the content of an HtmlDom.
+	 * Adds to the nodes-to-remove-list the comments in the content of an HtmlElement.
 	 * 
-	 * @param	the HtmlDom to parse for comments removing
+	 * @param	the HtmlElement to parse for comments removing
 	 */
-	static function removeComments(elt:HtmlDom) : Void
+	static function removeComments(elt:HtmlElement) : Void
 	{
 		for (nc in elt.childNodes)
 		{
@@ -781,9 +782,9 @@ class Builder
 	 * Recursively adds the white spaces, tabulations and line breaks to the nodes-to-remove-list 
 	 * so that they will be removed just before packing.
 	 * 
-	 * @param	the HtmlDom to minimize.
+	 * @param	the HtmlElement to minimize.
 	 */
-	static function minimizeHtml(elt:HtmlDom) : Void
+	static function minimizeHtml(elt:HtmlElement) : Void
 	{
 		for (nc in elt.childNodes)
 		{
@@ -838,9 +839,9 @@ class Builder
 		
 		if (splitedClassName.length > 0)
 		{
-			return { expr : EType( generateImportPackagePath(splitedClassName) , realClassName), pos : Context.currentPos() };
+			return { expr : EField( generateImportPackagePath(splitedClassName) , realClassName), pos : Context.currentPos() };
 		}
-		return { expr : EConst(CType(classname)), pos : Context.currentPos() };
+		return { expr : EConst(CString(classname)), pos : Context.currentPos() };
 	}
 	
 	/**

@@ -11,9 +11,6 @@ package brix.core;
 import brix.util.haxe.ObjectHash;
 import brix.util.DomTools;
 
-import js.Lib;
-import js.Dom;
-
 /**
  * event dispach direction
  */

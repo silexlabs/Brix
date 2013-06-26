@@ -8,12 +8,12 @@
  */
 package brix.core;
 
+import haxe.ds.StringMap;
+
 #if macro
-import cocktail.Lib;
-import cocktail.Dom;
+import cocktail.html.HtmlElement;
 #else
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 #end
 
 /**
@@ -31,9 +31,9 @@ class Application
 	static inline private var BRIX_ID_ATTR_NAME:String = "data-brix-id";
 	
 	/**
-	 * A Hash of Brix Application instances indexed by their id.
+	 * A StringMap of Brix Application instances indexed by their id.
 	 */
-	static private var instances:Hash<Application> = new Hash();
+	static private var instances:StringMap<Application> = new StringMap();
 	/**
 	 * Gets an Brix Application instance corresponding to an id.
 	 */
@@ -51,23 +51,23 @@ class Application
 	 */
 	private var nodesIdSequence:Int;
 	/**
-	 * A Hash of all UI component instances indexed by node Brix id.
+	 * A StringMap of all UI component instances indexed by node Brix id.
 	 */
-	private var nodeToCmpInstances:Hash<List<brix.component.ui.DisplayObject>>;
+	private var nodeToCmpInstances:StringMap<List<brix.component.ui.DisplayObject>>;
 	/**
-	 * A Hash of all global component instances. Keys are the components full classnames.
+	 * A StringMap of all global component instances. Keys are the components full classnames.
 	 */
-	private var globalCompInstances:Hash<Dynamic>;
+	private var globalCompInstances:StringMap<Dynamic>;
 	/**
 	 * The Brix Apllication root node. Usually, any class used in a Brix application shouldn't use 
 	 * Lib.document.documentElement directly but this variable instead.
 	 */
-	public var htmlRootElement(default,null):HtmlDom;
+	public var htmlRootElement(default,null):HtmlElement;
 	/**
 	 * Use during int of components
 	 * After init all the nodes in body are moved to Lib.document.body
 	 */
-	public var body:HtmlDom;
+	public var body:HtmlElement;
 	/**
 	 * The potential arguments passed to the Brix Application class at instanciation.
 	 */
@@ -171,9 +171,9 @@ class Application
 		this.nodesIdSequence = 0;
 		this.registeredUIComponents = new Array();
 		this.registeredGlobalComponents = new Array();
-		this.nodeToCmpInstances = new Hash();
-		this.globalCompInstances = new Hash();
-		//this.metaParameters = new Hash();
+		this.nodeToCmpInstances = new StringMap();
+		this.globalCompInstances = new StringMap();
+		//this.metaParameters = new StringMap();
 
 		body = Lib.document.createElement("div");
 
@@ -217,7 +217,7 @@ class Application
 	/**
 	 * attach the content of the temporary body to the DOM
 	 */
-	public function attachBody(?appendTo:Null<HtmlDom>) 
+	public function attachBody(?appendTo:Null<HtmlElement>) 
 	{
 		// attach the content of the temporary body to the DOM
 /* do not work: the group component and other components go up in the dom untill they reach the body, and they store a ref to the body
@@ -242,7 +242,7 @@ class Application
 	 * @param	?appendTo	optional, the parent application's node to which to hook this Brix application. By default or if
 	 * the given node is invalid, it's the document's document element (or equivalent if not js) that is used for that.
 	 */
-	public function initDom(?appendTo:Null<HtmlDom>) : Void
+	public function initDom(?appendTo:Null<HtmlElement>) : Void
 	{
 		#if brixdebug
 			trace("Initializing Brix Application id "+id+" on "+appendTo);
@@ -349,7 +349,7 @@ class Application
 	 */
 	public function initComponents()
 	{
-		// build the Brix Application instance meta parameters Hash
+		// build the Brix Application instance meta parameters StringMap
 		//initMetaParameters();
 		
 		// register the application components for initialization
@@ -364,10 +364,10 @@ class Application
 	/**
 	 * Parses and initializes all declared components on a given node.
 	 * 
-	 * @param node:HtmlDom the node to initialize.
+	 * @param node:HtmlElement the node to initialize.
 	 * @return 
 	 */
-	public function initNode(node:HtmlDom):Void
+	public function initNode(node:HtmlElement):Void
 	{
 		var comps:List<brix.component.ui.DisplayObject> = createUIComponents(node);
 		
@@ -390,7 +390,7 @@ class Application
 	 * @param	node the DOM node where to start creating declared components
 	 * @return	a List of DisplayObject.
 	 */
-	private function createUIComponents(node:HtmlDom):Null<List<brix.component.ui.DisplayObject>>
+	private function createUIComponents(node:HtmlElement):Null<List<brix.component.ui.DisplayObject>>
 	{
 		if ( node.nodeType != 1 )
 		{
@@ -585,7 +585,7 @@ class Application
 	 * 
 	 * @param	node
 	 */
-	public function cleanNode(node:HtmlDom):Void
+	public function cleanNode(node:HtmlElement):Void
 	{
 		if ( node.nodeType != Lib.document.body.nodeType )
 		{
@@ -610,7 +610,7 @@ class Application
 	 * @param	node	the node we want to add an associated component instance to.
 	 * @param	cmp		the component instance to add.
 	 */
-	public function addAssociatedComponent(node : HtmlDom, cmp : brix.component.ui.DisplayObject) : Void
+	public function addAssociatedComponent(node : HtmlElement, cmp : brix.component.ui.DisplayObject) : Void
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
 		
@@ -637,7 +637,7 @@ class Application
 	 * @param	node	the node associated with the component instance.
 	 * @param	cmp		the component instance to remove.
 	 */
-	public function removeAssociatedComponent(node : HtmlDom, cmp : brix.component.ui.DisplayObject) : Void
+	public function removeAssociatedComponent(node : HtmlElement, cmp : brix.component.ui.DisplayObject) : Void
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
 		
@@ -670,7 +670,7 @@ class Application
 	 * Remove all component instances associated with a given node.
 	 * @param	node	the node.
 	 */
-	public function removeAllAssociatedComponent(node : HtmlDom) : Void
+	public function removeAllAssociatedComponent(node : HtmlElement) : Void
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
 
@@ -698,7 +698,7 @@ class Application
 	 * @param	typeFilter	a type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
 	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
-	public function getAssociatedComponents<TypeFilter>(node : HtmlDom, typeFilter:Class<TypeFilter>) : List<TypeFilter>
+	public function getAssociatedComponents<TypeFilter>(node : HtmlElement, typeFilter:Class<TypeFilter>) : List<TypeFilter>
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
 
@@ -860,5 +860,5 @@ typedef RegisteredComponent =
 {
 	var classname : String;
 	var unconflictedClassTag : String;
-	var args : Null<Hash<String>>;
+	var args : Null<StringMap<String>>;
 }

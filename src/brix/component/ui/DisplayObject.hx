@@ -15,11 +15,9 @@ import brix.component.IBrixComponent;
 using brix.component.IBrixComponent.BrixComponent;
 
 #if macro
-import cocktail.Lib;
-import cocktail.Dom;
+import cocktail.html.HtmlElement;
 #else
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
 #end
 
 import haxe.Template;
@@ -27,12 +25,12 @@ import haxe.Template;
 /**
  * The contract a DisplayObject must fulfill.
  */
-interface IDisplayObject implements IBrixComponent
+interface IDisplayObject extends IBrixComponent
 {
 	/**
 	 * having a associated HTML DOM element.
 	 */
-	public var rootElement(default, null) : HtmlDom;
+	public var rootElement(default, null) : HtmlElement;
 }
 
 /**
@@ -62,7 +60,7 @@ class DisplayObject implements IDisplayObject
 	 * The dom node associated with the instance of this component. By default, all events used for communication with other 
 	 * components are dispatched to and listened from this DOM element.
 	 */
-	public var rootElement(default, null) : HtmlDom;
+	public var rootElement(default, null) : HtmlElement;
 	/**
 	 * The EventMap object managing the component's listeners subscriptions
 	 */
@@ -84,7 +82,7 @@ class DisplayObject implements IDisplayObject
 	 * 
 	 * @param	rootElement
 	 */
-	private function new(rootElement : HtmlDom, brixId:String) 
+	private function new(rootElement : HtmlElement, brixId:String) 
 	{
 		this.rootElement = rootElement;
 		
@@ -116,7 +114,7 @@ class DisplayObject implements IDisplayObject
 	/**
 	 * Registers an event listener.
 	 */
-	public function mapListener(dispatcher:Dynamic, type:String, listener:js.Event->Void, ?useCapture:Bool=false):Void
+	public function mapListener(dispatcher:Dynamic, type:String, listener:js.html.Event->Void, ?useCapture:Bool=false):Void
 	{
 		this.eventMap.mapListener(dispatcher, type, listener, useCapture);
 	}
@@ -124,7 +122,7 @@ class DisplayObject implements IDisplayObject
 	/**
 	 * Unregisters an event listener.
 	 */
-	public function unmapListener(dispatcher:Dynamic, type:String, listener:js.Event->Void, ?useCapture:Bool=false):Void
+	public function unmapListener(dispatcher:Dynamic, type:String, listener:js.html.Event->Void, ?useCapture:Bool=false):Void
 	{
 		this.eventMap.unmapListener(dispatcher, type, listener, useCapture);
 	}
@@ -144,7 +142,7 @@ class DisplayObject implements IDisplayObject
 	 * @param	?dispatcher the dispatching node.
 	 * @param	?direction 	up or down the DOM.
 	 */
-	public function dispatch(eventType:String, ?data:Dynamic=null, ?dispatcher:HtmlDom=null, ?cancelable:Bool=true, ?direction:EventDirection=null):Void
+	public function dispatch(eventType:String, ?data:Dynamic=null, ?dispatcher:HtmlElement=null, ?cancelable:Bool=true, ?direction:EventDirection=null):Void
 	{
 		if (dispatcher == null)
 			dispatcher = rootElement;
@@ -177,7 +175,7 @@ class DisplayObject implements IDisplayObject
 	 * @param	cmpClass: the component class to check
 	 * @param	elt: the DOM element to check. By default the rootElement.
 	 */
-	static public function checkFilterOnElt( cmpClass:Class<Dynamic> , elt:HtmlDom ) : Void
+	static public function checkFilterOnElt( cmpClass:Class<Dynamic> , elt:HtmlElement ) : Void
 	{
 		if (elt.nodeType != Lib.document.body.nodeType)
 			throw "cannot instantiate "+Type.getClassName(cmpClass)+" on a non element node.";

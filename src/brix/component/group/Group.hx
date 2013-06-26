@@ -10,7 +10,6 @@ package brix.component.group;
 
 import brix.component.ui.DisplayObject;
 
-import js.Dom;
 
 /**
  * Gives its child elements a common event-based communication point.
