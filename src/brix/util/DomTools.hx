@@ -8,9 +8,6 @@
  */
 package brix.util;
 
-import js.Lib;
-import js.Dom;
-
 using StringTools;
 
 typedef BoundingBox = {

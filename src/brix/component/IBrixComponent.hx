@@ -11,9 +11,9 @@ package brix.component;
 import brix.core.Application;
 
 #if macro
-import cocktail.Dom;
+import cocktail.html.HtmlElement;
 #else
-import js.Dom;
+import js.html.HtmlElement;
 #end
 
 /**
@@ -55,7 +55,7 @@ class BrixComponent
 	 * @param	the class of the component to check.
 	 * @param	the DOM element to check. By default the rootElement.
 	 */
-	static public function checkRequiredParameters( cmpClass : Class<Dynamic> , elt:HtmlDom ) : Void
+	static public function checkRequiredParameters( cmpClass : Class<Dynamic> , elt:HtmlElement ) : Void
 	{
 		var requires = haxe.rtti.Meta.getType(cmpClass).requires;
 		

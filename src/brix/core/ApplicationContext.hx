@@ -8,8 +8,6 @@
  */
 package brix.core;
 
-import js.Lib;
-import js.Dom;
 
 import brix.core.Application;
 

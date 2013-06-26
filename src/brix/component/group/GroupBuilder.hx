@@ -9,6 +9,7 @@
 package brix.component.group;
 
 
+import brix.component.list.JsonConnector;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type;
@@ -16,8 +17,7 @@ import haxe.macro.Type;
 import brix.core.Builder;
 import brix.util.MacroTools;
 
-import cocktail.Dom;
-import cocktail.Lib;
+import cocktail.html.HtmlElement;
 
 
 using Lambda;
@@ -34,7 +34,7 @@ class GroupBuilder
 	 * its groupable childs. This id assignment and sharing is done by modifying the HTML DOM. This allows then any groupable
 	 * component to retreive its group DOM element transparently thanks to the GroupableBuilder macro.
 	 */
-	@:macro static public function build() : Array<haxe.macro.Field>
+	macro static public function build() : Array<haxe.macro.Field>
 	{
 		var groupFullClassName = Context.getLocalClass().get().pack.join(".") + "." + Context.getLocalClass().get().name;
 		
@@ -49,7 +49,7 @@ class GroupBuilder
 		
 		for ( groupClass in groupClassNames )
 		{
-			for ( groupElt in Lib.document.body.getElementsByClassName(groupClass) )
+			for ( groupElt in cocktail.Browser.document.body.getElementsByClassName(groupClass) )
 			{
 				gCnt++;
 				
@@ -86,15 +86,15 @@ class GroupBuilder
 	 * @param the HTML element to search in.
 	 * @return a List of elements associated with at list one groupable component.
 	 */
-	static private function discoverGroupableChilds( elt:HtmlDom ) : List<HtmlDom>
+	static private function discoverGroupableChilds( elt:HtmlElement ) : List<HtmlElement>
 	{
-		var groupables : List<HtmlDom> = new List();
+		var groupables : List<HtmlElement> = new List();
 
-		var directChilds:HtmlCollection<Dynamic> = elt.childNodes;
+		var directChilds:cocktail.html.NodeList = elt.childNodes;
 
 		for (childCnt in 0...directChilds.length)
 		{
-			var childElt : HtmlDom = cast directChilds[childCnt];
+			var childElt : HtmlElement = cast directChilds[childCnt];
 			if (childElt.nodeType != Lib.document.body.nodeType)
 				continue;
 
