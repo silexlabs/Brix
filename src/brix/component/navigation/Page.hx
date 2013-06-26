@@ -193,11 +193,12 @@ class Page extends DisplayObject implements IGroupable
 		// browse all pages
 		for (pageIdx in 0...pages.length)
 		{
+			var page : HtmlElement = cast pages[pageIdx];
 			// check if it has the desired name
-			if (pages[pageIdx].getAttribute(Page.CONFIG_NAME_ATTR) == pageName)
+			if (page.getAttribute(Page.CONFIG_NAME_ATTR) == pageName)
 			{
 				// retrieve the Page class instance associated with this node
-				var pageInstances:List<Page> = Application.get(brixId).getAssociatedComponents(pages[pageIdx], Page);
+				var pageInstances:List<Page> = Application.get(brixId).getAssociatedComponents(cast pages[pageIdx], Page);
 				for (page in pageInstances)
 				{
 					return page;

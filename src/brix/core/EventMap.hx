@@ -9,7 +9,9 @@
 package brix.core;
 
 import js.html.Event;
+import js.html.CustomEvent;
 import js.html.HtmlElement;
+import js.Browser;
 
 import brix.util.haxe.ObjectHash;
 import brix.util.DomTools;
@@ -68,7 +70,7 @@ class EventMap
 
 		if (!coll.exists(dispatcher))
 		{
-			coll.set(dispatcher, new Hash());
+			coll.set(dispatcher, new StringMap());
 		}
 		if (!coll.get(dispatcher).exists(type))
 		{
@@ -162,7 +164,7 @@ class EventMap
 	{//trace("dispatchDownRecursive "+eventType+" on "+dispatcher);
 		for (i in 0...dispatcher.childNodes.length)
 		{
-			var node = dispatcher.childNodes[i];
+			var node : HtmlElement = cast dispatcher.childNodes[i];
 			if (node.nodeType == NodeTypes.ELEMENT_NODE)
 			{
 				dispatchCustomEvent(eventType, data, node, cancelable, false);
@@ -173,7 +175,7 @@ class EventMap
 
 	private function dispatchCustomEvent(eventType:String, data:Dynamic, dispatcher:HtmlElement, cancelable:Bool, canBubble:Bool)
 	{//trace("dispatchCustomEvent "+eventType+" on "+dispatcher.className);
-		var event : CustomEvent = cast js.Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(eventType, canBubble, cancelable, data);
 		dispatcher.dispatchEvent(event);
 	}

@@ -10,6 +10,7 @@ package brix.component.list;
 
 import js.html.HtmlElement;
 import js.html.Event;
+import js.Browser;
 
 import haxe.Template;
 
@@ -230,7 +231,7 @@ class Repeater<ElementClass> extends DisplayObject
 #end
 		var time = Date.now().getTime();
 		// temp container
-		var tmpDiv = Lib.document.createElement("div");
+		var tmpDiv = Browser.document.createElement("div");
 		var numContinuation = 0;
 	 	// browse all items of the dataProvider, and if it is in the DOM, move it, otherwise create a node
 		for (idx in 0...dataProvider.length)
@@ -298,7 +299,7 @@ class Repeater<ElementClass> extends DisplayObject
 				}
 				for (nodeIdx in 0...tmpDiv.childNodes.length)
 				{
-					var node = tmpDiv.childNodes[nodeIdx];
+					var node : HtmlElement = cast tmpDiv.childNodes[nodeIdx];
 					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
 					{
 						getBrixApplication().initNode(node);
@@ -334,7 +335,7 @@ class Repeater<ElementClass> extends DisplayObject
 */	}
 	private function getChildAt(idx:Int):HtmlElement
 	{
-		return rootElement.childNodes[idx];
+		return cast rootElement.childNodes[idx];
 	}
 	private function getNumChildren():Int
 	{
@@ -405,7 +406,7 @@ class Repeater<ElementClass> extends DisplayObject
 		}
 		if (childElement.nodeType != rootElement.nodeType || childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
 		{
-			return getItemIdx(childElement.parentNode);
+			return getItemIdx(cast childElement.parentNode);
 		}
 		return Std.parseInt(childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX));
 	}

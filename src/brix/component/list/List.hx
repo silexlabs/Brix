@@ -10,6 +10,8 @@ package brix.component.list;
 
 import js.html.HtmlElement;
 import js.html.Event;
+import js.html.CustomEvent;
+import js.Browser;
 
 import brix.component.interaction.Draggable;
 
@@ -86,7 +88,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 		selectedItem = dataProvider[idx];
 
 		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_CLICK, false, false, {
 			target: rootElement,
 			item: selectedItem,
@@ -102,7 +104,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 		var idx = getItemIdx(element);
 
 		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_CHANGE, false, false, {
 			target: rootElement,
 			item: dataProvider[idx],
@@ -129,7 +131,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 		var children = rootElement.getElementsByTagName("li");
 		for (idx in 0...children.length)
 		{
-			var idxElem:Int = getItemIdx(children[idx]);
+			var idxElem:Int = getItemIdx(cast children[idx]);
 			if (idxElem >= 0)
 			{
 				var found = false;
@@ -150,11 +152,11 @@ class List<ElementClass> extends Repeater<ElementClass>
 
 				if (found)
 				{
-					DomTools.addClass(children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
+					DomTools.addClass(cast children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
 				}
 				else
 				{
-					DomTools.removeClass(children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
+					DomTools.removeClass(cast children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
 				}
 			}
 		}
@@ -221,7 +223,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 			updateSelectionDisplay([selectedItem]);
 
 			// dispatch a custom event
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_CHANGE, false, false, {
 				target: rootElement,
 				item: selectedItem,

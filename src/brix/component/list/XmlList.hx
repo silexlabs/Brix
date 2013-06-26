@@ -51,8 +51,7 @@ class XmlList extends List<Xml>
 		for (item in xml.iterator())
 		{
 			if ( item.nodeType == Xml.PCData 
-				|| item.nodeType == Xml.CData
-					|| item.nodeType == Xml.Prolog )
+				|| item.nodeType == Xml.CData )
 			{
 				return item.nodeValue;
 			}

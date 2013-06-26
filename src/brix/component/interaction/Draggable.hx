@@ -11,6 +11,8 @@ package brix.component.interaction;
 import js.html.HtmlElement;
 import js.html.Event;
 import js.html.MouseEvent;
+import js.html.CustomEvent;
+import js.Browser;
 
 import brix.util.DomTools;
 import brix.component.ui.DisplayObject;
@@ -194,12 +196,12 @@ class Draggable extends DisplayObject implements IGroupable
 		// implementation of IGroupable
 		startGroupable();
 		if (groupElement == null){
-			groupElement = Lib.document.body;
+			groupElement = cast Browser.document.body;
 		}
 
 		// create the phantom
-		phantom = Lib.document.createElement("div");
-		miniPhantom = Lib.document.createElement("div");
+		phantom = cast Browser.document.createElement("div");
+		miniPhantom = cast Browser.document.createElement("div");
 
 		// init
 		state = none;
@@ -236,8 +238,8 @@ class Draggable extends DisplayObject implements IGroupable
 		mapListener(dragZone,"mousedown", cast(startDrag), false);
 		//dragZone.onmouseup = stopDrag;
 		//mouseUpCallback = callback(stopDrag);
-		//Lib.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
-		mapListener(Lib.document.body,"mouseup", cast(stopDrag), false);
+		//Browser.document.body.addEventListener("mouseup", cast(mouseUpCallback), false);
+		mapListener(Browser.document.body,"mouseup", cast(stopDrag), false);
 		dragZone.style.cursor = "move";
 	}
 	
@@ -251,7 +253,7 @@ class Draggable extends DisplayObject implements IGroupable
 		super.clean();
 
 		//dragZone.removeEventListener("mousedown", cast(startDrag), false);
-		//Lib.document.body.removeEventListener("mouseup", cast(mouseUpCallback), false);
+		//Browser.document.body.removeEventListener("mouseup", cast(mouseUpCallback), false);
 	}
 	
 	////////////////////////////////////
@@ -331,9 +333,9 @@ class Draggable extends DisplayObject implements IGroupable
 	private function startDrag(e:MouseEvent)
 	{
 		// start listening to the mouse move envent
-		moveCallback = callback(move);
-		//Lib.document.body.addEventListener("mousemove", cast(moveCallback), false);
-		mapListener(Lib.document.body, "mousemove", cast(moveCallback), false);
+		moveCallback = move.bind();
+		//Browser.document.body.addEventListener("mousemove", cast(moveCallback), false);
+		mapListener(Browser.document.body, "mousemove", cast(moveCallback), false);
 
 		// prevent default behavior
 		e.preventDefault();
@@ -360,7 +362,7 @@ class Draggable extends DisplayObject implements IGroupable
 			DomTools.moveTo(rootElement, boundingBox.x, boundingBox.y);
 
 			// dispatch event so that other components can change the phantom style
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_DRAG, true, true, {
 				dropZone : bestDropZone,
 				target: rootElement,
@@ -378,7 +380,7 @@ class Draggable extends DisplayObject implements IGroupable
 		invalidateBestDropZone();
 
 		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_MOVE, true, true, {
 			dropZone : bestDropZone,
 			target: rootElement,
@@ -394,8 +396,8 @@ class Draggable extends DisplayObject implements IGroupable
 	 */
 	public function stopDrag(e:MouseEvent)
 	{
-		//Lib.document.body.removeEventListener("mousemove", cast(moveCallback), false);
-		unmapListener(Lib.document.body, "mousemove", cast(moveCallback), false);
+		//Browser.document.body.removeEventListener("mousemove", cast(moveCallback), false);
+		unmapListener(Browser.document.body, "mousemove", cast(moveCallback), false);
 		if (state == dragging)
 		{
 			// change parent node
@@ -405,7 +407,7 @@ class Draggable extends DisplayObject implements IGroupable
 				bestDropZone.parent.insertBefore(rootElement, bestDropZone.parent.childNodes[bestDropZone.position]);
 				
 				// dispatch a custom event
-				var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+				var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 				event.initCustomEvent(EVENT_DROPPED, true, true, {
 					dropZone : bestDropZone,
 					target: bestDropZone.parent,
@@ -415,7 +417,7 @@ class Draggable extends DisplayObject implements IGroupable
 				
 			}
 			// dispatch a custom event
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_DROPPED, true, true, {
 				dropZone : bestDropZone,
 				target: rootElement,
@@ -428,7 +430,7 @@ class Draggable extends DisplayObject implements IGroupable
 			//rootElement.style.position = initialStylePosition;
 			resetRootElementStyle();
 			// Leave the event, in case we miss the mouseup event (happens when the mouse leave the browser window while down)
-			// Lib.document.body.removeEventListener("mouseup", mouseUpCallback, false);
+			// Browser.document.body.removeEventListener("mouseup", mouseUpCallback, false);
 			setAsBestDropZone(null);
 			// reset 
 			deleteDropZoneArray();
@@ -507,11 +509,11 @@ class Draggable extends DisplayObject implements IGroupable
 		var taggedDropZones = groupElement.getElementsByClassName(dropZonesClassName);
 		for ( dzi in 0...taggedDropZones.length )
 		{
-			dropZones.add(taggedDropZones[dzi]);
+			dropZones.add(cast taggedDropZones[dzi]);
 		}
 		if (dropZones.isEmpty())
 		{
-			dropZones.add(rootElement.parentNode);
+			dropZones.add(cast rootElement.parentNode);
 		}
 
 		dropZoneArray = new Array();

@@ -475,7 +475,7 @@ class Application
 		// iterate on child nodes
 		for (cc in 0...node.childNodes.length)
 		{
-			var res = createUIComponents(node.childNodes[cc]);
+			var res = createUIComponents(cast node.childNodes[cc]);
 			if (res != null)
 			{
 				compsToInit = Lambda.concat( compsToInit, res );
@@ -605,7 +605,7 @@ class Application
 		
 		for ( childCnt in 0...node.childNodes.length )
 		{
-			cleanNode(node.childNodes[childCnt]);
+			cleanNode(cast node.childNodes[childCnt]);
 		}
 	}
 	

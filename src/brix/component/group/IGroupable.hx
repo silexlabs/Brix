@@ -58,7 +58,7 @@ class Groupable
 				throw "ERROR "+groupElements.length+" Group components are declared with the same group id "+groupId;
 			}
 			// set the reference to the group node on the element
-			groupable.groupElement = groupElements[0];
+			groupable.groupElement = cast groupElements[0];
 		}
 		else
 		{
@@ -67,7 +67,7 @@ class Groupable
 			var domElement = rootElement;
 			while (domElement != null && !DomTools.hasClass(domElement, groupId))
 			{
-				domElement = domElement.parentNode;
+				domElement = cast domElement.parentNode;
 			}
 			if (domElement != null)
 			{
