@@ -317,6 +317,7 @@ class Layer extends DisplayObject
 		{
 			var element = childrenArray.shift();
 			rootElement.appendChild(element);
+			getBrixApplication().initNode(element);
 		}
 
 		// notify the transition observer
@@ -526,14 +527,15 @@ class Layer extends DisplayObject
 
 
 		// remove children 
-/**/
+/*
 		while (rootElement.childNodes.length > 0)
 		{
 			var element:HtmlDom = rootElement.childNodes[0];
+			getBrixApplication().cleanNode(element);
 			rootElement.removeChild(element);
 			childrenArray.push(element);
 		}
-/**/
+*/
 		// set or reset style.display
 		rootElement.style.display = "none";
 	}
