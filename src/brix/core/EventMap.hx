@@ -140,7 +140,15 @@ class EventMap
 	 * @param	?direction 	up or down the DOM.
 	 */
 	public function dispatch(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool, direction:EventDirection):Void
-	{//trace("dispatch "+eventType+" on "+dispatcher);
+	{
+		trace("dispatch "+eventType+" "+direction);
+/*
+trace("--------------------------------------------");
+trace(data);
+//		direction = none;
+trace(haxe.Stack.callStack().toString());
+trace("--------------------------------------------");
+*/		
 		if (direction != down)
 		{
 			// use native dispatcher

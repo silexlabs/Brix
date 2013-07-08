@@ -59,7 +59,7 @@ class TemplateRenderer extends DisplayObject
 		mapListener(rootElement, ConnectorBase.ON_DATA_RECEIVED, onDataReceived, false);
 
 		// listen to the layer events
-/**/		var tmpHtmlDom = rootElement;
+/*		var tmpHtmlDom = rootElement;
 		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
 		{
 			tmpHtmlDom = tmpHtmlDom.parentNode;
@@ -71,7 +71,12 @@ class TemplateRenderer extends DisplayObject
 			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
 			mapListener(tmpHtmlDom, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
 		}
-/**/	}
+/**/
+		// listen to the Layer class event, in order to loadData when the page opens
+		mapListener(rootElement, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
+		mapListener(rootElement, Layer.EVENT_TYPE_SHOW_STOP, onLayerShow, false);
+		mapListener(rootElement, Layer.EVENT_TYPE_HIDE_STOP, onLayerHide, false);
+	}
 	/**
 	 * callback for the event
 	 */

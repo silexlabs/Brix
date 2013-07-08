@@ -37,7 +37,7 @@ class PageQueryConnector extends DisplayObject
 		super(rootElement, brixId);
 
 		// listen to the Layer class event, in order to loadData when the page opens
-		var tmpHtmlDom = rootElement;
+/*		var tmpHtmlDom = rootElement;
 		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
 		{
 			tmpHtmlDom = tmpHtmlDom.parentNode;
@@ -52,6 +52,10 @@ class PageQueryConnector extends DisplayObject
 		{
 			throw("Error: could not find the layer");
 		}
+		*/
+		// listen to the Layer class event, in order to loadData when the page opens
+		mapListener(rootElement, Layer.EVENT_TYPE_SHOW_START, onLayerShow, false);
+		mapListener(rootElement, Layer.EVENT_TYPE_SHOW_AGAIN, onLayerShow, false);
 	}
 	/**
 	 * the layer is being showed

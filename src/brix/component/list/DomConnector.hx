@@ -137,6 +137,6 @@ class DomConnector extends ConnectorBase
 	{
 		trace("dispatch");
 		// dispatch a custom event
-		dispatch(ConnectorBase.ON_DATA_RECEIVED, data, rootElement, false, both);
+		dispatch(ConnectorBase.ON_DATA_RECEIVED, data, rootElement, false, none);
 	}
 }
