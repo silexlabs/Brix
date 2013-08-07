@@ -8,7 +8,8 @@
  */
 package brix.component.list;
 
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.Event;
 import haxe.Http;
 import haxe.Timer;
 
@@ -77,7 +78,7 @@ class ConnectorBase extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 
@@ -102,7 +103,7 @@ class ConnectorBase extends DisplayObject
 			var startupDelay = rootElement.getAttribute(ATTR_STARTUP_DELAY);
 			if (startupDelay != null)
 			{
-				Timer.delay(callback(loadData, null), Std.parseInt(startupDelay));
+				Timer.delay(loadData.bind(null), Std.parseInt(startupDelay));
 			}
 			else
 			{
@@ -188,7 +189,7 @@ class ConnectorBase extends DisplayObject
 	{
 		if (isPolling && pollingFreq!=null && pollingFreq>0)
 		{
-			Timer.delay(callback(loadData, null), pollingFreq);
+			Timer.delay(loadData.bind(null), pollingFreq);
 		}
 		// small optim
 		if (hasNoMoreDataToLoad(data))
@@ -279,7 +280,7 @@ class ConnectorBase extends DisplayObject
 	 */
 	public function parseData2Object(data:String):Dynamic
 	{
-		
+		return null;
 	}
 	
 	/**

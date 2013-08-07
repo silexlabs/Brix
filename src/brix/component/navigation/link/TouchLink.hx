@@ -1,7 +1,7 @@
 package brix.component.navigation.link;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 
 import brix.component.ui.DisplayObject;
 import brix.util.DomTools;
@@ -28,7 +28,7 @@ class TouchLink extends DisplayObject, implements IGroupable
 	 * the group element set by the Group class
 	 * implementation of IGroupable
 	 */
-	public var groupElement:HtmlDom;
+	public var groupElement:HtmlElement;
 	/**
 	 * name of the attribute to pass the gesture type, 
 	 * i.e. left, right, up, down (swipe) or in, out (pinch)
@@ -58,7 +58,7 @@ class TouchLink extends DisplayObject, implements IGroupable
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		

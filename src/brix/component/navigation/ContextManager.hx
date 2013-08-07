@@ -13,8 +13,9 @@ import brix.component.ui.DisplayObject;
 import brix.util.DomTools;
 import brix.core.Application;
 
-import js.Dom;
-import js.Lib;
+import js.html.HtmlElement;
+import js.html.CustomEvent;
+import js.Browser;
 
 /**
  * the value for a context
@@ -81,7 +82,7 @@ class ContextManager extends DisplayObject
 	 * current contexts
 	 * case incensitive
 	 */
-	public var currentContexts(default, setCurrentContexts): Array<ContextValue>;
+	public var currentContexts(default, set): Array<ContextValue>;
 	/**
 	 * flag used to implement invalidation mechanism
 	 * 
@@ -90,14 +91,14 @@ class ContextManager extends DisplayObject
 	/**
 	 * Stores the style node with the current context as visible 
 	 */
-	//private static var styleSheet:HtmlDom;
+	//private static var styleSheet:HtmlElement;
 	///////////////////////////////////////////////////////////////
 	// main methods
 	///////////////////////////////////////////////////////////////
 	/**
 	 * Builds the Context with arguments passed in the html node attributes
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		// init context list
@@ -169,7 +170,7 @@ class ContextManager extends DisplayObject
 	private function onReplaceContextsEvent(e:CustomEvent)
 	{trace("onReplaceContextsEvent"+e.detail);
 		var contextValues:Array<ContextValue> = cast(e.detail);
-		setCurrentContexts(contextValues);
+		currentContexts = contextValues;
 	}
 	
 	private function onToggleContextsEvent(e:CustomEvent)
@@ -203,7 +204,7 @@ class ContextManager extends DisplayObject
 		refresh();
 		isDirty = true;
 		// dispatch a change event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_CONTEXT_CHANGE, true, true, this);
 		rootElement.dispatchEvent(event);
 	}
@@ -213,7 +214,7 @@ class ContextManager extends DisplayObject
 	/**
 	 * replace the current context
 	 */
-	public function setCurrentContexts(contextList:Array<ContextValue>):Array<ContextValue>
+	public function set_currentContexts(contextList:Array<ContextValue>):Array<ContextValue>
 	{
 		currentContexts = contextList;
 		invalidate();
@@ -295,7 +296,7 @@ class ContextManager extends DisplayObject
 	 * for each css class of the node, check if it is a context
 	 * and then if this context is in the current context
 	 */
-	public function isInContext(element:HtmlDom):Bool
+	public function isInContext(element:HtmlElement):Bool
 	{
 		if (element.className != null)
 		{
@@ -316,7 +317,7 @@ class ContextManager extends DisplayObject
 	 * for each css class of the node, check if it is a context
 	 * and then if this context is in the current context
 	 */
-	public function isOutContext(element:HtmlDom):Bool
+	public function isOutContext(element:HtmlElement):Bool
 	{
 		if (element.className != null)
 		{

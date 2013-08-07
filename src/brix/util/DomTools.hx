@@ -9,6 +9,10 @@
 package brix.util;
 
 using StringTools;
+import js.html.HtmlElement;
+import js.html.NodeList;
+import js.Browser;
+import haxe.ds.StringMap;
 
 typedef BoundingBox = {
 	x:Int,
@@ -194,17 +198,18 @@ class DomTools
 	 * @param	elt the DOM element
 	 * @param	attr the attr name to search for
 	 * @param	value the attr value to search for, specifying '*' means "any value"
-	 * @return an Array<HtmlDom>
+	 * @return an Array<HtmlElement>
 	 */
-	static public function getElementsByAttribute(elt : HtmlDom, attr:String, value:String):Array<HtmlDom>
+	static public function getElementsByAttribute(elt : HtmlElement, attr:String, value:String):Array<HtmlElement>
 	{
 		var childElts = elt.getElementsByTagName('*');
-		var filteredChildElts:Array<HtmlDom> = new Array();
+		var filteredChildElts:Array<HtmlElement> = new Array();
 		
 		for (cCount in 0...childElts.length)
 		{
-			if ( childElts[cCount].getAttribute(attr)!=null && ( value == "*" || childElts[cCount].getAttribute(attr) == value) )
-                filteredChildElts.push(childElts[cCount]);
+			var child : HtmlElement = cast childElts[cCount];
+			if ( child.getAttribute(attr)!=null && ( value == "*" || child.getAttribute(attr) == value) )
+                filteredChildElts.push(child);
 		}
 		return filteredChildElts;
 	}
@@ -214,7 +219,7 @@ class DomTools
 	 * The element is supposed to be the only one with this css class
 	 * If the element is not found, returns null or throws an error, depending on the param "required"
 	 */
-	public static function getSingleElement(rootElement:HtmlDom, className:String, required:Bool = true):Null<HtmlDom>
+	public static function getSingleElement(rootElement:HtmlElement, className:String, required:Bool = true):Null<HtmlElement>
 	{
 		var domElements = rootElement.getElementsByClassName(className);
 		
@@ -224,7 +229,7 @@ class DomTools
 		}
 		if (domElements != null && domElements.length == 1)
 		{
-			return domElements[0];
+			return cast domElements[0];
 		}
 		else
 		{
@@ -235,12 +240,12 @@ class DomTools
 		}
 	}
 	/**
-	 * Compute the htmlDom element size and position, taking margins, paddings and borders into account, and also the parents ones
-	 * @param	htmlDom 	HtmlDom element of which we want to know the size 
+	 * Compute the HtmlElement element size and position, taking margins, paddings and borders into account, and also the parents ones
+	 * @param	htmlElement 	HtmlElement element of which we want to know the size 
 	 * @return 	the BoundingBox object
 	 */
-	static public function getElementBoundingBox(htmlDom:HtmlDom):BoundingBox{
-		if (htmlDom.nodeType != 1)
+	static public function getElementBoundingBox(htmlElement:HtmlElement):BoundingBox{
+		if (htmlElement.nodeType != 1)
 			return null;
 
 		// add the scroll offset of all container
@@ -249,7 +254,7 @@ class DomTools
 		var offsetLeft = 0;
 		var offsetWidth = 0.0;
 		var offsetHeight = 0.0;
-		var element = htmlDom;
+		var element = htmlElement;
 		while (element != null
 			//&& element.tagName.toLowerCase() != "body" 
 			//&& element.style.position != "relative" && element.style.position != "absolute" && element.style.position != "fixed"
@@ -271,50 +276,50 @@ class DomTools
 			offsetTop += element.offsetTop;
 			offsetLeft += element.offsetLeft;
 
-			element = element.offsetParent;
+			element = cast element.offsetParent;
 		}
 
 		return {
 			x:Math.round(offsetLeft),
 			y:Math.round(offsetTop),
-			w:Math.round(htmlDom.offsetWidth + offsetWidth),
-			h:Math.round(htmlDom.offsetHeight + offsetHeight)
+			w:Math.round(htmlElement.offsetWidth + offsetWidth),
+			h:Math.round(htmlElement.offsetHeight + offsetHeight)
 		};
 	}
 	/**
 	 * retrieve the postion of a node in its parent's children
 	 */
-	public static function getElementIndex(childNode:HtmlDom):Int
+	public static function getElementIndex(childNode:HtmlElement):Int
 	{
 		var i = 0;
 		var child = childNode;
-		while((child = child.previousSibling) != null ) 
+		while((child = cast child.previousSibling) != null ) 
 			i++;
 		return i;
 	}
 	/**
 	 * position the given element at the given position
 	 * apply an offest instead of an absolut position, in order to handle the case of the container being position absolute or relative
-	 * @param 	htmlDom 	the elment to move
+	 * @param 	htmlElement 	the elment to move
 	 * @param 	x 			the position in the window global coordinate system
 	 * @param 	y 			the position in the window global coordinate system
 	 */
-	static public function moveTo(htmlDom: HtmlDom, x:Null<Int>, y:Null<Int>) 
+	static public function moveTo(htmlElement: HtmlElement, x:Null<Int>, y:Null<Int>) 
 	{
 		// retrieve the bounding boxes
-		var elementBox = DomTools.getElementBoundingBox(htmlDom);
+		var elementBox = DomTools.getElementBoundingBox(htmlElement);
 
 		if (x != null){
 			// apply the offset between the 2 positions
-			var newPosX = htmlDom.offsetLeft + (x - elementBox.x);
+			var newPosX = htmlElement.offsetLeft + (x - elementBox.x);
 			// move the element to the position
-			htmlDom.style.left = Math.round(newPosX) + "px";
+			htmlElement.style.left = Math.round(newPosX) + "px";
 		}
 		if (y != null){
 			// apply the offset between the 2 positions
-			var newPosY = htmlDom.offsetTop + (y - elementBox.y);
+			var newPosY = htmlElement.offsetTop + (y - elementBox.y);
 			// move the element to the position
-			htmlDom.style.top = Math.round(newPosY) + "px";
+			htmlElement.style.top = Math.round(newPosY) + "px";
 		}
 	}
 	/**
@@ -334,7 +339,7 @@ class DomTools
 	/**
 	 * add a css class to a node if it is not already in the class name
 	 */
-	static public function toggleClass(element:HtmlDom, className:String) 
+	static public function toggleClass(element:HtmlElement, className:String) 
 	{
 		if(hasClass(element, className))
 			removeClass(element, className);
@@ -347,7 +352,7 @@ class DomTools
 	 * @param the DOM element to consider.
 	 * @param the class name(s) to add.
 	 */
-	static public function addClass(element:HtmlDom, className:String):Void
+	static public function addClass(element:HtmlElement, className:String):Void
 	{
 		if (element.className == null) element.className = "";
 
@@ -359,7 +364,7 @@ class DomTools
 	 * @param the DOM element to consider.
 	 * @param the class name(s) to remove. Several class names can be passed, separated by a white space, ie: "myClass1 myClass2".
 	 */
-	static public function removeClass(element:HtmlDom, className:String):Void
+	static public function removeClass(element:HtmlElement, className:String):Void
 	{
 		if (element.className == null || element.className.trim() == "") return;
 
@@ -382,7 +387,7 @@ class DomTools
 	 * 																				 => hasClass(node, "class2 class1", true) => true
 	 * @return true if className found, else false.
 	 */
-	static public function hasClass(element:HtmlDom, className:String, ?orderedClassName:Bool=false):Bool
+	static public function hasClass(element:HtmlElement, className:String, ?orderedClassName:Bool=false):Bool
 	{
 		if (element.className == null || element.className.trim() == "" || className == null || className.trim() == "") return false;
 
@@ -429,22 +434,22 @@ class DomTools
 	 * @param	attributeName 	the name of the attribute, of which to return the value
 	 * @example	DomTools.setMeta("description", "A 1st test of Silex publication"); // set the description of the HTML page found in the head tag, i.e. <META name="description" content="A 1st test of Silex publication"></META>
 	 */
-	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content", head:HtmlDom=null):Hash<String>{
-		var res:Hash<String> = new Hash();
+	static public function setMeta(metaName:String, metaValue:String, attributeName:String="content", head:HtmlElement=null):StringMap<String>{
+		var res:StringMap<String> = new StringMap();
 
 		// default value for document
 		if (head == null) 
-			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
+			head = cast Browser.document.documentElement.getElementsByTagName("head")[0]; 
 
 		// retrieve all config tags (the meta tags)
-		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("META");
+		var metaTags:NodeList = head.getElementsByTagName("META");
 
 		// flag to check if metaName exists
 		var found = false;
 
 		// for each config element, store the name/value pair
 		for (idxNode in 0...metaTags.length){
-			var node = metaTags[idxNode];
+			var node : HtmlElement = cast metaTags[idxNode];
 			var configName = node.getAttribute("name");
 			var configValue = node.getAttribute(attributeName);
 			if (configName!=null && configValue!=null){
@@ -458,7 +463,7 @@ class DomTools
 		}
 		// add the meta if needed
 		if (!found){
-			var node = Lib.document.createElement("meta");
+			var node = Browser.document.createElement("meta");
 			node.setAttribute("name", metaName);
 			node.setAttribute("content", metaValue);
 			head.appendChild(node);
@@ -474,17 +479,17 @@ class DomTools
 	 * @param	attributeName 	the name of the attribute, of which to return the value
 	 * @example	DomTools.getMeta("description", "content"); // returns the description of the HTML page found in the head tag, e.g. <META name="description" content="A 1st test of Silex publication"></META>
 	 */
-	static public function getMeta(name:String, attributeName:String="content", head:HtmlDom=null):Null<String>{
+	static public function getMeta(name:String, attributeName:String="content", head:HtmlElement=null):Null<String>{
 		// default value for document
 		if (head == null) 
-			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
+			head = cast Browser.document.documentElement.getElementsByTagName("head")[0]; 
 
 		// retrieve all config tags (the meta tags)
-		var metaTags:HtmlCollection<HtmlDom> = head.getElementsByTagName("meta");
+		var metaTags:NodeList = head.getElementsByTagName("meta");
 
 		// for each config element, store the name/value pair
 		for (idxNode in 0...metaTags.length){
-			var node = metaTags[idxNode];
+			var node : HtmlElement = cast metaTags[idxNode];
 			var configName = node.getAttribute("name");
 			var configValue = node.getAttribute(attributeName);
 			if (configName==name)
@@ -495,17 +500,17 @@ class DomTools
 	/**
 	 * Add a css tag with the given CSS rules in it
 	 * @param	css 		String containing the CSS rules
-	 * @param	head 		An optional HtmlDom which is the <head> tag of the document. Default: use Lib.document.getElementsByTagName("head") to retrieve it
+	 * @param	head 		An optional HtmlElement which is the <head> tag of the document. Default: use Browser.document.getElementsByTagName("head") to retrieve it
 	 * @returns the created node for the css style tag
 	 */
-	static public function addCssRules(css:String, head:HtmlDom=null):HtmlDom{
+	static public function addCssRules(css:String, head:HtmlElement=null):HtmlElement{
 		// default value for document
 		if (head == null) 
-			head = Lib.document.documentElement.getElementsByTagName("head")[0]; 
+			head = cast Browser.document.documentElement.getElementsByTagName("head")[0]; 
 		
-		var node = Lib.document.createElement('style');
+		var node = Browser.document.createElement('style');
 		node.setAttribute('type', 'text/css');
-		node.appendChild(Lib.document.createTextNode(css));
+		node.appendChild(Browser.document.createTextNode(css));
 
 		head.appendChild(node);
 		return cast(node);
@@ -514,16 +519,16 @@ class DomTools
 	 * Add a script tag with the given src param
 	 * @param	src 			String containing the URL of the script to embed
 	 */
-	static public function embedScript(src:String):HtmlDom{
-		var head = Lib.document.getElementsByTagName("head")[0];
-		var scriptNodes = Lib.document.getElementsByTagName("script");
+	static public function embedScript(src:String):HtmlElement{
+		var head = Browser.document.getElementsByTagName("head")[0];
+		var scriptNodes = Browser.document.getElementsByTagName("script");
 		for (idxNode in 0...scriptNodes.length){
-			var node = scriptNodes[idxNode];
+			var node : HtmlElement = cast scriptNodes[idxNode];
 			if(node.getAttribute("src") == src){
 				return node;
 			}
 		}
-		var node = Lib.document.createElement("script");
+		var node = Browser.document.createElement("script");
 		node.setAttribute("src", src);
 		head.appendChild(node);
 
@@ -533,9 +538,9 @@ class DomTools
 	 * Get the html page base tag
 	 */
 	public static function getBaseTag():Null<String>{
-		var baseNodes = Lib.document.getElementsByTagName("base");
+		var baseNodes = Browser.document.getElementsByTagName("base");
 		if (baseNodes.length > 0){
-			return baseNodes[0].getAttribute("href");
+			return cast(baseNodes[0]).getAttribute("href");
 		}
 		else{
 			return null;
@@ -547,16 +552,16 @@ class DomTools
 	 */
 	public static function setBaseTag(href:String){
 		// browse all tags in the head section and check if it a base tag is already set
-		var head = Lib.document.getElementsByTagName("head")[0];
-		var baseNodes = Lib.document.getElementsByTagName("base");
+		var head = Browser.document.getElementsByTagName("head")[0];
+		var baseNodes = Browser.document.getElementsByTagName("base");
 
 		href = DomTools.rel2abs(href);
 		if (baseNodes.length > 0){
-			trace("Warning: base tag already set in the head section. Current value (\""+baseNodes[0].getAttribute("href")+"\") will be replaced by \""+href+"\"");
-			baseNodes[0].setAttribute("href", href);
+			trace("Warning: base tag already set in the head section. Current value (\""+cast(baseNodes[0]).getAttribute("href")+"\") will be replaced by \""+href+"\"");
+			cast(baseNodes[0]).setAttribute("href", href);
 		}
 		else{
-			var node = Lib.document.createElement("base");
+			var node = Browser.document.createElement("base");
 			node.setAttribute("href", href);
 			if (head.childNodes.length>0)
 				head.insertBefore(node, head.childNodes[0]);
@@ -569,7 +574,7 @@ class DomTools
 	 */
 	public static function removeBaseTag(){
 		// browse all tags in the head section and check if it a base tag is already set
-		var baseNodes = Lib.document.getElementsByTagName("base");
+		var baseNodes = Browser.document.getElementsByTagName("base");
 		while (baseNodes.length > 0){
 			baseNodes[0].parentNode.removeChild(baseNodes[0]);
 		}
@@ -587,10 +592,10 @@ class DomTools
 		if (base == null)
 		{
 			// check if there is a file name in the location, i.e. */*.* pattern 
-			var idxSlash = Lib.window.location.href.lastIndexOf("/");
-			var idxDot = Lib.window.location.href.lastIndexOf(".");
-			if (idxSlash < idxDot) base = base = Lib.window.location.href.substr(0, idxSlash+1);
-			else base = Lib.window.location.href;
+			var idxSlash = Browser.window.location.href.lastIndexOf("/");
+			var idxDot = Browser.window.location.href.lastIndexOf(".");
+			if (idxSlash < idxDot) base = base = Browser.window.location.href.substr(0, idxSlash+1);
+			else base = Browser.window.location.href;
 		}
 #end
 		return base;
@@ -612,20 +617,20 @@ class DomTools
 
 	/**
 	 * Cross-browser innerHTML accessor for DOM nodes
-	 * @param node HtmlDom
+	 * @param node HtmlElement
 	 * @param optional, a value to set
 	 * @return String
 	 */
-	static public function innerHTML(node:HtmlDom, ?content:String=null):String
+	static public function innerHTML(node:HtmlElement, ?content:String=null):String
 	{
 #if js
-		if (content!=null && node.nodeName == "HTML" && Lib.window.navigator.userAgent.toLowerCase().indexOf("msie")>-1) //IE specific
+		if (content!=null && node.nodeName == "HTML" && Browser.window.navigator.userAgent.toLowerCase().indexOf("msie")>-1) //IE specific
 		{
 			content=StringTools.replace(content, "<HEAD>", "<BRIXHEAD>");
 			content=StringTools.replace(content, "</HEAD>", "</BRIXHEAD>");
 			content=StringTools.replace(content, "<BODY>", "<BRIXBODY>");
 			content=StringTools.replace(content, "</BODY>", "</BRIXBODY>");
-			var tempNode = Lib.document.createElement("DIV");
+			var tempNode = Browser.document.createElement("DIV");
 			tempNode.innerHTML = content;
 
 			//clean existing DOM tree
@@ -641,16 +646,17 @@ class DomTools
 					head[0].removeChild(head[0].firstChild);
 				}
 			}
-			var body = node.getElementsByTagName("BODY");
-			if (body.length > 0)
+			var bodies = node.getElementsByTagName("BODY");
+			if (bodies.length > 0)
 			{
-				while (body[0].attributes.length>0)
+				var body : HtmlElement = cast bodies[0];
+				while (body.attributes.length>0)
 				{
-					body[0].removeAttribute(body[0].attributes[0].nodeName);
+					body.removeAttribute(body.attributes[0].nodeName);
 				}
-				while (body[0].hasChildNodes())
+				while (body.hasChildNodes())
 				{
-					body[0].removeChild(body[0].firstChild);
+					body.removeChild(body.firstChild);
 				}
 			}
 
@@ -668,11 +674,11 @@ class DomTools
 				{
 					if (node.hasChildNodes())
 					{
-						node.insertBefore( Lib.document.createElement("HEAD"), node.firstChild );
+						node.insertBefore( Browser.document.createElement("HEAD"), node.firstChild );
 					}
 					else
 					{
-						node.appendChild( Lib.document.createElement("HEAD") );
+						node.appendChild( Browser.document.createElement("HEAD") );
 					}
 				}
 				while (tempHead[0].hasChildNodes())
@@ -680,22 +686,24 @@ class DomTools
 					head[0].appendChild(tempHead[0].removeChild(tempHead[0].childNodes[0]));
 				}
 			}
-			var tempBody = tempNode.getElementsByTagName("BRIXBODY");
-			var body = node.getElementsByTagName("BODY");
-			if (tempBody.length > 0)
+			var tempBodies = tempNode.getElementsByTagName("BRIXBODY");
+			var bodies = node.getElementsByTagName("BODY");
+			if (tempBodies.length > 0)
 			{
-				if (body.length == 0)
+				if (bodies.length == 0)
 				{
-					node.appendChild( Lib.document.createElement("BODY") );
+					node.appendChild( Browser.document.createElement("BODY") );
 				}
-				while (tempBody[0].attributes.length>0)
+				var tempBody : HtmlElement = cast tempBodies[0];
+				var body : HtmlElement = cast bodies[0];
+				while (tempBody.attributes.length>0)
 				{
-					body[0].setAttribute(tempBody[0].attributes[0].nodeName, tempBody[0].attributes[0].nodeValue);
-					tempBody[0].removeAttribute(tempBody[0].attributes[0].nodeName);
+					body.setAttribute(tempBody.attributes[0].nodeName, tempBody.attributes[0].nodeValue);
+					tempBody.removeAttribute(tempBody.attributes[0].nodeName);
 				}
-				while (tempBody[0].hasChildNodes())
+				while (tempBody.hasChildNodes())
 				{
-					body[0].appendChild(tempBody[0].removeChild(tempBody[0].childNodes[0]));
+					body.appendChild(tempBody.removeChild(tempBody.childNodes[0]));
 				}
 			}
 			return node.innerHTML;

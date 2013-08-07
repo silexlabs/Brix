@@ -8,8 +8,8 @@
  */
 package brix.component.layout;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.CustomEvent;
 import Xml;
 
 import brix.util.DomTools;
@@ -17,6 +17,9 @@ import brix.component.navigation.Page;
 import brix.component.navigation.ContextManager;
 import brix.component.navigation.StateManager;
 import brix.component.ui.DisplayObject;
+
+import js.html.Event;
+import js.Browser;
 
 /**
  * LayoutBase class
@@ -39,23 +42,23 @@ class LayoutBase extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String){
+	public function new(rootElement:HtmlElement, BrixId:String){
 		super(rootElement, BrixId);
 
-		//Lib.window.addEventListener('resize', redrawCallback, false);
-		mapListener(Lib.window,'resize', redrawCallback, false);
+		//Browser.window.addEventListener('resize', redrawCallback, false);
+		mapListener(Browser.window,'resize', redrawCallback, false);
 
-		// do not work: Lib.document.addEventListener("resize", redraw, false);
-		// do not compile: Lib.window.addEventListener("resize", redraw, false);
-		// yes but only 1 instance can listen: Lib.window.onresize = redraw;
+		// do not work: Browser.document.addEventListener("resize", redraw, false);
+		// do not compile: Browser.window.addEventListener("resize", redraw, false);
+		// yes but only 1 instance can listen: Browser.window.onresize = redraw;
 
-		mapListener(Lib.document.body, Page.EVENT_TYPE_OPEN_STOP, navigationCallback, true);
-		mapListener(Lib.document.body, Page.EVENT_TYPE_CLOSE_STOP, navigationCallback, true);
-		mapListener(Lib.document.body, ContextManager.EVENT_CONTEXT_CHANGE, navigationCallback, true);
-		mapListener(Lib.document.body, StateManager.EVENT_STATE_CHANGE, navigationCallback, true);
+		mapListener(Browser.document.body, Page.EVENT_TYPE_OPEN_STOP, navigationCallback, true);
+		mapListener(Browser.document.body, Page.EVENT_TYPE_CLOSE_STOP, navigationCallback, true);
+		mapListener(Browser.document.body, ContextManager.EVENT_CONTEXT_CHANGE, navigationCallback, true);
+		mapListener(Browser.document.body, StateManager.EVENT_STATE_CHANGE, navigationCallback, true);
 
 		// other layouts event
-		mapListener(Lib.document.body, EVENT_LAYOUT_REDRAW, redrawCallback, true);
+		mapListener(Browser.document.body, EVENT_LAYOUT_REDRAW, redrawCallback, true);
 	}
 	/**
 	 * init the component
@@ -89,7 +92,7 @@ class LayoutBase extends DisplayObject
 		}
 		preventRedraw = true;
 		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_LAYOUT_REDRAW, true, true, {
 			target: rootElement,
 			component: this,

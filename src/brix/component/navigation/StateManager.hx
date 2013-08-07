@@ -14,8 +14,9 @@ import brix.component.ui.DisplayObject;
 import brix.util.DomTools;
 import brix.core.Application;
 
-import js.Dom;
-import js.Lib;
+import js.html.HtmlElement;
+import js.html.CustomEvent;
+import js.Browser;
 
 /**
  * The StateManager component is a component that is in charge to show/hide HTML elements in function of the currrent opened page or the contexts
@@ -49,7 +50,7 @@ class StateManager extends DisplayObject
 	/**
 	 * Builds the Context with arguments passed in the html node attributes
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		currentCssClassNamesContexts = new Array();
@@ -58,8 +59,8 @@ class StateManager extends DisplayObject
 	override public function init()
 	{
 		// listen to other components events
-		mapListener(Lib.document.body, Page.EVENT_TYPE_OPEN_STOP, cast(onPageOpened), true);
-		mapListener(Lib.document.body, ContextManager.EVENT_CONTEXT_CHANGE, cast(onContextChanged), true);
+		mapListener(Browser.document.body, Page.EVENT_TYPE_OPEN_STOP, cast(onPageOpened), true);
+		mapListener(Browser.document.body, ContextManager.EVENT_CONTEXT_CHANGE, cast(onContextChanged), true);
 	}
 	/** 
 	 * callback for page events
@@ -113,7 +114,7 @@ class StateManager extends DisplayObject
 		// dispatch a change event if needed
 		if (isDirty)
 		{
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_STATE_CHANGE, false, false, this);
 			rootElement.dispatchEvent(event);
 		}

@@ -8,8 +8,9 @@
  */
 package brix.component.list;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.Event;
+import js.Browser;
 
 import haxe.Template;
 
@@ -59,7 +60,7 @@ class Repeater<ElementClass> extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		elementsHtml = new Array();
@@ -180,7 +181,7 @@ class Repeater<ElementClass> extends DisplayObject
 	 	// browse the current dom and remove the nodes which have no equivalent in the dataProvider
 	 	// tmpElementsHtml is used to handle the case of multiple elements having the same html rendering
 	 	var tmpElementsHtml = newElementsHtml.copy();
-	 	var toBeRemoved:Array<HtmlDom> = new Array();
+	 	var toBeRemoved:Array<HtmlElement> = new Array();
 
 
 		for (htmlIdx in 0...elementsHtml.length)
@@ -230,7 +231,7 @@ class Repeater<ElementClass> extends DisplayObject
 #end
 		var time = Date.now().getTime();
 		// temp container
-		var tmpDiv = Lib.document.createElement("div");
+		var tmpDiv = Browser.document.createElement("div");
 		var numContinuation = 0;
 	 	// browse all items of the dataProvider, and if it is in the DOM, move it, otherwise create a node
 		for (idx in 0...dataProvider.length)
@@ -298,7 +299,7 @@ class Repeater<ElementClass> extends DisplayObject
 				}
 				for (nodeIdx in 0...tmpDiv.childNodes.length)
 				{
-					var node = tmpDiv.childNodes[nodeIdx];
+					var node : HtmlElement = cast tmpDiv.childNodes[nodeIdx];
 					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
 					{
 						getBrixApplication().initNode(node);
@@ -332,19 +333,19 @@ class Repeater<ElementClass> extends DisplayObject
 			rootElementParent.appendChild(rootElement);
 		}
 */	}
-	private function getChildAt(idx:Int):HtmlDom
+	private function getChildAt(idx:Int):HtmlElement
 	{
-		return rootElement.childNodes[idx];
+		return cast rootElement.childNodes[idx];
 	}
 	private function getNumChildren():Int
 	{
 		return rootElement.childNodes.length;
 	}
-	private function removeChild(node:HtmlDom) 
+	private function removeChild(node:HtmlElement) 
 	{
 		rootElement.removeChild(node);
 	}
-	private function insertAt(node:HtmlDom, idx:Int) 
+	private function insertAt(node:HtmlElement, idx:Int) 
 	{
 		try
 		{
@@ -395,7 +396,7 @@ class Repeater<ElementClass> extends DisplayObject
 	 * retrieves the id of the item containing a given node
 	 * @param the given DOM node
 	 */
-	public function getItemIdx(childElement:HtmlDom):Int
+	public function getItemIdx(childElement:HtmlElement):Int
 	{
 		if (childElement == rootElement || childElement == null)
 		{
@@ -405,7 +406,7 @@ class Repeater<ElementClass> extends DisplayObject
 		}
 		if (childElement.nodeType != rootElement.nodeType || childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX) == null)
 		{
-			return getItemIdx(childElement.parentNode);
+			return getItemIdx(cast childElement.parentNode);
 		}
 		return Std.parseInt(childElement.getAttribute(DATA_ATTR_LIST_ITEM_INDEX));
 	}

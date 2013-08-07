@@ -8,8 +8,14 @@
  */
 package brix.core;
 
+import js.html.Event;
+import js.html.CustomEvent;
+import js.html.HtmlElement;
+import js.Browser;
+
 import brix.util.haxe.ObjectHash;
 import brix.util.DomTools;
+import haxe.ds.StringMap;
 
 /**
  * event dispach direction
@@ -41,9 +47,9 @@ enum EventDirection
  */
 class EventMap 
 {
-	private var notCapturingListeners:ObjectHash<Dynamic,Hash<List<js.Event->Void>>>;
+	private var notCapturingListeners:ObjectHash<Dynamic,StringMap<List<Event->Void>>>;
 
-	private var capturingListeners:ObjectHash<Dynamic,Hash<List<js.Event->Void>>>;
+	private var capturingListeners:ObjectHash<Dynamic,StringMap<List<Event->Void>>>;
 
 	public function new() 
 	{
@@ -58,19 +64,19 @@ class EventMap
 	 * @param	listener
 	 * @param	?useCapture
 	 */
-	public function mapListener( dispatcher:Dynamic, type:String, listener:js.Event->Void, ?useCapture:Bool=false ):Void
+	public function mapListener( dispatcher:Dynamic, type:String, listener:Event->Void, ?useCapture:Bool=false ):Void
 	{
 		var coll = getListeners(useCapture);
 
 		if (!coll.exists(dispatcher))
 		{
-			coll.set(dispatcher, new Hash());
+			coll.set(dispatcher, new StringMap());
 		}
 		if (!coll.get(dispatcher).exists(type))
 		{
 			coll.get(dispatcher).set(type, new List());
 		}
-		if (!Lambda.exists(coll.get(dispatcher).get(type), function(l:js.Event->Void) { return Reflect.compareMethods(listener, l); }))
+		if (!Lambda.exists(coll.get(dispatcher).get(type), function(l:Event->Void) { return Reflect.compareMethods(listener, l); }))
 		{
 			coll.get(dispatcher).get(type).add(listener);
 
@@ -85,7 +91,7 @@ class EventMap
 	 * @param	listener
 	 * @param	?useCapture
 	 */
-	public function unmapListener( dispatcher:Dynamic, type:String, listener:js.Event->Void, ?useCapture:Bool=false ):Void
+	public function unmapListener( dispatcher:Dynamic, type:String, listener:Event->Void, ?useCapture:Bool=false ):Void
 	{
 		var coll = getListeners(useCapture);
 
@@ -136,7 +142,7 @@ class EventMap
 	 * @param	?dispatcher the dispatching node.
 	 * @param	?direction 	up or down the DOM.
 	 */
-	public function dispatch(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool, direction:EventDirection):Void
+	public function dispatch(eventType:String, data:Dynamic, dispatcher:HtmlElement, cancelable:Bool, direction:EventDirection):Void
 	{//trace("dispatch "+eventType+" on "+dispatcher);
 		if (direction != down)
 		{
@@ -154,11 +160,11 @@ class EventMap
 		}
 	}
 
-	private function dispatchDownRecursive(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool)
+	private function dispatchDownRecursive(eventType:String, data:Dynamic, dispatcher:HtmlElement, cancelable:Bool)
 	{//trace("dispatchDownRecursive "+eventType+" on "+dispatcher);
 		for (i in 0...dispatcher.childNodes.length)
 		{
-			var node = dispatcher.childNodes[i];
+			var node : HtmlElement = cast dispatcher.childNodes[i];
 			if (node.nodeType == NodeTypes.ELEMENT_NODE)
 			{
 				dispatchCustomEvent(eventType, data, node, cancelable, false);
@@ -167,21 +173,21 @@ class EventMap
 		}
 	}
 
-	private function dispatchCustomEvent(eventType:String, data:Dynamic, dispatcher:HtmlDom, cancelable:Bool, canBubble:Bool)
+	private function dispatchCustomEvent(eventType:String, data:Dynamic, dispatcher:HtmlElement, cancelable:Bool, canBubble:Bool)
 	{//trace("dispatchCustomEvent "+eventType+" on "+dispatcher.className);
-		var event : CustomEvent = cast js.Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(eventType, canBubble, cancelable, data);
 		dispatcher.dispatchEvent(event);
 	}
 
-	private function getListeners(useCapture:Bool):ObjectHash<Dynamic,Hash<List<js.Event->Void>>>
+	private function getListeners(useCapture:Bool):ObjectHash<Dynamic,StringMap<List<Event->Void>>>
 	{
 		if (useCapture)
 			return capturingListeners;
 		return notCapturingListeners;
 	}
 
-	private function crossBrowserAddEventListener(dispatcher:Dynamic, type:String, listener:js.Event->Void, useCapture:Bool)
+	private function crossBrowserAddEventListener(dispatcher:Dynamic, type:String, listener:Event->Void, useCapture:Bool)
 	{
 #if js
 		untyped
@@ -200,7 +206,7 @@ class EventMap
 #end
 	}
 
-	private function crossBrowserRemoveEventListener(dispatcher:Dynamic, type:String, listener:js.Event->Void, useCapture:Bool)
+	private function crossBrowserRemoveEventListener(dispatcher:Dynamic, type:String, listener:Event->Void, useCapture:Bool)
 	{
 #if js
 		untyped

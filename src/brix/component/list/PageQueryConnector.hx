@@ -8,8 +8,8 @@
  */
 package brix.component.list;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 import haxe.Http;
 import haxe.Json;
 import haxe.Timer;
@@ -32,7 +32,7 @@ class PageQueryConnector extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 

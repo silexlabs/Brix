@@ -8,8 +8,8 @@
  */
 package brix.component.layout;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 import Xml;
 
 import brix.util.DomTools;
@@ -44,7 +44,7 @@ class Accordion extends LayoutBase
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, BrixId:String){
+	public function new(rootElement:HtmlElement, BrixId:String){
 		super(rootElement, BrixId);
 	}
 	/**

@@ -14,8 +14,8 @@ package brix.component.list;
  * @author Raphael Harmel
  */
 
-import js.Dom;
-import js.Lib;
+import js.html.HtmlElement;
+
 
 class RssConnector extends ConnectorBase
 {

@@ -10,8 +10,8 @@ package brix.component.automatisation;
 
 import haxe.Timer;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 
 import brix.util.DomTools;
 import brix.component.ui.DisplayObject;
@@ -165,7 +165,7 @@ class Sequencer extends DisplayObject
 	 * init properties
 	 * retrieve atributes of the html dom node
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		state = stoped;

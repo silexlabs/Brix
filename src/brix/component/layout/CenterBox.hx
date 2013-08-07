@@ -8,8 +8,8 @@
  */
 package brix.component.layout;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 import Xml;
 
 import brix.util.DomTools;
@@ -24,7 +24,7 @@ class CenterBox extends LayoutBase
 {
 	private var lastContainerBox:BoundingBox;
 	private var lastElementBox:BoundingBox;
-	public function new(rootElement:HtmlDom, BrixId:String){
+	public function new(rootElement:HtmlElement, BrixId:String){
 		super(rootElement, BrixId);
 		rootElement.style.visibility="hidden";
 	}

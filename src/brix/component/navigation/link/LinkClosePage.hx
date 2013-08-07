@@ -8,8 +8,8 @@
  */
 package brix.component.navigation.link;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 
 /**
  * Close the nodes which have a targetted class name, when the user clicks on the component's node

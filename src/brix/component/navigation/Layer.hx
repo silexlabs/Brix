@@ -8,8 +8,11 @@
  */
 package brix.component.navigation;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.Event;
+import js.html.NodeList;
+import js.html.AudioElement;
+import js.html.VideoElement;
 
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.transition.TransitionData;
@@ -31,7 +34,7 @@ typedef LayerEventDetail =
 {
 	var transitionObserver : TransitionObserver;
 	var transitionData : TransitionData;
-	var target: HtmlDom;
+	var target: HtmlElement;
 	var layer: Layer;
 }
 
@@ -77,11 +80,11 @@ class Layer extends DisplayObject
 	/**
 	 * array used to store all the children while the layer is hided
 	 */
-	private var childrenArray:Array<HtmlDom>;
+	private var childrenArray:Array<HtmlElement>;
 	/**
 	 * true if the layer is hidden
 	 */
-	public var status(default, setStatus):LayerStatus;
+	public var status(default, set):LayerStatus;
 	/**
 	 * Flag used to detect if a transition has started
 	 */
@@ -104,7 +107,7 @@ class Layer extends DisplayObject
 	 * constructor
 	 * removes all children from the DOM
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		childrenArray = new Array();
@@ -115,7 +118,7 @@ class Layer extends DisplayObject
 	/** 
 	 * Retrieve the given layer of this application or group
 	 */
-	static public function getLayerNodes(pageName:String="", brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	static public function getLayerNodes(pageName:String="", brixId:String, root:HtmlElement = null):NodeList
 	{
 		// default is the hole body
 		var body:Dynamic = root;
@@ -131,7 +134,7 @@ class Layer extends DisplayObject
 	// Transitions
 	//////////////////////////////////////////////////////
 	private static inline var MAX_DELAY_FOR_TRANSITION:Int = 2500;
-	private function setStatus(newStatus:LayerStatus):LayerStatus
+	private function set_status(newStatus:LayerStatus):LayerStatus
 	{
 		status = newStatus;
 		#if (!php)
@@ -187,7 +190,7 @@ class Layer extends DisplayObject
 			for (transition in sumOfTransitions)
 				DomTools.addClass(rootElement, transition.startStyleName);//
 			// continue later
-			DomTools.doLater(callback(doStartTransition, sumOfTransitions, onComplete));
+			DomTools.doLater(doStartTransition.bind(sumOfTransitions, onComplete));
 		}
 	}
 	/**
@@ -340,7 +343,7 @@ class Layer extends DisplayObject
 		// do the transition
 		if (preventTransitions == false)
 		{
-			doShowCallback = callback(doShow, transitionData, transitionObserver, preventTransitions);
+			doShowCallback = doShow.bind(transitionData, transitionObserver, preventTransitions);
 			startTransition(TransitionType.show, transitionData, doShowCallback);
 		}
 		else
@@ -460,7 +463,7 @@ class Layer extends DisplayObject
 		// do the transition
 		if (preventTransitions == false)
 		{
-			doHideCallback = callback(doHide, transitionData, transitionObserver, preventTransitions);
+			doHideCallback = doHide.bind(transitionData, transitionObserver, preventTransitions);
 			startTransition(TransitionType.hide, transitionData, doHideCallback);
 		}
 		else
@@ -517,7 +520,7 @@ class Layer extends DisplayObject
 /**/
 		while (rootElement.childNodes.length > 0)
 		{
-			var element:HtmlDom = rootElement.childNodes[0];
+			var element:HtmlElement = cast rootElement.childNodes[0];
 			rootElement.removeChild(element);
 			childrenArray.push(element);
 		}
@@ -531,13 +534,13 @@ class Layer extends DisplayObject
 	/**
 	 * play the videos/sounds when entering the page
 	 */ 
-	private function setupAudioElements(nodeList:HtmlCollection<Audio>) 
+	private function setupAudioElements(nodeList:NodeList) 
 	{
 		for (idx in 0...nodeList.length)
 		{
 			try
 			{				
-				var element = nodeList[idx];
+				var element:AudioElement = cast nodeList[idx];
 				if (element.autoplay == true)
 				{
 					element.currentTime = 0;
@@ -556,13 +559,13 @@ class Layer extends DisplayObject
 	/**
 	 * play the videos/sounds when entering the page
 	 */ 
-	private function setupVideoElements(nodeList:HtmlCollection<Video>) 
+	private function setupVideoElements(nodeList:NodeList) 
 	{
 		for (idx in 0...nodeList.length)
 		{
 			try
 			{				
-				var element = nodeList[idx];
+				var element:VideoElement = cast nodeList[idx];
 				if (element.autoplay == true)
 				{
 					element.currentTime = 0;
@@ -581,13 +584,13 @@ class Layer extends DisplayObject
 	/**
 	 * stop the videos/sounds when leaving the page
 	 */ 
-	private function cleanupAudioElements(nodeList:HtmlCollection<Audio>) 
+	private function cleanupAudioElements(nodeList:NodeList) 
 	{
 		for (idx in 0...nodeList.length)
 		{
 			try
 			{				
-				var element = nodeList[idx];
+				var element:AudioElement = cast nodeList[idx];
 				element.pause();
 				element.currentTime = 0;
 			}
@@ -603,13 +606,13 @@ class Layer extends DisplayObject
 	/**
 	 * stop the videos/sounds when leaving the page
 	 */ 
-	private function cleanupVideoElements(nodeList:HtmlCollection<Video>) 
+	private function cleanupVideoElements(nodeList:NodeList) 
 	{
 		for (idx in 0...nodeList.length)
 		{
 			try
 			{
-				var element = nodeList[idx];
+				var element:VideoElement = cast nodeList[idx];
 				element.pause();
 				element.currentTime = 0;
 			}

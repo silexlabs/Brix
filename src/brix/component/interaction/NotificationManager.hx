@@ -8,8 +8,8 @@
  */
 package brix.component.interaction;
 
-import js.Lib;
-import js.Dom;
+
+import js.html.HtmlElement;
 
 import haxe.Timer;
 import haxe.Template;
@@ -63,7 +63,7 @@ class NotificationManager extends DisplayObject
 	/**
 	 * div tag which contains the template for custom notifications
 	 */
-	private var notificationZone:HtmlDom;
+	private var notificationZone:HtmlElement;
 
 	////////////////////////////////////////////////////////////////
 	// static helper functions
@@ -71,21 +71,21 @@ class NotificationManager extends DisplayObject
 	/**
 	 * send a notification request on a node
 	 */
-	public static function notifySuccess(title:String, body:String, ?rootElement:HtmlDom=null) 
+	public static function notifySuccess(title:String, body:String, ?rootElement:HtmlElement=null) 
 	{
 		notify(DEFAULT_SUCCESS_ICON, title, body, rootElement);
 	}
 	/**
 	 * send a notification request on a node
 	 */
-	public static function notifyError(title:String, body:String, ?rootElement:HtmlDom=null) 
+	public static function notifyError(title:String, body:String, ?rootElement:HtmlElement=null) 
 	{
 		notify(DEFAULT_ERROR_ICON, title, body, rootElement);
 	}
 	/**
 	 * send a notification request on a node
 	 */
-	public static function notify(iconUrl:String, title:String, body:String, ?rootElement:HtmlDom=null) 
+	public static function notify(iconUrl:String, title:String, body:String, ?rootElement:HtmlElement=null) 
 	{
 		if (rootElement==null)
 		{
@@ -111,7 +111,7 @@ class NotificationManager extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 

@@ -16,8 +16,10 @@ using brix.component.IBrixComponent.BrixComponent;
 
 #if macro
 import cocktail.html.HtmlElement;
+import cocktail.Browser;
 #else
 import js.html.HtmlElement;
+import js.Browser;
 #end
 
 import haxe.Template;
@@ -177,7 +179,7 @@ class DisplayObject implements IDisplayObject
 	 */
 	static public function checkFilterOnElt( cmpClass:Class<Dynamic> , elt:HtmlElement ) : Void
 	{
-		if (elt.nodeType != Lib.document.body.nodeType)
+		if (elt.nodeType != Browser.document.body.nodeType)
 			throw "cannot instantiate "+Type.getClassName(cmpClass)+" on a non element node.";
 
 		var tagFilter = (haxe.rtti.Meta.getType(cmpClass) != null) ? haxe.rtti.Meta.getType(cmpClass).tagNameFilter : null ;

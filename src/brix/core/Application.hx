@@ -11,9 +11,13 @@ package brix.core;
 import haxe.ds.StringMap;
 
 #if macro
-import cocktail.html.HtmlElement;
+import cocktail.html.Element;
+import cocktail.Browser;
+import cocktail.html.Event;
 #else
-import js.html.HtmlElement;
+import js.html.Element;
+import js.Browser;
+import js.html.Event;
 #end
 
 /**
@@ -60,14 +64,14 @@ class Application
 	private var globalCompInstances:StringMap<Dynamic>;
 	/**
 	 * The Brix Apllication root node. Usually, any class used in a Brix application shouldn't use 
-	 * Lib.document.documentElement directly but this variable instead.
+	 * Browser.document.documentElement directly but this variable instead.
 	 */
-	public var htmlRootElement(default,null):HtmlElement;
+	public var htmlRootElement(default,null):Element;
 	/**
 	 * Use during int of components
-	 * After init all the nodes in body are moved to Lib.document.body
+	 * After init all the nodes in body are moved to Browser.document.body
 	 */
-	public var body:HtmlElement;
+	public var body:Element;
 	/**
 	 * The potential arguments passed to the Brix Application class at instanciation.
 	 */
@@ -84,8 +88,8 @@ class Application
 	 * A collection of the <script> declared UI components with the optionnal data- args passed on the <script> tag.
 	 * A UI component class is a child class of brix.component.ui.DisplayObject
 	 */
-	public var registeredUIComponents(getRegisteredUIComponents, null) : Array<RegisteredComponent>;
-	public function getRegisteredUIComponents():Array<RegisteredComponent>
+	public var registeredUIComponents(get, null) : Array<RegisteredComponent>;
+	public function get_registeredUIComponents():Array<RegisteredComponent>
 	{
 		#if macro
 		if (registeredUIComponents == null)
@@ -102,8 +106,8 @@ class Application
 	 * A global component class does not extend brix.component.ui.DisplayObject (otherwise it would be a UI component) but 
 	 * ideally, a global component class should implement brix.component.IBrixComponent if it needs to know its Brix Application.
 	 */
-	public var registeredGlobalComponents(getRegisteredGlobalComponents,null) : Array<RegisteredComponent>;
-	public function getRegisteredGlobalComponents():Array<RegisteredComponent>
+	public var registeredGlobalComponents(get,null) : Array<RegisteredComponent>;
+	public function get_registeredGlobalComponents():Array<RegisteredComponent>
 	{
 		#if macro
 		if (registeredGlobalComponents == null)
@@ -145,7 +149,7 @@ class Application
 			#if ((php || js) && disableEmbedHtml)
 				//special case in js when auto starting the application, 
 				//we need to ensure first that the parent document is ready
-				Lib.window.onload = function(e:Event)
+				Browser.window.onload = function(e:Event)
 				{ 
 					newApp.initDom();
 					newApp.initComponents();
@@ -175,7 +179,7 @@ class Application
 		this.globalCompInstances = new StringMap();
 		//this.metaParameters = new StringMap();
 
-		body = Lib.document.createElement("div");
+		body = Browser.document.createElement("div");
 
 		#if !macro
 		this.applicationContext = new ApplicationContext();
@@ -217,18 +221,18 @@ class Application
 	/**
 	 * attach the content of the temporary body to the DOM
 	 */
-	public function attachBody(?appendTo:Null<HtmlElement>) 
+	public function attachBody(?appendTo:Null<Element>) 
 	{
 		// attach the content of the temporary body to the DOM
 /* do not work: the group component and other components go up in the dom untill they reach the body, and they store a ref to the body
 		while(body.firstChild != null)
 		{
-			Lib.document.body.appendChild(body.firstChild);
+			Browser.document.body.appendChild(body.firstChild);
 		}
 */
 		if (appendTo == null)
 		{
-			appendTo = Lib.document.body;
+			appendTo = Browser.document.body;
 		}
 		// attache the body to the DOM
 		if (body.parentNode == null)
@@ -242,7 +246,7 @@ class Application
 	 * @param	?appendTo	optional, the parent application's node to which to hook this Brix application. By default or if
 	 * the given node is invalid, it's the document's document element (or equivalent if not js) that is used for that.
 	 */
-	public function initDom(?appendTo:Null<HtmlElement>) : Void
+	public function initDom(?appendTo:Null<Element>) : Void
 	{
 		#if brixdebug
 			trace("Initializing Brix Application id "+id+" on "+appendTo);
@@ -255,18 +259,18 @@ class Application
 		htmlRootElement = appendTo;
 
 		// it can't be a non element node
-		if (htmlRootElement == null || htmlRootElement.nodeType != Lib.document.documentElement.nodeType)
+		if (htmlRootElement == null || htmlRootElement.nodeType != Browser.document.documentElement.nodeType)
 		{
 			#if brixdebug
-				trace("setting htmlRootElement to Lib.document.documentElement");
+				trace("setting htmlRootElement to Browser.document.documentElement");
 			#end
-			htmlRootElement = Lib.document.documentElement;
+			htmlRootElement = Browser.document.documentElement;
 		}
 
 		if ( htmlRootElement == null )
 		{
 			#if js
-			trace("ERROR Lib.document.documentElement is null => You are trying to start your application while the document loading is probably not complete yet." +
+			trace("ERROR Browser.document.documentElement is null => You are trying to start your application while the document loading is probably not complete yet." +
 			" To fix that, add the noAutoStart option to your Brix application and control the application startup with: window.onload = function() { myApplication.init() };");
 			#else
 			trace("ERROR could not set Application's root element.");
@@ -275,7 +279,7 @@ class Application
 			return;
 		}
 
-		// at macro time, htmlRootElement == Lib.document.documentElement so we already have the source html in 
+		// at macro time, htmlRootElement == Browser.document.documentElement so we already have the source html in 
 		// htmlRootElement.innerHTML
 		#if (!macro && !disableEmbedHtml)
 			// **
@@ -315,7 +319,7 @@ class Application
 
 			// **
 			// set the head to the document
-			var updateRootRef:Bool = (htmlRootElement == Lib.document.documentElement);
+			var updateRootRef:Bool = (htmlRootElement == Browser.document.documentElement);
 
 			//htmlRootElement.innerHTML = documentString;
 			brix.util.DomTools.innerHTML(htmlRootElement, documentString);
@@ -324,10 +328,10 @@ class Application
 
 			if (updateRootRef)
 			{
-				htmlRootElement = Lib.document.documentElement; // needed for cocktail
+				htmlRootElement = Browser.document.documentElement; // needed for cocktail
 			}
 		#else
-			body = Lib.document.body;
+			body = Browser.document.body;
 		#end
 	}
 	
@@ -364,10 +368,10 @@ class Application
 	/**
 	 * Parses and initializes all declared components on a given node.
 	 * 
-	 * @param node:HtmlElement the node to initialize.
+	 * @param node:Element the node to initialize.
 	 * @return 
 	 */
-	public function initNode(node:HtmlElement):Void
+	public function initNode(node:Element):Void
 	{
 		var comps:List<brix.component.ui.DisplayObject> = createUIComponents(node);
 		
@@ -390,7 +394,7 @@ class Application
 	 * @param	node the DOM node where to start creating declared components
 	 * @return	a List of DisplayObject.
 	 */
-	private function createUIComponents(node:HtmlElement):Null<List<brix.component.ui.DisplayObject>>
+	private function createUIComponents(node:Element):Null<List<brix.component.ui.DisplayObject>>
 	{
 		if ( node.nodeType != 1 )
 		{
@@ -455,11 +459,11 @@ class Application
 				{
 					trace("ERROR while creating component "+classValue+" - error message: "+Std.string(unknown));
 // throws an exception on android :					trace("ERROR while creating "+Type.getClassName(componentClass)+": "+Std.string(unknown));
-					trace(haxe.Stack.toString(haxe.Stack.callStack()));
-					var excptArr = haxe.Stack.exceptionStack();
+					trace(haxe.CallStack.toString(haxe.CallStack.callStack()));
+					var excptArr = haxe.CallStack.exceptionStack();
 					if ( excptArr.length > 0 )
 					{
-						trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+						trace( haxe.CallStack.toString(haxe.CallStack.exceptionStack()) );
 					}
 				}
 				#end
@@ -471,7 +475,7 @@ class Application
 		// iterate on child nodes
 		for (cc in 0...node.childNodes.length)
 		{
-			var res = createUIComponents(node.childNodes[cc]);
+			var res = createUIComponents(cast node.childNodes[cc]);
 			if (res != null)
 			{
 				compsToInit = Lambda.concat( compsToInit, res );
@@ -504,12 +508,12 @@ class Application
 			catch (unknown : Dynamic)
 			{
 				trace("ERROR while trying to call init() on a component - error message: "+Std.string(unknown));
-				trace(haxe.Stack.toString(haxe.Stack.callStack()));
+				trace(haxe.CallStack.toString(haxe.CallStack.callStack()));
 //	throws an exception on android			trace("ERROR while trying to call init() on a "+Type.getClassName(Type.getClass(ci))+": "+Std.string(unknown));
-				var excptArr = haxe.Stack.exceptionStack();
+				var excptArr = haxe.CallStack.exceptionStack();
 				if ( excptArr.length > 0 )
 				{
-					trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+					trace( haxe.CallStack.toString(haxe.CallStack.exceptionStack()) );
 				}
 			}
 			#end
@@ -555,10 +559,10 @@ class Application
 			catch ( unknown : Dynamic )
 			{
 				trace("ERROR while creating "+rc.classname+": "+Std.string(unknown));
-				var excptArr = haxe.Stack.exceptionStack();
+				var excptArr = haxe.CallStack.exceptionStack();
 				if ( excptArr.length > 0 )
 				{
-					trace( haxe.Stack.toString(haxe.Stack.exceptionStack()) );
+					trace( haxe.CallStack.toString(haxe.CallStack.exceptionStack()) );
 				}
 			}
 			#end
@@ -585,9 +589,9 @@ class Application
 	 * 
 	 * @param	node
 	 */
-	public function cleanNode(node:HtmlElement):Void
+	public function cleanNode(node:Element):Void
 	{
-		if ( node.nodeType != Lib.document.body.nodeType )
+		if ( node.nodeType != Browser.document.body.nodeType )
 		{
 			// works only for elements
 			return;
@@ -601,7 +605,7 @@ class Application
 		
 		for ( childCnt in 0...node.childNodes.length )
 		{
-			cleanNode(node.childNodes[childCnt]);
+			cleanNode(cast node.childNodes[childCnt]);
 		}
 	}
 	
@@ -610,7 +614,7 @@ class Application
 	 * @param	node	the node we want to add an associated component instance to.
 	 * @param	cmp		the component instance to add.
 	 */
-	public function addAssociatedComponent(node : HtmlElement, cmp : brix.component.ui.DisplayObject) : Void
+	public function addAssociatedComponent(node : Element, cmp : brix.component.ui.DisplayObject) : Void
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
 		
@@ -637,7 +641,7 @@ class Application
 	 * @param	node	the node associated with the component instance.
 	 * @param	cmp		the component instance to remove.
 	 */
-	public function removeAssociatedComponent(node : HtmlElement, cmp : brix.component.ui.DisplayObject) : Void
+	public function removeAssociatedComponent(node : Element, cmp : brix.component.ui.DisplayObject) : Void
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
 		
@@ -670,7 +674,7 @@ class Application
 	 * Remove all component instances associated with a given node.
 	 * @param	node	the node.
 	 */
-	public function removeAllAssociatedComponent(node : HtmlElement) : Void
+	public function removeAllAssociatedComponent(node : Element) : Void
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
 
@@ -698,7 +702,7 @@ class Application
 	 * @param	typeFilter	a type filter (specify here a Type or an Interface, eg : Button, Draggable, List...). 
 	 * @return	a List<DisplayObject>, empty if there is no component.
 	 */
-	public function getAssociatedComponents<TypeFilter>(node : HtmlElement, typeFilter:Class<TypeFilter>) : List<TypeFilter>
+	public function getAssociatedComponents<TypeFilter>(node : Element, typeFilter:Class<TypeFilter>) : List<TypeFilter>
 	{
 		var nodeId = node.getAttribute(BRIX_ID_ATTR_NAME);
 

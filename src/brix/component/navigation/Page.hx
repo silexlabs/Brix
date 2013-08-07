@@ -8,8 +8,11 @@
  */
 package brix.component.navigation;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.NodeList;
+import js.html.Event;
+import js.html.PopStateEvent;
+import js.Browser;
 
 import brix.component.ui.DisplayObject;
 import brix.component.navigation.link.LinkBase;
@@ -32,7 +35,7 @@ using StringTools;
  * When the page is to be opened/closed, then all the layers which have the page deeplink as a class name are shown/hidden
  */
 @tagNameFilter("a")
-class Page extends DisplayObject, implements IGroupable
+class Page extends DisplayObject implements IGroupable
 {
 	/**
 	 * constant, name of this class
@@ -87,7 +90,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * the group element set by the Group class
 	 * implementation of IGroupable
 	 */
-	public var groupElement:HtmlDom;
+	public var groupElement:HtmlElement;
 
 	/**
 	 * holds the query string data contained
@@ -99,7 +102,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Open the page with the given "name" attribute
 	 * This will close other pages
 	 */
-	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, brixId:String, root:HtmlDom = null)
+	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, brixId:String, root:HtmlElement = null)
 	{
 		// default is the whole body
 		var body:Dynamic = root;
@@ -139,7 +142,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Close the page with the given "name" attribute
 	 * This will close only this page
 	 */
-	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlDom = null)
+	static public function closePage(pageName:String, transitionData:TransitionData, brixId:String, root:HtmlElement = null)
 	{ 
 		// default is the whole body
 		var body:Dynamic = root;
@@ -162,13 +165,13 @@ class Page extends DisplayObject, implements IGroupable
 	/** 
 	 * Retrieve all the pages of this application or group
 	 */
-	static public function getPageNodes(brixId:String, root:HtmlDom = null):HtmlCollection<HtmlDom>
+	static public function getPageNodes(brixId:String, root:HtmlElement = null):NodeList
 	{
 		// default is the hole body
-		var body:HtmlDom = root;
+		var body:HtmlElement = root;
 		if (root == null)
 		{
-			body = Application.get(brixId).body;
+			body = cast Application.get(brixId).body;
 		}
 
 		// get all pages, i.e. all elements with class name "Page"
@@ -178,7 +181,7 @@ class Page extends DisplayObject, implements IGroupable
 	/** 
 	 * Retrieve the page whose "name" attribute is pageName
 	 */
-	static public function getPageByName(pageName:String, brixId:String, root:HtmlDom = null):Null<Page>
+	static public function getPageByName(pageName:String, brixId:String, root:HtmlElement = null):Null<Page>
 	{
 		// default is the hole body
 		var body:Dynamic = root;
@@ -186,15 +189,16 @@ class Page extends DisplayObject, implements IGroupable
 			body = Application.get(brixId).body;
 
 		// get all pages, i.e. all element with class name "page"
-		var pages:HtmlCollection<HtmlDom> = getPageNodes(brixId, body);
+		var pages:NodeList = getPageNodes(brixId, body);
 		// browse all pages
 		for (pageIdx in 0...pages.length)
 		{
+			var page : HtmlElement = cast pages[pageIdx];
 			// check if it has the desired name
-			if (pages[pageIdx].getAttribute(Page.CONFIG_NAME_ATTR) == pageName)
+			if (page.getAttribute(Page.CONFIG_NAME_ATTR) == pageName)
 			{
 				// retrieve the Page class instance associated with this node
-				var pageInstances:List<Page> = Application.get(brixId).getAssociatedComponents(pages[pageIdx], Page);
+				var pageInstances:List<Page> = Application.get(brixId).getAssociatedComponents(cast pages[pageIdx], Page);
 				for (page in pageInstances)
 				{
 					return page;
@@ -225,7 +229,7 @@ class Page extends DisplayObject, implements IGroupable
 	 * Init the attributes
 	 * Close the page
 	 */
-	public function new(rootElement:HtmlDom, brixId:String) 
+	public function new(rootElement:HtmlElement, brixId:String) 
 	{
 		super(rootElement, brixId);
 		
@@ -235,7 +239,7 @@ class Page extends DisplayObject, implements IGroupable
 		// group element is body element by default
 		if (groupElement == null)
 		{
-			groupElement = getBrixApplication().body;
+			groupElement = cast getBrixApplication().body;
 		}
 		name = rootElement.getAttribute(CONFIG_NAME_ATTR);
 		if (name == null || name.trim() == "")
@@ -249,7 +253,7 @@ class Page extends DisplayObject, implements IGroupable
 		if (useDeeplink)
 		{
 			// listen to the history api changes
-			mapListener(Lib.window, "popstate", onPopState, true);
+			mapListener(Browser.window, "popstate", onPopState, true);
 		}
 	}
 
@@ -275,17 +279,17 @@ class Page extends DisplayObject, implements IGroupable
 // workaround window.location not yet implemented in cocktail
 #if js
 		// open if it is the page in history
-		if (useDeeplink && Lib.window.history.state != null)
+		if (useDeeplink && Browser.window.history.state != null)
 		{
-			if (Lib.window.history.state.name == name)
+			if (Browser.window.history.state.name == name)
 			{
 				open(null, null, true, true, false);
 			}
 		}
 		// open if it is the page in the deeplink
-		else if (StringTools.startsWith(Lib.window.location.search, "?/"))
+		else if (StringTools.startsWith(Browser.window.location.search, "?/"))
 		{
-			if (Lib.window.location.search.substr(2) == name)
+			if (Browser.window.location.search.substr(2) == name)
 			{
 				open(null, null, true, true);
 			}
@@ -329,7 +333,7 @@ class Page extends DisplayObject, implements IGroupable
 				if ( __js__("window.history.pushState") )
 				{
 #end
-			Lib.window.history.pushState({
+			Browser.window.history.pushState({
 					name: name,
 					transitionDataShow: transitionDataShow,
 					transitionDataHide: transitionDataHide,
@@ -355,7 +359,7 @@ class Page extends DisplayObject, implements IGroupable
 		for (idxPageNode in 0...nodes.length)
 		{
 			var pageNode = nodes[idxPageNode];
-			var pageInstances:List<Page> = getBrixApplication().getAssociatedComponents(pageNode, Page);
+			var pageInstances:List<Page> = getBrixApplication().getAssociatedComponents(cast pageNode, Page);
 			for (pageInstance in pageInstances)
 			{
 				if (pageInstance != this)
@@ -382,7 +386,7 @@ class Page extends DisplayObject, implements IGroupable
 		for (idxLayerNode in 0...nodes.length)
 		{
 			var layerNode = nodes[idxLayerNode];
-			var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
+			var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(cast layerNode, Layer);
 			for (layerInstance in layerInstances)
 			{
 				layerInstance.show(transitionData, transitionObserver, preventTransitions);
@@ -429,14 +433,14 @@ class Page extends DisplayObject, implements IGroupable
 			var hasForbiddenClass = false;
 			for (className in preventCloseByClassName)
 			{
-				if (DomTools.hasClass(layerNode, className))
+				if (DomTools.hasClass(cast layerNode, className))
 				{
 					hasForbiddenClass = true;
 				}
 			}
 			if (!hasForbiddenClass)
 			{
-				var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(layerNode, Layer);
+				var layerInstances:List<Layer> = getBrixApplication().getAssociatedComponents(cast layerNode, Layer);
 				for (layerInstance in layerInstances)
 				{
 					layersToBeClosed.push(layerInstance);

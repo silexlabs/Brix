@@ -8,8 +8,11 @@
  */
 package brix.component.list;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.Event;
+import js.html.CustomEvent;
+import js.Browser;
+
 import brix.component.interaction.Draggable;
 
 import brix.util.DomTools;
@@ -46,15 +49,15 @@ class List<ElementClass> extends Repeater<ElementClass>
 	/**
 	 * selected item if any
 	 */
-	public var selectedItem(getSelectedItem, setSelectedItem):Null<ElementClass>;
+	public var selectedItem(get, set):Null<ElementClass>;
 	/**
 	 * selected item index, in the dataProvider array, or -1 of there is no selected index
 	 */
-	public var selectedIndex(default, setSelectedIndex):Int;
+	public var selectedIndex(default, set):Int;
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		selectedIndex = -1;
@@ -85,7 +88,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 		selectedItem = dataProvider[idx];
 
 		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_CLICK, false, false, {
 			target: rootElement,
 			item: selectedItem,
@@ -97,11 +100,11 @@ class List<ElementClass> extends Repeater<ElementClass>
 	 */
 	private function rollOver(e:Event)
 	{
-		var element:HtmlDom = cast(e.target);
+		var element:HtmlElement = cast(e.target);
 		var idx = getItemIdx(element);
 
 		// dispatch a custom event
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(EVENT_CHANGE, false, false, {
 			target: rootElement,
 			item: dataProvider[idx],
@@ -128,7 +131,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 		var children = rootElement.getElementsByTagName("li");
 		for (idx in 0...children.length)
 		{
-			var idxElem:Int = getItemIdx(children[idx]);
+			var idxElem:Int = getItemIdx(cast children[idx]);
 			if (idxElem >= 0)
 			{
 				var found = false;
@@ -149,11 +152,11 @@ class List<ElementClass> extends Repeater<ElementClass>
 
 				if (found)
 				{
-					DomTools.addClass(children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
+					DomTools.addClass(cast children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
 				}
 				else
 				{
-					DomTools.removeClass(children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
+					DomTools.removeClass(cast children[idx], LIST_SELECTED_ITEM_CSS_CLASS);
 				}
 			}
 		}
@@ -164,14 +167,14 @@ class List<ElementClass> extends Repeater<ElementClass>
 	/**
 	 * getter/setter
 	 */
-	function getSelectedItem():Null<ElementClass> 
+	function get_selectedItem():Null<ElementClass> 
 	{
 		return dataProvider[selectedIndex];
 	}
 	/**
 	 * getter/setter
 	 */
-	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> 
+	function set_selectedItem(selected:Null<ElementClass>):Null<ElementClass> 
 	{
 		if (selected != selectedItem)
 		{
@@ -198,14 +201,14 @@ class List<ElementClass> extends Repeater<ElementClass>
 	/**
 	 * getter/setter
 	 */
-	function getSelectedIndex():Int 
+	function get_selectedIndex():Int 
 	{
 		return selectedIndex;
 	}
 	/**
 	 * getter/setter
 	 */
-	function setSelectedIndex(idx:Int):Int 
+	function set_selectedIndex(idx:Int):Int 
 	{
 		if (idx != selectedIndex)
 		{
@@ -220,7 +223,7 @@ class List<ElementClass> extends Repeater<ElementClass>
 			updateSelectionDisplay([selectedItem]);
 
 			// dispatch a custom event
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 			event.initCustomEvent(EVENT_CHANGE, false, false, {
 				target: rootElement,
 				item: selectedItem,

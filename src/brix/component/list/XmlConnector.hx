@@ -8,7 +8,7 @@
  */
 package brix.component.list;
 
-import js.Dom;
+import js.html.HtmlElement;
 import haxe.Http;
 import haxe.Timer;
 

@@ -10,8 +10,9 @@ package brix.component.navigation.transition;
 
 import brix.util.DomTools;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.CustomEvent;
+import js.Browser;
 
 /**
  * this class is passed to the layers when a page opens or closes
@@ -103,7 +104,7 @@ class TransitionObserver{
 		// dispatch a custom event on the root element
 		try
 		{
-			var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+			var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 			event.initCustomEvent(eventName, true, true, page);
 			page.rootElement.dispatchEvent(event);
 		}

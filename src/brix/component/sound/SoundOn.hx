@@ -1,7 +1,9 @@
 package brix.component.sound;
 
-import js.Lib;
-import js.Dom;
+import js.html.HtmlElement;
+import js.html.Event;
+import js.html.NodeList;
+import js.Browser;
 
 import brix.component.ui.DisplayObject;
 import brix.util.DomTools;
@@ -25,7 +27,7 @@ class SoundOn extends DisplayObject
 	/**
 	 * constructor
 	 */
-	public function new(rootElement:HtmlDom, brixId:String)
+	public function new(rootElement:HtmlElement, brixId:String)
 	{
 		super(rootElement, brixId);
 		rootElement.onclick = onClick;
@@ -33,7 +35,7 @@ class SoundOn extends DisplayObject
 
 	override public function init()
 	{
-		DomTools.doLater(callback(mute, false));
+		DomTools.doLater(mute.bind(false));
 	}
 
 	/**
@@ -54,7 +56,7 @@ class SoundOn extends DisplayObject
 	{
 		// mute/unmute audio tags
 		#if js
-			var audioTags:HtmlCollection<HtmlDom> = Lib.document.getElementsByTagName("audio");
+			var audioTags:NodeList = Browser.document.getElementsByTagName("audio");
 			for (idx in 0...audioTags.length)
 			{
 				cast(audioTags[idx]).muted = doMute;
@@ -73,24 +75,26 @@ class SoundOn extends DisplayObject
 		isMuted = doMute;
 
 		// get all the "sound on/off" button(s)
-		var soundOffButtons:HtmlCollection<HtmlDom> = Lib.document.getElementsByClassName(SoundOff.CLASS_NAME);
-		var soundOnButtons:HtmlCollection<HtmlDom> = Lib.document.getElementsByClassName(SoundOn.CLASS_NAME);
+		var soundOffButtons:NodeList = Browser.document.getElementsByClassName(SoundOff.CLASS_NAME);
+		var soundOnButtons:NodeList = Browser.document.getElementsByClassName(SoundOn.CLASS_NAME);
 
 		// display/hide the sound on/off buttons
 		for (idx in 0...soundOffButtons.length)
 		{
+			var soundOffButton : HtmlElement = cast soundOffButtons[idx];
 			if (doMute)
-				soundOffButtons[idx].style.visibility = "hidden";
+				soundOffButton.style.visibility = "hidden";
 			else
-				soundOffButtons[idx].style.visibility = "visible";
+				soundOffButton.style.visibility = "visible";
 		}
 		// display/hide the sound on/off buttons
 		for (idx in 0...soundOnButtons.length)
 		{
+			var soundOnButton : HtmlElement = cast soundOnButtons[idx];
 			if (!doMute)
-				soundOnButtons[idx].style.visibility = "hidden";
+				soundOnButton.style.visibility = "hidden";
 			else
-				soundOnButtons[idx].style.visibility = "visible";
+				soundOnButton.style.visibility = "visible";
 		}
 	}
 }
