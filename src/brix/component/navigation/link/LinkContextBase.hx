@@ -14,6 +14,9 @@ import brix.util.DomTools;
 
 
 import js.html.HtmlElement;
+import js.html.Event;
+import js.html.CustomEvent;
+import js.Browser;
 
 /**
  * Let you specify the list of contexts to display when the user clicks on the component's node
@@ -59,7 +62,7 @@ class LinkContextBase extends LinkBase
 	 */
 	public function dispatchContextEvent(type:String) 
 	{
-		var event : CustomEvent = cast Lib.document.createEvent("CustomEvent");
+		var event : CustomEvent = cast Browser.document.createEvent("CustomEvent");
 		event.initCustomEvent(type, false, false, links);
 		rootElement.dispatchEvent(event);
 	}

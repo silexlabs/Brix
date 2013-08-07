@@ -1,5 +1,5 @@
 -js Brix.js
--cp ../../../haxe_libs/Cocktail/src/
+-lib cocktail
 -cp ../../src/
 -cp ../my_custom_components/src/
 -debug
