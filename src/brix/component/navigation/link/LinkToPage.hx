@@ -10,6 +10,7 @@ package brix.component.navigation.link;
 
 
 import js.html.HtmlElement;
+import js.html.Event;
 
 /**
  * Let you specify a page to display when the user clicks on the component's node

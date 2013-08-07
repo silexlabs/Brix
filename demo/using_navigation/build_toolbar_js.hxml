@@ -4,7 +4,7 @@
 
 -js ./bin/toolbar.js
 -cp ../../src/
--cp ../../../haxe_libs/Cocktail/src/
+-lib cocktail
 -debug
 -main brix.core.Application
 --macro brix.core.Builder.create('./src/toolbar.html')
@@ -16,7 +16,7 @@
 
 -js ./bin/multiple-toolbars.js
 -cp ../../src/
--cp ../../../haxe_libs/Cocktail/src/
+-lib cocktail
 -debug
 -main brix.core.Application
 --macro brix.core.Builder.create('./src/multiple-toolbars.html')
