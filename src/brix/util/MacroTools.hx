@@ -59,7 +59,7 @@ class MacroTools
 		if (elt.parentNode == null)
 			return 0;
 		
-		var parent:HtmlElement = elt.parentNode;
+		var parent:HtmlElement = cast elt.parentNode;
 		var count = 0;
 		
 		for ( i in 0...parent.childNodes.length )
@@ -74,7 +74,7 @@ class MacroTools
 				//FIXME Use constants (add to Dom.hx ?)
 				case 1: // Node.ELEMENT_NODE
 					
-					count += child.innerHTML.split('\n').length - 1;
+					count += cast(child).innerHTML.split('\n').length - 1;
 					
 				case 3: // Node.TEXT_NODE
 					

@@ -10,6 +10,8 @@ package brix.component.template;
 
 
 import js.html.HtmlElement;
+import js.html.Event;
+
 import brix.component.interaction.Draggable;
 
 import brix.util.DomTools;
@@ -62,7 +64,7 @@ class TemplateRenderer extends DisplayObject
 /**/		var tmpHtmlDom = rootElement;
 		while(tmpHtmlDom!=null && !DomTools.hasClass(tmpHtmlDom, "Layer"))
 		{
-			tmpHtmlDom = tmpHtmlDom.parentNode;
+			tmpHtmlDom = cast tmpHtmlDom.parentNode;
 		}
 		if (tmpHtmlDom!=null)
 		{
@@ -152,7 +154,7 @@ class TemplateRenderer extends DisplayObject
 					var node = rootElement.childNodes[nodeIdx];
 					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
 					{
-						getBrixApplication().cleanNode(node);
+						getBrixApplication().cleanNode(cast node);
 					}
 				}
 				lastRenderedHtml = res;
@@ -163,7 +165,7 @@ class TemplateRenderer extends DisplayObject
 					var node = rootElement.childNodes[nodeIdx];
 					if (node!=null && node.nodeType == NodeTypes.ELEMENT_NODE)
 					{
-						getBrixApplication().initNode(node);
+						getBrixApplication().initNode(cast node);
 					}
 				}
 			}

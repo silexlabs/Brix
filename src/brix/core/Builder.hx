@@ -136,7 +136,7 @@ class Builder
 			var cocktailView : CocktailView = new CocktailView();
 			cocktailView.loadHTML("<!DOCTYPE html><html><head></head><body></body></html>");
 			//set the cocktail instance as static (accessible through Browser)
-			Browser.init(cocktailView.document);
+			Browser.init(cast cocktailView.document, cocktailView.window);
 			
 			//init the DOM tree from source HTML file content
 			cocktail.Browser.document.innerHTML = htmlSource;
@@ -667,7 +667,7 @@ class Builder
 		{
 			if (n.parentNode != null)
 			{
-				var parent : HtmlElement = n.parentNode;
+				var parent : HtmlElement = cast n.parentNode;
 				
 				parent.removeChild(n);
 			}
@@ -772,7 +772,7 @@ class Builder
 				case 8:	//Node.COMMENT_NODE
 					elt.removeChild(nc);
 				case 1:	//Node.ELEMENT_NODE:
-					removeComments(nc);
+					removeComments(cast(nc));
 				default:
 			}
 		}
@@ -819,7 +819,7 @@ class Builder
 					
 				case 1:		//Node.ELEMENT_NODE
 					
-					minimizeHtml(nc);
+					minimizeHtml(cast(nc));
 					
 				default:
 			}

@@ -8,6 +8,7 @@
  */
 package brix.component.group;
 
+import js.html.HtmlElement;
 import brix.component.ui.DisplayObject;
 
 
@@ -74,23 +75,24 @@ class Group extends DisplayObject
 			{
 				continue;
 			}
-			if (elt.childNodes[childCnt].className != null)
+			if (cast(elt.childNodes[childCnt]).className != null)
 			{
-				for (c in elt.childNodes[childCnt].className.split(" "))
+				var classes:Array<String> = cast(elt.childNodes[childCnt]).className.split(" ");
+				for (c in classes)
 				{
 					var rc:Class<Dynamic> = getBrixApplication().resolveUIComponentClass(c, brix.component.group.IGroupable);
 
 					if ( rc == null ) continue;
 
-					groupables.add(elt.childNodes[childCnt]);
+					groupables.add(cast elt.childNodes[childCnt]);
 					break;
 				}
-				if (Lambda.has(elt.childNodes[childCnt].className.split(" "), "Group"))
+				if (Lambda.has(cast(elt.childNodes[childCnt]).className.split(" "), "Group"))
 				{
 					continue;
 				}
 			}
-			groupables = Lambda.concat(groupables, discoverGroupableChilds(elt.childNodes[childCnt]));
+			groupables = Lambda.concat(groupables, discoverGroupableChilds(cast(elt.childNodes[childCnt])));
 		}
 		return groupables;
 	}

@@ -4,7 +4,7 @@
 
 -js ./bin/context.js
 -cp ../../src/
--cp ../../../Cocktail/src/
+-lib cocktail
 -debug
 -main brix.core.Application
 --macro brix.core.Builder.create('./src/context.html')

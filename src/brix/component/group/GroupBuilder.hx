@@ -9,7 +9,6 @@
 package brix.component.group;
 
 
-import brix.component.list.JsonConnector;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type;
@@ -17,8 +16,8 @@ import haxe.macro.Type;
 import brix.core.Builder;
 import brix.util.MacroTools;
 
+import cocktail.Browser;
 import cocktail.html.HtmlElement;
-
 
 using Lambda;
 
@@ -95,7 +94,7 @@ class GroupBuilder
 		for (childCnt in 0...directChilds.length)
 		{
 			var childElt : HtmlElement = cast directChilds[childCnt];
-			if (childElt.nodeType != Lib.document.body.nodeType)
+			if (childElt.nodeType != Browser.document.body.nodeType)
 				continue;
 
 			if ( childElt.className != null )
@@ -120,7 +119,7 @@ class GroupBuilder
 					continue;
 				}
 			}
-			groupables = Lambda.concat(groupables, discoverGroupableChilds(directChilds[childCnt]));
+			groupables = Lambda.concat(groupables, discoverGroupableChilds(cast directChilds[childCnt]));
 		}
 		return groupables;
 	}
