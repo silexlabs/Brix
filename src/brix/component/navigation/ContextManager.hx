@@ -73,6 +73,10 @@ class ContextManager extends DisplayObject
 	 */
 	public static inline var EVENT_RESET_CONTEXTS = "resetContextsEvent";
 	/**
+	 * name of the event which you can dispatch from your components to change the value of the contexts
+	 */
+	public static inline var EVENT_REQUEST_CONTEXTS = "requestContextsEvent";
+	/**
 	 * list of contexts
 	 * case incensitive
 	 */
@@ -116,6 +120,7 @@ class ContextManager extends DisplayObject
 		mapListener(rootElement, EVENT_RESET_CONTEXTS, cast(onResetContextEvent), true);
 		mapListener(rootElement, EVENT_REPLACE_CONTEXTS, cast(onReplaceContextsEvent), true);
 		mapListener(rootElement, EVENT_TOGGLE_CONTEXTS, cast(onToggleContextsEvent), true);
+		mapListener(rootElement, EVENT_REQUEST_CONTEXTS, cast(onRequestContextsEvent), true);
 	}
 	override public function init()
 	{
@@ -176,6 +181,10 @@ class ContextManager extends DisplayObject
 		var contextValues:Array<ContextValue> = cast(e.detail);
 		for (contextValue in contextValues)
 			toggleContext(contextValue);
+	}
+	private function onRequestContextsEvent(e:CustomEvent)
+	{trace("onRequestContextsEvent"+e.detail);
+		invalidate();
 	}
 	/** 
 	 * callback for a request comming from another brix component

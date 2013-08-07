@@ -58,8 +58,10 @@ class StateManager extends DisplayObject
 	override public function init()
 	{
 		// listen to other components events
-		mapListener(Lib.document.body, Page.EVENT_TYPE_OPEN_STOP, cast(onPageOpened), true);
-		mapListener(Lib.document.body, ContextManager.EVENT_CONTEXT_CHANGE, cast(onContextChanged), true);
+		mapListener(getBrixApplication().body, Page.EVENT_TYPE_OPEN_STOP, cast(onPageOpened), true);
+		mapListener(getBrixApplication().body, ContextManager.EVENT_CONTEXT_CHANGE, cast(onContextChanged), true);
+
+		dispatch(ContextManager.EVENT_REQUEST_CONTEXTS);
 	}
 	/** 
 	 * callback for page events

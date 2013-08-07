@@ -127,6 +127,22 @@ class Layer extends DisplayObject
 		else
 			return body.getElementsByClassName("Layer");
 	}
+	/**
+	 * retrieve the layer in which this component is defined
+	 */
+	static public function getLayer(element:HtmlDom, brixId:String) : Null<Layer>
+	{
+		while(element!=null && !DomTools.hasClass(element, "Layer"))
+		{
+			element = element.parentNode;
+		}
+		if (element!=null)
+		{
+			return Application.get(brixId).getAssociatedComponents(element, Layer).first();
+		}
+		trace("WARNING: could not find layer "+element);
+		return null;
+	}
 	//////////////////////////////////////////////////////
 	// Transitions
 	//////////////////////////////////////////////////////

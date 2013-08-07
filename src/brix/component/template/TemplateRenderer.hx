@@ -81,7 +81,7 @@ class TemplateRenderer extends DisplayObject
 	 * callback for the event
 	 */
 	public function onDataReceived(e:Event)
-	{trace("onDataReceived");
+	{//trace("onDataReceived");
 		var newData:Dynamic = cast(e).detail;
 		data = newData;
 		redraw();
@@ -173,7 +173,7 @@ class TemplateRenderer extends DisplayObject
 			else
 			{
 
-				trace("render not different "+rootElement.className);
+				//trace("render not different "+rootElement.className);
 				// throws an error "XML parser failure: element is malformed." : trace("render not different "+rootElement.innerHTML);
 			}
 		}
