@@ -12,6 +12,8 @@ import js.Lib;
 import js.Dom;
 import Xml;
 
+import brix.component.navigation.Layer;
+
 import brix.util.DomTools;
 import brix.component.ui.DisplayObject;
 
@@ -24,8 +26,17 @@ class CenterBox extends LayoutBase
 {
 	private var lastContainerBox:BoundingBox;
 	private var lastElementBox:BoundingBox;
+	
+	private var leftNext:String;
+	private var topNext:String;
+
 	public function new(rootElement:HtmlDom, BrixId:String){
 		super(rootElement, BrixId);
+		rootElement.style.visibility="hidden";
+		mapListener(rootElement, Layer.EVENT_TYPE_SHOW_START, hide, true);
+	}
+	private function hide(e:Event)
+	{
 		rootElement.style.visibility="hidden";
 	}
 	/**
@@ -63,11 +74,16 @@ class CenterBox extends LayoutBase
 				var newPosY = rootElement.offsetTop + (containerCenterY - elementCenterY);
 
 				// move the element to the center of the container
-				rootElement.style.left = Math.round(newPosX) + "px";
-				rootElement.style.top = Math.round(newPosY) + "px";
-				rootElement.style.visibility="visible";
-				super.redraw();
+				leftNext = Math.round(newPosX) + "px";
+				topNext = Math.round(newPosY) + "px";
+				DomTools.doLater(function ()
+				{
+					rootElement.style.visibility="visible";
+					rootElement.style.left = leftNext;
+					rootElement.style.top = topNext;
+				}, 2);
 			}
 		}
+		super.redraw();
 	}
 }

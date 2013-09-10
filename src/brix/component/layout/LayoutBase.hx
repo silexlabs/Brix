@@ -70,7 +70,7 @@ class LayoutBase extends DisplayObject
 	 * call redraw when an event occures
 	 */
 	public function navigationCallback(e:Event){
-		DomTools.doLater(redraw);
+		redraw();
 	}
 	/**
 	 * call redraw when an event occures
