@@ -100,7 +100,11 @@ class Page extends DisplayObject, implements IGroupable
 	 * This will close other pages
 	 */
 	static public function openPage(pageName:String, isPopup:Bool, transitionDataShow:TransitionData, transitionDataHide:TransitionData, brixId:String, root:HtmlDom = null)
-	{
+	{trace("openPage "+pageName+", "+isPopup+", "+transitionDataShow+", "+transitionDataHide+", "+brixId+", "+root);
+		if (pageName==null) {
+			trace("Error: page name is null, can not open, abort.");
+			return;
+		}
 		// default is the whole body
 		var body:Dynamic = root;
 		if (root == null)
